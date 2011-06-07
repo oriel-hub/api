@@ -225,7 +225,7 @@ def dump_db():
     if db_engine != 'mysql':
         print 'dump_db only knows how to dump mysql so far'
         sys.exit(1)
-    dump_cmd = '/usr/bin/mysqldump --user=%s --password=%s --host=127.0.0.1 ' %
+    dump_cmd = '/usr/bin/mysqldump --user=%s --password=%s --host=127.0.0.1 ' %\
             (db_user, db_pw)
     if db_port != None:
         dump_cmd += '--port=%s ' % db_port
@@ -348,7 +348,7 @@ def deploy(environment=None):
     if environment == None:
         environment = _infer_environment()
 
-    create_ve()
     link_local_settings(environment)
+    create_ve()
     update_db()
 
