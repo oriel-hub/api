@@ -1,10 +1,23 @@
 from django.conf.urls.defaults import patterns, url
 
-from idsapi.openapi.views import AssetView, AssetSearchView, CategoryView
+from openapi.views import AssetView, AssetSearchView, CategoryView
+from openapi import defines
 
 urlpatterns = patterns('idsapi.openapi.views',
-    url(r'^assets/search/(?P<amount>\w+).(?P<format>\w+)', AssetSearchView.as_view(), name='asset_search'),
-    url(r'^assets/(?P<asset_id>\d+)/(?P<amount>\w+).(?P<format>\w+)', AssetView.as_view(), name='asset'),
+    # eg:
+    # /assets/search/short
+    # /themes/search/
+    # /documents/search/full
+    url(r'^(?P<asset_type>' + '|'.join(defines.asset_types) + r')/search/(?P<format>\w*)$', 
+        AssetSearchView.as_view(), name='asset_search'),
+    # eg:
+    # /assets/1234/full
+    # /documents/5678/
+    url(r'^(?P<asset_type>' + '|'.join(defines.asset_types) + r')/(?P<asset_id>\d+)/(?P<format>\w+)$', 
+        AssetView.as_view(), name='asset'),
+
+
+
 #    url(r'^decision/add$', 'decision_add_page', name='decision_add'),
 #    url(r'^decision/(?P<decision_id>[\d]+)/$', 'decision_view_page',
 #                            name='decision_edit'),
