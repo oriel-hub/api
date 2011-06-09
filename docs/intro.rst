@@ -4,11 +4,27 @@ Introduction
 The IDS web API provides a way for programmers to use the data and metadata
 contained in the datasets that IDS maintains - namely BRIDGE and ELDIS.
 
-Some examples URLs would be:
+The API can be used for search or for retreiving all the metadata about an
+asset stored in the IDS datasets.
 
-- ``/openapi/assets/search/short.json?q=undp&author=lopez``
-- ``/openapi/assets/12345/full.xml``
-- ``/openapi/assets/5678/short.xml?extra_fields=description+publisher``
-- ``/openapi/categories/name/agriculture/category.xml``
-- ``/openapi/categories/id/789/category.xml``
-- ``/openapi/categories/name/agriculture/child_categories.xml``
+Examples
+--------
+
+To find all documents that mention UNDP you could use:
+
+   ``/a/documents/search/short?q=undp``
+    
+To find all documents that mention UNDP, with an author named "Lopez" you could
+use:
+
+   ``/a/documents/search/short?q=undp&author=lopez``
+
+To get all the information about asset 1234 you could use:
+
+   ``/a/assets/1234/full``
+
+To get summary information about Angola you could use:
+
+   ``/a/countries/Angola/short``
+
+

@@ -9,9 +9,10 @@ Welcome to IDS API's documentation!
 Contents:
 
 .. toctree::
-    :maxdepth: 2
+   :maxdepth: 2
 
-    intro
+   intro
+   details
 
 Indices and tables
 ==================
