@@ -6,4 +6,4 @@ project_name = "idsapi"
 
 django_dir   = "django/" + project_name
 
-django_apps  = ['project_app', ]
+django_apps  = ['openapi', ]
