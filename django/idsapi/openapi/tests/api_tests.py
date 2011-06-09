@@ -9,6 +9,10 @@ class ApiIntegrationTests(TestCase):
         return self.client.get('/a/' + asset_type + '/search/' + output_format, 
                 {'q': 'undp'}, CONTENT_TYPE=content_type)
 
+    def get_asset(self, asset_type='assets', id='1234', output_format='', content_type='application/json'):
+        return self.client.get('/a/' + asset_type + '/' + id + '/' + output_format, 
+                {'q': 'undp'}, CONTENT_TYPE=content_type)
+
     def test_id_only_search_returns_200(self):
         response = self.undp_search(output_format='id')
         self.assertEqual(200, response.status_code)
@@ -52,3 +56,6 @@ class ApiIntegrationTests(TestCase):
         response = self.undp_search(asset_type='documents')
         self.assertEqual(200, response.status_code)
 
+    def test_get_asset_by_id_returns_200(self):
+        response = self.get_asset()
+        self.assertEqual(200, response.status_code)
