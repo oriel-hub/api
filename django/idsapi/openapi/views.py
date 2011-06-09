@@ -10,7 +10,7 @@ import json
 import sunburnt
 
 from openapi import defines
-from openapi.data import DataMunger
+from openapi.data import DataMunger, DataMungerFormatError
 
 #from resourceexample.forms import MyForm
 
@@ -54,7 +54,7 @@ class AssetSearchView(View):
             for result in r:
                 results.append(DataMunger.get_required_data(result, output_format))
         except DataMungerFormatError as e:
-            return Response(status.HTTP_400_BAD_REQUEST, content=e.value)
+            return Response(status.HTTP_400_BAD_REQUEST, content=e)
         return results
 
 class CategoryView(View):

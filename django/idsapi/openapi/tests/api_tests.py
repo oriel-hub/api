@@ -6,7 +6,7 @@ import json
 class ApiIntegrationTests(TestCase):
 
     def undp_search(self, asset_type='assets', output_format='', content_type='application/json'):
-        return self.client.get('/openapi/' + asset_type + '/search/' + output_format, 
+        return self.client.get('/a/' + asset_type + '/search/' + output_format, 
                 {'q': 'undp'}, CONTENT_TYPE=content_type)
 
     def test_id_only_search_returns_200(self):
@@ -37,9 +37,18 @@ class ApiIntegrationTests(TestCase):
         self.assertEqual(response_short.content, response_blank.content)
 
     def test_400_returned_if_no_q_parameter(self):
-        response = self.client.get('/openapi/assets/search/', CONTENT_TYPE='application/json')
+        response = self.client.get('/a/assets/search/', CONTENT_TYPE='application/json')
         self.assertEqual(400, response.status_code)
 
     def test_400_returned_if_unknown_asset_type(self):
         response = self.undp_search(asset_type='foobars')
         self.assertEqual(400, response.status_code)
+
+    def test_400_returned_if_unknown_output_format(self):
+        response = self.undp_search(output_format='foobar')
+        self.assertEqual(400, response.status_code)
+
+    def test_document_search_returns_200(self):
+        response = self.undp_search(asset_type='documents')
+        self.assertEqual(200, response.status_code)
+

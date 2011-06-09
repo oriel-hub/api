@@ -1,5 +1,5 @@
 # class to assemble the data to be returned
-
+import exceptions
 
 class DataMunger():
     @classmethod
@@ -17,5 +17,10 @@ class DataMunger():
         else:
             raise DataMungerFormatError("the output_format of data returned can be 'id', 'short' or 'full'")
 
-class DataMungerFormatError(StandardError):
-    pass
+class DataMungerFormatError(exceptions.Exception):
+    def __init__(self, error_text='Data format error'):
+        self.error_text = error_text
+        return
+        
+    def __str__(self):
+        print self.error_text
