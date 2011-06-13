@@ -1,6 +1,6 @@
 from django.conf.urls.defaults import patterns, url
 
-from openapi.views import AssetView, AssetSearchView
+from openapi.views import AssetView, AssetSearchView, RootView
 
 urlpatterns = patterns('idsapi.openapi.views',
     # eg:
@@ -16,6 +16,7 @@ urlpatterns = patterns('idsapi.openapi.views',
         AssetView.as_view(), name='asset'),
 
 
+    url(r'^$', RootView.as_view(), name='root'),
 
 #    url(r'^decision/add$', 'decision_add_page', name='decision_add'),
 #    url(r'^decision/(?P<decision_id>[\d]+)/$', 'decision_view_page',

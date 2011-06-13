@@ -1,4 +1,5 @@
 from django.conf.urls.defaults import patterns, include, url
+from django.views.generic.simple import redirect_to
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -19,4 +20,7 @@ urlpatterns = patterns('',
 
     # the API stuff
     url(r'^openapi/', include(openapi.urls)),
+
+    url(r'^$', redirect_to, {'url': '/openapi/'}),
+
 )
