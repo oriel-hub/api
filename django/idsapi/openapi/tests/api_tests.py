@@ -31,6 +31,14 @@ class ApiSearchIntegrationTests(TestCase):
             sorted_keys.sort()
             self.assertEqual(['id', 'object_type', 'title'], sorted_keys)
 
+    def test_json_full_search_returns_more_than_3_fields(self):
+        response = self.undp_search(output_format='full')
+        search_results = json.loads(response.content)
+        # no assert - if the above line throws an exception then the test fails
+        # check that the results only contain the correct field
+        for result in search_results:
+            self.assertTrue(len(result.keys()) > 3)
+
     def test_blank_search_returns_same_as_short_search(self):
         response_short = self.undp_search(output_format='short')
         response_blank = self.undp_search(output_format='')
