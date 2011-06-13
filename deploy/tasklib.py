@@ -220,7 +220,7 @@ def dump_db():
     """Dump the database in the current working directory"""
     project_name = project_settings.django_dir.split('/')[-1]
     db_engine, db_name, db_user, db_pw, db_port = _get_django_db_settings()
-    if db_engine != 'mysql':
+    if not db_engine.endswith('mysql'):
         print 'dump_db only knows how to dump mysql so far'
         sys.exit(1)
     dump_cmd = '/usr/bin/mysqldump --user=%s --password=%s --host=127.0.0.1 ' %\
