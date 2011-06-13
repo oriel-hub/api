@@ -1,5 +1,3 @@
-#!/usr/bin/python2.6
-#
 # This script is to set up various things for our projects. It can be used by:
 #
 # * developers - setting up their own environment
