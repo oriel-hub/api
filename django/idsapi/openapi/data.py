@@ -19,6 +19,7 @@ class DataMunger():
 
 class DataMungerFormatException(exceptions.Exception):
     def __init__(self, error_text='Data format error'):
+        Exception.__init__(self)
         self.error_text = error_text
         return
         

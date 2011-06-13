@@ -12,19 +12,20 @@ SOLR_SERVER_URL = 'http://api.ids.ac.uk:8983/solr/eldis-test/'
 class SearchBuilder():
 
     def __init__(self):
-        self.si = sunburnt.SolrInterface(SOLR_SERVER_URL)
+        self.solr = sunburnt.SolrInterface(SOLR_SERVER_URL)
+        self.si_query = None
 
     @classmethod
     def create_assetid_search(cls, asset_id, asset_type):
         sb = SearchBuilder()
-        sb.si_query = sb.si.query(asset_id=asset_id)
+        sb.si_query = sb.solr.query(asset_id=asset_id)
         sb.restrict_search_by_asset(asset_type)
         return sb
 
     @classmethod
     def create_free_text_search(cls, search_string, asset_type):
         sb = SearchBuilder()
-        sb.si_query = sb.si.query(search_string)
+        sb.si_query = sb.solr.query(search_string)
         sb.restrict_search_by_asset(asset_type)
         return sb
 
@@ -41,6 +42,7 @@ class SearchBuilder():
 
 class UnknownAssetException(exceptions.Exception):
     def __init__(self, error_text='Unknown asset type'):
+        Exception.__init__(self)
         self.error_text = error_text
         return
         

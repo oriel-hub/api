@@ -1,7 +1,6 @@
 from django.conf.urls.defaults import patterns, url
 
 from openapi.views import AssetView, AssetSearchView
-from openapi import defines
 
 urlpatterns = patterns('idsapi.openapi.views',
     # eg:
