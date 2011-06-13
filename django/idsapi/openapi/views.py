@@ -6,14 +6,13 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from djangorestframework.views import View
 from djangorestframework.response import Response
 from djangorestframework import status
-import sunburnt
 
-import defines
-from data import DataMunger, DataMungerFormatException
-from search_builder import SearchBuilder, UnknownAssetException
+from openapi.data import DataMunger, DataMungerFormatException
+from openapi.search_builder import SearchBuilder, UnknownAssetException
 
 class BaseView(View):
     def __init__(self):
+        View.__init__(self)
         self.output_format = None
         self.query = None
 

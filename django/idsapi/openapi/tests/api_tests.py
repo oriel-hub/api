@@ -54,8 +54,8 @@ class ApiSearchIntegrationTests(TestCase):
 
 class ApiGetAssetIntegrationTests(TestCase):
 
-    def get_asset(self, asset_type='assets', id='1234', output_format='', content_type='application/json'):
-        return self.client.get('/a/' + asset_type + '/' + id + '/' + output_format, 
+    def get_asset(self, asset_type='assets', asset_id='1234', output_format='', content_type='application/json'):
+        return self.client.get('/a/' + asset_type + '/' + asset_id + '/' + output_format, 
                 {'q': 'undp'}, CONTENT_TYPE=content_type)
 
     def test_get_document_by_id_returns_200(self):
