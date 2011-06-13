@@ -23,8 +23,9 @@ class RootView(View):
                 'example': url_root + 'assets/search/?q=undp',
                 },
             'asset': {
-                'format': url_root + 'assets/{asset_id}/',
-                'example': url_root + 'assets/123/',
+                'format': url_root + 'assets/{asset_id}/{id|short|full}',
+                'example': url_root + 'assets/12345/full',
+                'example2': url_root + 'assets/123/',
                 },
             'help': 'http://' + hostname + '/docs/',
             }
