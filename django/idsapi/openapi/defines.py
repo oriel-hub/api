@@ -5,7 +5,7 @@ asset_types = [ 'assets', 'documents', 'organisations', 'themes', 'items',
 
 asset_types_to_object_name = {
 'assets':        None,
-'documents':     'CDocuments',
+'documents':     'CDocument',
 'organisations': 'COrganisation',
 'themes':        'theme',
 'items':         'CItem',
