@@ -5,7 +5,7 @@ import exceptions
 
 import sunburnt
 
-from openapi import defines
+import defines
 
 SOLR_SERVER_URL = 'http://api.ids.ac.uk:8983/solr/eldis-test/'
 
