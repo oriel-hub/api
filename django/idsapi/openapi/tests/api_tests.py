@@ -7,7 +7,7 @@ class ApiSearchIntegrationTests(TestCase):
 
     def undp_search(self, asset_type='assets', output_format='', content_type='application/json'):
         return self.client.get('/a/' + asset_type + '/search/' + output_format, 
-                {'q': 'undp'}, CONTENT_TYPE=content_type)
+                {'q': 'undp'}, ACCEPT=content_type)
 
     def test_id_only_search_returns_200(self):
         response = self.undp_search(output_format='id')
@@ -45,7 +45,7 @@ class ApiSearchIntegrationTests(TestCase):
         self.assertEqual(response_short.content, response_blank.content)
 
     def test_400_returned_if_no_q_parameter(self):
-        response = self.client.get('/a/assets/search/', CONTENT_TYPE='application/json')
+        response = self.client.get('/a/assets/search/', ACCEPT='application/json')
         self.assertEqual(400, response.status_code)
 
     def test_400_returned_if_unknown_asset_type(self):
@@ -64,7 +64,7 @@ class ApiGetAssetIntegrationTests(TestCase):
 
     def get_asset(self, asset_type='assets', asset_id='1234', output_format='', content_type='application/json'):
         return self.client.get('/a/' + asset_type + '/' + asset_id + '/' + output_format, 
-                {'q': 'undp'}, CONTENT_TYPE=content_type)
+                {'q': 'undp'}, ACCEPT=content_type)
 
     def test_get_document_by_id_returns_200(self):
         response = self.get_asset(asset_type='documents')
