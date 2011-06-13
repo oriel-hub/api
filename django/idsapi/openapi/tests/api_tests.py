@@ -3,10 +3,12 @@ from django.test.testcases import TestCase
 
 import json
 
+URL_ROOT = '/openapi/'
+
 class ApiSearchIntegrationTests(TestCase):
 
     def undp_search(self, asset_type='assets', output_format='', content_type='application/json'):
-        return self.client.get('/a/' + asset_type + '/search/' + output_format, 
+        return self.client.get(URL_ROOT + asset_type + '/search/' + output_format, 
                 {'q': 'undp'}, ACCEPT=content_type)
 
     def test_id_only_search_returns_200(self):
@@ -45,7 +47,7 @@ class ApiSearchIntegrationTests(TestCase):
         self.assertEqual(response_short.content, response_blank.content)
 
     def test_400_returned_if_no_q_parameter(self):
-        response = self.client.get('/a/assets/search/', ACCEPT='application/json')
+        response = self.client.get(URL_ROOT + 'assets/search/', ACCEPT='application/json')
         self.assertEqual(400, response.status_code)
 
     def test_400_returned_if_unknown_asset_type(self):
@@ -63,8 +65,8 @@ class ApiSearchIntegrationTests(TestCase):
 class ApiGetAssetIntegrationTests(TestCase):
 
     def get_asset(self, asset_type='assets', asset_id='1234', output_format='', content_type='application/json'):
-        return self.client.get('/a/' + asset_type + '/' + asset_id + '/' + output_format, 
-                {'q': 'undp'}, ACCEPT=content_type)
+        return self.client.get(URL_ROOT + asset_type + '/' + asset_id + '/' + output_format, 
+                ACCEPT=content_type)
 
     def test_get_document_by_id_returns_200(self):
         response = self.get_asset(asset_type='documents')

@@ -18,5 +18,5 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
 
     # the API stuff
-    url(r'^a/', include(openapi.urls)),
+    url(r'^openapi/', include(openapi.urls)),
 )
