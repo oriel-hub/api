@@ -12,19 +12,26 @@ Examples
 
 To find all documents that mention UNDP you could use:
 
-   ``/a/documents/search/short?q=undp``
+   ``/openapi/documents/search/short?q=undp``
     
 To find all documents that mention UNDP, with an author named "Lopez" you could
 use:
 
-   ``/a/documents/search/short?q=undp&author=lopez``
+   ``/openapi/documents/search/short?q=undp&author=lopez``
 
 To get all the information about asset 1234 you could use:
 
-   ``/a/assets/1234/full``
+   ``/openapi/assets/1234/full``
 
 To get summary information about Angola you could use:
 
-   ``/a/countries/Angola/short``
+   ``/openapi/countries/Angola/short``
 
+Latest 10 documents on Climate Change
+
+   ``/openapi/documents/search/?q=Climate%20Change&sortDesc=publishDate``
+
+All organisations relating to Peru
+
+   ``/openapi/organisations/search/?q=Peru``
 
