@@ -12,7 +12,9 @@ Contents:
    :maxdepth: 2
 
    intro
-   details
+   get_asset
+   searching
+   response
 
 Indices and tables
 ==================

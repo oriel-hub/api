@@ -1,14 +1,13 @@
-Details
-=======
+Get An Asset
+============
 
 URL Formats
 -----------
 
-.. http:get:: /openapi/(asset_type)/search/(format)?q
+.. http:get:: /openapi/(asset_type)/(int:asset_id)/(format)
 
-   Retrieve list of assets of type `asset_type` matching the search defined by
-   `q`. The amount of information returned is controlled by `format` which can
-   be one of the following:
+   Retrieve the asset with `asset_id` and return the amount of information as
+   indicated by `format` which can be one of the following:
 
    * id - just the id and a URL to get it from
    * short - the id, title and object_type
@@ -34,11 +33,6 @@ URL Formats
    :query q: The text to search for
    :query extra_fields: Extra fields to include in the response
 
-.. http:get:: /openapi/(asset_type)/(int:asset_id)/(format)
-
-   Retrieve the asset with `asset_id` and return the amount of information as
-   indicated by `format`. See above for possible values of `asset_id` and
-   `format`.
 
 .. http:get:: /openapi/(asset_type)/(name)/(format)
 
@@ -56,16 +50,3 @@ available fields vary by asset type. The common fields are:
 * more ...
 
 Fields only available to documents are:
-
-
-Response Format
----------------
-
-The data can be returned as JSON or as XML (or as a nice HTML page which by
-default shows formatted JSON - handy for exploring the interface). You specify
-which data format you want by using the "Accept" field in the header of
-the HTTP GET request. For example, using ``curl`` you would do
-
-    ``curl -X GET -H "Accept: application/json" http://api.ids.ac.uk/openapi/documents/1234/short``
-
-More about XML formats, Dublin Core etc.
