@@ -7,6 +7,13 @@ contained in the datasets that IDS maintains - namely BRIDGE and ELDIS.
 The API can be used for search or for retreiving all the metadata about an
 asset stored in the IDS datasets.
 
+Root URL
+--------
+
+The root URL is ``/openapi/``. If you load that URL you will get some example
+URLs to load, along with a basic guide to the format, and a link to this
+documentation.
+
 Examples
 --------
 
