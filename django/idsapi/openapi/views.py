@@ -67,8 +67,6 @@ class AssetView(BaseView):
         try:
             return self.build_response()
         except NoAssetFoundException:
-            if asset_type == None:
-                asset_type = 'assets'
             return Response(status.HTTP_404_NOT_FOUND, 
                     content='No %s found with asset_id %s' % (asset_type, asset_id))
 

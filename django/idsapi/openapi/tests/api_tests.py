@@ -54,6 +54,9 @@ class ApiSearchIntegrationTests(TestCase):
                     angola_found = True
             self.assertTrue(angola_found)
 
+    def test_query_by_country_and_free_text(self):
+        response = self.asset_search(query={'q':'undp','country':'angola'})
+        self.assertEqual(200, response.status_code)
 
     def test_query_by_country_with_and(self):
         response = self.asset_search(query={'country':'angola&namibia'})
@@ -68,7 +71,6 @@ class ApiSearchIntegrationTests(TestCase):
                     namibia_found = True
             self.assertTrue(angola_found and namibia_found)
 
-
     def test_query_by_country_with_or(self):
         response = self.asset_search(query={'country':'angola|iran'})
         search_results = json.loads(response.content)
@@ -82,11 +84,9 @@ class ApiSearchIntegrationTests(TestCase):
                     iran_found = True
             self.assertTrue(angola_found or iran_found)
 
-
     def test_query_by_country_with_both_or_and_and(self):
         response = self.asset_search(query={'country':'angola|iran&namibia'})
         self.assertEqual(400, response.status_code)
-
 
     def test_blank_search_returns_same_as_short_search(self):
         response_short = self.asset_search(output_format='short')
@@ -113,6 +113,12 @@ class ApiSearchIntegrationTests(TestCase):
         response = self.asset_search(asset_type='documents')
         self.assertEqual(200, response.status_code)
 
+    def test_200_returned_if_no_results(self):
+        response = self.asset_search(query={'country':'NoddyLand'})
+        self.assertEqual(200, response.status_code)
+        # this test is just to check the search actually returned zero results
+        search_results = json.loads(response.content)
+        self.assertEqual(0, len(search_results))
 
 class ApiGetAssetIntegrationTests(TestCase):
 
@@ -132,6 +138,10 @@ class ApiGetAssetIntegrationTests(TestCase):
     def test_404_returned_if_no_asset(self):
         response = self.get_asset(asset_id='1234567890')
         self.assertEqual(404, response.status_code)
+
+    def test_400_returned_if_unknown_asset_type(self):
+        response = self.get_asset(asset_type='foobars')
+        self.assertEqual(400, response.status_code)
 
 
 class ApiRootIntegrationTests(TestCase):
