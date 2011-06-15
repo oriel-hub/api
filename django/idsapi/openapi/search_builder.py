@@ -73,14 +73,14 @@ class SearchWrapper:
                 q_final = q_final & self.solr.Q(**kwargs)
             self._add_combined_Qs(q_final)
         else:
-            kwargs = {param: param_value}
+            kwargs = {param: str(param_value)}
             self._add_query(**kwargs)
 
     def _add_query(self, **kwargs):
         if self.si_query == None:
-            self.si_query = self.solr.query(kwargs)
+            self.si_query = self.solr.query(**kwargs)
         else:
-            self.si_query = self.si_query.query(kwargs)
+            self.si_query = self.si_query.query(**kwargs)
 
     def _add_combined_Qs(self, q_object):
         if self.si_query == None:

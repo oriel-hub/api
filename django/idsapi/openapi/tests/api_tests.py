@@ -7,7 +7,7 @@ from openapi.defines import URL_ROOT
 
 class ApiSearchIntegrationTests(TestCase):
 
-    def asset_search(self, asset_type='assets', output_format='', query={'q':'undp'},
+    def asset_search(self, asset_type='assets', output_format='full', query={'q':'undp'},
             content_type='application/json'):
         return self.client.get(URL_ROOT + asset_type + '/search/' + output_format, 
                 query, ACCEPT=content_type)
@@ -44,11 +44,15 @@ class ApiSearchIntegrationTests(TestCase):
         for result in search_results:
             self.assertTrue(len(result.keys()) > 3)
 
-#    def test_query_by_country(self):
-#        response = self.asset_search(query={'country':'angola'})
-#        search_results = json.loads(response.content)
-#        for result in search_results:
-#            self.assertTrue(result['country_focus']
+    def test_query_by_country(self):
+        response = self.asset_search(query={'country':'angola'})
+        search_results = json.loads(response.content)
+        for result in search_results:
+            angola_found = False
+            for country in result['country_focus']:
+                if country.strip().lower().startswith('angola'):
+                    angola_found = True
+            self.assertTrue(angola_found)
 
     def test_blank_search_returns_same_as_short_search(self):
         response_short = self.asset_search(output_format='short')
