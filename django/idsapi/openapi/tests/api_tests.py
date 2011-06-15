@@ -54,6 +54,40 @@ class ApiSearchIntegrationTests(TestCase):
                     angola_found = True
             self.assertTrue(angola_found)
 
+
+    def test_query_by_country_with_and(self):
+        response = self.asset_search(query={'country':'angola&namibia'})
+        search_results = json.loads(response.content)
+        for result in search_results:
+            angola_found = False
+            namibia_found = False
+            for country in result['country_focus']:
+                if country.strip().lower().startswith('angola'):
+                    angola_found = True
+                if country.strip().lower().startswith('namibia'):
+                    namibia_found = True
+            self.assertTrue(angola_found and namibia_found)
+
+
+    def test_query_by_country_with_or(self):
+        response = self.asset_search(query={'country':'angola|iran'})
+        search_results = json.loads(response.content)
+        for result in search_results:
+            angola_found = False
+            iran_found = False
+            for country in result['country_focus']:
+                if country.strip().lower().startswith('angola'):
+                    angola_found = True
+                if country.strip().lower().startswith('iran'):
+                    iran_found = True
+            self.assertTrue(angola_found or iran_found)
+
+
+    def test_query_by_country_with_both_or_and_and(self):
+        response = self.asset_search(query={'country':'angola|iran&namibia'})
+        self.assertEqual(400, response.status_code)
+
+
     def test_blank_search_returns_same_as_short_search(self):
         response_short = self.asset_search(output_format='short')
         response_blank = self.asset_search(output_format='')
