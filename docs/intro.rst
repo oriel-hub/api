@@ -30,9 +30,12 @@ To get all the information about asset 1234 you could use:
 
    ``/openapi/assets/1234/full``
 
-To get summary information about Angola you could use:
+To get all the information about India you could use:
 
-   ``/openapi/countries/Angola/short``
+   ``/openapi/countries/1100/full/India``
+
+(Note that you have to know the ID, but the URL will appear this way in search 
+results making it easy to read.)
 
 Latest 10 documents on Climate Change
 

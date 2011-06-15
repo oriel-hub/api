@@ -12,7 +12,7 @@ urlpatterns = patterns('idsapi.openapi.views',
     # eg:
     # /assets/1234/full
     # /documents/5678/
-    url(r'^(?P<asset_type>\w+)/(?P<asset_id>\d+)/(?P<output_format>\w*)$', 
+    url(r'^(?P<asset_type>\w+)/(?P<asset_id>\d+)/(?P<output_format>\w*)(/\S*)?$', 
         AssetView.as_view(), name='asset'),
 
 

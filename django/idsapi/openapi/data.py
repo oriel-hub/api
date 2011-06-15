@@ -1,6 +1,7 @@
 # class to assemble the data to be returned
 import exceptions
-from openapi.defines import URL_ROOT, get_hostname
+import re
+from openapi.defines import URL_ROOT, get_hostname, object_name_to_asset_type
 
 class DataMunger():
     def __init__(self, request):
@@ -11,23 +12,26 @@ class DataMunger():
         if output_format == 'id':
             return {
                 'id': asset_id,
-                'url': self._make_url(asset_id, output_format),
+                'url': self._make_url(asset_id, result),
                 }
         elif output_format == 'short' or output_format == '':
             return {
                 'id': asset_id,
-                'url': self._make_url(asset_id, 'short'),
+                'url': self._make_url(asset_id, result),
                 'object_type': result['object_type'],
                 'title': result['title']
                 }
         elif output_format == 'full':
-            result['url'] = self._make_url(asset_id, output_format)
+            result['url'] = self._make_url(asset_id, result)
             return result
         else:
             raise DataMungerFormatException("the output_format of data returned can be 'id', 'short' or 'full'")
 
-    def _make_url(self, asset_id, output_format):
-        return 'http://' + self.hostname + URL_ROOT + 'assets/' + asset_id + '/' + output_format
+    def _make_url(self, asset_id, result):
+        asset_type = object_name_to_asset_type(result['object_type'])
+        title = re.sub('\W+', '-', result['title']).lower().strip('-')
+        return 'http://' + self.hostname + URL_ROOT + asset_type + '/' + asset_id + '/full/' + title
+
 
 class DataMungerFormatException(exceptions.Exception):
     def __init__(self, error_text=''):

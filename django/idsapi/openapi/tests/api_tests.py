@@ -2,8 +2,9 @@
 from django.test.testcases import TestCase
 
 import json
+import re
 
-from openapi.defines import URL_ROOT
+from openapi.defines import URL_ROOT, asset_types
 
 class ApiSearchIntegrationTests(TestCase):
 
@@ -96,6 +97,21 @@ class ApiSearchIntegrationTests(TestCase):
         response_short = self.asset_search(output_format='short')
         response_blank = self.asset_search(output_format='')
         self.assertEqual(response_short.content, response_blank.content)
+
+    def test_urls_include_friendly_ids(self):
+        response = self.asset_search()
+        search_results = json.loads(response.content)
+        for result in search_results:
+            url_bits = result['url'].split(URL_ROOT)[-1].split('/')
+            # should now have something like ['documents', '1234', 'full', 'asdf']
+            self.assertTrue(len(url_bits) == 4)
+            self.assertTrue(url_bits[0] != 'assets')
+            self.assertTrue(url_bits[0] in asset_types)
+            self.assertTrue(url_bits[1].isdigit())
+            self.assertTrue(url_bits[2] == 'full')
+            self.assertTrue(re.match(r'^[-\w]+$', url_bits[3]) != None)
+            self.assertFalse(url_bits[3].startswith('-'))
+            self.assertFalse(url_bits[3].endswith('-'))
 
     def test_400_returned_if_no_q_parameter(self):
         response = self.asset_search(query={})

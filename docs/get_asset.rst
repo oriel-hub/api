@@ -6,6 +6,8 @@ URL Formats
 
 .. http:get:: /openapi/(asset_type)/(int:asset_id)/(format)
 
+.. http:get:: /openapi/(asset_type)/(int:asset_id)/(format)/(text_name)
+
    Retrieve the asset with **asset_id** and return the amount of information as
    indicated by **format** which can be one of the following:
 
@@ -16,6 +18,9 @@ URL Formats
    If **format** is left blank then the amount returned will be as for "short".
    Extra fields can be requested using the **extra_fields** query parameter - see
    below.
+
+   The **text_name** field is optional, and is not parsed by the server, but is
+   used to make the URLs more readable.
 
    The **asset_type** can be "assets" to return results across all assets, or one
    of the following to restrict what will be returned:
@@ -43,6 +48,7 @@ URL Formats
    * ``/openapi/documents/12345/short``
    * ``/openapi/documents/12345/``
    * ``/openapi/themes/1234/id``
+   * ``/openapi/countries/1100/full/India``
 
 
 .. http:get:: /openapi/(asset_type)/(name)/(format)
