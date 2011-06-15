@@ -19,8 +19,8 @@ URL Formats
    Extra fields can be requested using the **extra_fields** query parameter - see
    below.
 
-   The **text_name** field is optional, and is not parsed by the server, but is
-   used to make the URLs more readable.
+   The **text_name** field is optional, and is not parsed by the server, but
+   can be used to make the URLs more readable.
 
    The **asset_type** can be "assets" to return results across all assets, or one
    of the following to restrict what will be returned:

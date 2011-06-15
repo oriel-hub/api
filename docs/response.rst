@@ -19,14 +19,17 @@ Contents of formats
 The **id only format** actually has two entries per item returned:
 
 :id:    The asset_id
-:url:   The url to get the full metadata for that asset
+:url:   The url to get the full metadata for that asset. It will have a
+        "friendly" format - that is the asset type (documents/themes/etc)
+        will appear in the URL, it will use the "full" format, and after the
+        "full" there will be a text representation of the title of the asset.
 
 The **short format** has four entries per item returned:
 
-:id:          The asset_id
+:id:          As above.
 :object_type: The type of the object
 :title:       The full title of the asset
-:url:         The url to get the full metadata for that asset
+:url:         As above.
 
 The **full format** has every field available for each item returned. These
 include lots of things ...
