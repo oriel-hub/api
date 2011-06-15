@@ -1,4 +1,6 @@
 # some defines to use
+import exceptions
+
 URL_ROOT = '/openapi/'
 
 asset_types = [ 'assets', 'documents', 'organisations', 'themes', 'items', 
@@ -33,3 +35,11 @@ def get_hostname(request):
         return request.META['HOST']
     else:
         return 'hostname'
+
+class IdsApiError(exceptions.StandardError):
+    def __init__(self, error_text=''):
+        StandardError.__init__(self)
+        self.error_text = error_text
+    def __str__(self):
+        return self.error_text
+

@@ -1,7 +1,7 @@
 # class to assemble the data to be returned
 import exceptions
 import re
-from openapi.defines import URL_ROOT, get_hostname, object_name_to_asset_type
+from openapi.defines import URL_ROOT, get_hostname, object_name_to_asset_type, IdsApiError
 
 class DataMunger():
     def __init__(self, request):
@@ -25,7 +25,7 @@ class DataMunger():
             result['url'] = self._make_url(asset_id, result)
             return result
         else:
-            raise DataMungerFormatException("the output_format of data returned can be 'id', 'short' or 'full'")
+            raise DataMungerFormatError("the output_format of data returned can be 'id', 'short' or 'full'")
 
     def _make_url(self, asset_id, result):
         asset_type = object_name_to_asset_type(result['object_type'])
@@ -33,9 +33,7 @@ class DataMunger():
         return 'http://' + self.hostname + URL_ROOT + asset_type + '/' + asset_id + '/full/' + title
 
 
-class DataMungerFormatException(exceptions.Exception):
+class DataMungerFormatError(IdsApiError):
     def __init__(self, error_text=''):
-        Exception.__init__(self)
+        IdsApiError.__init__(self, error_text)
         self.error_text = 'Data format error: ' + error_text
-    def __str__(self):
-        return self.error_text

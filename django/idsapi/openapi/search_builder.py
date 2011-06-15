@@ -28,7 +28,7 @@ class SearchBuilder():
             elif param == 'country':
                 sw.add_parameter_query('country_focus', search_params[param])
             else:
-                raise UnknownQueryParamException(param)
+                raise UnknownQueryParamError(param)
         sw.restrict_search_by_asset(asset_type)
         return sw
 
@@ -44,7 +44,7 @@ class SearchWrapper:
     def restrict_search_by_asset(self, asset_type):
         if asset_type != None and asset_type != 'assets':
             if not asset_type in defines.asset_types:
-                raise UnknownAssetException(asset_type)
+                raise UnknownAssetError(asset_type)
             self.si_query = self.si_query.query(object_type=defines.asset_types_to_object_name[asset_type])
 
     def add_free_text_query(self, search_text):
@@ -59,7 +59,7 @@ class SearchWrapper:
         or_terms = decoded_param_value.split('|')
         and_terms = decoded_param_value.split('&')
         if len(or_terms) > 1 and len(and_terms) > 1:
-            raise InvalidQueryException("Cannot use both '|' and '&' within a single term")
+            raise InvalidQueryError("Cannot use both '|' and '&' within a single term")
         if len(or_terms) > 1:
             q_final = self.solr.Q()
             for term in or_terms:
@@ -90,23 +90,17 @@ class SearchWrapper:
 
 
 
-class InvalidQueryException(exceptions.Exception):
+class InvalidQueryError(defines.IdsApiError):
     def __init__(self, error_text=''):
-        Exception.__init__(self)
+        defines.IdsApiError.__init__(self, error_text)
         self.error_text = 'Invalid query: ' + error_text
-    def __str__(self):
-        return self.error_text
 
-class UnknownQueryParamException(exceptions.Exception):
+class UnknownQueryParamError(defines.IdsApiError):
     def __init__(self, error_text=''):
-        Exception.__init__(self)
+        defines.IdsApiError.__init__(self, error_text)
         self.error_text = 'Unknown query parameter: ' + error_text
-    def __str__(self):
-        return self.error_text
 
-class UnknownAssetException(exceptions.Exception):
+class UnknownAssetError(defines.IdsApiError):
     def __init__(self, error_text=''):
-        Exception.__init__(self)
+        defines.IdsApiError.__init__(self, error_text)
         self.error_text = 'Unknown asset type: ' + error_text
-    def __str__(self):
-        return self.error_text

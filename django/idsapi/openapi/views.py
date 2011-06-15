@@ -8,10 +8,10 @@ from djangorestframework.views import View
 from djangorestframework.response import Response
 from djangorestframework import status
 
-from openapi.data import DataMunger, DataMungerFormatException
-from openapi.search_builder import SearchBuilder, UnknownAssetException, \
-        InvalidQueryException, UnknownQueryParamException
-from openapi.defines import URL_ROOT, get_hostname
+from openapi.data import DataMunger, DataMungerFormatError
+from openapi.search_builder import SearchBuilder, UnknownAssetError, \
+        InvalidQueryError, UnknownQueryParamError
+from openapi.defines import URL_ROOT, get_hostname, IdsApiError
 
 class RootView(View):
     def get(self, request):
@@ -43,10 +43,10 @@ class BaseView(View):
         try:
             for result in self.query.execute():
                 formatted_results.append(self.data_munger.get_required_data(result, self.output_format))
-        except DataMungerFormatException as e:
+        except DataMungerFormatError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
         if self.raise_if_no_results and len(formatted_results) == 0:
-            raise NoAssetFoundException()
+            raise NoAssetFoundError()
         return formatted_results
 
 
@@ -60,13 +60,13 @@ class AssetView(BaseView):
 
         try:
             self.query = SearchBuilder.create_assetid_query(asset_id, asset_type)
-        except (UnknownAssetException, InvalidQueryException, UnknownQueryParamException) as e:
+        except (UnknownAssetError, InvalidQueryError, UnknownQueryParamError) as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
 
         # return the metadata with the output_format specified
         try:
             return self.build_response()
-        except NoAssetFoundException:
+        except NoAssetFoundError:
             return Response(status.HTTP_404_NOT_FOUND, 
                     content='No %s found with asset_id %s' % (asset_type, asset_id))
 
@@ -82,7 +82,7 @@ class AssetSearchView(BaseView):
                     content='asset search must have some query string, eg /assets/search/short?q=undp')
         try:
             self.query = SearchBuilder.create_search(search_params, asset_type)
-        except (UnknownAssetException, InvalidQueryException, UnknownQueryParamException) as e:
+        except (UnknownAssetError, InvalidQueryError, UnknownQueryParamError) as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
 
         # return the metadata with the output_format specified
@@ -90,5 +90,5 @@ class AssetSearchView(BaseView):
 
 
 
-class NoAssetFoundException(exceptions.Exception):
+class NoAssetFoundError(IdsApiError):
     pass
