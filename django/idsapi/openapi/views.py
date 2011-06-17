@@ -1,8 +1,5 @@
-# Create your views here.
-import exceptions
-
-from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseBadRequest
+#from django.core.urlresolvers import reverse
+#from django.http import HttpResponse, HttpResponseBadRequest
 
 from djangorestframework.views import View
 from djangorestframework.response import Response

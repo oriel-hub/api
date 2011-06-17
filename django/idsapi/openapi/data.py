@@ -1,5 +1,4 @@
 # class to assemble the data to be returned
-import exceptions
 import re
 from openapi.defines import URL_ROOT, get_hostname, object_name_to_asset_type, IdsApiError
 

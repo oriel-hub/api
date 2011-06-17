@@ -1,7 +1,6 @@
 # a class to build searches
 #
 # TODO: create a mock version of this class for tests
-import exceptions
 import urllib2
 
 import sunburnt

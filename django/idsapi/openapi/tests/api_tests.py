@@ -56,11 +56,11 @@ class ApiSearchIntegrationTests(TestCase):
             self.assertTrue(angola_found)
 
     def test_query_by_country_and_free_text(self):
-        response = self.asset_search(query={'q':'undp','country':'angola'})
+        response = self.asset_search(query={'q':'undp', 'country':'angola'})
         self.assertEqual(200, response.status_code)
 
     def test_query_by_boolean_country_and_free_text(self):
-        response = self.asset_search(query={'q':'undp','country':'angola&tanzania'})
+        response = self.asset_search(query={'q':'undp', 'country':'angola&tanzania'})
         self.assertEqual(200, response.status_code)
 
     def test_query_by_country_with_and(self):
