@@ -19,7 +19,7 @@ class ApiSearchIntegrationTests(TestCase):
 
     def test_json_id_only_search_returns_only_ids(self):
         response = self.asset_search(output_format='id')
-        search_results = json.loads(response.content)
+        search_results = json.loads(response.content)['results']
         # no assert - if the above line throws an exception then the test fails
         # check that the results only contain the id field
         for result in search_results:
@@ -29,7 +29,7 @@ class ApiSearchIntegrationTests(TestCase):
 
     def test_json_short_search_returns_short_fields(self):
         response = self.asset_search(output_format='short')
-        search_results = json.loads(response.content)
+        search_results = json.loads(response.content)['results']
         # no assert - if the above line throws an exception then the test fails
         # check that the results only contain the correct field
         for result in search_results:
@@ -39,7 +39,7 @@ class ApiSearchIntegrationTests(TestCase):
 
     def test_json_full_search_returns_more_than_3_fields(self):
         response = self.asset_search(output_format='full')
-        search_results = json.loads(response.content)
+        search_results = json.loads(response.content)['results']
         # no assert - if the above line throws an exception then the test fails
         # check that the results only contain the correct field
         for result in search_results:
@@ -47,7 +47,8 @@ class ApiSearchIntegrationTests(TestCase):
 
     def test_query_by_country(self):
         response = self.asset_search(query={'country':'angola'})
-        search_results = json.loads(response.content)
+        # no assert - if the above line throws an exception then the test fails
+        search_results = json.loads(response.content)['results']
         for result in search_results:
             angola_found = False
             for country in result['country_focus']:
@@ -65,7 +66,7 @@ class ApiSearchIntegrationTests(TestCase):
 
     def test_query_by_country_with_and(self):
         response = self.asset_search(query={'country':'angola&namibia'})
-        search_results = json.loads(response.content)
+        search_results = json.loads(response.content)['results']
         for result in search_results:
             angola_found = False
             namibia_found = False
@@ -78,7 +79,7 @@ class ApiSearchIntegrationTests(TestCase):
 
     def test_query_by_country_with_or(self):
         response = self.asset_search(query={'country':'angola|iran'})
-        search_results = json.loads(response.content)
+        search_results = json.loads(response.content)['results']
         for result in search_results:
             angola_found = False
             iran_found = False
@@ -92,6 +93,11 @@ class ApiSearchIntegrationTests(TestCase):
     def test_query_by_country_with_both_or_and_and(self):
         response = self.asset_search(query={'country':'angola|iran&namibia'})
         self.assertEqual(400, response.status_code)
+    
+    def test_search_response_has_metadata(self):
+        response = self.asset_search()
+        metadata = json.loads(response.content)['metadata']
+        self.assertTrue(metadata.has_key('num_results') and metadata.has_key('start_offset'))
 
     def test_blank_search_returns_same_as_short_search(self):
         response_short = self.asset_search(output_format='short')
@@ -100,7 +106,7 @@ class ApiSearchIntegrationTests(TestCase):
 
     def test_urls_include_friendly_ids(self):
         response = self.asset_search()
-        search_results = json.loads(response.content)
+        search_results = json.loads(response.content)['results']
         for result in search_results:
             url_bits = result['url'].split(URL_ROOT)[-1].split('/')
             # should now have something like ['documents', '1234', 'full', 'asdf']
@@ -138,7 +144,8 @@ class ApiSearchIntegrationTests(TestCase):
         self.assertEqual(200, response.status_code)
         # this test is just to check the search actually returned zero results
         search_results = json.loads(response.content)
-        self.assertEqual(0, len(search_results))
+        self.assertEqual(0, search_results['metadata']['num_results'])
+        self.assertEqual(0, len(search_results['results']))
 
 class ApiGetAssetIntegrationTests(TestCase):
 

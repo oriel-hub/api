@@ -38,7 +38,8 @@ class BaseView(View):
     def build_response(self):
         formatted_results = []
         try:
-            for result in self.query.execute():
+            self.search_response = self.query.execute()
+            for result in self.search_response:
                 formatted_results.append(self.data_munger.get_required_data(result, self.output_format))
         except DataMungerFormatError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
@@ -83,7 +84,15 @@ class AssetSearchView(BaseView):
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
 
         # return the metadata with the output_format specified
-        return self.build_response()
+        results = self.build_response()
+        # might be a HTTP 400 here
+        if not isinstance(results, list):
+            return results
+        metadata = {
+                'num_results': self.search_response.result.numFound,
+                'start_offset': self.search_response.result.start,
+                }
+        return {'metadata': metadata, 'results': results }
 
 
 
