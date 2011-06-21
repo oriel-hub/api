@@ -11,6 +11,12 @@ SOLR_SERVER_URL = 'http://api.ids.ac.uk:8983/solr/eldis-test/'
 
 query_mapping = {
         'country': 'country_focus',
+        'keyword': 'keyword',
+        'region': 'category_region', 
+        'sector': 'category_sector', 
+        'subject': 'category_subject',
+        'source': 'branch', 
+        'theme': 'category_theme',
         }
 
 class SearchBuilder():

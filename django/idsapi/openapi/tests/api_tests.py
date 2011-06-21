@@ -71,6 +71,24 @@ class ApiSearchIntegrationTests(TestCase):
         response = self.asset_search(query={'q':'undp', 'country':'angola'})
         self.assertEqual(200, response.status_code)
 
+    def test_query_by_each_query_term(self):
+        query_term_list = [
+                {'country': 'angola'},
+                {'keyword': 'gender'},
+                {'region': 'global'},
+                {'sector': 'report'},
+                {'source': 'bridge'},
+                {'source': 'eldis'},
+                {'subject': 'gdn'},
+                {'theme': 'climate'},
+                ]
+        for query_term in query_term_list:
+            response = self.asset_search(query=query_term)
+            self.assertEqual(200, response.status_code)
+            search_results = json.loads(response.content)
+            self.assertTrue(search_results['metadata']['num_results'] > 0)
+
+
     def test_query_by_boolean_country_and_free_text(self):
         response = self.asset_search(query={'q':'undp', 'country':'angola&tanzania'})
         self.assertEqual(200, response.status_code)
