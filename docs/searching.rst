@@ -29,16 +29,19 @@ URL Format For Searches
    * sectors
    * countries
    * regions
-   * item_types
+   * itemtypes
 
    :query q: The text to search for. Note the search is not case-sensitive.
    :query country: The name of a country to search for.
    :query theme: The name of a theme to search for.
    :query extra_fields: Extra fields to include in the response (*not implemeted yet*)
 
+   Note that each query parameter can only be included once in the query. If
+   you do so the API will return with a status of 400 and a message telling you
+   which parameter was repeated.
+
    :statuscode 200: Asset data returned.
    :statuscode 400: The URL was in an invalid format. There will be a message explaining why.
-   :statuscode 404: No asset (of type specified) found with that asset_id.
    :statuscode 500: There was a server fault. Try again later.
 
 

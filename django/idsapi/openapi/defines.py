@@ -16,7 +16,7 @@ asset_types_to_object_name = {
 'sectors':       'sector',
 'countries':     'CCountry',
 'regions':       'region',
-'item_types':    'itemtype',
+'itemtypes':     'itemtype',
 }
 
 asset_types  = asset_types_to_object_name.keys()

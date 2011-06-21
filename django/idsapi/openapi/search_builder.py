@@ -9,6 +9,10 @@ from openapi import defines
 
 SOLR_SERVER_URL = 'http://api.ids.ac.uk:8983/solr/eldis-test/'
 
+query_mapping = {
+        'country': 'country_focus',
+        }
+
 class SearchBuilder():
 
     @classmethod
@@ -21,13 +25,20 @@ class SearchBuilder():
     @classmethod
     def create_search(cls, search_params, asset_type):
         sw = SearchWrapper()
+
         for param in search_params:
+            query_list = search_params.getlist(param)
+            if len(query_list) > 1:
+                raise InvalidQueryError(
+                    "Cannot repeat query parameters - there is more than one '%s'" \
+                    % param)
             if param == 'q':
-                sw.add_free_text_query(search_params[param])
-            elif param == 'country':
-                sw.add_parameter_query('country_focus', search_params[param])
+                sw.add_free_text_query(query_list[0])
+            elif param in query_mapping.keys():
+                sw.add_parameter_query(query_mapping[param], query_list[0])
             else:
                 raise UnknownQueryParamError(param)
+
         sw.restrict_search_by_asset(asset_type)
         return sw
 
@@ -44,7 +55,7 @@ class SearchWrapper:
         return self.si_query.execute()
 
     def restrict_search_by_asset(self, asset_type):
-        if asset_type != None and asset_type != 'assets':
+        if asset_type != 'assets':
             if not asset_type in defines.asset_types:
                 raise UnknownAssetError(asset_type)
             self.si_query = self.si_query.query(object_type=defines.asset_types_to_object_name[asset_type])

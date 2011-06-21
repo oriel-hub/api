@@ -63,6 +63,10 @@ class ApiSearchIntegrationTests(TestCase):
                     angola_found = True
             self.assertTrue(angola_found)
 
+    def test_400_returned_for_repeated_country_search(self):
+        response = self.asset_search(query={'country':['namibia','angola']})
+        self.assertContains(response, 'country', status_code=400)
+
     def test_query_by_country_and_free_text(self):
         response = self.asset_search(query={'q':'undp', 'country':'angola'})
         self.assertEqual(200, response.status_code)
