@@ -3,9 +3,6 @@ import exceptions
 
 URL_ROOT = '/openapi/'
 
-asset_types = [ 'assets', 'documents', 'organisations', 'themes', 'items', 
-    'subjects', 'sectors', 'countries', 'regions', 'item_types', ]
-
 asset_types_to_object_name = {
 'assets':        None,
 'documents':     'CDocument',
