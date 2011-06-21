@@ -88,9 +88,9 @@ To give some examples:
    * ``country=angola|lesotho&namibia`` (before being URL encoded)
    * ``country=angola%7Clesotho%26namibia`` (after being URL encoded)
 
-* The following is entirely legal. It will search for items that are concerned both with Angola and Lesotho, *and* have a theme of either gender or climate change.    
-   * ``country=angola&lesotho & theme=gender|climate change`` (before being URL encoded)
-   * ``country=angola%26lesotho&theme=gender%7Cclimate%20change`` (after being URL encoded)
+* The following is entirely legal. It will search for items that are concerned both with Angola and South Africa, *and* have a theme of either gender or climate change.    
+   * ``country=angola&south africa & theme=gender|climate change`` (before being URL encoded)
+   * ``country=angola%26south%20africa&theme=gender%7Cclimate%20change`` (after being URL encoded)
 
 Note that in the last example, in the pre-encoded version the middle ``&`` is
 separated by a space - this is because it is the character to combine query
@@ -106,18 +106,31 @@ encode the URL with (in pseudo-code)::
 Example Searches
 ----------------
 
-To find all entries that mention UNDP you could use:
+To find all entries that mention UNDP you would use:
 
    ``/openapi/assets/search/short?q=undp``
     
+To find all entries that mention UNDP, with a keyword of gender you would use:
+
+   ``/openapi/assets/search/short?q=undp&keyword=gender``
+
+To find all documents that refer to both Angola *and* South Africa, and that
+have a theme or either gender or climate change, you would use:
+    
+   ``/openapi/documents/search/full?country=angola%26South%20Africa&theme=gender|climate%20change``
+
 To find all documents that mention UNDP, with an author named "Lopez" you could
 use:
 
    ``/openapi/documents/search/short?q=undp&author=lopez``
 
+*Note:* the author field is not implemented yet.
+
 Latest 10 documents on Climate Change
 
    ``/openapi/documents/search/?q=Climate%20Change&sortDesc=publishDate``
+
+*Note:* the sortDesc (and sortAsc) fields have not been implemented yet.
 
 All organisations relating to Peru
 

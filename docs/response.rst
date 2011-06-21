@@ -19,7 +19,7 @@ Contents of formats
 The **id only format** actually has two entries per item returned:
 
 :id:    The asset_id
-:url:   The url to get the full metadata for that asset. It will have a
+:metadata_url:   The url to get the full metadata for that asset. It will have a
         "friendly" format - that is the asset type (documents/themes/etc)
         will appear in the URL, it will use the "full" format, and after the
         "full" there will be a text representation of the title of the asset.
@@ -29,7 +29,7 @@ The **short format** has four entries per item returned:
 :id:          As above.
 :object_type: The type of the object
 :title:       The full title of the asset
-:url:         As above.
+:metadata_url:         As above.
 
 The **full format** has every field available for each item returned. These
 include lots of things ...
@@ -47,7 +47,7 @@ In response to ``/openapi/documents/12345/short`` with ``Accept: application/jso
       "id": "12345", 
       "object_type": "CDocument", 
       "title": "Sharing knowledge for community development and transformation: a handbook", 
-      "url": "http://api.ids.ac.uk/openapi/assets/12345/short"
+      "metadata_url": "http://api.ids.ac.uk/openapi/assets/12345/short"
     }
   ]
 
@@ -55,7 +55,7 @@ The same query with ``Accept: application/xml`` gives::
 
   <root>
     <list-item>
-      <url>http://api.ids.ac.uk/openapi/assets/12345/short</url>
+      <metadata_url>http://api.ids.ac.uk/openapi/assets/12345/short</metadata_url>
       <object_type>CDocument</object_type>
       <id>12345</id>
       <title>

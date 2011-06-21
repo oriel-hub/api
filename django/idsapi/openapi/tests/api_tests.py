@@ -25,7 +25,7 @@ class ApiSearchIntegrationTests(TestCase):
         for result in search_results:
             sorted_keys = result.keys()
             sorted_keys.sort()
-            self.assertEqual(['id', 'url'], sorted_keys)
+            self.assertEqual(['id', 'metadata_url'], sorted_keys)
 
     def test_json_short_search_returns_short_fields(self):
         response = self.asset_search(output_format='short')
@@ -35,7 +35,7 @@ class ApiSearchIntegrationTests(TestCase):
         for result in search_results:
             sorted_keys = result.keys()
             sorted_keys.sort()
-            self.assertEqual(['id', 'object_type', 'title', 'url'], sorted_keys)
+            self.assertEqual(['id', 'metadata_url', 'object_type', 'title'], sorted_keys)
 
     def test_json_full_search_returns_more_than_3_fields(self):
         response = self.asset_search(output_format='full')
@@ -137,7 +137,7 @@ class ApiSearchIntegrationTests(TestCase):
         response = self.asset_search()
         search_results = json.loads(response.content)['results']
         for result in search_results:
-            url_bits = result['url'].split(URL_ROOT)[-1].split('/')
+            url_bits = result['metadata_url'].split(URL_ROOT)[-1].split('/')
             # should now have something like ['documents', '1234', 'full', 'asdf']
             self.assertTrue(len(url_bits) == 4)
             self.assertTrue(url_bits[0] != 'assets')

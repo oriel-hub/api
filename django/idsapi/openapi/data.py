@@ -11,18 +11,18 @@ class DataMunger():
         if output_format == 'id':
             return {
                 'id': asset_id,
-                'url': self._make_url(asset_id, result),
+                'metadata_url': self._make_url(asset_id, result),
                 }
         elif output_format == 'short' or output_format == '':
             return {
                 'id': asset_id,
-                'url': self._make_url(asset_id, result),
+                'metadata_url': self._make_url(asset_id, result),
                 'object_type': result['object_type'],
                 'title': result['title']
                 }
         elif output_format == 'full':
             result = dict((k, v) for k, v in result.items() if not k.endswith('_facet'))
-            result['url'] = self._make_url(asset_id, result)
+            result['metadata_url'] = self._make_url(asset_id, result)
             return result
         else:
             raise DataMungerFormatError("the output_format of data returned can be 'id', 'short' or 'full'")

@@ -49,15 +49,8 @@ URL Formats
    * ``/openapi/documents/12345/``
    * ``/openapi/themes/1234/id``
    * ``/openapi/countries/1100/full/India``
+   * ``/openapi/documents/24903/full/undp-human-development-report-1996-highlights``
 
-
-.. http:get:: /openapi/(asset_type)/(name)/(format)
-
-   Retrieve the asset with title **name** and return the amount of information as
-   indicated by **format**. See above for possible values of **asset_id** and
-   **format**.
-
-   *Note:* Not implemented yet.
 
 .. _extra-fields:
 
