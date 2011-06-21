@@ -102,15 +102,15 @@ class BadRequestError(defines.IdsApiError):
 
 class InvalidQueryError(BadRequestError):
     def __init__(self, error_text=''):
-        defines.IdsApiError.__init__(self, error_text)
+        BadRequestError.__init__(self, error_text)
         self.error_text = 'Invalid query: ' + error_text
 
 class UnknownQueryParamError(BadRequestError):
     def __init__(self, error_text=''):
-        defines.IdsApiError.__init__(self, error_text)
+        BadRequestError.__init__(self, error_text)
         self.error_text = 'Unknown query parameter: ' + error_text
 
 class UnknownAssetError(BadRequestError):
     def __init__(self, error_text=''):
-        defines.IdsApiError.__init__(self, error_text)
+        BadRequestError.__init__(self, error_text)
         self.error_text = 'Unknown asset type: ' + error_text

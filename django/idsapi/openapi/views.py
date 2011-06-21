@@ -33,6 +33,7 @@ class BaseView(View):
         self.query = None
         self.raise_if_no_results = raise_if_no_results
         self.data_munger = None
+        self.search_response = None
 
     def build_response(self):
         formatted_results = []

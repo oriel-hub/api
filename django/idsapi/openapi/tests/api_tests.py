@@ -45,14 +45,21 @@ class ApiSearchIntegrationTests(TestCase):
         for result in search_results:
             self.assertTrue(len(result.keys()) > 3)
 
+    def test_json_full_search_does_not_contain_facet_fields(self):
+        response = self.asset_search(output_format='full')
+        search_results = json.loads(response.content)['results']
+        for result in search_results:
+            for key in result.keys():
+                self.assertFalse(key.endswith('_facet'))
+
     def test_query_by_country(self):
-        response = self.asset_search(query={'country':'angola'})
+        response = self.asset_search(query={'country':'namibia'})
         # no assert - if the above line throws an exception then the test fails
         search_results = json.loads(response.content)['results']
         for result in search_results:
-            angola_found = False
+            namibia_found = False
             for country in result['country_focus']:
-                if country.strip().lower().startswith('angola'):
+                if country.strip().lower().startswith('namibia'):
                     angola_found = True
             self.assertTrue(angola_found)
 
@@ -78,17 +85,17 @@ class ApiSearchIntegrationTests(TestCase):
             self.assertTrue(angola_found and namibia_found)
 
     def test_query_by_country_with_or(self):
-        response = self.asset_search(query={'country':'angola|iran'})
+        response = self.asset_search(query={'country':'namibia|iran'})
         search_results = json.loads(response.content)['results']
         for result in search_results:
-            angola_found = False
+            namibia_found = False
             iran_found = False
             for country in result['country_focus']:
-                if country.strip().lower().startswith('angola'):
-                    angola_found = True
+                if country.strip().lower().startswith('namibia'):
+                    namibia_found = True
                 if country.strip().lower().startswith('iran'):
                     iran_found = True
-            self.assertTrue(angola_found or iran_found)
+            self.assertTrue(namibia_found or iran_found)
 
     def test_query_by_country_with_both_or_and_and(self):
         response = self.asset_search(query={'country':'angola|iran&namibia'})

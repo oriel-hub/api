@@ -26,7 +26,6 @@ def object_name_to_asset_type(object_name):
     for asset_type in asset_types_to_object_name:
         if asset_types_to_object_name[asset_type] == object_name:
             return asset_type
-    return None
 
 def get_hostname(request):
     if request.META.has_key('HTTP_HOST'):

@@ -21,6 +21,7 @@ class DataMunger():
                 'title': result['title']
                 }
         elif output_format == 'full':
+            result = dict((k, v) for k, v in result.items() if not k.endswith('_facet'))
             result['url'] = self._make_url(asset_id, result)
             return result
         else:

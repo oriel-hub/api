@@ -1,2 +1,2 @@
-from data_munger import *
-from api_tests import *
+from openapi.tests.data_munger import *
+from openapi.tests.api_tests import *
