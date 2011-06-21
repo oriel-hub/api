@@ -6,8 +6,7 @@ from djangorestframework.response import Response
 from djangorestframework import status
 
 from openapi.data import DataMunger, DataMungerFormatError
-from openapi.search_builder import SearchBuilder, UnknownAssetError, \
-        InvalidQueryError, UnknownQueryParamError
+from openapi.search_builder import SearchBuilder, BadRequestError, SolrUnavailableError
 from openapi.defines import URL_ROOT, get_hostname, IdsApiError
 
 class RootView(View):
@@ -58,8 +57,10 @@ class AssetView(BaseView):
 
         try:
             self.query = SearchBuilder.create_assetid_query(asset_id, asset_type)
-        except (UnknownAssetError, InvalidQueryError, UnknownQueryParamError) as e:
+        except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
+        except SolrUnavailableError as e:
+            return Response(status.HTTP_500_INTERNAL_SERVER_ERROR, content=e)
 
         # return the metadata with the output_format specified
         try:
@@ -80,8 +81,10 @@ class AssetSearchView(BaseView):
                     content='asset search must have some query string, eg /assets/search/short?q=undp')
         try:
             self.query = SearchBuilder.create_search(search_params, asset_type)
-        except (UnknownAssetError, InvalidQueryError, UnknownQueryParamError) as e:
+        except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
+        except SolrUnavailableError as e:
+            return Response(status.HTTP_500_INTERNAL_SERVER_ERROR, content=e)
 
         # return the metadata with the output_format specified
         results = self.build_response()

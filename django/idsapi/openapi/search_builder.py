@@ -34,7 +34,10 @@ class SearchBuilder():
 
 class SearchWrapper:
     def __init__(self):
-        self.solr = sunburnt.SolrInterface(SOLR_SERVER_URL)
+        try:
+            self.solr = sunburnt.SolrInterface(SOLR_SERVER_URL)
+        except:
+            raise SolrUnavailableError('Solr is not responding, using ' + SOLR_SERVER_URL)
         self.si_query = None
 
     def execute(self):
@@ -89,17 +92,25 @@ class SearchWrapper:
 
 
 
-class InvalidQueryError(defines.IdsApiError):
+class SolrUnavailableError(defines.IdsApiError):
+    def __init__(self, error_text=''):
+        defines.IdsApiError.__init__(self, error_text)
+        self.error_text = error_text
+
+class BadRequestError(defines.IdsApiError):
+    pass
+
+class InvalidQueryError(BadRequestError):
     def __init__(self, error_text=''):
         defines.IdsApiError.__init__(self, error_text)
         self.error_text = 'Invalid query: ' + error_text
 
-class UnknownQueryParamError(defines.IdsApiError):
+class UnknownQueryParamError(BadRequestError):
     def __init__(self, error_text=''):
         defines.IdsApiError.__init__(self, error_text)
         self.error_text = 'Unknown query parameter: ' + error_text
 
-class UnknownAssetError(defines.IdsApiError):
+class UnknownAssetError(BadRequestError):
     def __init__(self, error_text=''):
         defines.IdsApiError.__init__(self, error_text)
         self.error_text = 'Unknown asset type: ' + error_text
