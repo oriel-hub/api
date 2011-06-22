@@ -40,6 +40,11 @@ class SearchBuilder():
                     % param)
             if param == 'q':
                 sw.add_free_text_query(query_list[0])
+            elif param == 'all':
+                if len(search_params) > 1:
+                    raise InvalidQueryError(
+                    "Cannot use 'all' parameter in combination with any other parameter.")
+                sw.add_all_query()
             elif param in query_mapping.keys():
                 sw.add_parameter_query(query_mapping[param], query_list[0])
             else:
@@ -65,6 +70,9 @@ class SearchWrapper:
             if not asset_type in defines.asset_types:
                 raise UnknownAssetError(asset_type)
             self.si_query = self.si_query.query(object_type=defines.asset_types_to_object_name[asset_type])
+
+    def add_all_query(self):
+        self.si_query = self.solr.query()
 
     def add_free_text_query(self, search_text):
         if self.si_query == None:

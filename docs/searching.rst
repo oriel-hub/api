@@ -31,6 +31,8 @@ URL Format For Searches
    * regions
    * itemtypes
 
+   Query fields that take text as the argument to search for. 
+
    :query q: The text to search for. Note the search is not case-sensitive.
    :query country: The name of a country to search for.
    :query keyword: The name of a keyword to search for.
@@ -39,6 +41,20 @@ URL Format For Searches
    :query subject: The name of a subject to search for.
    :query source: The name of a source to search for - currently 'eldis' or 'bridge'
    :query theme: The name of a theme to search for.
+
+   Note that you can use ``*`` in your query, but not as the first character.
+   So you can use:
+
+   ``/openapi/documents/search/full?keyword=af*``
+   ``/openapi/documents/search/full?keyword=af*ca``
+
+   but not:
+
+   ``/openapi/documents/search/full?keyword=*ca``
+
+   Special query fields:
+
+   :query all: Used by itself to just return all items.
    :query extra_fields: Extra fields to include in the response (*not implemeted yet*)
 
    Note that each query parameter can only be included once in the query. If

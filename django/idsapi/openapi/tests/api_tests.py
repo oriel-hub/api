@@ -6,12 +6,14 @@ import re
 
 from openapi.defines import URL_ROOT, asset_types
 
-class ApiSearchIntegrationTests(TestCase):
+class ApiSearchTests(TestCase):
 
     def asset_search(self, asset_type='assets', output_format='full', query={'q':'undp'},
             content_type='application/json'):
         return self.client.get(URL_ROOT + asset_type + '/search/' + output_format, 
                 query, ACCEPT=content_type)
+
+class ApiSearchIntegrationTests(ApiSearchTests):
 
     def test_id_only_search_returns_200(self):
         response = self.asset_search(output_format='id')
@@ -62,10 +64,6 @@ class ApiSearchIntegrationTests(TestCase):
                 if country.strip().lower().startswith('namibia'):
                     angola_found = True
             self.assertTrue(angola_found)
-
-    def test_400_returned_for_repeated_country_search(self):
-        response = self.asset_search(query={'country':['namibia','angola']})
-        self.assertContains(response, 'country', status_code=400)
 
     def test_query_by_country_and_free_text(self):
         response = self.asset_search(query={'q':'undp', 'country':'angola'})
@@ -119,10 +117,6 @@ class ApiSearchIntegrationTests(TestCase):
                     iran_found = True
             self.assertTrue(namibia_found or iran_found)
 
-    def test_query_by_country_with_both_or_and_and(self):
-        response = self.asset_search(query={'country':'angola|iran&namibia'})
-        self.assertEqual(400, response.status_code)
-    
     def test_search_response_has_metadata(self):
         response = self.asset_search()
         metadata = json.loads(response.content)['metadata']
@@ -148,6 +142,24 @@ class ApiSearchIntegrationTests(TestCase):
             self.assertFalse(url_bits[3].startswith('-'))
             self.assertFalse(url_bits[3].endswith('-'))
 
+    def test_document_search_returns_200(self):
+        response = self.asset_search(asset_type='documents')
+        self.assertEqual(200, response.status_code)
+
+    def test_all_document_search_returns_200(self):
+        response = self.asset_search(query={'all':''})
+        self.assertEqual(200, response.status_code)
+
+    def test_200_returned_if_no_results(self):
+        response = self.asset_search(query={'country':'NoddyLand'})
+        self.assertEqual(200, response.status_code)
+        # this test is just to check the search actually returned zero results
+        search_results = json.loads(response.content)
+        self.assertEqual(0, search_results['metadata']['num_results'])
+        self.assertEqual(0, len(search_results['results']))
+
+class ApiSearchErrorTests(ApiSearchTests):
+
     def test_400_returned_if_no_q_parameter(self):
         response = self.asset_search(query={})
         self.assertEqual(400, response.status_code)
@@ -164,18 +176,14 @@ class ApiSearchIntegrationTests(TestCase):
         response = self.asset_search(query={'foo': 'bar'})
         self.assertEqual(400, response.status_code)
 
-    def test_document_search_returns_200(self):
-        response = self.asset_search(asset_type='documents')
-        self.assertEqual(200, response.status_code)
+    def test_400_returned_for_repeated_country_search(self):
+        response = self.asset_search(query={'country':['namibia','angola']})
+        self.assertContains(response, 'country', status_code=400)
 
-    def test_200_returned_if_no_results(self):
-        response = self.asset_search(query={'country':'NoddyLand'})
-        self.assertEqual(200, response.status_code)
-        # this test is just to check the search actually returned zero results
-        search_results = json.loads(response.content)
-        self.assertEqual(0, search_results['metadata']['num_results'])
-        self.assertEqual(0, len(search_results['results']))
-
+    def test_query_by_country_with_both_or_and_and(self):
+        response = self.asset_search(query={'country':'angola|iran&namibia'})
+        self.assertEqual(400, response.status_code)
+    
 class ApiGetAssetIntegrationTests(TestCase):
 
     def get_asset(self, asset_type='assets', asset_id='12345', output_format='', 
