@@ -52,6 +52,15 @@ URL Format For Searches
 
    ``/openapi/documents/search/full?keyword=*ca``
 
+   Date based query fields:
+
+   :query metadata_published_after: Date after which the metadata was published.
+   :query metadata_published_before: Date before which the metadata was published.
+   :query metadata_published_year: The metadata was published during the specified year.
+
+   For the first two, the date should be specified as YYYY-MM-DD (year, month,
+   day). For the last option, the value is just the 4 digit year.
+
    Special query fields:
 
    :query all: Used by itself to just return all items.

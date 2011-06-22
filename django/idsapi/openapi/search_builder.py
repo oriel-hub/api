@@ -2,6 +2,8 @@
 #
 # TODO: create a mock version of this class for tests
 import urllib2
+import datetime
+import re
 
 import sunburnt
 
@@ -18,6 +20,12 @@ query_mapping = {
         'source': 'branch', 
         'theme': 'category_theme',
         }
+
+date_queries = [
+        'metadata_published_before',
+        'metadata_published_after',
+        'metadata_published_year',
+        ]
 
 class SearchBuilder():
 
@@ -47,6 +55,8 @@ class SearchBuilder():
                 sw.add_all_query()
             elif param in query_mapping.keys():
                 sw.add_parameter_query(query_mapping[param], query_list[0])
+            elif param in date_queries:
+                sw.add_date_query(param, query_list[0])
             else:
                 raise UnknownQueryParamError(param)
 
@@ -79,6 +89,28 @@ class SearchWrapper:
             self.si_query = self.solr.query(search_text)
         else:
             self.si_query = self.si_query.query(search_text)
+
+    def add_date_query(self, param, date):
+        if param.startswith('metadata_'):
+            solr_param = 'timestamp'
+        else:
+            raise InvalidQueryError("Unknown date query, '%s'" % param)
+        if param.endswith('published_year'):
+            if len(date) != 4 or not date.isdigit():
+                raise InvalidQueryError("Invalid date, should be 4 digits but is %s" % date)
+            year = int(date)
+            kwargs = {solr_param + '__range': (str(year), str(year+1))}
+            self._add_query(**kwargs)
+        else:
+            if re.match(r'\d{4}-\d{2}-\d{2}', date) == None:
+                raise InvalidQueryError("Invalid date, should be YYYY-MM-DD but is %s" % date)
+            if param.endswith('published_after'):
+                kwargs = {solr_param + '__gte': date}
+                self._add_query(**kwargs)
+            elif param.endswith('published_before'):
+                kwargs = {solr_param + '__lt': date}
+                self._add_query(**kwargs)
+
 
     def add_parameter_query(self, param, param_value):
         # decode spaces and '|' before using

@@ -165,6 +165,18 @@ class ApiSearchIntegrationTests(ApiSearchTests):
     def test_200_returned_for_middle_star(self):
         response = self.asset_search(query={'keyword': 'af*ca'})
         self.assertEqual(200, response.status_code)
+
+    def test_200_returned_for_metadata_published_before(self):
+        response = self.asset_search(query={'metadata_published_before': '2008-12-31'})
+        self.assertEqual(200, response.status_code)
+    
+    def test_200_returned_for_metadata_published_after(self):
+        response = self.asset_search(query={'metadata_published_after': '2008-12-31'})
+        self.assertEqual(200, response.status_code)
+    
+    def test_200_returned_for_metadata_published_year(self):
+        response = self.asset_search(query={'metadata_published_year': '2008'})
+        self.assertEqual(200, response.status_code)
     
 class ApiSearchErrorTests(ApiSearchTests):
 
@@ -195,6 +207,18 @@ class ApiSearchErrorTests(ApiSearchTests):
     def test_400_returned_for_leading_star(self):
         response = self.asset_search(query={'keyword': '*ca'})
         self.assertEqual(400, response.status_code)
+    
+    def test_400_returned_for_metadata_published_before_bad_date_format(self):
+        bad_dates = ['200-12-31', '2008-1-01', '2008-01-1', '20080101', '200A-01-01']
+        for date in bad_dates:
+            response = self.asset_search(query={'metadata_published_before': date})
+            self.assertEqual(400, response.status_code)
+
+    def test_400_returned_for_metadata_published_year_bad_date_format(self):
+        bad_dates = ['200', '200A', '20080',]
+        for date in bad_dates:
+            response = self.asset_search(query={'metadata_published_year': date})
+            self.assertEqual(400, response.status_code)
     
 class ApiGetAssetIntegrationTests(TestCase):
 
