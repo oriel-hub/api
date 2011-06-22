@@ -83,6 +83,9 @@ class SearchWrapper:
     def add_parameter_query(self, param, param_value):
         # decode spaces and '|' before using
         decoded_param_value = urllib2.unquote(param_value)
+        if not decoded_param_value[0].isalnum():
+            raise InvalidQueryError("Cannot start query value with '%s'" \
+                    % decoded_param_value[0])
         or_terms = decoded_param_value.split('|')
         and_terms = decoded_param_value.split('&')
         if len(or_terms) > 1 and len(and_terms) > 1:

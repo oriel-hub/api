@@ -158,6 +158,14 @@ class ApiSearchIntegrationTests(ApiSearchTests):
         self.assertEqual(0, search_results['metadata']['num_results'])
         self.assertEqual(0, len(search_results['results']))
 
+    def test_200_returned_for_trailing_star(self):
+        response = self.asset_search(query={'keyword': 'af*'})
+        self.assertEqual(200, response.status_code)
+    
+    def test_200_returned_for_middle_star(self):
+        response = self.asset_search(query={'keyword': 'af*ca'})
+        self.assertEqual(200, response.status_code)
+    
 class ApiSearchErrorTests(ApiSearchTests):
 
     def test_400_returned_if_no_q_parameter(self):
@@ -182,6 +190,10 @@ class ApiSearchErrorTests(ApiSearchTests):
 
     def test_query_by_country_with_both_or_and_and(self):
         response = self.asset_search(query={'country':'angola|iran&namibia'})
+        self.assertEqual(400, response.status_code)
+
+    def test_400_returned_for_leading_star(self):
+        response = self.asset_search(query={'keyword': '*ca'})
         self.assertEqual(400, response.status_code)
     
 class ApiGetAssetIntegrationTests(TestCase):
