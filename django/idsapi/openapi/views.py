@@ -47,6 +47,18 @@ class BaseView(View):
             raise NoAssetFoundError()
         return formatted_results
 
+    def format_result_list(self):
+        # return the metadata with the output_format specified
+        results = self.build_response()
+        # might be a HTTP 400 here
+        if not isinstance(results, list):
+            return results
+        metadata = {
+                'num_results': self.search_response.result.numFound,
+                'start_offset': self.search_response.result.start,
+                }
+        return {'metadata': metadata, 'results': results }
+
 
 class AssetView(BaseView):
     def __init__(self):
@@ -88,15 +100,7 @@ class AssetSearchView(BaseView):
             return Response(status.HTTP_500_INTERNAL_SERVER_ERROR, content=e)
 
         # return the metadata with the output_format specified
-        results = self.build_response()
-        # might be a HTTP 400 here
-        if not isinstance(results, list):
-            return results
-        metadata = {
-                'num_results': self.search_response.result.numFound,
-                'start_offset': self.search_response.result.start,
-                }
-        return {'metadata': metadata, 'results': results }
+        return self.format_result_list()
 
 
 class AllAssetView(BaseView):
@@ -112,16 +116,7 @@ class AllAssetView(BaseView):
             return Response(status.HTTP_500_INTERNAL_SERVER_ERROR, content=e)
 
         # return the metadata with the output_format specified
-        results = self.build_response()
-        # might be a HTTP 400 here
-        if not isinstance(results, list):
-            return results
-        metadata = {
-                'num_results': self.search_response.result.numFound,
-                'start_offset': self.search_response.result.start,
-                }
-        return {'metadata': metadata, 'results': results }
-
+        return self.format_result_list()
 
 
 class NoAssetFoundError(IdsApiError):

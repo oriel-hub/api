@@ -225,6 +225,10 @@ class ApiSearchErrorTests(ApiSearchTests):
             response = self.asset_search(query={'metadata_published_year': date})
             self.assertEqual(400, response.status_code)
 
+    def test_400_returned_for_bad_date_query_param(self):
+        response = self.asset_search(query={'foobar_published_year': '2009'})
+        self.assertEqual(400, response.status_code)
+
     def test_400_returned_if_document_specific_query_param_used(self):
         response = self.asset_search(query={'author': 'John'})
         self.assertEqual(400, response.status_code)
