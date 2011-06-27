@@ -80,6 +80,27 @@ URL Format For Searches
    :query document_published_before: Date before which the document was published.
    :query document_published_year: The document was published during the specified year.
 
+   **Organisation specific query fields:**
+
+   These fields are only valid when searching for organisations, ie when the URL
+   starts with ``/openapi/organisations/``.
+
+   :query acronym: The acronym for an organisation.
+   :query organisation_name: The name of an organisation.
+
+   **Item specific query fields:**
+
+   These fields are only valid when searching for items, ie when the URL
+   starts with ``/openapi/items/``.
+
+   :query item_type: The type of item.
+   :query item_started_after: Date after which the item started.
+   :query item_started_before: Date before which the item started.
+   :query item_started_year: The item started during the specified year.
+   :query item_finished_after: Date after which the item finished.
+   :query item_finished_before: Date before which the item finished.
+   :query item_finished_year: The item finished during the specified year.
+
    **Status codes returned:**
 
    :statuscode 200: Asset data returned.

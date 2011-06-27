@@ -14,14 +14,29 @@ class RootView(View):
         hostname = get_hostname(request)
         url_root = 'http://' + hostname + URL_ROOT
         return {
+            'all': {
+                'format': url_root + '{asset_type}/all/{id|short|full}',
+                'examples': [
+                    url_root + 'assets/all/short',
+                    url_root + 'documents/all/full',
+                    url_root + 'organisations/all/',
+                    ]
+                },
             'search': {
-                'format': url_root + 'assets/search/?q={query_term}',
-                'example': url_root + 'assets/search/?q=undp',
+                'format': url_root + '{asset_type}/search/?q={query_term}&...',
+                'examples': [
+                    url_root + 'assets/search/?q=undp',
+                    url_root + 'documents/search/?q=undp&document_published_year=2009',
+                    url_root + 'assets/search/?country=angola%26south%20africa&theme=gender%7Cclimate%20change',
+                    ]
                 },
             'asset': {
-                'format': url_root + 'assets/{asset_id}/{id|short|full}',
-                'example': url_root + 'assets/12345/full',
-                'example2': url_root + 'assets/123/',
+                'format': url_root + 'assets/{asset_id}/{id|short|full}/friendly-name',
+                'examples': [
+                    url_root + 'assets/12345/full',
+                    url_root + 'assets/123/',
+                    url_root + 'themes/123/full/capacity-building-approaches',
+                    ]
                 },
             'help': 'http://' + hostname + '/docs/',
             }

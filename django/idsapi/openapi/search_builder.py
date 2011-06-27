@@ -20,16 +20,17 @@ query_mapping = {
         'theme':   {'solr_field': 'category_theme',   'asset_type': 'all'},
         'author':  {'solr_field': 'author',           'asset_type': 'documents'},
         'author_organisation': {'solr_field': 'author_organisation', 'asset_type': 'documents'},
+        'organisation_name': {'solr_field': ['title', 'alternative_name'], 'asset_type': 'organisations'},
+        'acronym': {'solr_field': ['acronym', 'alternative_acronym'], 'asset_type': 'organisations'},
+        'item_type':  {'solr_field': 'item_type',     'asset_type': 'items'},
         }
 
-date_queries = [
-        'metadata_published_before',
-        'metadata_published_after',
-        'metadata_published_year',
-        'document_published_before',
-        'document_published_after',
-        'document_published_year',
-        ]
+date_prefix_mapping = {
+        'metadata_published': 'timestamp',
+        'document_published': 'publication_date',
+        'item_started': 'start_date',
+        'item_finished': 'end_date', 
+        }
 
 class SearchBuilder():
 
@@ -41,6 +42,13 @@ class SearchBuilder():
         return sw
 
     @classmethod
+    def _is_date_query(cls, param):
+        for date_prefix in date_prefix_mapping.keys():
+            if param.startswith(date_prefix):
+                return True
+        return False
+
+    @classmethod
     def create_search(cls, search_params, asset_type):
         sw = SearchWrapper()
 
@@ -50,17 +58,22 @@ class SearchBuilder():
                 raise InvalidQueryError(
                     "Cannot repeat query parameters - there is more than one '%s'" \
                     % param)
+            query = query_list[0]
             if param == 'q':
-                sw.add_free_text_query(query_list[0])
+                sw.add_free_text_query(query)
             elif param in query_mapping.keys():
                 if query_mapping[param]['asset_type'] != 'all':
                     if query_mapping[param]['asset_type'] != asset_type:
                         raise InvalidQueryError(
-                                'Can only use query parameter %s with asset type %s, your had asset type %s' \
+                                "Can only use query parameter '%s' with asset type '%s', your had asset type '%s'" \
                                 % (param, query_mapping[param]['asset_type'], asset_type))
-                sw.add_parameter_query(query_mapping[param]['solr_field'], query_list[0])
-            elif param in date_queries:
-                sw.add_date_query(param, query_list[0])
+                # we might have to search across multiple fields
+                if isinstance(query_mapping[param]['solr_field'], list):
+                    sw.add_multifield_parameter_query(query_mapping[param]['solr_field'], query)
+                else:
+                    sw.add_parameter_query(query_mapping[param]['solr_field'], query)
+            elif SearchBuilder._is_date_query(param):
+                sw.add_date_query(param, query)
             else:
                 raise UnknownQueryParamError(param)
 
@@ -102,13 +115,13 @@ class SearchWrapper:
             self.si_query = self.si_query.query(search_text)
 
     def add_date_query(self, param, date):
-        if param.startswith('metadata_'):
-            solr_param = 'timestamp'
-        elif param.startswith('document_'):
-            solr_param = 'publication_date'
-        else:
-            raise InvalidQueryError("Unknown date query, '%s'" % param)
-        if param.endswith('published_year'):
+        # strip the _year/_after/_before
+        m = re.match(r'(.*)(_before|_after|_year)', param)
+        if m == None:
+            raise InvalidQueryError("Unknown date query '%s'." % param)
+        param_prefix = m.group(1)
+        solr_param = date_prefix_mapping[param_prefix]
+        if param.endswith('_year'):
             if len(date) != 4 or not date.isdigit():
                 raise InvalidQueryError("Invalid date, should be 4 digits but is %s" % date)
             year = int(date)
@@ -117,15 +130,26 @@ class SearchWrapper:
         else:
             if re.match(r'\d{4}-\d{2}-\d{2}', date) == None:
                 raise InvalidQueryError("Invalid date, should be YYYY-MM-DD but is %s" % date)
-            if param.endswith('published_after'):
+            if param.endswith('_after'):
                 kwargs = {solr_param + '__gte': date}
                 self._add_query(**kwargs)
-            elif param.endswith('published_before'):
+            elif param.endswith('_before'):
                 kwargs = {solr_param + '__lt': date}
                 self._add_query(**kwargs)
+            else:
+                raise InvalidQueryError("Unknown date query '%s'." % param)
 
 
-    def add_parameter_query(self, param, param_value):
+    def add_multifield_parameter_query(self, field_list, param_value):
+        q_final = self.solr.Q()
+        for field_name in field_list:
+            q_final = q_final | self.add_field_query(field_name, param_value)
+        self._add_combined_Qs(q_final)
+
+    def add_parameter_query(self, field_name, param_value):
+        self._add_combined_Qs(self.add_field_query(field_name, param_value))
+
+    def add_field_query(self, field_name, param_value):
         # decode spaces and '|' before using
         decoded_param_value = urllib2.unquote(param_value)
         if not decoded_param_value[0].isalnum():
@@ -138,18 +162,17 @@ class SearchWrapper:
         if len(or_terms) > 1:
             q_final = self.solr.Q()
             for term in or_terms:
-                kwargs = {param: term}
+                kwargs = {field_name: term}
                 q_final = q_final | self.solr.Q(**kwargs)
-            self._add_combined_Qs(q_final)
         elif len(and_terms) > 1:
             q_final = self.solr.Q()
             for term in and_terms:
-                kwargs = {param: term}
+                kwargs = {field_name: term}
                 q_final = q_final & self.solr.Q(**kwargs)
-            self._add_combined_Qs(q_final)
         else:
-            kwargs = {param: str(param_value)}
-            self._add_query(**kwargs)
+            kwargs = {field_name: str(param_value)}
+            q_final = self.solr.Q(**kwargs)
+        return q_final
 
     def _add_query(self, **kwargs):
         if self.si_query == None:

@@ -170,6 +170,22 @@ class ApiSearchIntegrationTests(ApiSearchTests):
         for result in search_results:
             self.assertTrue(' '.join(result['author']).lower().find('john') > -1)
         
+    def test_organisation_specific_query_param_author(self):
+        response = self.asset_search(asset_type='organisations', query={'acronym': 'un'})
+        self.assertEqual(200, response.status_code)
+        search_results = json.loads(response.content)['results']
+        for result in search_results:
+            acronym_found = ' '.join(result['acronym']).lower().find('un') > -1
+            alternative_acronym_found = ' '.join(result['alternative_acronym']).lower().find('un') > -1
+            self.assertTrue(acronym_found or alternative_acronym_found)
+        
+    def test_item_specific_query_param_item_type(self):
+        response = self.asset_search(asset_type='items', query={'item_type': 'Other*'})
+        self.assertEqual(200, response.status_code)
+        search_results = json.loads(response.content)['results']
+        for result in search_results:
+            self.assertTrue(result['item_type'].lower().find('other') > -1)
+        
     def test_200_returned_for_document_published_before(self):
         response = self.asset_search(query={'document_published_before': '2008-12-31'})
         self.assertEqual(200, response.status_code)
@@ -181,6 +197,17 @@ class ApiSearchIntegrationTests(ApiSearchTests):
     def test_200_returned_for_document_published_year(self):
         response = self.asset_search(query={'document_published_year': '2008'})
         self.assertEqual(200, response.status_code)
+    
+    def test_200_returned_for_item_dates(self):
+        for query_param in ['item_started_after', 'item_started_before', 'item_finished_after',
+                'item_finished_before']:
+            response = self.asset_search(query={query_param: '2008-12-31'})
+            self.assertEqual(200, response.status_code)
+    
+    def test_200_returned_for_item_years(self):
+        for query_param in ['item_started_year', 'item_finished_year',]:
+            response = self.asset_search(query={query_param: '2008'})
+            self.assertEqual(200, response.status_code)
     
 
 class ApiSearchErrorTests(ApiSearchTests):
