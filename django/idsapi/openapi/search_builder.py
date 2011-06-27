@@ -48,11 +48,6 @@ class SearchBuilder():
                     % param)
             if param == 'q':
                 sw.add_free_text_query(query_list[0])
-            elif param == 'all':
-                if len(search_params) > 1:
-                    raise InvalidQueryError(
-                    "Cannot use 'all' parameter in combination with any other parameter.")
-                sw.add_all_query()
             elif param in query_mapping.keys():
                 sw.add_parameter_query(query_mapping[param], query_list[0])
             elif param in date_queries:
@@ -63,13 +58,20 @@ class SearchBuilder():
         sw.restrict_search_by_asset(asset_type)
         return sw
 
+    @classmethod
+    def create_all_search(cls, asset_type):
+        sw = SearchWrapper()
+        sw.add_all_query()
+        sw.restrict_search_by_asset(asset_type)
+        return sw
+
 
 class SearchWrapper:
     def __init__(self):
         try:
             self.solr = sunburnt.SolrInterface(SOLR_SERVER_URL)
         except:
-            raise SolrUnavailableError('Solr is not responding, using ' + SOLR_SERVER_URL)
+            raise SolrUnavailableError('Solr is not responding (using %s )' % SOLR_SERVER_URL)
         self.si_query = None
 
     def execute(self):

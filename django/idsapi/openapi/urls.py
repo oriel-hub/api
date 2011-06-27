@@ -1,6 +1,6 @@
 from django.conf.urls.defaults import patterns, url
 
-from openapi.views import AssetView, AssetSearchView, RootView
+from openapi.views import AssetView, AssetSearchView, RootView, AllAssetView
 
 urlpatterns = patterns('idsapi.openapi.views',
     # eg:
@@ -9,11 +9,18 @@ urlpatterns = patterns('idsapi.openapi.views',
     # /documents/search/full
     url(r'^(?P<asset_type>\w+)/search/(?P<output_format>\w*)$', 
         AssetSearchView.as_view(), name='asset_search'),
+
     # eg:
     # /assets/1234/full
     # /documents/5678/
     url(r'^(?P<asset_type>\w+)/(?P<asset_id>\d+)/(?P<output_format>\w*)(/\S*)?$', 
         AssetView.as_view(), name='asset'),
+
+    # eg:
+    # /assets/all/full/
+    # /documents/all/
+    url(r'^(?P<asset_type>\w+)/all/(?P<output_format>\w*)/?$', 
+        AllAssetView.as_view(), name='all_asset'),
 
 
     url(r'^$', RootView.as_view(), name='root'),

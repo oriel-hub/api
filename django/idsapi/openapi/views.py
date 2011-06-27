@@ -99,6 +99,30 @@ class AssetSearchView(BaseView):
         return {'metadata': metadata, 'results': results }
 
 
+class AllAssetView(BaseView):
+    def get(self, request, output_format, asset_type=None):
+        self.output_format = output_format
+        self.data_munger = DataMunger(request)
+
+        try:
+            self.query = SearchBuilder.create_all_search(asset_type)
+        except BadRequestError as e:
+            return Response(status.HTTP_400_BAD_REQUEST, content=e)
+        except SolrUnavailableError as e:
+            return Response(status.HTTP_500_INTERNAL_SERVER_ERROR, content=e)
+
+        # return the metadata with the output_format specified
+        results = self.build_response()
+        # might be a HTTP 400 here
+        if not isinstance(results, list):
+            return results
+        metadata = {
+                'num_results': self.search_response.result.numFound,
+                'start_offset': self.search_response.result.start,
+                }
+        return {'metadata': metadata, 'results': results }
+
+
 
 class NoAssetFoundError(IdsApiError):
     pass

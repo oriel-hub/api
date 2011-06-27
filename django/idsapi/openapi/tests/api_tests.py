@@ -146,9 +146,9 @@ class ApiSearchIntegrationTests(ApiSearchTests):
         response = self.asset_search(asset_type='documents')
         self.assertEqual(200, response.status_code)
 
-    def test_all_document_search_returns_200(self):
+    def test_all_document_search_returns_400(self):
         response = self.asset_search(query={'all':''})
-        self.assertEqual(200, response.status_code)
+        self.assertEqual(400, response.status_code)
 
     def test_200_returned_if_no_results(self):
         response = self.asset_search(query={'country':'NoddyLand'})
@@ -219,7 +219,26 @@ class ApiSearchErrorTests(ApiSearchTests):
         for date in bad_dates:
             response = self.asset_search(query={'metadata_published_year': date})
             self.assertEqual(400, response.status_code)
+
+class ApiGetAllIntegrationTests(TestCase):
+
+    def get_all(self, asset_type='assets', output_format='', 
+                                content_type='application/json'):
+        return self.client.get(URL_ROOT + asset_type + '/all/' + output_format, 
+                ACCEPT=content_type)
     
+    def test_get_all_documents_returns_200(self):
+        response = self.get_all(asset_type='documents')
+        self.assertEqual(200, response.status_code)
+
+    def test_get_all_assets_returns_200(self):
+        response = self.get_all()
+        self.assertEqual(200, response.status_code)
+
+    def test_400_returned_if_unknown_asset_type(self):
+        response = self.get_all(asset_type='foobars')
+        self.assertEqual(400, response.status_code)
+
 class ApiGetAssetIntegrationTests(TestCase):
 
     def get_asset(self, asset_type='assets', asset_id='12345', output_format='', 

@@ -63,17 +63,37 @@ URL Format For Searches
 
    Special query fields:
 
-   :query all: Used by itself to just return all items.
    :query extra_fields: Extra fields to include in the response (*not implemeted yet*)
 
    Note that each query parameter can only be included once in the query. If
    you do so the API will return with a status of 400 and a message telling you
    which parameter was repeated.
 
+   Document specific query fields:
+
+   These fields are only valid when searching for documents, ie when the URL
+   starts with ``/openapi/documents/``.
+
+   :query author:
+   :query publisher:
+   :query distributor:
+   :query document_published_after: Date after which the document was published.
+   :query document_published_before: Date before which the document was published.
+   :query document_published_year: The document was published during the specified year.
+
    :statuscode 200: Asset data returned.
    :statuscode 400: The URL was in an invalid format. There will be a message explaining why.
    :statuscode 500: There was a server fault. Try again later.
 
+.. http:get:: /openapi/(asset_type)/all/(format)
+
+   Retrieve list of assets of type **asset_type**. This will return all the assets.
+   The amount of information returned is controlled by **format** which can
+   be id, short or full, as for search.
+
+   The only query parameters allowed are **extra_fields** and the various
+   **sort_by** arguments, which all work as for the search query. *Not
+   implemented yet.*
 
 Combining Search Terms
 ----------------------
