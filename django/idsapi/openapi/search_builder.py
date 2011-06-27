@@ -2,7 +2,6 @@
 #
 # TODO: create a mock version of this class for tests
 import urllib2
-import datetime
 import re
 
 import sunburnt
