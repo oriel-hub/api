@@ -59,11 +59,7 @@ class ApiSearchIntegrationTests(ApiSearchTests):
         # no assert - if the above line throws an exception then the test fails
         search_results = json.loads(response.content)['results']
         for result in search_results:
-            namibia_found = False
-            for country in result['country_focus']:
-                if country.strip().lower().startswith('namibia'):
-                    angola_found = True
-            self.assertTrue(angola_found)
+            self.assertTrue(' '.join(result['country_focus']).lower().find('namibia') > -1)
 
     def test_query_by_country_and_free_text(self):
         response = self.asset_search(query={'q':'undp', 'country':'angola'})
@@ -95,26 +91,15 @@ class ApiSearchIntegrationTests(ApiSearchTests):
         response = self.asset_search(query={'country':'angola&namibia'})
         search_results = json.loads(response.content)['results']
         for result in search_results:
-            angola_found = False
-            namibia_found = False
-            for country in result['country_focus']:
-                if country.strip().lower().startswith('angola'):
-                    angola_found = True
-                if country.strip().lower().startswith('namibia'):
-                    namibia_found = True
-            self.assertTrue(angola_found and namibia_found)
+            self.assertTrue(' '.join(result['country_focus']).lower().find('angola'))
+            self.assertTrue(' '.join(result['country_focus']).lower().find('namibia'))
 
     def test_query_by_country_with_or(self):
         response = self.asset_search(query={'country':'namibia|iran'})
         search_results = json.loads(response.content)['results']
         for result in search_results:
-            namibia_found = False
-            iran_found = False
-            for country in result['country_focus']:
-                if country.strip().lower().startswith('namibia'):
-                    namibia_found = True
-                if country.strip().lower().startswith('iran'):
-                    iran_found = True
+            namibia_found = ' '.join(result['country_focus']).lower().find('namibia') > -1
+            iran_found = ' '.join(result['country_focus']).lower().find('iran') > -1
             self.assertTrue(namibia_found or iran_found)
 
     def test_search_response_has_metadata(self):
@@ -178,6 +163,26 @@ class ApiSearchIntegrationTests(ApiSearchTests):
         response = self.asset_search(query={'metadata_published_year': '2008'})
         self.assertEqual(200, response.status_code)
     
+    def test_document_specific_query_param_author(self):
+        response = self.asset_search(asset_type='documents', query={'author': 'john'})
+        self.assertEqual(200, response.status_code)
+        search_results = json.loads(response.content)['results']
+        for result in search_results:
+            self.assertTrue(' '.join(result['author']).lower().find('john') > -1)
+        
+    def test_200_returned_for_document_published_before(self):
+        response = self.asset_search(query={'document_published_before': '2008-12-31'})
+        self.assertEqual(200, response.status_code)
+    
+    def test_200_returned_for_document_published_after(self):
+        response = self.asset_search(query={'document_published_after': '2008-12-31'})
+        self.assertEqual(200, response.status_code)
+    
+    def test_200_returned_for_document_published_year(self):
+        response = self.asset_search(query={'document_published_year': '2008'})
+        self.assertEqual(200, response.status_code)
+    
+
 class ApiSearchErrorTests(ApiSearchTests):
 
     def test_400_returned_if_no_q_parameter(self):
@@ -219,6 +224,10 @@ class ApiSearchErrorTests(ApiSearchTests):
         for date in bad_dates:
             response = self.asset_search(query={'metadata_published_year': date})
             self.assertEqual(400, response.status_code)
+
+    def test_400_returned_if_document_specific_query_param_used(self):
+        response = self.asset_search(query={'author': 'John'})
+        self.assertEqual(400, response.status_code)
 
 class ApiGetAllIntegrationTests(TestCase):
 

@@ -12,19 +12,24 @@ from openapi import defines
 SOLR_SERVER_URL = 'http://api.ids.ac.uk:8983/solr/eldis-test/'
 
 query_mapping = {
-        'country': 'country_focus',
-        'keyword': 'keyword',
-        'region': 'category_region', 
-        'sector': 'category_sector', 
-        'subject': 'category_subject',
-        'source': 'branch', 
-        'theme': 'category_theme',
+        'country': {'solr_field': 'country_focus',    'asset_type': 'all'},
+        'keyword': {'solr_field': 'keyword',          'asset_type': 'all'},
+        'region':  {'solr_field': 'category_region',  'asset_type': 'all'},
+        'sector':  {'solr_field': 'category_sector',  'asset_type': 'all'},
+        'subject': {'solr_field': 'category_subject', 'asset_type': 'all'},
+        'source':  {'solr_field': 'branch',           'asset_type': 'all'},
+        'theme':   {'solr_field': 'category_theme',   'asset_type': 'all'},
+        'author':  {'solr_field': 'author',           'asset_type': 'documents'},
+        'author_organisation': {'solr_field': 'author_organisation', 'asset_type': 'documents'},
         }
 
 date_queries = [
         'metadata_published_before',
         'metadata_published_after',
         'metadata_published_year',
+        'document_published_before',
+        'document_published_after',
+        'document_published_year',
         ]
 
 class SearchBuilder():
@@ -49,7 +54,12 @@ class SearchBuilder():
             if param == 'q':
                 sw.add_free_text_query(query_list[0])
             elif param in query_mapping.keys():
-                sw.add_parameter_query(query_mapping[param], query_list[0])
+                if query_mapping[param]['asset_type'] != 'all':
+                    if query_mapping[param]['asset_type'] != asset_type:
+                        raise InvalidQueryError(
+                                'Can only use query parameter %s with asset type %s, your had asset type %s' \
+                                % (param, query_mapping[param]['asset_type'], asset_type))
+                sw.add_parameter_query(query_mapping[param]['solr_field'], query_list[0])
             elif param in date_queries:
                 sw.add_date_query(param, query_list[0])
             else:
@@ -95,6 +105,8 @@ class SearchWrapper:
     def add_date_query(self, param, date):
         if param.startswith('metadata_'):
             solr_param = 'timestamp'
+        elif param.startswith('document_'):
+            solr_param = 'publication_date'
         else:
             raise InvalidQueryError("Unknown date query, '%s'" % param)
         if param.endswith('published_year'):

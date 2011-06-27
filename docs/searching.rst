@@ -31,7 +31,7 @@ URL Format For Searches
    * regions
    * itemtypes
 
-   Query fields that take text as the argument to search for. 
+   **Query fields that take text as the argument to search for:**
 
    :query q: The text to search for. Note the search is not case-sensitive.
    :query country: The name of a country to search for.
@@ -52,7 +52,7 @@ URL Format For Searches
 
    ``/openapi/documents/search/full?keyword=*ca``
 
-   Date based query fields:
+   **Date based query fields:**
 
    :query metadata_published_after: Date after which the metadata was published.
    :query metadata_published_before: Date before which the metadata was published.
@@ -61,7 +61,7 @@ URL Format For Searches
    For the first two, the date should be specified as YYYY-MM-DD (year, month,
    day). For the last option, the value is just the 4 digit year.
 
-   Special query fields:
+   **Special query fields:**
 
    :query extra_fields: Extra fields to include in the response (*not implemeted yet*)
 
@@ -69,17 +69,18 @@ URL Format For Searches
    you do so the API will return with a status of 400 and a message telling you
    which parameter was repeated.
 
-   Document specific query fields:
+   **Document specific query fields:**
 
    These fields are only valid when searching for documents, ie when the URL
    starts with ``/openapi/documents/``.
 
-   :query author:
-   :query publisher:
-   :query distributor:
+   :query author: The author(s) of the document.
+   :query author_organisation: The organisation that authored the document.
    :query document_published_after: Date after which the document was published.
    :query document_published_before: Date before which the document was published.
    :query document_published_year: The document was published during the specified year.
+
+   **Status codes returned:**
 
    :statuscode 200: Asset data returned.
    :statuscode 400: The URL was in an invalid format. There will be a message explaining why.
