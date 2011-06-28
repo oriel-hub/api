@@ -9,6 +9,7 @@ import sunburnt
 from openapi import defines
 
 SOLR_SERVER_URL = 'http://api.ids.ac.uk:8983/solr/eldis-test/'
+SOLR_SCHEMA = SOLR_SERVER_URL + 'admin/file/?file=schema.xml'
 
 query_mapping = {
         'country': {'solr_field': 'country_focus',    'asset_type': 'all'},
@@ -74,17 +75,18 @@ class SearchBuilder():
                     sw.add_parameter_query(query_mapping[param]['solr_field'], query)
             elif SearchBuilder._is_date_query(param):
                 sw.add_date_query(param, query)
-            else:
+            elif not param in ['num_results', 'start_offset']:
                 raise UnknownQueryParamError(param)
 
         sw.restrict_search_by_asset(asset_type)
+        sw.add_paginate(search_params)
         return sw
 
     @classmethod
-    def create_all_search(cls, asset_type):
+    def create_all_search(cls, search_params, asset_type):
         sw = SearchWrapper()
-        sw.add_all_query()
         sw.restrict_search_by_asset(asset_type)
+        sw.add_paginate(search_params)
         return sw
 
 
@@ -94,7 +96,7 @@ class SearchWrapper:
             self.solr = sunburnt.SolrInterface(SOLR_SERVER_URL)
         except:
             raise SolrUnavailableError('Solr is not responding (using %s )' % SOLR_SERVER_URL)
-        self.si_query = None
+        self.si_query = self.solr.query()
 
     def execute(self):
         return self.si_query.execute()
@@ -105,14 +107,13 @@ class SearchWrapper:
                 raise UnknownAssetError(asset_type)
             self.si_query = self.si_query.query(object_type=defines.asset_types_to_object_name[asset_type])
 
-    def add_all_query(self):
-        self.si_query = self.solr.query()
+    def add_paginate(self, search_params):
+        start_offset = int(search_params['start_offset']) if search_params.has_key('start_offset') else 0
+        num_results = int(search_params['num_results']) if search_params.has_key('num_results') else 10
+        self.si_query = self.si_query.paginate(start=start_offset, rows=num_results)
 
     def add_free_text_query(self, search_text):
-        if self.si_query == None:
-            self.si_query = self.solr.query(search_text)
-        else:
-            self.si_query = self.si_query.query(search_text)
+        self.si_query = self.si_query.query(search_text)
 
     def add_date_query(self, param, date):
         # strip the _year/_after/_before
@@ -126,16 +127,16 @@ class SearchWrapper:
                 raise InvalidQueryError("Invalid date, should be 4 digits but is %s" % date)
             year = int(date)
             kwargs = {solr_param + '__range': (str(year), str(year+1))}
-            self._add_query(**kwargs)
+            self.si_query.query(**kwargs)
         else:
             if re.match(r'\d{4}-\d{2}-\d{2}', date) == None:
                 raise InvalidQueryError("Invalid date, should be YYYY-MM-DD but is %s" % date)
             if param.endswith('_after'):
                 kwargs = {solr_param + '__gte': date}
-                self._add_query(**kwargs)
+                self.si_query.query(**kwargs)
             elif param.endswith('_before'):
                 kwargs = {solr_param + '__lt': date}
-                self._add_query(**kwargs)
+                self.si_query.query(**kwargs)
             else:
                 raise InvalidQueryError("Unknown date query '%s'." % param)
 
@@ -144,10 +145,10 @@ class SearchWrapper:
         q_final = self.solr.Q()
         for field_name in field_list:
             q_final = q_final | self.add_field_query(field_name, param_value)
-        self._add_combined_Qs(q_final)
+        self.si_query = self.si_query.query(q_final)
 
     def add_parameter_query(self, field_name, param_value):
-        self._add_combined_Qs(self.add_field_query(field_name, param_value))
+        self.si_query = self.si_query.query(self.add_field_query(field_name, param_value))
 
     def add_field_query(self, field_name, param_value):
         # decode spaces and '|' before using
@@ -174,18 +175,20 @@ class SearchWrapper:
             q_final = self.solr.Q(**kwargs)
         return q_final
 
-    def _add_query(self, **kwargs):
-        if self.si_query == None:
-            self.si_query = self.solr.query(**kwargs)
-        else:
-            self.si_query = self.si_query.query(**kwargs)
-
-    def _add_combined_Qs(self, q_object):
-        if self.si_query == None:
-            self.si_query = self.solr.query(q_object)
-        else:
-            self.si_query = self.si_query.query(q_object)
-
+class FieldReader():
+    def __init__(self):
+        # fetch file from SOLR_SCHEMA
+        import httplib2
+        h = httplib2.Http(".cache")
+        resp, content = h.request(SOLR_SCHEMA, "GET")
+        from xml.dom import minidom
+        doc = minidom.parseString(content)
+        field_list = []
+        for field in doc.getElementsByTagName('fields')[0].getElementsByTagName('field'):
+            field_list.append(field.getAttribute('name'))
+        field_list.sort()
+        field_list = [elem for elem in field_list if not elem.endswith('_facet')]
+        self.field_list = [elem for elem in field_list if not elem in ['text', 'word']]
 
 
 class SolrUnavailableError(defines.IdsApiError):

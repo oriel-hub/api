@@ -31,6 +31,14 @@ URL Format For Searches
    * regions
    * itemtypes
 
+   **Query fields for pagination:**
+
+   :query num_results: The number of results to return. If not specified then a value of 10 is used.
+   :query start_offset: The index of the result to start from. If not specified then a value of 0 is used.
+
+   Note that the metadata section of the results will have links to the next
+   and previous pages (assuming they exist).
+
    **Query fields that take text as the argument to search for:**
 
    :query q: The text to search for. Note the search is not case-sensitive.

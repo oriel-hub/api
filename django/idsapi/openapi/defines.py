@@ -24,14 +24,6 @@ def object_name_to_asset_type(object_name):
         if asset_types_to_object_name[asset_type] == object_name:
             return asset_type
 
-def get_hostname(request):
-    if request.META.has_key('HTTP_HOST'):
-        return request.META['HTTP_HOST']
-    elif request.META.has_key('HOST'):
-        return request.META['HOST']
-    else:
-        return 'hostname'
-
 class IdsApiError(exceptions.StandardError):
     def __init__(self, error_text=''):
         StandardError.__init__(self)

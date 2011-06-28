@@ -69,9 +69,9 @@ class ApiSearchIntegrationTests(ApiSearchTests):
         query_term_list = [
                 {'country': 'angola'},
                 {'keyword': 'gender'},
-                {'region': 'global'},
+                {'region': 'africa'},
                 {'sector': 'report'},
-                {'source': 'bridge'},
+                #{'source': 'bridge'},
                 {'source': 'eldis'},
                 {'subject': 'gdn'},
                 {'theme': 'climate'},
@@ -81,7 +81,6 @@ class ApiSearchIntegrationTests(ApiSearchTests):
             self.assertEqual(200, response.status_code)
             search_results = json.loads(response.content)
             self.assertTrue(search_results['metadata']['num_results'] > 0)
-
 
     def test_query_by_boolean_country_and_free_text(self):
         response = self.asset_search(query={'q':'undp', 'country':'angola&tanzania'})
@@ -107,10 +106,42 @@ class ApiSearchIntegrationTests(ApiSearchTests):
         metadata = json.loads(response.content)['metadata']
         self.assertTrue(metadata.has_key('num_results') and metadata.has_key('start_offset'))
 
+    def test_search_response_has_next_in_metadata(self):
+        response = self.asset_search()
+        metadata = json.loads(response.content)['metadata']
+        self.assertTrue(metadata.has_key('next_page'))
+        self.assertTrue(metadata['next_page'].find('num_results') > -1)
+        self.assertTrue(metadata['next_page'].find('start_offset') > -1)
+        # also, default search should not have prev_page link
+        self.assertFalse(metadata.has_key('prev_page'))
+
+    def test_2nd_page_has_prev_in_metadata(self):
+        response = self.asset_search(query={'q': 'undp', 'start_offset': '10'})
+        metadata = json.loads(response.content)['metadata']
+        self.assertTrue(metadata.has_key('prev_page'))
+        self.assertTrue(metadata['prev_page'].find('num_results') > -1)
+        self.assertTrue(metadata['prev_page'].find('start_offset') > -1)
+
+    def test_prev_never_has_negative_start_offset(self):
+        response = self.asset_search(query={'q': 'undp', 'start_offset': '1'})
+        metadata = json.loads(response.content)['metadata']
+        self.assertTrue(metadata.has_key('prev_page'))
+        match = re.search(r'start_offset=([-0-9]+)', metadata['prev_page'])
+        self.assertTrue(int(match.group(1)) >= 0)
+
+    def test_num_results_works(self):
+        response = self.asset_search(query={'q': 'undp', 'num_results': '20'})
+        results = json.loads(response.content)['results']
+        self.assertEqual(20, len(results))
+
     def test_blank_search_returns_same_as_short_search(self):
         response_short = self.asset_search(output_format='short')
         response_blank = self.asset_search(output_format='')
-        self.assertEqual(response_short.content, response_blank.content)
+        # the metadata is different due to next/prev link containing "short",
+        # or not, so just compare up to the metadata.
+        response_short = response_short.content.split('"metadata":')[0]
+        response_blank = response_blank.content.split('"metadata":')[0]
+        self.assertEqual(response_short, response_blank)
 
     def test_urls_include_friendly_ids(self):
         response = self.asset_search()

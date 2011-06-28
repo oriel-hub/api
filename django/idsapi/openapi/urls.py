@@ -7,7 +7,7 @@ urlpatterns = patterns('idsapi.openapi.views',
     # /assets/search/short
     # /themes/search/
     # /documents/search/full
-    url(r'^(?P<asset_type>\w+)/search/(?P<output_format>\w*)$', 
+    url(r'^(?P<asset_type>\w+)/search/(?P<output_format>\w*)/?$', 
         AssetSearchView.as_view(), name='asset_search'),
 
     # eg:
