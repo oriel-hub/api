@@ -116,10 +116,10 @@ class SearchWrapper:
 
     def add_date_query(self, param, date):
         # strip the _year/_after/_before
-        m = re.match(r'(.*)(_before|_after|_year)', param)
-        if m == None:
+        match = re.match(r'(.*)(_before|_after|_year)', param)
+        if match == None:
             raise InvalidQueryError("Unknown date query '%s'." % param)
-        param_prefix = m.group(1)
+        param_prefix = match.group(1)
         solr_param = date_prefix_mapping[param_prefix]
         if param.endswith('_year'):
             if len(date) != 4 or not date.isdigit():

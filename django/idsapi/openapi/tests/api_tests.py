@@ -170,13 +170,15 @@ class ApiSearchIntegrationTests(ApiSearchTests):
         for result in search_results:
             self.assertTrue(' '.join(result['author']).lower().find('john') > -1)
         
-    def test_organisation_specific_query_param_author(self):
-        response = self.asset_search(asset_type='organisations', query={'acronym': 'un'})
+    def test_organisation_specific_query_param_acronym(self):
+        response = self.asset_search(asset_type='organisations', query={'acronym': 'UN*'})
         self.assertEqual(200, response.status_code)
         search_results = json.loads(response.content)['results']
         for result in search_results:
-            acronym_found = ' '.join(result['acronym']).lower().find('un') > -1
-            alternative_acronym_found = ' '.join(result['alternative_acronym']).lower().find('un') > -1
+            acronym_found = result['acronym'].lower().find('un') > -1
+            alternative_acronym_found = False
+            if result.has_key('alternative_acronym'):
+                alternative_acronym_found = ' '.join(result['alternative_acronym']).lower().find('un') > -1
             self.assertTrue(acronym_found or alternative_acronym_found)
         
     def test_item_specific_query_param_item_type(self):
@@ -252,8 +254,12 @@ class ApiSearchErrorTests(ApiSearchTests):
             response = self.asset_search(query={'metadata_published_year': date})
             self.assertEqual(400, response.status_code)
 
-    def test_400_returned_for_bad_date_query_param(self):
+    def test_400_returned_for_bad_date_query_param_prefix(self):
         response = self.asset_search(query={'foobar_published_year': '2009'})
+        self.assertEqual(400, response.status_code)
+
+    def test_400_returned_for_bad_date_query_param_postfix(self):
+        response = self.asset_search(query={'metadata_published_foobar': '2009'})
         self.assertEqual(400, response.status_code)
 
     def test_400_returned_if_document_specific_query_param_used(self):
