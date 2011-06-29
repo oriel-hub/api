@@ -31,6 +31,10 @@ URL Format For Searches
    * regions
    * itemtypes
 
+   Note that each of the below query parameter can only be included once in the
+   query. If you do so the API will return with a status of 400 and a message
+   telling you which parameter was repeated.
+
    **Query fields for pagination:**
 
    :query num_results: The number of results to return. If not specified then a value of 10 is used.
@@ -73,10 +77,7 @@ URL Format For Searches
    **Special query fields:**
 
    :query extra_fields: Extra fields to include in the response (*not implemeted yet*)
-
-   Note that each query parameter can only be included once in the query. If
-   you do so the API will return with a status of 400 and a message telling you
-   which parameter was repeated.
+   :query num_results_only: Just return the number of results (in the metadata) but not the actual results.
 
    **Document specific query fields:**
 

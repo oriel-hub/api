@@ -73,7 +73,7 @@ class SearchBuilder():
                     sw.add_parameter_query(query_mapping[param]['solr_field'], query)
             elif SearchBuilder._is_date_query(param):
                 sw.add_date_query(param, query)
-            elif not param in ['num_results', 'start_offset']:
+            elif not param in ['num_results', 'num_results_only', 'start_offset']:
                 raise UnknownQueryParamError(param)
 
         sw.restrict_search_by_asset(asset_type)
@@ -115,6 +115,8 @@ class SearchWrapper:
         if num_results > settings.MAX_RESULTS:
             raise InvalidQueryError("'num_results' cannot be more than %d - you gave %d" \
                     % (settings.MAX_RESULTS, num_results))
+        if search_params.has_key('num_results_only'):
+            num_results = 0
         self.si_query = self.si_query.paginate(start=start_offset, rows=num_results)
 
     def add_free_text_query(self, search_text):

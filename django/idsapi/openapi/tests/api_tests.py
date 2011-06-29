@@ -249,6 +249,15 @@ class ApiSearchIntegrationTests(ApiSearchTests):
         for query_param in ['item_started_year', 'item_finished_year',]:
             response = self.asset_search(query={query_param: '2008'})
             self.assertEqual(200, response.status_code)
+
+    def test_num_results_only_returns_only_num_results(self):
+        response = self.asset_search(query={'q': 'undp', 'num_results_only': None})
+        self.assertEqual(200, response.status_code)
+        response_dict = json.loads(response.content)
+        self.assertTrue(response_dict.has_key('metadata'))
+        self.assertFalse(response_dict.has_key('results'))
+        self.assertEqual(1, len(response_dict['metadata'].keys()))
+        self.assertTrue(response_dict['metadata'].has_key('num_results'))
     
 
 class ApiSearchErrorTests(ApiSearchTests):

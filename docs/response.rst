@@ -13,8 +13,8 @@ the HTTP GET request. For example, using ``curl`` you would do
 
 More about XML formats, Dublin Core etc.
 
-Contents of formats
--------------------
+Single Asset Response Format
+----------------------------
 
 The **id only format** actually has two entries per item returned:
 
@@ -33,6 +33,32 @@ The **short format** has four entries per item returned:
 
 The **full format** has every field available for each item returned. These
 include lots of things ...
+
+Search/All Response Format
+--------------------------
+
+At the top level, the response has two entries - **metadata** and **results**. 
+
+The **metadata** section can contain:
+
+* **num_results** - the total number of results for that search.
+* **start_offset** - the offset into the results of the items in the **results** section.
+* **next_page** - a link to the next page of results (only present if there are more results after this page).
+* **prev_page** - a link to the previous page of results (only present if there are more results before this page).
+
+The **results** section is a list of results. Each item has data as specified
+by the format part of the URL, as for the single asset response.
+
+The exception to all this is that if the **num_results_only** query parameter
+is present, then the response will only have the metadata section, and that
+will only have the **num_results** item present. The nesting of data will be
+the same as for the full response though, allowing the same code to be used in
+both cases.
+
+Field List Response Format
+--------------------------
+
+This is just a list of the names of the fields present.
 
 Example Responses
 -----------------

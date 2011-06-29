@@ -75,6 +75,9 @@ class BaseView(View):
         # might be a HTTP 400 here
         if not isinstance(results, list):
             return results
+        if request.GET.has_key('num_results_only'):
+            return {'metadata': {'num_results': self.search_response.result.numFound} }
+
         metadata = {
                 'num_results': self.search_response.result.numFound,
                 'start_offset': self.search_response.result.start,
