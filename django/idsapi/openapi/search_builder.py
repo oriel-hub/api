@@ -11,6 +11,8 @@ from openapi import defines
 SOLR_SERVER_URL = 'http://api.ids.ac.uk:8983/solr/eldis-test/'
 SOLR_SCHEMA = SOLR_SERVER_URL + 'admin/file/?file=schema.xml'
 
+MAX_RESULTS = 500
+
 query_mapping = {
         'country': {'solr_field': 'country_focus',    'asset_type': 'all'},
         'keyword': {'solr_field': 'keyword',          'asset_type': 'all'},
@@ -110,6 +112,13 @@ class SearchWrapper:
     def add_paginate(self, search_params):
         start_offset = int(search_params['start_offset']) if search_params.has_key('start_offset') else 0
         num_results = int(search_params['num_results']) if search_params.has_key('num_results') else 10
+        if start_offset < 0:
+            raise InvalidQueryError("'start_offset' cannot be negative - you gave %d" % start_offset)
+        if num_results < 0:
+            raise InvalidQueryError("'num_results' cannot be negative - you gave %d" % num_results)
+        if num_results > MAX_RESULTS:
+            raise InvalidQueryError("'num_results' cannot be more than %d - you gave %d" \
+                    % (MAX_RESULTS, num_results))
         self.si_query = self.si_query.paginate(start=start_offset, rows=num_results)
 
     def add_free_text_query(self, search_text):

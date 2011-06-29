@@ -129,10 +129,18 @@ class ApiSearchIntegrationTests(ApiSearchTests):
         match = re.search(r'start_offset=([-0-9]+)', metadata['prev_page'])
         self.assertTrue(int(match.group(1)) >= 0)
 
-    def test_num_results_works(self):
+    def test_num_results_in_query_matches_results_returned(self):
         response = self.asset_search(query={'q': 'undp', 'num_results': '20'})
         results = json.loads(response.content)['results']
         self.assertEqual(20, len(results))
+
+    def test_num_results_correctly_passed_on_to_next_and_prev_links(self):
+        response = self.asset_search(
+                query={'q': 'undp', 'num_results': '20', 'start_offset': '20'})
+        metadata = json.loads(response.content)['metadata']
+        for link in ('prev_page', 'next_page'):
+            match = re.search(r'num_results=([-0-9]+)', metadata[link])
+            self.assertTrue(int(match.group(1)) == 20)
 
     def test_blank_search_returns_same_as_short_search(self):
         response_short = self.asset_search(output_format='short')
@@ -295,6 +303,18 @@ class ApiSearchErrorTests(ApiSearchTests):
 
     def test_400_returned_if_document_specific_query_param_used(self):
         response = self.asset_search(query={'author': 'John'})
+        self.assertEqual(400, response.status_code)
+
+    def test_400_returned_if_more_than_500_results_requested(self):
+        response = self.asset_search(query={'q': 'undp', 'num_results': '501'})
+        self.assertEqual(400, response.status_code)
+
+    def test_400_returned_if_num_results_is_negative(self):
+        response = self.asset_search(query={'q': 'undp', 'num_results': '-1'})
+        self.assertEqual(400, response.status_code)
+
+    def test_400_returned_if_start_offset_is_negative(self):
+        response = self.asset_search(query={'q': 'undp', 'start_offset': '-1'})
         self.assertEqual(400, response.status_code)
 
 class ApiGetAllIntegrationTests(TestCase):

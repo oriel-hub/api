@@ -37,7 +37,8 @@ URL Format For Searches
    :query start_offset: The index of the result to start from. If not specified then a value of 0 is used.
 
    Note that the metadata section of the results will have links to the next
-   and previous pages (assuming they exist).
+   and previous pages (assuming they exist). Also the maximum value for
+   ``num_results`` is **500**.
 
    **Query fields that take text as the argument to search for:**
 
