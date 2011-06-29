@@ -71,8 +71,8 @@ class ApiSearchIntegrationTests(ApiSearchTests):
                 {'keyword': 'gender'},
                 {'region': 'africa'},
                 {'sector': 'report'},
-                #{'source': 'bridge'},
-                {'source': 'eldis'},
+                {'branch': 'bridge'},
+                {'branch': 'eldis'},
                 {'subject': 'gdn'},
                 {'theme': 'climate'},
                 ]
@@ -373,3 +373,15 @@ class ApiRootIntegrationTests(TestCase):
         response_dict = json.loads(response.content)
         self.assertTrue(response_dict['help'].startswith('http://'))
 
+class ApiFieldListIntegrationTests(TestCase):
+    def get_field_list(self):
+        return self.client.get(URL_ROOT + 'fieldlist/', ACCEPT='application/json')
+
+    def test_field_list_returns_200(self):
+        response = self.get_field_list()
+        self.assertEqual(200, response.status_code)
+
+    def test_field_list_has_items(self):
+        response = self.get_field_list()
+        response_list = json.loads(response.content)
+        self.assertTrue(len(response_list) > 1)

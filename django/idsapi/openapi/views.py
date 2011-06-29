@@ -1,9 +1,13 @@
 #from django.core.urlresolvers import reverse
 #from django.http import HttpResponse, HttpResponseBadRequest
+import httplib2
+from xml.dom import minidom
 
 from djangorestframework.views import View
 from djangorestframework.response import Response
 from djangorestframework import status
+
+from django.conf import settings
 
 from openapi.data import DataMunger, DataMungerFormatError
 from openapi.search_builder import SearchBuilder, BadRequestError, SolrUnavailableError
@@ -37,6 +41,9 @@ class RootView(View):
                     url_root + 'assets/123/',
                     url_root + 'themes/123/full/capacity-building-approaches',
                     ]
+                },
+            'field list': {
+                'format': url_root + 'fieldlist/',
                 },
             'help': 'http://' + hostname + '/docs/',
             }
@@ -161,6 +168,20 @@ class AllAssetView(BaseView):
 
         # return the metadata with the output_format specified
         return self.format_result_list(request)
+
+
+class FieldListView(View):
+    def get(self, request):
+        # fetch file from SOLR_SCHEMA
+        http = httplib2.Http(".cache")
+        resp, content = http.request(settings.SOLR_SCHEMA, "GET")
+        doc = minidom.parseString(content)
+        field_list = [field.getAttribute('name') for field in 
+                doc.getElementsByTagName('fields')[0].getElementsByTagName('field')]
+        field_list.sort()
+        field_list = [elem for elem in field_list if not elem.endswith('_facet')]
+        field_list = [elem for elem in field_list if not elem in ['text', 'word']]
+        return field_list
 
 
 class NoAssetFoundError(IdsApiError):

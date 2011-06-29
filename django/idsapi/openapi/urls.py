@@ -1,8 +1,14 @@
 from django.conf.urls.defaults import patterns, url
 
-from openapi.views import AssetView, AssetSearchView, RootView, AllAssetView
+from openapi.views import AllAssetView, AssetSearchView, AssetView, FieldListView, RootView
 
 urlpatterns = patterns('idsapi.openapi.views',
+
+    url(r'^$', RootView.as_view(), name='root'),
+
+
+    url(r'^fieldlist/?$', FieldListView.as_view(), name='field_list'),
+
     # eg:
     # /assets/search/short
     # /themes/search/
@@ -21,9 +27,6 @@ urlpatterns = patterns('idsapi.openapi.views',
     # /documents/all/
     url(r'^(?P<asset_type>\w+)/all/(?P<output_format>\w*)/?$', 
         AllAssetView.as_view(), name='all_asset'),
-
-
-    url(r'^$', RootView.as_view(), name='root'),
 
 #    url(r'^decision/add$', 'decision_add_page', name='decision_add'),
 #    url(r'^decision/(?P<decision_id>[\d]+)/$', 'decision_view_page',

@@ -7,11 +7,7 @@ import re
 import sunburnt
 
 from openapi import defines
-
-SOLR_SERVER_URL = 'http://api.ids.ac.uk:8983/solr/eldis-test/'
-SOLR_SCHEMA = SOLR_SERVER_URL + 'admin/file/?file=schema.xml'
-
-MAX_RESULTS = 500
+from django.conf import settings
 
 query_mapping = {
         'country': {'solr_field': 'country_focus',    'asset_type': 'all'},
@@ -19,7 +15,7 @@ query_mapping = {
         'region':  {'solr_field': 'category_region',  'asset_type': 'all'},
         'sector':  {'solr_field': 'category_sector',  'asset_type': 'all'},
         'subject': {'solr_field': 'category_subject', 'asset_type': 'all'},
-        'source':  {'solr_field': 'branch',           'asset_type': 'all'},
+        'branch':  {'solr_field': 'branch',           'asset_type': 'all'},
         'theme':   {'solr_field': 'category_theme',   'asset_type': 'all'},
         'author':  {'solr_field': 'author',           'asset_type': 'documents'},
         'author_organisation': {'solr_field': 'author_organisation', 'asset_type': 'documents'},
@@ -95,9 +91,9 @@ class SearchBuilder():
 class SearchWrapper:
     def __init__(self):
         try:
-            self.solr = sunburnt.SolrInterface(SOLR_SERVER_URL)
+            self.solr = sunburnt.SolrInterface(settings.SOLR_SERVER_URL)
         except:
-            raise SolrUnavailableError('Solr is not responding (using %s )' % SOLR_SERVER_URL)
+            raise SolrUnavailableError('Solr is not responding (using %s )' % settings.SOLR_SERVER_URL)
         self.si_query = self.solr.query()
 
     def execute(self):
@@ -116,9 +112,9 @@ class SearchWrapper:
             raise InvalidQueryError("'start_offset' cannot be negative - you gave %d" % start_offset)
         if num_results < 0:
             raise InvalidQueryError("'num_results' cannot be negative - you gave %d" % num_results)
-        if num_results > MAX_RESULTS:
+        if num_results > settings.MAX_RESULTS:
             raise InvalidQueryError("'num_results' cannot be more than %d - you gave %d" \
-                    % (MAX_RESULTS, num_results))
+                    % (settings.MAX_RESULTS, num_results))
         self.si_query = self.si_query.paginate(start=start_offset, rows=num_results)
 
     def add_free_text_query(self, search_text):
@@ -183,22 +179,6 @@ class SearchWrapper:
             kwargs = {field_name: str(param_value)}
             q_final = self.solr.Q(**kwargs)
         return q_final
-
-class FieldReader():
-    def __init__(self):
-        # fetch file from SOLR_SCHEMA
-        import httplib2
-        h = httplib2.Http(".cache")
-        resp, content = h.request(SOLR_SCHEMA, "GET")
-        from xml.dom import minidom
-        doc = minidom.parseString(content)
-        field_list = []
-        for field in doc.getElementsByTagName('fields')[0].getElementsByTagName('field'):
-            field_list.append(field.getAttribute('name'))
-        field_list.sort()
-        field_list = [elem for elem in field_list if not elem.endswith('_facet')]
-        self.field_list = [elem for elem in field_list if not elem in ['text', 'word']]
-
 
 class SolrUnavailableError(defines.IdsApiError):
     def __init__(self, error_text=''):

@@ -43,12 +43,12 @@ URL Format For Searches
    **Query fields that take text as the argument to search for:**
 
    :query q: The text to search for. Note the search is not case-sensitive.
+   :query branch: The name of a source to search for - currently 'eldis' or 'bridge'
    :query country: The name of a country to search for.
    :query keyword: The name of a keyword to search for.
    :query region: The name of a region to search for.
    :query sector: The name of a sector to search for.
    :query subject: The name of a subject to search for.
-   :query source: The name of a source to search for - currently 'eldis' or 'bridge'
    :query theme: The name of a theme to search for.
 
    Note that you can use ``*`` in your query, but not as the first character.

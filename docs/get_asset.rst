@@ -51,6 +51,15 @@ URL Formats
    * ``/openapi/countries/1100/full/India``
    * ``/openapi/documents/24903/full/undp-human-development-report-1996-highlights``
 
+.. http:get:: /openapi/fieldlist/
+
+   Retrieve the list of fields. The list will name all fields that might appear
+   in the entry for an asset, though no single asset would have all fields -
+   some fields will only appear for one type of asset. You can use the entries
+   from this list to ask for extra fields.
+
+   There are no query parameters for this call, and the status code will be as
+   above.
 
 .. _extra-fields:
 
