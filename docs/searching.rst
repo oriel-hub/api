@@ -145,6 +145,24 @@ URL Format For Searches
    * num_results
    * start_offset
    
+   **Example:** ``/openapi/documents/country_count/?q=undp``
+
+.. http:get:: /openapi/(category_type)/(int:asset_id)/children/(format)
+
+   Retrieve the child categories for the category with the given **asset_id**.
+   The valid category types are:
+   
+   * itemtypes
+   * regions
+   * sectors
+   * subjects
+   * themes
+   
+   The only valid query parameters to use are num_results and start_offset which 
+   work as above.
+   
+   **Example:** ``/openapi/themes/34/children/full``
+   
 Combining Search Terms
 ----------------------
 

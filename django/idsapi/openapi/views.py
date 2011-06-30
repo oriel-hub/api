@@ -10,7 +10,7 @@ from djangorestframework import status
 from django.conf import settings
 
 from openapi.data import DataMunger, DataMungerFormatError
-from openapi.search_builder import SearchBuilder, BadRequestError, SolrUnavailableError,\
+from openapi.search_builder import SearchBuilder, BadRequestError, SolrUnavailableError, \
     facet_mapping
 from openapi.defines import URL_ROOT, IdsApiError
 
@@ -49,7 +49,7 @@ class RootView(View):
             'help': 'http://' + hostname + '/docs/',
             }
 
-class BaseView(View):
+class BaseSearchView(View):
     def __init__(self, raise_if_no_results=False):
         View.__init__(self)
         self.output_format = None
@@ -121,9 +121,9 @@ class BaseView(View):
             params['start_offset'] = 0
         return 'http://' + request.get_host() + request.path + '?' + params.urlencode()
 
-class AssetView(BaseView):
+class AssetView(BaseSearchView):
     def __init__(self):
-        BaseView.__init__(self, True)
+        BaseSearchView.__init__(self, True)
 
     def get(self, request, asset_id, output_format, asset_type=None):
         self.output_format = output_format
@@ -144,7 +144,7 @@ class AssetView(BaseView):
                     content='No %s found with asset_id %s' % (asset_type, asset_id))
 
 
-class AssetSearchView(BaseView):
+class AssetSearchView(BaseSearchView):
     def get(self, request, output_format, asset_type=None):
         self.output_format = output_format
         self.data_munger = DataMunger(request)
@@ -164,7 +164,7 @@ class AssetSearchView(BaseView):
         return self.format_result_list(request)
 
 
-class AllAssetView(BaseView):
+class AllAssetView(BaseSearchView):
     def get(self, request, output_format, asset_type=None):
         self.output_format = output_format
         self.data_munger = DataMunger(request)
@@ -185,12 +185,12 @@ class FacetCountView(View):
     def get(self, request, asset_type, facet_type):
         search_params = request.GET
         try:
-            self.query = SearchBuilder.create_search(search_params, asset_type, facet_type)
+            query = SearchBuilder.create_search(search_params, asset_type, facet_type)
         except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
         except SolrUnavailableError as e:
             return Response(status.HTTP_500_INTERNAL_SERVER_ERROR, content=e)
-        search_response = self.query.execute()
+        search_response = query.execute()
         facet_counts = search_response.facet_counts.facet_fields[facet_mapping[facet_type]]
         return {'metadata': {'num_results': search_response.result.numFound}, 
                 facet_type+'_count': facet_counts}
@@ -207,6 +207,22 @@ class FieldListView(View):
         field_list = [elem for elem in field_list if not elem.endswith('_facet')]
         field_list = [elem for elem in field_list if not elem in ['text', 'word']]
         return field_list
+    
+class CategoryChildrenView(BaseSearchView):
+    def get(self, request, asset_type, asset_id, output_format):
+        self.output_format = output_format
+        self.data_munger = DataMunger(request)
+
+        try:
+            self.query = SearchBuilder.create_category_children_search(request.GET, asset_type, asset_id)
+        except BadRequestError as e:
+            return Response(status.HTTP_400_BAD_REQUEST, content=e)
+        except SolrUnavailableError as e:
+            return Response(status.HTTP_500_INTERNAL_SERVER_ERROR, content=e)
+
+        # return the metadata with the output_format specified
+        return self.format_result_list(request)
+        
 
 class The404View(View):
     def get(self, request, path):

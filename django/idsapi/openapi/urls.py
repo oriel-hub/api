@@ -1,7 +1,7 @@
 from django.conf.urls.defaults import patterns, url
 
 from openapi.views import AllAssetView, AssetSearchView, AssetView, FieldListView, \
-    RootView, FacetCountView, The404View
+    RootView, FacetCountView, CategoryChildrenView, The404View
 
 urlpatterns = patterns('idsapi.openapi.views',
 
@@ -16,6 +16,12 @@ urlpatterns = patterns('idsapi.openapi.views',
     # /documents/search/full
     url(r'^(?P<asset_type>\w+)/search/(?P<output_format>\w*)/?$', 
         AssetSearchView.as_view(), name='asset_search'),
+
+    # eg:
+    # /themes/34/children/full
+    # /documents/5678/
+    url(r'^(?P<asset_type>\w+)/(?P<asset_id>\d+)/children/(?P<output_format>\w*)/?$', 
+        CategoryChildrenView.as_view(), name='category_children'),
 
     # eg:
     # /assets/1234/full

@@ -420,3 +420,25 @@ class ApiFacetIntegrationTests(TestCase):
         for country_count in search_results['country_count']:
             self.assertTrue(isinstance(country_count[0], unicode))
             self.assertTrue(isinstance(country_count[1], int))
+
+class ApiCategoryChildrenIntegrationTests(TestCase):
+    def children_search(self, asset_type='themes', asset_id=34,
+            content_type='application/json'):
+        return self.client.get(URL_ROOT + asset_type + '/' + str(asset_id) + '/children/full', 
+                ACCEPT=content_type)
+    
+    def test_200_returned_for_children_search(self):
+        child_searches = {'themes': 34, 'itemtypes': 1067} 
+        for asset_type, asset_id in child_searches.items():
+            response = self.children_search(asset_type=asset_type, asset_id=asset_id)
+            self.assertEqual(200, response.status_code)
+
+    def test_parents_match_for_children_search(self):
+        response = self.children_search()
+        search_results = json.loads(response.content)
+        for result in search_results['results']:
+            self.assertEqual(34, int(result['cat_parent']))
+            
+    def test_400_returned_for_invalid_child(self):
+        response = self.children_search(asset_type='documents', asset_id=8346)
+        self.assertEqual(400, response.status_code)

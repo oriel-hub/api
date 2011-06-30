@@ -100,6 +100,17 @@ class SearchBuilder():
         sw.add_paginate(search_params)
         return sw
     
+    @classmethod
+    def create_category_children_search(cls, search_params, asset_type, asset_id):
+        if asset_type not in ['themes', 'itemtypes']:
+            raise InvalidQueryError("Asset type '%s' does not have children" % asset_type)
+        
+        sw = SearchWrapper()
+        sw.add_parameter_query('cat_parent', asset_id)
+        sw.restrict_search_by_asset(asset_type)
+        sw.add_paginate(search_params)
+        return sw
+    
 
 class SearchWrapper:
     def __init__(self):
