@@ -127,6 +127,24 @@ URL Format For Searches
    **sort_by** arguments, which all work as for the search query. *Not
    implemented yet.*
 
+.. http:get:: /openapi/(asset_type)/country_count/
+.. http:get:: /openapi/(asset_type)/keyword_count/
+.. http:get:: /openapi/(asset_type)/region_count/
+.. http:get:: /openapi/(asset_type)/sector_count/
+.. http:get:: /openapi/(asset_type)/subject_count/
+.. http:get:: /openapi/(asset_type)/theme_count/
+
+   This gives you the number of results for your query for each country (or region
+   or ...) So for ``/openapi/assets/country_count/?q=undp`` you would get a set of results
+   that told you, for each country, how many assets existed that had the text
+   "undp" and were concerned with that country. It's easier to see than to explain.
+   
+   You can use all the query terms available with search, apart from:
+   
+   * extra_fields
+   * num_results
+   * start_offset
+   
 Combining Search Terms
 ----------------------
 

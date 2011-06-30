@@ -394,3 +394,29 @@ class ApiFieldListIntegrationTests(TestCase):
         response = self.get_field_list()
         response_list = json.loads(response.content)
         self.assertTrue(len(response_list) > 1)
+
+class ApiFacetIntegrationTests(TestCase):
+    def facet_search(self, asset_type='assets', facet_type='country', query={'q':'undp'},
+            content_type='application/json'):
+        return self.client.get(URL_ROOT + asset_type + '/' + facet_type + '_count/', 
+                query, ACCEPT=content_type)
+
+    def test_200_returned_for_all_facet_types(self):
+        for facet_type in ('country', 'region', 'keyword', 'sector', 'subject', 'theme'):
+            response = self.facet_search(facet_type=facet_type)
+            self.assertEqual(200, response.status_code)
+
+    def test_200_returned_for_individual_asset_type(self):
+        response = self.facet_search(asset_type='documents')
+        self.assertEqual(200, response.status_code)
+            
+    def test_400_returned_if_unknown_facet_type(self):
+        response = self.facet_search(facet_type='foobars')
+        self.assertEqual(400, response.status_code)
+                
+    def test_all_counts_from_facet_gt_0(self):
+        response = self.facet_search()
+        search_results = json.loads(response.content)
+        for country_count in search_results['country_count']:
+            self.assertTrue(isinstance(country_count[0], unicode))
+            self.assertTrue(isinstance(country_count[1], int))

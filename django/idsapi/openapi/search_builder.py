@@ -31,6 +31,15 @@ date_prefix_mapping = {
         'item_finished': 'end_date', 
         }
 
+facet_mapping = {
+        'country': 'country_focus_facet',
+        'keyword': 'keyword_facet',
+        'region':  'category_region_facet',
+        'sector':  'category_sector_facet',
+        'subject': 'category_subject_facet',
+        'theme':   'category_theme_facet',
+        }
+
 class SearchBuilder():
 
     @classmethod
@@ -48,7 +57,7 @@ class SearchBuilder():
         return False
 
     @classmethod
-    def create_search(cls, search_params, asset_type):
+    def create_search(cls, search_params, asset_type, facet_type=None):
         sw = SearchWrapper()
 
         for param in search_params:
@@ -77,7 +86,11 @@ class SearchBuilder():
                 raise UnknownQueryParamError(param)
 
         sw.restrict_search_by_asset(asset_type)
-        sw.add_paginate(search_params)
+        if facet_type == None:
+            sw.add_paginate(search_params)
+        else:
+            sw.add_facet(facet_type)
+            sw.add_paginate({'num_results': 0})
         return sw
 
     @classmethod
@@ -86,7 +99,7 @@ class SearchBuilder():
         sw.restrict_search_by_asset(asset_type)
         sw.add_paginate(search_params)
         return sw
-
+    
 
 class SearchWrapper:
     def __init__(self):
@@ -121,6 +134,11 @@ class SearchWrapper:
 
     def add_free_text_query(self, search_text):
         self.si_query = self.si_query.query(search_text)
+
+    def add_facet(self, facet_type):
+        if not facet_type in facet_mapping.keys():
+            raise InvalidQueryError("Unknown count type: '%s_count'" % facet_type)
+        self.si_query = self.si_query.facet_by(facet_mapping[facet_type])
 
     def add_date_query(self, param, date):
         # strip the _year/_after/_before

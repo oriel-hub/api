@@ -60,6 +60,14 @@ Field List Response Format
 
 This is just a list of the names of the fields present.
 
+Category Count Response Format
+------------------------------
+
+This will have a metadata section, giving the total number of results for the query,
+and a xxx_count section which will be a list of lists - each list will have two
+items. The first item will be the name of the category and the second
+item will be the number of times the category appears in the results.
+
 Example Responses
 -----------------
 

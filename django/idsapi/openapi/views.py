@@ -10,7 +10,8 @@ from djangorestframework import status
 from django.conf import settings
 
 from openapi.data import DataMunger, DataMungerFormatError
-from openapi.search_builder import SearchBuilder, BadRequestError, SolrUnavailableError
+from openapi.search_builder import SearchBuilder, BadRequestError, SolrUnavailableError,\
+    facet_mapping
 from openapi.defines import URL_ROOT, IdsApiError
 
 class RootView(View):
@@ -55,7 +56,14 @@ class BaseView(View):
         self.query = None
         self.raise_if_no_results = raise_if_no_results
         self.data_munger = None
-        self.search_response = None
+        self.search_response = None#    url(r'^decision/add$', 'decision_add_page', name='decision_add'),
+#    url(r'^decision/(?P<decision_id>[\d]+)/$', 'decision_view_page',
+#                            name='decision_edit'),
+#    url(r'^decision_list/(?P<group_id>[\d]+)/$',
+#                                openconsent.publicweb.views.decision_list, name='decision_list'),
+#    url(r'^groups/$', openconsent.publicweb.views.groups, name='groups'),
+#    url(r'^group_add/$', 'group_add', name='group_add'),
+
 
     def build_response(self):
         formatted_results = []
@@ -173,11 +181,25 @@ class AllAssetView(BaseView):
         return self.format_result_list(request)
 
 
+class FacetCountView(View):
+    def get(self, request, asset_type, facet_type):
+        search_params = request.GET
+        try:
+            self.query = SearchBuilder.create_search(search_params, asset_type, facet_type)
+        except BadRequestError as e:
+            return Response(status.HTTP_400_BAD_REQUEST, content=e)
+        except SolrUnavailableError as e:
+            return Response(status.HTTP_500_INTERNAL_SERVER_ERROR, content=e)
+        search_response = self.query.execute()
+        facet_counts = search_response.facet_counts.facet_fields[facet_mapping[facet_type]]
+        return {'metadata': {'num_results': search_response.result.numFound}, 
+                facet_type+'_count': facet_counts}
+
 class FieldListView(View):
     def get(self, request):
         # fetch file from SOLR_SCHEMA
         http = httplib2.Http(".cache")
-        resp, content = http.request(settings.SOLR_SCHEMA, "GET")
+        resp, content = http.request(settings.SOLR_SCHEMA, "GET") #@UnusedVariable
         doc = minidom.parseString(content)
         field_list = [field.getAttribute('name') for field in 
                 doc.getElementsByTagName('fields')[0].getElementsByTagName('field')]
@@ -185,6 +207,10 @@ class FieldListView(View):
         field_list = [elem for elem in field_list if not elem.endswith('_facet')]
         field_list = [elem for elem in field_list if not elem in ['text', 'word']]
         return field_list
+
+class The404View(View):
+    def get(self, request, path):
+        return Response(status.HTTP_404_NOT_FOUND, content="Path '%s' not known." % path)
 
 
 class NoAssetFoundError(IdsApiError):
