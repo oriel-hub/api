@@ -398,12 +398,10 @@ class ApiFieldListIntegrationTests(TestCase):
         self.assertTrue(len(response_list) > 1)
 
 class ApiFacetIntegrationTests(TestCase):
-    def facet_search(self, asset_type='assets', facet_type='country', query=None,
+    def facet_search(self, asset_type='assets', facet_type='country',
             content_type='application/json'):
-        if query == None:
-            query = {'q':'undp'}
         return self.client.get(URL_ROOT + asset_type + '/' + facet_type + '_count/', 
-                query, ACCEPT=content_type)
+                {'q': 'undp'}, ACCEPT=content_type)
 
     def test_200_returned_for_all_facet_types(self):
         for facet_type in ('country', 'region', 'keyword', 'sector', 'subject', 'theme'):
