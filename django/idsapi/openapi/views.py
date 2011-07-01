@@ -127,7 +127,7 @@ class AssetView(BaseSearchView):
 
     def get(self, request, asset_id, output_format, asset_type=None):
         self.output_format = output_format
-        self.data_munger = DataMunger(request)
+        self.data_munger = DataMunger()
 
         try:
             self.query = SearchBuilder.create_assetid_query(asset_id, asset_type)
@@ -147,7 +147,7 @@ class AssetView(BaseSearchView):
 class AssetSearchView(BaseSearchView):
     def get(self, request, output_format, asset_type=None):
         self.output_format = output_format
-        self.data_munger = DataMunger(request)
+        self.data_munger = DataMunger()
 
         search_params = request.GET
         if len(search_params.keys()) == 0:
@@ -167,7 +167,7 @@ class AssetSearchView(BaseSearchView):
 class AllAssetView(BaseSearchView):
     def get(self, request, output_format, asset_type=None):
         self.output_format = output_format
-        self.data_munger = DataMunger(request)
+        self.data_munger = DataMunger()
 
         search_params = request.GET
         try:
@@ -211,7 +211,7 @@ class FieldListView(View):
 class CategoryChildrenView(BaseSearchView):
     def get(self, request, asset_type, asset_id, output_format):
         self.output_format = output_format
-        self.data_munger = DataMunger(request)
+        self.data_munger = DataMunger()
 
         try:
             self.query = SearchBuilder.create_category_children_search(request.GET, asset_type, asset_id)

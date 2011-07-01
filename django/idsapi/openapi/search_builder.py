@@ -102,7 +102,7 @@ class SearchBuilder():
     
     @classmethod
     def create_category_children_search(cls, search_params, asset_type, asset_id):
-        if asset_type not in ['themes', 'itemtypes']:
+        if asset_type not in defines.asset_types_with_hierarchy:
             raise InvalidQueryError("Asset type '%s' does not have children" % asset_type)
         
         sw = SearchWrapper()

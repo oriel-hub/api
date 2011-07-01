@@ -19,6 +19,8 @@ asset_types_to_object_name = {
 asset_types  = asset_types_to_object_name.keys()
 object_names = asset_types_to_object_name.values()
 
+asset_types_with_hierarchy = ['themes', 'itemtypes']
+
 def object_name_to_asset_type(object_name):
     for asset_type in asset_types_to_object_name:
         if asset_types_to_object_name[asset_type] == object_name:
