@@ -11,7 +11,8 @@ class DataMunger():
         elif output_format == 'short' or output_format == '':
             asset_data = dict((k, v) for k, v in result.items() if k in ['asset_id', 'object_type', 'title'])
         elif output_format == 'full':
-            asset_data = dict((k, v) for k, v in result.items() if not k.endswith('_facet'))
+            asset_data = dict((k, v) for k, v in result.items() \
+                    if not (k.endswith('_facet') or k in defines.hidden_fields))
             if defines.object_name_to_asset_type(result['object_type']) in defines.asset_types_with_hierarchy:
                 self._add_child_parent_links(asset_data, asset_id, result)
         else:

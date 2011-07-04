@@ -21,6 +21,8 @@ object_names = asset_types_to_object_name.values()
 
 asset_types_with_hierarchy = ['themes', 'itemtypes']
 
+hidden_fields = ['send_email_alerts']
+
 def object_name_to_asset_type(object_name):
     for asset_type in asset_types_to_object_name:
         if asset_types_to_object_name[asset_type] == object_name:

@@ -4,7 +4,7 @@ from django.test.testcases import TestCase
 import json
 import re
 
-from openapi.defines import URL_ROOT, asset_types, asset_types_with_hierarchy
+from openapi import defines
 
 class ApiTestsBase(TestCase):
 
@@ -12,12 +12,12 @@ class ApiTestsBase(TestCase):
             content_type='application/json'):
         if query == None:
             query = {'q':'undp'}
-        return self.client.get(URL_ROOT + asset_type + '/search/' + output_format, 
+        return self.client.get(defines.URL_ROOT + asset_type + '/search/' + output_format, 
                 query, ACCEPT=content_type)
 
     def get_all(self, asset_type='assets', output_format='', 
                                 content_type='application/json'):
-        return self.client.get(URL_ROOT + asset_type + '/all/' + output_format, 
+        return self.client.get(defines.URL_ROOT + asset_type + '/all/' + output_format, 
                 ACCEPT=content_type)
     
 class ApiSearchIntegrationTests(ApiTestsBase):
@@ -60,6 +60,13 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         for result in search_results:
             for key in result.keys():
                 self.assertFalse(key.endswith('_facet'))
+
+    def test_json_full_search_does_not_contain_hidden_fields(self):
+        response = self.asset_search(output_format='full')
+        search_results = json.loads(response.content)['results']
+        for result in search_results:
+            for key in result.keys():
+                self.assertFalse(key in defines.hidden_fields)
 
     def test_query_by_country(self):
         response = self.asset_search(query={'country':'namibia'})
@@ -162,11 +169,11 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         response = self.asset_search()
         search_results = json.loads(response.content)['results']
         for result in search_results:
-            url_bits = result['metadata_url'].split(URL_ROOT)[-1].strip('/').split('/')
+            url_bits = result['metadata_url'].split(defines.URL_ROOT)[-1].strip('/').split('/')
             # should now have something like ['documents', '1234', 'full', 'asdf']
             self.assertTrue(len(url_bits) == 4)
             self.assertTrue(url_bits[0] != 'assets')
-            self.assertTrue(url_bits[0] in asset_types)
+            self.assertTrue(url_bits[0] in defines.asset_types)
             self.assertTrue(url_bits[1].isdigit())
             self.assertTrue(url_bits[2] == 'full')
             self.assertTrue(re.match(r'^[-\w]+$', url_bits[3]) != None)
@@ -351,7 +358,7 @@ class ApiGetAssetIntegrationTests(TestCase):
 
     def get_asset(self, asset_type='assets', asset_id='12345', output_format='', 
                                 content_type='application/json'):
-        return self.client.get(URL_ROOT + asset_type + '/' + asset_id + '/' + output_format, 
+        return self.client.get(defines.URL_ROOT + asset_type + '/' + asset_id + '/' + output_format, 
                 ACCEPT=content_type)
 
     def test_get_document_by_id_returns_200(self):
@@ -373,7 +380,7 @@ class ApiGetAssetIntegrationTests(TestCase):
 
 class ApiRootIntegrationTests(TestCase):
     def get_root(self):
-        return self.client.get(URL_ROOT, ACCEPT='application/json')
+        return self.client.get(defines.URL_ROOT, ACCEPT='application/json')
 
     def test_root_url_returns_200(self):
         response = self.get_root()
@@ -386,7 +393,7 @@ class ApiRootIntegrationTests(TestCase):
 
 class ApiFieldListIntegrationTests(TestCase):
     def get_field_list(self):
-        return self.client.get(URL_ROOT + 'fieldlist/', ACCEPT='application/json')
+        return self.client.get(defines.URL_ROOT + 'fieldlist/', ACCEPT='application/json')
 
     def test_field_list_returns_200(self):
         response = self.get_field_list()
@@ -400,7 +407,7 @@ class ApiFieldListIntegrationTests(TestCase):
 class ApiFacetIntegrationTests(TestCase):
     def facet_search(self, asset_type='assets', facet_type='country',
             content_type='application/json'):
-        return self.client.get(URL_ROOT + asset_type + '/' + facet_type + '_count/', 
+        return self.client.get(defines.URL_ROOT + asset_type + '/' + facet_type + '_count/', 
                 {'q': 'undp'}, ACCEPT=content_type)
 
     def test_200_returned_for_all_facet_types(self):
@@ -426,7 +433,7 @@ class ApiFacetIntegrationTests(TestCase):
 class ApiCategoryChildrenIntegrationTests(ApiTestsBase):
     def children_search(self, asset_type='themes', asset_id=34,
             content_type='application/json'):
-        return self.client.get(URL_ROOT + asset_type + '/' + str(asset_id) + '/children/full', 
+        return self.client.get(defines.URL_ROOT + asset_type + '/' + str(asset_id) + '/children/full', 
                 ACCEPT=content_type)
     
     def test_200_returned_for_children_search(self):
@@ -446,7 +453,7 @@ class ApiCategoryChildrenIntegrationTests(ApiTestsBase):
         self.assertEqual(400, response.status_code)
 
     def test_all_have_children_link(self):
-        for asset_type in asset_types_with_hierarchy:
+        for asset_type in defines.asset_types_with_hierarchy:
             response = self.get_all(asset_type=asset_type, output_format='full') 
             search_results = json.loads(response.content)
             for result in search_results['results']:
