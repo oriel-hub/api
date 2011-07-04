@@ -70,9 +70,6 @@ class BaseSearchView(View):
     def format_result_list(self, request):
         # return the metadata with the output_format specified
         results = self.build_response()
-        # might be a HTTP 400 here
-        if not isinstance(results, list):
-            return results
         if request.GET.has_key('num_results_only'):
             return {'metadata': {'num_results': self.search_response.result.numFound} }
 
