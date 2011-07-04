@@ -404,6 +404,10 @@ class ApiGetAssetIntegrationTests(TestCase):
         response = self.get_asset(asset_type='foobars')
         self.assertEqual(400, response.status_code)
 
+    def test_400_returned_if_unknown_query_param(self):
+        response = self.get_asset(asset_type='documents', query={'country': 'angola'})
+        self.assertEqual(400, response.status_code)
+
 
 class ApiRootIntegrationTests(TestCase):
     def get_root(self):

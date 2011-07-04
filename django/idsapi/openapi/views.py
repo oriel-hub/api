@@ -9,7 +9,7 @@ from djangorestframework import status
 
 from django.conf import settings
 
-from openapi.data import DataMunger, DataMungerFormatError
+from openapi.data import DataMunger
 from openapi.search_builder import SearchBuilder, BadRequestError, SolrUnavailableError, \
     facet_mapping
 from openapi.defines import URL_ROOT, IdsApiError, HIDDEN_FIELDS
@@ -56,23 +56,13 @@ class BaseSearchView(View):
         self.query = None
         self.raise_if_no_results = raise_if_no_results
         self.data_munger = None
-        self.search_response = None#    url(r'^decision/add$', 'decision_add_page', name='decision_add'),
-#    url(r'^decision/(?P<decision_id>[\d]+)/$', 'decision_view_page',
-#                            name='decision_edit'),
-#    url(r'^decision_list/(?P<group_id>[\d]+)/$',
-#                                openconsent.publicweb.views.decision_list, name='decision_list'),
-#    url(r'^groups/$', openconsent.publicweb.views.groups, name='groups'),
-#    url(r'^group_add/$', 'group_add', name='group_add'),
-
+        self.search_response = None
 
     def build_response(self):
         formatted_results = []
-        try:
-            self.search_response = self.query.execute()
-            for result in self.search_response:
-                formatted_results.append(self.data_munger.get_required_data(result, self.output_format))
-        except DataMungerFormatError as e:
-            return Response(status.HTTP_400_BAD_REQUEST, content=e)
+        self.search_response = self.query.execute()
+        for result in self.search_response:
+            formatted_results.append(self.data_munger.get_required_data(result, self.output_format))
         if self.raise_if_no_results and len(formatted_results) == 0:
             raise NoAssetFoundError()
         return formatted_results

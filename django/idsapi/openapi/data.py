@@ -48,9 +48,3 @@ class DataMunger():
                 'asset_id': result['cat_first_parent'],
                 'output_format': 'full'
                 }) + '/'
-
-
-class DataMungerFormatError(defines.IdsApiError):
-    def __init__(self, error_text=''):
-        defines.IdsApiError.__init__(self, error_text)
-        self.error_text = 'Data format error: ' + error_text
