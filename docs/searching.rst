@@ -79,6 +79,16 @@ URL Format For Searches
    :query extra_fields: Extra fields to include in the response. See the :ref:`extra-fields` section for details. 
    :query num_results_only: Just return the number of results (in the metadata) but not the actual results.
 
+   **Sorting fields:**
+
+   :query sort_asc: Sort by the field named, in ascending order.
+   :query sort_desc: Sort by the field named, in descending order.
+
+   You can use any field that comes in the results, though it makes most sense
+   to use fields that are numbers or dates.
+
+   Note that you can only use one of these fields, and only once.
+
    **Document specific query fields:**
 
    These fields are only valid when searching for documents, ie when the URL

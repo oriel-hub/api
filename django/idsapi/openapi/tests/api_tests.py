@@ -1,8 +1,7 @@
 # integration tests at the API level
 from django.test.testcases import TestCase
 
-import json
-import re
+import json, re, datetime
 
 from openapi import defines
 
@@ -276,11 +275,31 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         self.assertTrue(response_dict['metadata'].has_key('num_results'))
     
     def test_extra_fields_with_asset_search(self):
-        response = self.get_all(asset_type='documents', output_format='short',
+        response = self.asset_search(asset_type='documents', output_format='short',
                 query={'q': 'undp', 'extra_fields': 'short_abstract long_abstract'})
         # not all the results have the abstracts, so just check it doesn't
         # immediately complain
         self.assertEqual(200, response.status_code)
+
+class ApiSearchSortTests(ApiTestsBase):
+
+    def test_sort_ascending_by_asset_id(self):
+        response = self.asset_search(asset_type='documents', output_format='full',
+                query={'q': 'undp', 'sort_asc': 'publication_date'})
+        results = json.loads(response.content)['results']
+        for i in range(0,9):
+            date1 = datetime.datetime.strptime(results[i]['publication_date'], "%Y-%m-%d %H:%M:%S.00")
+            date2 = datetime.datetime.strptime(results[i+1]['publication_date'], "%Y-%m-%d %H:%M:%S.00")
+            self.assertTrue(date1 <= date2)
+
+    def test_sort_descending_by_asset_id(self):
+        response = self.asset_search(asset_type='documents', output_format='full',
+                query={'q': 'undp', 'sort_desc': 'publication_date'})
+        results = json.loads(response.content)['results']
+        for i in range(0,9):
+            date1 = datetime.datetime.strptime(results[i]['publication_date'], "%Y-%m-%d %H:%M:%S.00")
+            date2 = datetime.datetime.strptime(results[i+1]['publication_date'], "%Y-%m-%d %H:%M:%S.00")
+            self.assertTrue(date1 >= date2)
 
 
 class ApiSearchErrorTests(ApiTestsBase):
@@ -347,6 +366,14 @@ class ApiSearchErrorTests(ApiTestsBase):
 
     def test_400_returned_if_start_offset_is_negative(self):
         response = self.asset_search(query={'q': 'undp', 'start_offset': '-1'})
+        self.assertEqual(400, response.status_code)
+
+    def test_400_returned_if_sort_asc_and_sort_desc_used(self):
+        response = self.asset_search(query={
+            'q': 'undp', 
+            'sort_asc': 'publication_date', 
+            'sort_desc': 'asset_id'
+            })
         self.assertEqual(400, response.status_code)
 
 class ApiGetAllIntegrationTests(ApiTestsBase):

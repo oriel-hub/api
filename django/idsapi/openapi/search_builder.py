@@ -86,11 +86,13 @@ class SearchBuilder():
                     sw.add_parameter_query(query_mapping[param]['solr_field'], query)
             elif SearchBuilder._is_date_query(param):
                 sw.add_date_query(param, query)
-            elif not param in ['num_results', 'num_results_only', 'start_offset', 'extra_fields']:
+            elif not param in ['num_results', 'num_results_only', 'start_offset', 
+                    'extra_fields', 'sort_asc', 'sort_desc']:
                 raise UnknownQueryParamError(param)
 
         sw.restrict_search_by_asset(asset_type)
         sw.restrict_fields_returned(output_format, search_params)
+        sw.add_sort(search_params)
         if facet_type == None:
             sw.add_paginate(search_params)
         else:
@@ -148,6 +150,14 @@ class SearchWrapper:
         if search_params.has_key('num_results_only'):
             num_results = 0
         self.si_query = self.si_query.paginate(start=start_offset, rows=num_results)
+
+    def add_sort(self, search_params):
+        if search_params.has_key('sort_asc') and search_params.has_key('sort_desc'):
+            raise InvalidQueryError("Cannot use both 'sort_asc' and 'sort_desc'")
+        if search_params.has_key('sort_asc'):
+            self.si_query = self.si_query.sort_by(search_params['sort_asc'])
+        if search_params.has_key('sort_desc'):
+            self.si_query = self.si_query.sort_by('-' + search_params['sort_desc'])
 
     def add_free_text_query(self, search_text):
         self.si_query = self.si_query.query(search_text)
