@@ -15,10 +15,12 @@ class ApiTestsBase(TestCase):
         return self.client.get(defines.URL_ROOT + asset_type + '/search/' + output_format, 
                 query, ACCEPT=content_type)
 
-    def get_all(self, asset_type='assets', output_format='', 
+    def get_all(self, asset_type='assets', output_format='', query=None,
                                 content_type='application/json'):
+        if query == None:
+            query = {}
         return self.client.get(defines.URL_ROOT + asset_type + '/all/' + output_format, 
-                ACCEPT=content_type)
+                query, ACCEPT=content_type)
     
 class ApiSearchIntegrationTests(ApiTestsBase):
 
@@ -273,6 +275,13 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         self.assertEqual(1, len(response_dict['metadata'].keys()))
         self.assertTrue(response_dict['metadata'].has_key('num_results'))
     
+    def test_extra_fields_with_asset_search(self):
+        response = self.get_all(asset_type='documents', output_format='short',
+                query={'q': 'undp', 'extra_fields': 'short_abstract long_abstract'})
+        # not all the results have the abstracts, so just check it doesn't
+        # immediately complain
+        self.assertEqual(200, response.status_code)
+
 
 class ApiSearchErrorTests(ApiTestsBase):
 
@@ -354,12 +363,23 @@ class ApiGetAllIntegrationTests(ApiTestsBase):
         response = self.get_all(asset_type='foobars')
         self.assertEqual(400, response.status_code)
 
+    def test_extra_fields_with_all_assets(self):
+        response = self.get_all(asset_type='documents', 
+                query={'extra_fields': 'short_abstract long_abstract'})
+        result_list = json.loads(response.content)['results']
+        for result in result_list:
+            self.assertTrue(result.has_key('short_abstract'))
+            self.assertTrue(result.has_key('long_abstract'))
+
+
 class ApiGetAssetIntegrationTests(TestCase):
 
-    def get_asset(self, asset_type='assets', asset_id='12345', output_format='', 
+    def get_asset(self, asset_type='assets', asset_id='12345', output_format='', query=None,
                                 content_type='application/json'):
+        if query == None:
+            query = {}
         return self.client.get(defines.URL_ROOT + asset_type + '/' + asset_id + '/' + output_format, 
-                ACCEPT=content_type)
+                query, ACCEPT=content_type)
 
     def test_get_document_by_id_returns_200(self):
         response = self.get_asset(asset_type='documents')
@@ -368,6 +388,13 @@ class ApiGetAssetIntegrationTests(TestCase):
     def test_get_asset_by_id_returns_200(self):
         response = self.get_asset()
         self.assertEqual(200, response.status_code)
+
+    def test_extra_fields_with_get_asset(self):
+        response = self.get_asset(asset_type='documents', 
+                query={'extra_fields': 'short_abstract long_abstract'})
+        result = json.loads(response.content)['results']
+        self.assertTrue(result.has_key('short_abstract'))
+        self.assertTrue(result.has_key('long_abstract'))
 
     def test_404_returned_if_no_asset(self):
         response = self.get_asset(asset_id='1234567890')

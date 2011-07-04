@@ -128,9 +128,10 @@ class AssetView(BaseSearchView):
     def get(self, request, asset_id, output_format, asset_type=None):
         self.output_format = output_format
         self.data_munger = DataMunger()
+        search_params = request.GET
 
         try:
-            self.query = SearchBuilder.create_assetid_query(asset_id, asset_type)
+            self.query = SearchBuilder.create_assetid_query(asset_id, asset_type, search_params, output_format)
         except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
         except SolrUnavailableError as e:
@@ -138,7 +139,7 @@ class AssetView(BaseSearchView):
 
         # return the metadata with the output_format specified
         try:
-            return self.build_response()
+            return {'results': self.build_response()[0]}
         except NoAssetFoundError:
             return Response(status.HTTP_404_NOT_FOUND, 
                     content='No %s found with asset_id %s' % (asset_type, asset_id))
@@ -154,7 +155,7 @@ class AssetSearchView(BaseSearchView):
             return Response(status.HTTP_400_BAD_REQUEST, 
                     content='asset search must have some query string, eg /assets/search/short?q=undp')
         try:
-            self.query = SearchBuilder.create_search(search_params, asset_type)
+            self.query = SearchBuilder.create_search(search_params, asset_type, output_format)
         except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
         except SolrUnavailableError as e:
@@ -171,7 +172,7 @@ class AllAssetView(BaseSearchView):
 
         search_params = request.GET
         try:
-            self.query = SearchBuilder.create_all_search(search_params, asset_type)
+            self.query = SearchBuilder.create_all_search(search_params, asset_type, output_format)
         except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
         except SolrUnavailableError as e:
@@ -185,7 +186,7 @@ class FacetCountView(View):
     def get(self, request, asset_type, facet_type):
         search_params = request.GET
         try:
-            query = SearchBuilder.create_search(search_params, asset_type, facet_type)
+            query = SearchBuilder.create_search(search_params, asset_type, 'id', facet_type)
         except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
         except SolrUnavailableError as e:

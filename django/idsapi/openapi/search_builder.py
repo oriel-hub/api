@@ -43,10 +43,14 @@ facet_mapping = {
 class SearchBuilder():
 
     @classmethod
-    def create_assetid_query(cls, asset_id, asset_type):
+    def create_assetid_query(cls, asset_id, asset_type, search_params, output_format):
+        for key in search_params.keys():
+            if key not in ['extra_fields']:
+                raise InvalidQueryError("Unknown query parameter '%s'" % key)
         sw = SearchWrapper()
         sw.si_query = sw.solr.query(asset_id=asset_id)
         sw.restrict_search_by_asset(asset_type)
+        sw.restrict_fields_returned(output_format, search_params)
         return sw
 
     @classmethod
@@ -57,7 +61,7 @@ class SearchBuilder():
         return False
 
     @classmethod
-    def create_search(cls, search_params, asset_type, facet_type=None):
+    def create_search(cls, search_params, asset_type, output_format, facet_type=None):
         sw = SearchWrapper()
 
         for param in search_params:
@@ -82,10 +86,11 @@ class SearchBuilder():
                     sw.add_parameter_query(query_mapping[param]['solr_field'], query)
             elif SearchBuilder._is_date_query(param):
                 sw.add_date_query(param, query)
-            elif not param in ['num_results', 'num_results_only', 'start_offset']:
+            elif not param in ['num_results', 'num_results_only', 'start_offset', 'extra_fields']:
                 raise UnknownQueryParamError(param)
 
         sw.restrict_search_by_asset(asset_type)
+        sw.restrict_fields_returned(output_format, search_params)
         if facet_type == None:
             sw.add_paginate(search_params)
         else:
@@ -94,9 +99,10 @@ class SearchBuilder():
         return sw
 
     @classmethod
-    def create_all_search(cls, search_params, asset_type):
+    def create_all_search(cls, search_params, asset_type, output_format):
         sw = SearchWrapper()
         sw.restrict_search_by_asset(asset_type)
+        sw.restrict_fields_returned(output_format, search_params)
         sw.add_paginate(search_params)
         return sw
     
@@ -150,6 +156,20 @@ class SearchWrapper:
         if not facet_type in facet_mapping.keys():
             raise InvalidQueryError("Unknown count type: '%s_count'" % facet_type)
         self.si_query = self.si_query.facet_by(facet_mapping[facet_type])
+
+    def restrict_fields_returned(self, output_format, search_params):
+        if output_format == 'full':
+            return
+        # the id format needs object_type and title to construct the metadata_url
+        elif output_format in ['', 'short', 'id']:
+            field_list = ['asset_id', 'object_type', 'title']
+        else:
+            raise InvalidQueryError(
+                    "the output_format of data returned can be 'id', 'short' or 'full' - you gave '%s'" \
+                    % output_format)
+        if search_params.has_key('extra_fields'):
+            field_list.extend(search_params['extra_fields'].split(' '))
+        self.si_query = self.si_query.field_limit(field_list)
 
     def add_date_query(self, param, date):
         # strip the _year/_after/_before

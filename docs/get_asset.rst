@@ -66,14 +66,19 @@ URL Formats
 Extra Fields
 ------------
 
-*Note:* The **extra_fields** parameter has not been implemented yet.
-
 You can request extra fields by using the **extra_fields** query parameter.
 List the fields you want, separating them by commas.
 
-The available fields vary by asset type. The common fields are:
+The available fields vary by asset type. The complete list of fields can be
+seen by using the ``fieldlist`` query - see above. Note that not every asset
+has every field - in fact no asset has every field, as some fields are specific
+to one asset type or another.
 
-* title
-* more ...
+For multiple fields, put a ``+`` in between them. So in order to get the short
+format, but add the short and long abstract you would add
 
-Fields only available to documents are:
+  ``extra_fields=short_abstract+long_abstract``
+
+These fields only exist for documents, so we could do:
+
+  ``/openapi/documents/12345/short?extra_fields=short_abstract+long_abstract``

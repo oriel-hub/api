@@ -76,7 +76,7 @@ URL Format For Searches
 
    **Special query fields:**
 
-   :query extra_fields: Extra fields to include in the response (*not implemeted yet*)
+   :query extra_fields: Extra fields to include in the response. See the :ref:`extra-fields` section for details. 
    :query num_results_only: Just return the number of results (in the metadata) but not the actual results.
 
    **Document specific query fields:**
@@ -124,7 +124,7 @@ URL Format For Searches
    be id, short or full, as for search.
 
    The only query parameters allowed are **extra_fields** and the various
-   **sort_by** arguments, which all work as for the search query. *Not
+   **sort_by** arguments, which all work as for the search query. *sort_by is not
    implemented yet.*
 
 .. http:get:: /openapi/(asset_type)/country_count/

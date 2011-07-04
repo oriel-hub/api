@@ -7,16 +7,14 @@ class DataMunger():
     def get_required_data(self, result, output_format):
         asset_id = result['asset_id']
         if output_format == 'id':
-            asset_data = { 'asset_id': asset_id }
-        elif output_format == 'short' or output_format == '':
-            asset_data = dict((k, v) for k, v in result.items() if k in ['asset_id', 'object_type', 'title'])
+            asset_data = {'asset_id': asset_id}
         elif output_format == 'full':
             asset_data = dict((k, v) for k, v in result.items() \
                     if not (k.endswith('_facet') or k in defines.HIDDEN_FIELDS))
             if defines.object_name_to_asset_type(result['object_type']) in defines.ASSET_TYPES_WITH_HIERARCHY:
                 self._add_child_parent_links(asset_data, asset_id, result)
         else:
-            raise DataMungerFormatError("the output_format of data returned can be 'id', 'short' or 'full'")
+            asset_data = result
 
         asset_data['metadata_url'] = self._make_get_asset_url(asset_id, result)
         return asset_data
