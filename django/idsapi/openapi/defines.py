@@ -3,7 +3,7 @@ import exceptions
 
 URL_ROOT = '/openapi/'
 
-asset_types_to_object_name = {
+ASSET_TYPES_TO_OBJECT_NAME = {
 'assets':        None,
 'documents':     'CDocument',
 'organisations': 'COrganisation',
@@ -16,16 +16,16 @@ asset_types_to_object_name = {
 'itemtypes':     'itemtype',
 }
 
-asset_types  = asset_types_to_object_name.keys()
-object_names = asset_types_to_object_name.values()
+ASSET_TYPES  = ASSET_TYPES_TO_OBJECT_NAME.keys()
+OBJECT_NAMES = ASSET_TYPES_TO_OBJECT_NAME.values()
 
-asset_types_with_hierarchy = ['themes', 'itemtypes']
+ASSET_TYPES_WITH_HIERARCHY = ['themes', 'itemtypes']
 
-hidden_fields = ['send_email_alerts']
+HIDDEN_FIELDS = ['send_email_alerts']
 
 def object_name_to_asset_type(object_name):
-    for asset_type in asset_types_to_object_name:
-        if asset_types_to_object_name[asset_type] == object_name:
+    for asset_type in ASSET_TYPES_TO_OBJECT_NAME:
+        if ASSET_TYPES_TO_OBJECT_NAME[asset_type] == object_name:
             return asset_type
 
 class IdsApiError(exceptions.StandardError):

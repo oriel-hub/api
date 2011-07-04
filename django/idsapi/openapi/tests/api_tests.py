@@ -66,7 +66,7 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         search_results = json.loads(response.content)['results']
         for result in search_results:
             for key in result.keys():
-                self.assertFalse(key in defines.hidden_fields)
+                self.assertFalse(key in defines.HIDDEN_FIELDS)
 
     def test_query_by_country(self):
         response = self.asset_search(query={'country':'namibia'})
@@ -173,7 +173,7 @@ class ApiSearchIntegrationTests(ApiTestsBase):
             # should now have something like ['documents', '1234', 'full', 'asdf']
             self.assertTrue(len(url_bits) == 4)
             self.assertTrue(url_bits[0] != 'assets')
-            self.assertTrue(url_bits[0] in defines.asset_types)
+            self.assertTrue(url_bits[0] in defines.ASSET_TYPES)
             self.assertTrue(url_bits[1].isdigit())
             self.assertTrue(url_bits[2] == 'full')
             self.assertTrue(re.match(r'^[-\w]+$', url_bits[3]) != None)
@@ -453,7 +453,7 @@ class ApiCategoryChildrenIntegrationTests(ApiTestsBase):
         self.assertEqual(400, response.status_code)
 
     def test_all_have_children_link(self):
-        for asset_type in defines.asset_types_with_hierarchy:
+        for asset_type in defines.ASSET_TYPES_WITH_HIERARCHY:
             response = self.get_all(asset_type=asset_type, output_format='full') 
             search_results = json.loads(response.content)
             for result in search_results['results']:

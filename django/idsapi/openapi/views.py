@@ -12,7 +12,7 @@ from django.conf import settings
 from openapi.data import DataMunger, DataMungerFormatError
 from openapi.search_builder import SearchBuilder, BadRequestError, SolrUnavailableError, \
     facet_mapping
-from openapi.defines import URL_ROOT, IdsApiError
+from openapi.defines import URL_ROOT, IdsApiError, HIDDEN_FIELDS
 
 class RootView(View):
     def get(self, request):
@@ -205,7 +205,7 @@ class FieldListView(View):
                 doc.getElementsByTagName('fields')[0].getElementsByTagName('field')]
         field_list.sort()
         field_list = [elem for elem in field_list if not elem.endswith('_facet')]
-        field_list = [elem for elem in field_list if not elem in ['text', 'word']]
+        field_list = [elem for elem in field_list if not elem in ['text', 'word'] + HIDDEN_FIELDS]
         return field_list
     
 class CategoryChildrenView(BaseSearchView):
