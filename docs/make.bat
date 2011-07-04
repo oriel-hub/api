@@ -39,8 +39,6 @@ if "%1" == "clean" (
 )
 
 if "%1" == "html" (
-    echo. Made it this far
-    echo. sphinxbuild is %SPHINXBUILD%
 	%SPHINXBUILD% -b html %ALLSPHINXOPTS% %BUILDDIR%/html
 	if errorlevel 1 exit /b 1
 	echo.
