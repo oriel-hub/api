@@ -288,8 +288,8 @@ class ApiSearchSortTests(ApiTestsBase):
                 query={'q': 'undp', 'sort_asc': 'publication_date'})
         results = json.loads(response.content)['results']
         for i in range(0,9):
-            date1 = datetime.datetime.strptime(results[i]['publication_date'], "%Y-%m-%d %H:%M:%S.00")
-            date2 = datetime.datetime.strptime(results[i+1]['publication_date'], "%Y-%m-%d %H:%M:%S.00")
+            date1 = datetime.datetime.strptime(results[i]['publication_date'][0:19], "%Y-%m-%d %H:%M:%S")
+            date2 = datetime.datetime.strptime(results[i+1]['publication_date'][0:19], "%Y-%m-%d %H:%M:%S")
             self.assertTrue(date1 <= date2)
 
     def test_sort_descending_by_asset_id(self):
@@ -297,8 +297,8 @@ class ApiSearchSortTests(ApiTestsBase):
                 query={'q': 'undp', 'sort_desc': 'publication_date'})
         results = json.loads(response.content)['results']
         for i in range(0,9):
-            date1 = datetime.datetime.strptime(results[i]['publication_date'], "%Y-%m-%d %H:%M:%S.00")
-            date2 = datetime.datetime.strptime(results[i+1]['publication_date'], "%Y-%m-%d %H:%M:%S.00")
+            date1 = datetime.datetime.strptime(results[i]['publication_date'][0:19], "%Y-%m-%d %H:%M:%S")
+            date2 = datetime.datetime.strptime(results[i+1]['publication_date'][0:19], "%Y-%m-%d %H:%M:%S")
             self.assertTrue(date1 >= date2)
 
 
