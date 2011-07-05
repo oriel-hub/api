@@ -287,7 +287,7 @@ class ApiSearchSortTests(ApiTestsBase):
         response = self.asset_search(asset_type='documents', output_format='full',
                 query={'q': 'undp', 'sort_asc': 'publication_date'})
         results = json.loads(response.content)['results']
-        for i in range(0,9):
+        for i in range(9):
             date1 = datetime.datetime.strptime(results[i]['publication_date'][0:19], "%Y-%m-%d %H:%M:%S")
             date2 = datetime.datetime.strptime(results[i+1]['publication_date'][0:19], "%Y-%m-%d %H:%M:%S")
             self.assertTrue(date1 <= date2)
@@ -296,11 +296,15 @@ class ApiSearchSortTests(ApiTestsBase):
         response = self.asset_search(asset_type='documents', output_format='full',
                 query={'q': 'undp', 'sort_desc': 'publication_date'})
         results = json.loads(response.content)['results']
-        for i in range(0,9):
+        for i in range(9):
             date1 = datetime.datetime.strptime(results[i]['publication_date'][0:19], "%Y-%m-%d %H:%M:%S")
             date2 = datetime.datetime.strptime(results[i+1]['publication_date'][0:19], "%Y-%m-%d %H:%M:%S")
             self.assertTrue(date1 >= date2)
 
+    def test_400_returned_for_unknown_sort_field(self):
+        response = self.asset_search(asset_type='documents', output_format='full',
+                query={'q': 'undp', 'sort_desc': 'foobar'})
+        self.assertEqual(400, response.status_code)
 
 class ApiSearchErrorTests(ApiTestsBase):
 

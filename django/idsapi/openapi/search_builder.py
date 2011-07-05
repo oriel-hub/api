@@ -154,10 +154,13 @@ class SearchWrapper:
     def add_sort(self, search_params):
         if search_params.has_key('sort_asc') and search_params.has_key('sort_desc'):
             raise InvalidQueryError("Cannot use both 'sort_asc' and 'sort_desc'")
-        if search_params.has_key('sort_asc'):
-            self.si_query = self.si_query.sort_by(search_params['sort_asc'])
-        if search_params.has_key('sort_desc'):
-            self.si_query = self.si_query.sort_by('-' + search_params['sort_desc'])
+        try:
+            if search_params.has_key('sort_asc'):
+                self.si_query = self.si_query.sort_by(search_params['sort_asc'])
+            if search_params.has_key('sort_desc'):
+                self.si_query = self.si_query.sort_by('-' + search_params['sort_desc'])
+        except sunburnt.SolrError as e:
+            raise InvalidQueryError("Can't do sort - " + str(e))
 
     def add_free_text_query(self, search_text):
         self.si_query = self.si_query.query(search_text)

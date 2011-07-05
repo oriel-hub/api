@@ -187,7 +187,7 @@ class FieldListView(View):
     def get(self, request):
         # fetch file from SOLR_SCHEMA
         http = httplib2.Http(".cache")
-        resp, content = http.request(settings.SOLR_SCHEMA, "GET") #@UnusedVariable
+        _, content = http.request(settings.SOLR_SCHEMA, "GET") #@UnusedVariable
         doc = minidom.parseString(content)
         field_list = [field.getAttribute('name') for field in 
                 doc.getElementsByTagName('fields')[0].getElementsByTagName('field')]
