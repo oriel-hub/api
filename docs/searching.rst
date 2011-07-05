@@ -1,8 +1,12 @@
+=========
 Searching
 =========
 
 URL Format For Searches
------------------------
+=======================
+
+General Search
+--------------
 
 .. http:get:: /openapi/(asset_type)/search/(format)?q
 
@@ -127,6 +131,9 @@ URL Format For Searches
    :statuscode 400: The URL was in an invalid format. There will be a message explaining why.
    :statuscode 500: There was a server fault. Try again later.
 
+Get All Assets
+--------------
+
 .. http:get:: /openapi/(asset_type)/all/(format)
 
    Retrieve list of assets of type **asset_type**. This will return all the assets.
@@ -136,6 +143,9 @@ URL Format For Searches
    The only query parameters allowed are **extra_fields** and the various
    **sort_by** arguments, which all work as for the search query. *sort_by is not
    implemented yet.*
+
+Get Count of Results by Country, Keyword etc
+--------------------------------------------
 
 .. http:get:: /openapi/(asset_type)/country_count/
 .. http:get:: /openapi/(asset_type)/keyword_count/
@@ -157,6 +167,9 @@ URL Format For Searches
    
    **Example:** ``/openapi/documents/country_count/?q=undp``
 
+Get Child Categories
+--------------------
+
 .. http:get:: /openapi/(category_type)/(int:asset_id)/children/(format)
 
    Retrieve the child categories for the category with the given **asset_id**.
@@ -174,7 +187,7 @@ URL Format For Searches
    **Example:** ``/openapi/themes/34/children/full``
    
 Combining Search Terms
-----------------------
+======================
 
 If you have multiple search terms in the query parameters, then the items
 returned will be those that match *all* of the search terms. To put it another
@@ -227,7 +240,7 @@ encode the URL with (in pseudo-code)::
    url += 'theme=' + url.encode('gender|climate change')
 
 Example Searches
-----------------
+================
 
 To find all entries that mention UNDP you would use:
 

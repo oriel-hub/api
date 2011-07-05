@@ -1,8 +1,12 @@
+============
 Get An Asset
 ============
 
 URL Formats
------------
+===========
+
+Get Single Asset
+----------------
 
 .. http:get:: /openapi/(asset_type)/(int:asset_id)/(format)
 
@@ -51,6 +55,9 @@ URL Formats
    * ``/openapi/countries/1100/full/India``
    * ``/openapi/documents/24903/full/undp-human-development-report-1996-highlights``
 
+Get List of Fields
+------------------
+
 .. http:get:: /openapi/fieldlist/
 
    Retrieve the list of fields. The list will name all fields that might appear
@@ -64,7 +71,7 @@ URL Formats
 .. _extra-fields:
 
 Extra Fields
-------------
+============
 
 You can request extra fields by using the **extra_fields** query parameter.
 List the fields you want, separating them by commas.

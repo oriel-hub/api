@@ -1,8 +1,9 @@
+================
 Response Details
 ================
 
 Response Format
----------------
+===============
 
 The data can be returned as JSON or as XML (or as a nice HTML page which by
 default shows formatted JSON - handy for exploring the interface). You specify
@@ -69,7 +70,7 @@ items. The first item will be the name of the category and the second
 item will be the number of times the category appears in the results.
 
 Example Responses
------------------
+=================
 
 *(Note that all the below examples are nicely formatted, the actual format will
 not have the whitespace.)*
