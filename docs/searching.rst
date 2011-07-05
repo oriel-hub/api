@@ -141,8 +141,7 @@ Get All Assets
    be id, short or full, as for search.
 
    The only query parameters allowed are **extra_fields** and the various
-   **sort_by** arguments, which all work as for the search query. *sort_by is not
-   implemented yet.*
+   **sort_by** arguments, which all work as for the search query.
 
 Get Count of Results by Country, Keyword etc
 --------------------------------------------
