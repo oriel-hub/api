@@ -21,7 +21,7 @@ class ApiTestsBase(TestCase):
         return self.client.get(defines.URL_ROOT + asset_type + '/all/' + output_format, 
                 query, ACCEPT=content_type)
     
-class ApiSearchIntegrationTests(ApiTestsBase):
+class ApiSearchResponseTests(ApiTestsBase):
 
     def test_id_only_search_returns_200(self):
         response = self.asset_search(output_format='id')
@@ -69,6 +69,14 @@ class ApiSearchIntegrationTests(ApiTestsBase):
             for key in result.keys():
                 self.assertFalse(key in defines.HIDDEN_FIELDS)
 
+    def test_can_specify_content_type_in_query(self):
+        response = self.asset_search(query={'q': 'undp', '_accept': 'application/json'},
+                content_type='test/html')
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response['Content-Type'].lower(), 'application/json')
+
+class ApiSearchIntegrationTests(ApiTestsBase):
+
     def test_query_by_country(self):
         response = self.asset_search(query={'country':'namibia'})
         # no assert - if the above line throws an exception then the test fails
@@ -115,47 +123,6 @@ class ApiSearchIntegrationTests(ApiTestsBase):
             namibia_found = ' '.join(result['country_focus']).lower().find('namibia') > -1
             iran_found = ' '.join(result['country_focus']).lower().find('iran') > -1
             self.assertTrue(namibia_found or iran_found)
-
-    def test_search_response_has_metadata(self):
-        response = self.asset_search()
-        metadata = json.loads(response.content)['metadata']
-        self.assertTrue(metadata.has_key('num_results') and metadata.has_key('start_offset'))
-
-    def test_search_response_has_next_in_metadata(self):
-        response = self.asset_search()
-        metadata = json.loads(response.content)['metadata']
-        self.assertTrue(metadata.has_key('next_page'))
-        self.assertTrue(metadata['next_page'].find('num_results') > -1)
-        self.assertTrue(metadata['next_page'].find('start_offset') > -1)
-        # also, default search should not have prev_page link
-        self.assertFalse(metadata.has_key('prev_page'))
-
-    def test_2nd_page_has_prev_in_metadata(self):
-        response = self.asset_search(query={'q': 'undp', 'start_offset': '10'})
-        metadata = json.loads(response.content)['metadata']
-        self.assertTrue(metadata.has_key('prev_page'))
-        self.assertTrue(metadata['prev_page'].find('num_results') > -1)
-        self.assertTrue(metadata['prev_page'].find('start_offset') > -1)
-
-    def test_prev_never_has_negative_start_offset(self):
-        response = self.asset_search(query={'q': 'undp', 'start_offset': '1'})
-        metadata = json.loads(response.content)['metadata']
-        self.assertTrue(metadata.has_key('prev_page'))
-        match = re.search(r'start_offset=([-0-9]+)', metadata['prev_page'])
-        self.assertTrue(int(match.group(1)) >= 0)
-
-    def test_num_results_in_query_matches_results_returned(self):
-        response = self.asset_search(query={'q': 'undp', 'num_results': '20'})
-        results = json.loads(response.content)['results']
-        self.assertEqual(20, len(results))
-
-    def test_num_results_correctly_passed_on_to_next_and_prev_links(self):
-        response = self.asset_search(
-                query={'q': 'undp', 'num_results': '20', 'start_offset': '20'})
-        metadata = json.loads(response.content)['metadata']
-        for link in ('prev_page', 'next_page'):
-            match = re.search(r'num_results=([-0-9]+)', metadata[link])
-            self.assertTrue(int(match.group(1)) == 20)
 
     def test_blank_search_returns_same_as_short_search(self):
         response_short = self.asset_search(output_format='short')
@@ -205,18 +172,6 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         response = self.asset_search(query={'keyword': 'af*ca'})
         self.assertEqual(200, response.status_code)
 
-    def test_200_returned_for_metadata_published_before(self):
-        response = self.asset_search(query={'metadata_published_before': '2008-12-31'})
-        self.assertEqual(200, response.status_code)
-    
-    def test_200_returned_for_metadata_published_after(self):
-        response = self.asset_search(query={'metadata_published_after': '2008-12-31'})
-        self.assertEqual(200, response.status_code)
-    
-    def test_200_returned_for_metadata_published_year(self):
-        response = self.asset_search(query={'metadata_published_year': '2008'})
-        self.assertEqual(200, response.status_code)
-    
     def test_document_specific_query_param_author(self):
         response = self.asset_search(asset_type='documents', query={'author': 'john'})
         self.assertEqual(200, response.status_code)
@@ -242,6 +197,79 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         for result in search_results:
             self.assertTrue(result['item_type'].lower().find('other') > -1)
         
+    def test_num_results_only_returns_only_num_results(self):
+        response = self.asset_search(query={'q': 'undp', 'num_results_only': None})
+        self.assertEqual(200, response.status_code)
+        response_dict = json.loads(response.content)
+        self.assertTrue(response_dict.has_key('metadata'))
+        self.assertFalse(response_dict.has_key('results'))
+        self.assertEqual(1, len(response_dict['metadata'].keys()))
+        self.assertTrue(response_dict['metadata'].has_key('num_results'))
+    
+    def test_extra_fields_with_asset_search(self):
+        response = self.asset_search(asset_type='documents', output_format='short',
+                query={'q': 'undp', 'extra_fields': 'short_abstract long_abstract'})
+        # not all the results have the abstracts, so just check it doesn't
+        # immediately complain
+        self.assertEqual(200, response.status_code)
+
+class ApiPaginationTests(ApiTestsBase):
+
+    def test_search_response_has_metadata(self):
+        response = self.asset_search()
+        metadata = json.loads(response.content)['metadata']
+        self.assertTrue(metadata.has_key('num_results') and metadata.has_key('start_offset'))
+
+    def test_search_response_has_next_in_metadata(self):
+        response = self.asset_search()
+        metadata = json.loads(response.content)['metadata']
+        self.assertTrue(metadata.has_key('next_page'))
+        self.assertTrue(metadata['next_page'].find('num_results') > -1)
+        self.assertTrue(metadata['next_page'].find('start_offset') > -1)
+        # also, default search should not have prev_page link
+        self.assertFalse(metadata.has_key('prev_page'))
+
+    def test_2nd_page_has_prev_in_metadata(self):
+        response = self.asset_search(query={'q': 'undp', 'start_offset': '10'})
+        metadata = json.loads(response.content)['metadata']
+        self.assertTrue(metadata.has_key('prev_page'))
+        self.assertTrue(metadata['prev_page'].find('num_results') > -1)
+        self.assertTrue(metadata['prev_page'].find('start_offset') > -1)
+
+    def test_prev_never_has_negative_start_offset(self):
+        response = self.asset_search(query={'q': 'undp', 'start_offset': '1'})
+        metadata = json.loads(response.content)['metadata']
+        self.assertTrue(metadata.has_key('prev_page'))
+        match = re.search(r'start_offset=([-0-9]+)', metadata['prev_page'])
+        self.assertTrue(int(match.group(1)) >= 0)
+
+    def test_num_results_in_query_matches_results_returned(self):
+        response = self.asset_search(query={'q': 'undp', 'num_results': '20'})
+        results = json.loads(response.content)['results']
+        self.assertEqual(20, len(results))
+
+    def test_num_results_correctly_passed_on_to_next_and_prev_links(self):
+        response = self.asset_search(
+                query={'q': 'undp', 'num_results': '20', 'start_offset': '20'})
+        metadata = json.loads(response.content)['metadata']
+        for link in ('prev_page', 'next_page'):
+            match = re.search(r'num_results=([-0-9]+)', metadata[link])
+            self.assertTrue(int(match.group(1)) == 20)
+
+class ApiDateQueryTests(ApiTestsBase):
+
+    def test_200_returned_for_metadata_published_before(self):
+        response = self.asset_search(query={'metadata_published_before': '2008-12-31'})
+        self.assertEqual(200, response.status_code)
+    
+    def test_200_returned_for_metadata_published_after(self):
+        response = self.asset_search(query={'metadata_published_after': '2008-12-31'})
+        self.assertEqual(200, response.status_code)
+    
+    def test_200_returned_for_metadata_published_year(self):
+        response = self.asset_search(query={'metadata_published_year': '2008'})
+        self.assertEqual(200, response.status_code)
+    
     def test_200_returned_for_document_published_before(self):
         response = self.asset_search(query={'document_published_before': '2008-12-31'})
         self.assertEqual(200, response.status_code)
@@ -264,22 +292,6 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         for query_param in ['item_started_year', 'item_finished_year',]:
             response = self.asset_search(query={query_param: '2008'})
             self.assertEqual(200, response.status_code)
-
-    def test_num_results_only_returns_only_num_results(self):
-        response = self.asset_search(query={'q': 'undp', 'num_results_only': None})
-        self.assertEqual(200, response.status_code)
-        response_dict = json.loads(response.content)
-        self.assertTrue(response_dict.has_key('metadata'))
-        self.assertFalse(response_dict.has_key('results'))
-        self.assertEqual(1, len(response_dict['metadata'].keys()))
-        self.assertTrue(response_dict['metadata'].has_key('num_results'))
-    
-    def test_extra_fields_with_asset_search(self):
-        response = self.asset_search(asset_type='documents', output_format='short',
-                query={'q': 'undp', 'extra_fields': 'short_abstract long_abstract'})
-        # not all the results have the abstracts, so just check it doesn't
-        # immediately complain
-        self.assertEqual(200, response.status_code)
 
 class ApiSearchSortTests(ApiTestsBase):
 

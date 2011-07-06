@@ -86,9 +86,13 @@ class SearchBuilder():
                     sw.add_parameter_query(query_mapping[param]['solr_field'], query)
             elif SearchBuilder._is_date_query(param):
                 sw.add_date_query(param, query)
+            # if param not in our list of allowed params
             elif not param in ['num_results', 'num_results_only', 'start_offset', 
                     'extra_fields', 'sort_asc', 'sort_desc']:
-                raise UnknownQueryParamError(param)
+                # params that start with _ are allowed - the django rest
+                # framework deals with them
+                if param[0] != '_':
+                    raise UnknownQueryParamError(param)
 
         sw.restrict_search_by_asset(asset_type)
         sw.restrict_fields_returned(output_format, search_params)
