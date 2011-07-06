@@ -103,7 +103,7 @@ class ApiSearchIntegrationTests(ApiTestsBase):
             response = self.asset_search(query=query_term)
             self.assertEqual(200, response.status_code)
             search_results = json.loads(response.content)
-            self.assertTrue(search_results['metadata']['num_results'] > 0)
+            self.assertTrue(search_results['metadata']['total_results'] > 0)
 
     def test_query_by_boolean_country_and_free_text(self):
         response = self.asset_search(query={'q':'undp', 'country':'angola&tanzania'})
@@ -161,7 +161,7 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         self.assertEqual(200, response.status_code)
         # this test is just to check the search actually returned zero results
         search_results = json.loads(response.content)
-        self.assertEqual(0, search_results['metadata']['num_results'])
+        self.assertEqual(0, search_results['metadata']['total_results'])
         self.assertEqual(0, len(search_results['results']))
 
     def test_200_returned_for_trailing_star(self):
@@ -197,14 +197,14 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         for result in search_results:
             self.assertTrue(result['item_type'].lower().find('other') > -1)
         
-    def test_num_results_only_returns_only_num_results(self):
+    def test_num_results_only_returns_only_total_results(self):
         response = self.asset_search(query={'q': 'undp', 'num_results_only': None})
         self.assertEqual(200, response.status_code)
         response_dict = json.loads(response.content)
         self.assertTrue(response_dict.has_key('metadata'))
         self.assertFalse(response_dict.has_key('results'))
         self.assertEqual(1, len(response_dict['metadata'].keys()))
-        self.assertTrue(response_dict['metadata'].has_key('num_results'))
+        self.assertTrue(response_dict['metadata'].has_key('total_results'))
     
     def test_extra_fields_with_asset_search(self):
         response = self.asset_search(asset_type='documents', output_format='short',
@@ -218,7 +218,7 @@ class ApiPaginationTests(ApiTestsBase):
     def test_search_response_has_metadata(self):
         response = self.asset_search()
         metadata = json.loads(response.content)['metadata']
-        self.assertTrue(metadata.has_key('num_results') and metadata.has_key('start_offset'))
+        self.assertTrue(metadata.has_key('total_results') and metadata.has_key('start_offset'))
 
     def test_search_response_has_next_in_metadata(self):
         response = self.asset_search()
@@ -260,7 +260,7 @@ class ApiDateQueryTests(ApiTestsBase):
 
     def test_200_returned_for_metadata_published_before(self):
         response = self.asset_search(query={'metadata_published_before': '2011-12-31'})
-        query_date = datetime.datetime.strptime('2008-12-31', "%Y-%m-%d")
+        query_date = datetime.datetime.strptime('2011-12-31', "%Y-%m-%d")
         results = json.loads(response.content)['results']
         for result in results:
             metadata_published = datetime.datetime.strptime(
@@ -282,7 +282,7 @@ class ApiDateQueryTests(ApiTestsBase):
         for result in results:
             metadata_published = datetime.datetime.strptime(
                     result['timestamp'][0:19], "%Y-%m-%d %H:%M:%S")
-            self.assertEqual(2008, metadata_published.year)
+            self.assertEqual(2011, metadata_published.year)
     
     def test_200_returned_for_document_published_before(self):
         response = self.asset_search(query={'document_published_before': '2008-12-31'})
