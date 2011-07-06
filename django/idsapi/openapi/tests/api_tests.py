@@ -368,6 +368,10 @@ class ApiSearchErrorTests(ApiTestsBase):
         response = self.asset_search(query={'country': ''})
         self.assertEqual(400, response.status_code)
 
+    def test_404_returned_for_unknown_path(self):
+        response = self.client.get('/openapi/foobar')
+        self.assertEqual(404, response.status_code)
+
     # TODO: fails - framework bug? think about this ...
     #def test_406_returned_if_unknown_return_format(self):
     #    response = self.asset_search(content_type='application/foobar')
