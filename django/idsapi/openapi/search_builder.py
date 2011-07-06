@@ -197,19 +197,19 @@ class SearchWrapper:
         solr_param = date_prefix_mapping[param_prefix]
         if param.endswith('_year'):
             if len(date) != 4 or not date.isdigit():
-                raise InvalidQueryError("Invalid date, should be 4 digits but is %s" % date)
+                raise InvalidQueryError("Invalid year, should be 4 digits but is %s" % date)
             year = int(date)
             kwargs = {solr_param + '__range': (str(year), str(year+1))}
-            self.si_query.query(**kwargs)
+            self.si_query = self.si_query.query(**kwargs)
         else:
             if re.match(r'\d{4}-\d{2}-\d{2}', date) == None:
                 raise InvalidQueryError("Invalid date, should be YYYY-MM-DD but is %s" % date)
             if param.endswith('_after'):
                 kwargs = {solr_param + '__gte': date}
-                self.si_query.query(**kwargs)
+                self.si_query = self.si_query.query(**kwargs)
             elif param.endswith('_before'):
                 kwargs = {solr_param + '__lt': date}
-                self.si_query.query(**kwargs)
+                self.si_query = self.si_query.query(**kwargs)
             else:
                 raise InvalidQueryError("Unknown date query '%s'." % param)
 

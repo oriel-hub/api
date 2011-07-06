@@ -260,27 +260,55 @@ class ApiDateQueryTests(ApiTestsBase):
 
     def test_200_returned_for_metadata_published_before(self):
         response = self.asset_search(query={'metadata_published_before': '2008-12-31'})
-        self.assertEqual(200, response.status_code)
+        query_date = datetime.datetime.strptime('2008-12-31', "%Y-%m-%d")
+        results = json.loads(response.content)['results']
+        for result in results:
+            metadata_published = datetime.datetime.strptime(
+                    result['timestamp'][0:19], "%Y-%m-%d %H:%M:%S")
+            self.assertTrue(metadata_published < query_date)
     
     def test_200_returned_for_metadata_published_after(self):
         response = self.asset_search(query={'metadata_published_after': '2008-12-31'})
-        self.assertEqual(200, response.status_code)
+        query_date = datetime.datetime.strptime('2008-12-31', "%Y-%m-%d")
+        results = json.loads(response.content)['results']
+        for result in results:
+            metadata_published = datetime.datetime.strptime(
+                    result['timestamp'][0:19], "%Y-%m-%d %H:%M:%S")
+            self.assertTrue(metadata_published >= query_date)
     
     def test_200_returned_for_metadata_published_year(self):
         response = self.asset_search(query={'metadata_published_year': '2008'})
-        self.assertEqual(200, response.status_code)
+        results = json.loads(response.content)['results']
+        for result in results:
+            metadata_published = datetime.datetime.strptime(
+                    result['timestamp'][0:19], "%Y-%m-%d %H:%M:%S")
+            self.assertEqual(2008, metadata_published.year)
     
     def test_200_returned_for_document_published_before(self):
         response = self.asset_search(query={'document_published_before': '2008-12-31'})
-        self.assertEqual(200, response.status_code)
+        query_date = datetime.datetime.strptime('2008-12-31', "%Y-%m-%d")
+        results = json.loads(response.content)['results']
+        for result in results:
+            document_published = datetime.datetime.strptime(
+                    result['publication_date'][0:19], "%Y-%m-%d %H:%M:%S")
+            self.assertTrue(document_published < query_date)
     
     def test_200_returned_for_document_published_after(self):
         response = self.asset_search(query={'document_published_after': '2008-12-31'})
-        self.assertEqual(200, response.status_code)
+        query_date = datetime.datetime.strptime('2008-12-31', "%Y-%m-%d")
+        results = json.loads(response.content)['results']
+        for result in results:
+            document_published = datetime.datetime.strptime(
+                    result['publication_date'][0:19], "%Y-%m-%d %H:%M:%S")
+            self.assertTrue(document_published >= query_date)
     
     def test_200_returned_for_document_published_year(self):
         response = self.asset_search(query={'document_published_year': '2008'})
-        self.assertEqual(200, response.status_code)
+        results = json.loads(response.content)['results']
+        for result in results:
+            document_published = datetime.datetime.strptime(
+                    result['publication_date'][0:19], "%Y-%m-%d %H:%M:%S")
+            self.assertEqual(2008, document_published.year)
     
     def test_200_returned_for_item_dates(self):
         for query_param in ['item_started_after', 'item_started_before', 'item_finished_after',
