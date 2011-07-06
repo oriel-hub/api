@@ -71,6 +71,8 @@ class SearchBuilder():
                     "Cannot repeat query parameters - there is more than one '%s'" \
                     % param)
             query = query_list[0]
+            if len(query) < 1:
+                raise InvalidQueryError("All query parameters must have a value, but '%s' does not" % param)
             if param == 'q':
                 sw.add_free_text_query(query)
             elif param in query_mapping.keys():

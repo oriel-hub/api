@@ -259,7 +259,7 @@ class ApiPaginationTests(ApiTestsBase):
 class ApiDateQueryTests(ApiTestsBase):
 
     def test_200_returned_for_metadata_published_before(self):
-        response = self.asset_search(query={'metadata_published_before': '2008-12-31'})
+        response = self.asset_search(query={'metadata_published_before': '2011-12-31'})
         query_date = datetime.datetime.strptime('2008-12-31', "%Y-%m-%d")
         results = json.loads(response.content)['results']
         for result in results:
@@ -277,7 +277,7 @@ class ApiDateQueryTests(ApiTestsBase):
             self.assertTrue(metadata_published >= query_date)
     
     def test_200_returned_for_metadata_published_year(self):
-        response = self.asset_search(query={'metadata_published_year': '2008'})
+        response = self.asset_search(query={'metadata_published_year': '2011'})
         results = json.loads(response.content)['results']
         for result in results:
             metadata_published = datetime.datetime.strptime(
@@ -362,6 +362,10 @@ class ApiSearchErrorTests(ApiTestsBase):
 
     def test_400_returned_if_unknown_query_parameter(self):
         response = self.asset_search(query={'foo': 'bar'})
+        self.assertEqual(400, response.status_code)
+
+    def test_400_returned_if_query_parameter_has_no_value(self):
+        response = self.asset_search(query={'country': ''})
         self.assertEqual(400, response.status_code)
 
     # TODO: fails - framework bug? think about this ...
