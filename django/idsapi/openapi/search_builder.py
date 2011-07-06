@@ -79,7 +79,7 @@ class SearchBuilder():
                 if query_mapping[param]['asset_type'] != 'all':
                     if query_mapping[param]['asset_type'] != asset_type:
                         raise InvalidQueryError(
-                                "Can only use query parameter '%s' with asset type '%s', your had asset type '%s'" \
+                                "Can only use query parameter '%s' with asset type '%s', your search had asset type '%s'" \
                                 % (param, query_mapping[param]['asset_type'], asset_type))
                 # we might have to search across multiple fields
                 if isinstance(query_mapping[param]['solr_field'], list):

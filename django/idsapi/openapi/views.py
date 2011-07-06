@@ -71,10 +71,10 @@ class BaseSearchView(View):
         # return the metadata with the output_format specified
         results = self.build_response()
         if request.GET.has_key('num_results_only'):
-            return {'metadata': {'num_results': self.search_response.result.numFound} }
+            return {'metadata': {'total_results': self.search_response.result.numFound} }
 
         metadata = {
-                'num_results': self.search_response.result.numFound,
+                'total_results': self.search_response.result.numFound,
                 'start_offset': self.search_response.result.start,
                 }
         if self.next_page_available():
@@ -180,7 +180,7 @@ class FacetCountView(View):
             return Response(status.HTTP_500_INTERNAL_SERVER_ERROR, content=e)
         search_response = query.execute()
         facet_counts = search_response.facet_counts.facet_fields[facet_mapping[facet_type]]
-        return {'metadata': {'num_results': search_response.result.numFound}, 
+        return {'metadata': {'total_results': search_response.result.numFound}, 
                 facet_type+'_count': facet_counts}
 
 class FieldListView(View):

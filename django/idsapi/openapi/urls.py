@@ -14,25 +14,25 @@ urlpatterns = patterns('idsapi.openapi.views',
     # /assets/search/short
     # /themes/search/
     # /documents/search/full
-    url(r'^(?P<asset_type>\w+)/search/(?P<output_format>\w*)/?$', 
+    url(r'^(?P<asset_type>\w+)/search(?:/(?P<output_format>\w*)/?)?$',
         AssetSearchView.as_view(), name='asset_search'),
 
     # eg:
     # /themes/34/children/full
     # /documents/5678/
-    url(r'^(?P<asset_type>\w+)/(?P<asset_id>\d+)/children/(?P<output_format>\w*)/?$', 
+    url(r'^(?P<asset_type>\w+)/(?P<asset_id>\d+)/children(?:/(?P<output_format>\w*)/?)?$', 
         CategoryChildrenView.as_view(), name='category_children'),
 
     # eg:
     # /assets/1234/full
     # /documents/5678/
-    url(r'^(?P<asset_type>\w+)/(?P<asset_id>\d+)/(?P<output_format>\w*)(/\S*)?$', 
+    url(r'^(?P<asset_type>\w+)/(?P<asset_id>\d+)(?:/(?P<output_format>\w*)(/\S*)?)?$', 
         AssetView.as_view(), name='asset'),
 
     # eg:
     # /assets/all/full/
     # /documents/all/
-    url(r'^(?P<asset_type>\w+)/all/(?P<output_format>\w*)/?$', 
+    url(r'^(?P<asset_type>\w+)/all(?:/(?P<output_format>\w*)/?)?$', 
         AllAssetView.as_view(), name='all_asset'),
 
     # eg:
