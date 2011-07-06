@@ -336,6 +336,16 @@ class ApiSearchErrorTests(ApiTestsBase):
         response = self.asset_search(query={'foo': 'bar'})
         self.assertEqual(400, response.status_code)
 
+    # TODO: fails - framework bug? think about this ...
+    #def test_406_returned_if_unknown_return_format(self):
+    #    response = self.asset_search(content_type='application/foobar')
+    #    self.assertEqual(406, response.status_code)
+
+    def test_405_returned_for_post_method_not_allowed(self):
+        response = self.client.post(defines.URL_ROOT + 'assets/search/',
+                {'q': 'undp'}, ACCEPT='application/json')
+        self.assertEqual(405, response.status_code)
+
     def test_400_returned_for_repeated_country_search(self):
         response = self.asset_search(query={'country':['namibia','angola']})
         self.assertContains(response, 'country', status_code=400)
