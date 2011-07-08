@@ -323,7 +323,7 @@ class ApiDateQueryTests(ApiTestsBase):
 
 class ApiSearchSortTests(ApiTestsBase):
 
-    def test_sort_ascending_by_asset_id(self):
+    def test_sort_ascending_by_publication_date(self):
         response = self.asset_search(asset_type='documents', output_format='full',
                 query={'q': 'undp', 'sort_asc': 'publication_date'})
         results = json.loads(response.content)['results']
@@ -332,7 +332,7 @@ class ApiSearchSortTests(ApiTestsBase):
             date2 = datetime.datetime.strptime(results[i+1]['publication_date'][0:19], "%Y-%m-%d %H:%M:%S")
             self.assertTrue(date1 <= date2)
 
-    def test_sort_descending_by_asset_id(self):
+    def test_sort_descending_by_publication_date(self):
         response = self.asset_search(asset_type='documents', output_format='full',
                 query={'q': 'undp', 'sort_desc': 'publication_date'})
         results = json.loads(response.content)['results']
