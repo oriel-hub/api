@@ -45,7 +45,7 @@ class SearchBuilder():
     @classmethod
     def create_assetid_query(cls, asset_id, asset_type, search_params, output_format):
         for key in search_params.keys():
-            if key not in ['extra_fields']:
+            if key[0] != '_' and key not in ['extra_fields']:
                 raise InvalidQueryError("Unknown query parameter '%s'" % key)
         sw = SearchWrapper()
         sw.si_query = sw.solr.query(asset_id=asset_id)
@@ -190,7 +190,7 @@ class SearchWrapper:
         if output_format == 'full':
             return
         # the id format needs object_type and title to construct the metadata_url
-        elif output_format in ['', 'short', 'id']:
+        elif output_format in [None, '', 'short', 'id']:
             field_list = ['asset_id', 'object_type', 'title']
         else:
             raise InvalidQueryError(

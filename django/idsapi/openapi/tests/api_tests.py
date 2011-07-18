@@ -11,7 +11,11 @@ class ApiTestsBase(TestCase):
             content_type='application/json'):
         if query == None:
             query = {'q':'undp'}
-        return self.client.get(defines.URL_ROOT + asset_type + '/search/' + output_format, 
+        if output_format == 'no_slash':
+            output_format = ''
+        else:
+            output_format = '/' + output_format
+        return self.client.get(defines.URL_ROOT + asset_type + '/search' + output_format, 
                 query, ACCEPT=content_type)
 
     def get_all(self, asset_type='assets', output_format='', query=None,
@@ -71,7 +75,7 @@ class ApiSearchResponseTests(ApiTestsBase):
 
     def test_can_specify_content_type_in_query(self):
         response = self.asset_search(query={'q': 'undp', '_accept': 'application/json'},
-                content_type='test/html')
+                content_type='text/html')
         self.assertEqual(200, response.status_code)
         self.assertEqual(response['Content-Type'].lower(), 'application/json')
 
@@ -127,11 +131,14 @@ class ApiSearchIntegrationTests(ApiTestsBase):
     def test_blank_search_returns_same_as_short_search(self):
         response_short = self.asset_search(output_format='short')
         response_blank = self.asset_search(output_format='')
+        response_no_slash = self.asset_search(output_format='no_slash')
         # the metadata is different due to next/prev link containing "short",
         # or not, so just compare up to the metadata.
         response_short = response_short.content.split('"metadata":')[0]
         response_blank = response_blank.content.split('"metadata":')[0]
+        response_no_slash = response_no_slash.content.split('"metadata":')[0]
         self.assertEqual(response_short, response_blank)
+        self.assertEqual(response_short, response_no_slash)
 
     def test_urls_include_friendly_ids(self):
         response = self.asset_search()
@@ -512,6 +519,19 @@ class ApiGetAssetIntegrationTests(TestCase):
     def test_400_returned_if_unknown_query_param(self):
         response = self.get_asset(asset_type='documents', query={'country': 'angola'})
         self.assertEqual(400, response.status_code)
+
+    def test_can_specify_content_type_in_query(self):
+        response = self.get_asset(query={'_accept': 'application/xml'},
+                content_type='text/html')
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response['Content-Type'].lower(), 'application/xml')
+
+    def test_extra_fields_with_asset_search(self):
+        response = self.get_asset(asset_type='documents', output_format='short',
+                query={'extra_fields': 'short_abstract long_abstract'})
+        # not all the results have the abstracts, so just check it doesn't
+        # immediately complain
+        self.assertEqual(200, response.status_code)
 
 
 class ApiRootIntegrationTests(TestCase):
