@@ -430,6 +430,14 @@ class ApiSearchErrorTests(ApiTestsBase):
         response = self.asset_search(query={'q': 'undp', 'start_offset': '-1'})
         self.assertEqual(400, response.status_code)
 
+    def test_400_returned_if_num_results_is_non_numeric(self):
+        response = self.asset_search(query={'q': 'undp', 'num_results': 'not_a_number'})
+        self.assertEqual(400, response.status_code)
+
+    def test_400_returned_if_start_offset_is_non_numeric(self):
+        response = self.asset_search(query={'q': 'undp', 'start_offset': 'not_a_number'})
+        self.assertEqual(400, response.status_code)
+
     def test_400_returned_if_sort_asc_and_sort_desc_used(self):
         response = self.asset_search(query={
             'q': 'undp', 

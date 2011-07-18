@@ -145,8 +145,16 @@ class SearchWrapper:
             self.si_query = self.si_query.query(object_type=defines.ASSET_TYPES_TO_OBJECT_NAME[asset_type])
 
     def add_paginate(self, search_params):
-        start_offset = int(search_params['start_offset']) if search_params.has_key('start_offset') else 0
-        num_results = int(search_params['num_results']) if search_params.has_key('num_results') else 10
+        try:
+            start_offset = int(search_params['start_offset']) if search_params.has_key('start_offset') else 0
+        except ValueError:
+            raise InvalidQueryError("'start_offset' must be a decimal number - you gave %s" \
+                    % search_params['start_offset'])
+        try:
+            num_results = int(search_params['num_results']) if search_params.has_key('num_results') else 10
+        except ValueError:
+            raise InvalidQueryError("'num_results' must be a decimal number - you gave %s" \
+                    % search_params['num_results'])
         if start_offset < 0:
             raise InvalidQueryError("'start_offset' cannot be negative - you gave %d" % start_offset)
         if num_results < 0:
@@ -154,6 +162,7 @@ class SearchWrapper:
         if num_results > settings.MAX_RESULTS:
             raise InvalidQueryError("'num_results' cannot be more than %d - you gave %d" \
                     % (settings.MAX_RESULTS, num_results))
+
         if search_params.has_key('num_results_only'):
             num_results = 0
         self.si_query = self.si_query.paginate(start=start_offset, rows=num_results)
