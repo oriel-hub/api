@@ -70,7 +70,7 @@ class SearchBuilder():
                 raise InvalidQueryError(
                     "Cannot repeat query parameters - there is more than one '%s'" \
                     % param)
-            query = query_list[0]
+            query = query_list[0].lower()
             if len(query) < 1:
                 raise InvalidQueryError("All query parameters must have a value, but '%s' does not" % param)
             if param == 'q':
@@ -197,7 +197,7 @@ class SearchWrapper:
                     "the output_format of data returned can be 'id', 'short' or 'full' - you gave '%s'" \
                     % output_format)
         if search_params.has_key('extra_fields'):
-            field_list.extend(search_params['extra_fields'].split(' '))
+            field_list.extend(search_params['extra_fields'].lower().split(' '))
         self.si_query = self.si_query.field_limit(field_list)
 
     def add_date_query(self, param, date):

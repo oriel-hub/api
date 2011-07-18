@@ -213,6 +213,14 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         # immediately complain
         self.assertEqual(200, response.status_code)
 
+    def test_search_is_case_insensitive(self):
+        response_upper = self.asset_search(asset_type='documents', query={'q': 'AGRI*'})
+        response_upper_data = json.loads(response_upper.content)
+        response_lower = self.asset_search(asset_type='documents', query={'q': 'agri*'})
+        response_lower_data = json.loads(response_lower.content)
+        self.assertEqual(response_upper_data['metadata']['total_results'],
+                response_lower_data['metadata']['total_results'])
+
 class ApiPaginationTests(ApiTestsBase):
 
     def test_search_response_has_metadata(self):
