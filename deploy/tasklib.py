@@ -1,3 +1,5 @@
+#!/usr/bin/python2.6
+#
 # This script is to set up various things for our projects. It can be used by:
 #
 # * developers - setting up their own environment
@@ -22,6 +24,7 @@ import os, sys
 import getopt
 import getpass
 import subprocess 
+import random
 
 # import per-project settings
 import project_settings
@@ -36,8 +39,9 @@ env = {}
 
 def _setup_paths():
     """Set up the paths used by other tasks"""
+    env['deploy_dir'] = os.path.dirname(__file__)
     # what is the root of the project - one up from this directory
-    env['project_dir'] = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    env['project_dir'] = os.path.join(env['deploy_dir'], '..')
     env['django_dir']  = os.path.join(env['project_dir'], project_settings.django_dir)
     env['ve_dir']      = os.path.join(env['django_dir'], '.ve')
     env['python_bin']  = os.path.join(env['ve_dir'], 'bin', 'python2.6')
@@ -170,7 +174,19 @@ def update_ve():
     """ Update the virtualenv """
     create_ve()
 
+def create_private_settings():
 
+    private_settings_file = os.path.join(env['django_dir'], 
+                                    'private_settings.py')
+    if not os.path.exists(private_settings_file):
+    
+        with open(private_settings_file, 'w') as f:
+            secret_key = "".join([random.choice("abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)") for i in range(50)])
+            db_password = "".join([random.choice("abcdefghijklmnopqrstuvwxyz0123456789") for i in range(12)])
+            
+            f.write("SECRET_KEY = '%s'\n" % secret_key)
+            f.write("DB_PASSWORD = '%s'\n" % db_password)
+    
 def link_local_settings(environment):
     """ link local_settings.py.environment as local_settings.py """
     # die if the correct local settings does not exist
@@ -326,6 +342,7 @@ def run_jenkins():
     """ make sure the local settings is correct and the database exists """
     update_ve()
     _install_django_jenkins()
+    create_private_settings()    
     link_local_settings('jenkins')
     clean_db()
     update_db()
@@ -345,8 +362,16 @@ def deploy(environment=None):
     """Do all the required steps in order"""
     if environment == None:
         environment = _infer_environment()
-
+    
+    create_private_settings()
     link_local_settings(environment)
     create_ve()
     update_db()
 
+def patch_south():
+    """ patch south to fix pydev errors """
+    south_db_init = os.path.join(env['ve_dir'],
+                'lib/python2.6/site-packages/south/db/__init__.py')
+    patch_file = os.path.join(env['deploy_dir'], 'south.patch')
+    cmd = ['patch', '-N', '-p0', south_db_init, patch_file]
+    subprocess.call(cmd)
