@@ -189,6 +189,7 @@ class ApiSearchIntegrationTests(ApiTestsBase):
     def test_organisation_specific_query_param_acronym(self):
         response = self.asset_search(asset_type='organisations', query={'acronym': 'UN*'})
         self.assertEqual(200, response.status_code)
+        self.assertTrue(0 < json.loads(response.content)['metadata']['total_results'])
         search_results = json.loads(response.content)['results']
         for result in search_results:
             acronym_found = result['acronym'].lower().find('un') > -1
@@ -200,6 +201,7 @@ class ApiSearchIntegrationTests(ApiTestsBase):
     def test_item_specific_query_param_item_type(self):
         response = self.asset_search(asset_type='items', query={'item_type': 'Other*'})
         self.assertEqual(200, response.status_code)
+        self.assertTrue(0 < json.loads(response.content)['metadata']['total_results'])
         search_results = json.loads(response.content)['results']
         for result in search_results:
             self.assertTrue(result['item_type'].lower().find('other') > -1)

@@ -50,7 +50,7 @@ General Search
 
    **Query fields that take text as the argument to search for:**
 
-   :query q: The text to search for. Note the search is not case-sensitive.
+   :query q: The text to search for. Note the search is not case-sensitive, although other queries are case-sensitive.
    :query branch: The name of a source to search for - currently 'eldis' or 'bridge'
    :query country: The name of a country to search for.
    :query keyword: The name of a keyword to search for.

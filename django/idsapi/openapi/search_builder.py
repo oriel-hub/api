@@ -70,7 +70,7 @@ class SearchBuilder():
                 raise InvalidQueryError(
                     "Cannot repeat query parameters - there is more than one '%s'" \
                     % param)
-            query = query_list[0].lower()
+            query = query_list[0]
             if len(query) < 1:
                 raise InvalidQueryError("All query parameters must have a value, but '%s' does not" % param)
             if param == 'q':
@@ -179,7 +179,7 @@ class SearchWrapper:
             raise InvalidQueryError("Can't do sort - " + str(e))
 
     def add_free_text_query(self, search_text):
-        self.si_query = self.si_query.query(search_text)
+        self.si_query = self.si_query.query(search_text.lower())
 
     def add_facet(self, facet_type):
         if not facet_type in facet_mapping.keys():

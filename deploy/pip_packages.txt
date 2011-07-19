@@ -3,6 +3,7 @@ mysql-python==1.2.3
 httplib2==0.6.0
 lxml
 sunburnt==0.5
+django-registration==0.7
 djangorestframework==0.2.3
 sphinx==1.0.7
 sphinxcontrib-httpdomain==1.1.4
