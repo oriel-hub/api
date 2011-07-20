@@ -18,6 +18,8 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
 
+    url(r'^accounts/', include('registration.urls')),
+
     # the API stuff
     url(r'^openapi/', include(openapi.urls)),
 

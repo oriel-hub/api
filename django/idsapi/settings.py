@@ -1,4 +1,8 @@
 # Django settings for idsapi project.
+import os
+#import private_settings #@UnresolvedImport
+
+PROJECT_HOME = os.path.dirname(os.path.realpath(__file__))
 
 # Settings for the openapi app
 SOLR_SERVER_URL = 'http://api.ids.ac.uk:8983/solr/eldis-test/'
@@ -99,6 +103,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    os.path.join(PROJECT_HOME, 'templates'),
 )
 
 INSTALLED_APPS = (
@@ -120,6 +125,9 @@ INSTALLED_APPS = (
     # our code
     'openapi',
 )
+
+# settings required for django registration
+ACCOUNT_ACTIVATION_DAYS = 7
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

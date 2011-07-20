@@ -1,0 +1,11 @@
+Hello
+
+You are receiving this email because somebody (hopefully you) has
+registered for an account to use the IDS API. If you don't know what
+this is, then please just delete this email.
+
+To activate your account, please follow this link within {{expiration_days}} days.
+After {{expiration_days}} days this link will not work and you will have to start
+again.
+
+http://api.ids.ac.uk/accounts/activate/{{activation_key}}/
