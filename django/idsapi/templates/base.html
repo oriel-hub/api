@@ -1,0 +1,78 @@
+{% load i18n %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+	
+	<meta name="keywords" content="knowledge, services, ids, library, eldis, bridge, information, research">
+		
+  <title>{% block title %}{% endblock %} - Open API Project - Knowledge Services, Institute of Development Studies </title>
+	<meta http-equiv="X-UA-Compatible" content="IE=7" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Language" content="en-uk" />
+	<link rel="shortcut icon" type="image/vnd.microsoft.icon" href="images/favicon.ico" />
+	<link rel="icon" type="image/vnd.microsoft.icon" href="images/favicon.ico" />
+	
+	
+	<link rel="stylesheet" type="text/css" href="css/ids_print.css" media="print" />
+	<link href="css/styles.css" rel="stylesheet" type="text/css" media="screen" />
+		<!--[if IE 6]>
+	<link rel="stylesheet" type="text/css" href="/css/IE-6-SPECIFIC.css" />
+	<![endif]-->
+
+	</head>
+	
+<body>
+<!--end SkipNav-->
+<a class="noshow" href="#contentWrapper" accesskey="1" title="accesskey 1">1 Skip To page Content </a>
+<a class="noshow" href="#nav" accesskey="2" title="accesskey 2">2 Skip To Main Navigation </a>
+<!--end SkipNav-->
+	
+		<div id="mainWrapper">
+	
+	<div id="headerWrap">
+		<div id="header">
+			<h1>Knowledge Services Open API Project</h1>
+		</div><!--ends Header-->
+	</div><!--ends HeaderWrap-->
+			
+     
+	<div id="nav">
+		<ul>
+			<li><a href="about.html">About</a></li>
+			<li><a href="key.html">Get API key</a></li>
+			<li><a href="terms.html">Terms and Conditions</a></li>
+			<li><a href="documentation.html">Documentation</a></li>
+			<li><a href="resources.html">Useful resources</a></li>
+{% block header %}
+	{% if user.is_authenticated %}
+      <li>{% trans "Logged in" %}: {{ user.username }} 
+      (<a href="{% url auth_logout %}">{% trans "Log out" %}</a></li>
+      <li><a href="{% url auth_password_change %}">{% trans "Change password" %}</a>)</li>
+	{% else %}
+      <li><a href="{% url auth_login %}">{% trans "Log in" %}</a></li>
+	{% endif %}
+{% endblock %}
+		</ul>		
+	</div>
+	<!--ends mainNav-->
+				
+	<h3 class="knowledgeHeader">Knowledge Services <q>Global Knowledge for Global Change</q></h3>
+
+
+	<div id="contentWrapper">
+				<div id="content" >
+        {% block content %}{% endblock %}
+				</div>
+	</div>
+	
+		</div>
+
+	<div id="Footer">
+        {% block footer %}
+        {% endblock %}
+    	<address>Institute of Development Studies, Library Road, Brighton, BN1 9RE, UK | &copy; <a href="http://www.ids.ac.uk/go/disclaimer">IDS Disclaimer</a><br />E: ids@ids.ac.uk | T: +44 (0)1273 606261 | F: +44 (0)1273 621202</address> 
+	</div>
+<!--ends Footer-->
+
+</body>
+</html>
