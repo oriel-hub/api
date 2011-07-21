@@ -19,34 +19,36 @@ class RootView(View):
         hostname = request.get_host()
         url_root = 'http://' + hostname + URL_ROOT
         return {
-            'all': {
-                'format': url_root + '{object_type}/all/{id|short|full}',
-                'examples': [
-                    url_root + 'objects/all/short',
-                    url_root + 'documents/all/full',
-                    url_root + 'organisations/all/',
-                    ]
-                },
-            'search': {
-                'format': url_root + '{object_type}/search/?q={query_term}&...',
-                'examples': [
-                    url_root + 'objects/search/?q=undp',
-                    url_root + 'documents/search/?q=undp&document_published_year=2009',
-                    url_root + 'objects/search/?country=angola%26south%20africa&theme=gender%7Cclimate%20change',
-                    ]
-                },
-            'object': {
-                'format': url_root + 'objects/{object_id}/{id|short|full}/friendly-name',
-                'examples': [
-                    url_root + 'objects/12345/full',
-                    url_root + 'objects/123/',
-                    url_root + 'themes/123/full/capacity-building-approaches',
-                    ]
-                },
-            'field list': {
-                'format': url_root + 'fieldlist/',
-                },
             'help': 'http://' + hostname + '/docs/',
+            'some_api_calls': {
+                'all': {
+                    'format': url_root + '{object_type}/all/{id|short|full}',
+                    'examples': [
+                        url_root + 'assets/all/short',
+                        url_root + 'documents/all/full',
+                        url_root + 'organisations/all/',
+                        ]
+                    },
+                'search': {
+                    'format': url_root + '{object_type}/search/?q={query_term}&...',
+                    'examples': [
+                        url_root + 'assets/search/?q=undp',
+                        url_root + 'documents/search/?q=undp&document_published_year=2009',
+                        url_root + 'assets/search/?country=angola%26south%20africa&theme=gender%7Cclimate%20change',
+                        ]
+                    },
+                'object': {
+                    'format': url_root + 'objects/{object_id}/{id|short|full}/friendly-name',
+                    'examples': [
+                        url_root + 'objects/A12345/full',
+                        url_root + 'objects/C123/',
+                        url_root + 'themes/C123/full/capacity-building-approaches',
+                        ]
+                    },
+                'field list': {
+                    'format': url_root + 'fieldlist/',
+                    },
+                },
             }
 
 class BaseSearchView(View):
