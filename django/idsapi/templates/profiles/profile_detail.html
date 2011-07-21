@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Your Profile{% endblock %}
+ 
+{% block content %}
+<ul>
+	<li><a href="/docs/">API Documentation</a></li>
+	<li><a href="/profiles/edit/">Edit your profile</a></li>
+	<li><a href="/logout/">Logout</a></li>
+</ul>
+<h1>Your profile</h1>
+ 
+<p>Your username is <em>{{user}}</em> and actual name is "{{profile.name}}". Your email address is
+{{email}}</p>
+
+<p>Your access GUID is <strong>{{profile.access_guid}}</strong>. TODO: explain how to
+use GUID and add link.
+</p>
+
+<table>
+	<tr>
+		<td>Organisation</td>
+		<td>{{profile.organisation}}</td>
+	</tr>
+	<tr>
+		<td>Address</td>
+		<td>
+			{% if profile.organisation_address1 %} {{profile.organisation_address1}}<br /> {% endif %}
+			{% if profile.organisation_address2 %} {{profile.organisation_address2}}<br /> {% endif %}
+			{% if profile.organisation_address3 %} {{profile.organisation_address3}}<br /> {% endif %}
+			{% if profile.city %} {{profile.city}}<br /> {% endif %}
+			{% if profile.zip_postal_code %} {{profile.zip_postal_code}}<br /> {% endif %}
+			{{profile.country.name}}
+		</td>
+	</tr>
+	<tr>
+		<td>Organisation website</td>
+		<td><a href="{{profile.organisation_url}}">{{profile.organisation_url}}</a></td>
+	</tr>
+	<tr>
+		<td>Website using API</td>
+		<td><a href="{{profile.website_using_api}}">{{profile.website_using_api}}</a></td>
+	</tr>
+	<tr>
+		<td>Organisation type</td>
+		<td>{{profile.organisation_type}}</td>
+	</tr>
+	<tr>
+		<td>API usage type</td>
+		<td>{{profile.api_usage_type}}</td>
+	</tr>
+	<tr>
+		<td>CMS/Technology Platform</td>
+		<td>{{profile.cms_technology_platform}}</td>
+	</tr>
+	<tr>
+		<td>How you heard about us</td>
+		<td>{{profile.heard_about}}</td>
+	</tr>
+	<tr>
+		<td>Usage</td>
+		<td>{{profile.commercial}}</td>
+	</tr>
+</table>
+ 
+{% endblock content %}

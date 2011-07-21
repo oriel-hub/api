@@ -5,14 +5,14 @@ from django.views.generic.simple import redirect_to
 from django.contrib import admin
 admin.autodiscover()
 
+from django.conf import settings
+
 import openapi.urls
 
 from userprofile.forms import ProfileForm
 
 urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'idsapi.views.home', name='home'),
-    # url(r'^idsapi/', include('idsapi.foo.urls')),
+    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT }),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
