@@ -10,18 +10,18 @@ from openapi import defines
 from django.conf import settings
 
 query_mapping = {
-        'country': {'solr_field': 'country_focus',    'asset_type': 'all'},
-        'keyword': {'solr_field': 'keyword',          'asset_type': 'all'},
-        'region':  {'solr_field': 'category_region',  'asset_type': 'all'},
-        'sector':  {'solr_field': 'category_sector',  'asset_type': 'all'},
-        'subject': {'solr_field': 'category_subject', 'asset_type': 'all'},
-        'branch':  {'solr_field': 'branch',           'asset_type': 'all'},
-        'theme':   {'solr_field': 'category_theme',   'asset_type': 'all'},
-        'author':  {'solr_field': 'author',           'asset_type': 'documents'},
-        'author_organisation': {'solr_field': 'author_organisation', 'asset_type': 'documents'},
-        'organisation_name': {'solr_field': ['title', 'alternative_name'], 'asset_type': 'organisations'},
-        'acronym': {'solr_field': ['acronym', 'alternative_acronym'], 'asset_type': 'organisations'},
-        'item_type':  {'solr_field': 'item_type',     'asset_type': 'items'},
+        'country': {'solr_field': 'country_focus',    'object_type': 'all'},
+        'keyword': {'solr_field': 'keyword',          'object_type': 'all'},
+        'region':  {'solr_field': 'category_region',  'object_type': 'all'},
+        'sector':  {'solr_field': 'category_sector',  'object_type': 'all'},
+        'subject': {'solr_field': 'category_subject', 'object_type': 'all'},
+        'branch':  {'solr_field': 'branch',           'object_type': 'all'},
+        'theme':   {'solr_field': 'category_theme',   'object_type': 'all'},
+        'author':  {'solr_field': 'author',           'object_type': 'documents'},
+        'author_organisation': {'solr_field': 'author_organisation', 'object_type': 'documents'},
+        'organisation_name': {'solr_field': ['title', 'alternative_name'], 'object_type': 'organisations'},
+        'acronym': {'solr_field': ['acronym', 'alternative_acronym'], 'object_type': 'organisations'},
+        'item_type':  {'solr_field': 'item_type',     'object_type': 'items'},
         }
 
 date_prefix_mapping = {
@@ -43,13 +43,13 @@ facet_mapping = {
 class SearchBuilder():
 
     @classmethod
-    def create_assetid_query(cls, asset_id, asset_type, search_params, output_format):
+    def create_objectid_query(cls, object_id, object_type, search_params, output_format):
         for key in search_params.keys():
             if key[0] != '_' and key not in ['extra_fields']:
                 raise InvalidQueryError("Unknown query parameter '%s'" % key)
         sw = SearchWrapper()
-        sw.si_query = sw.solr.query(asset_id=asset_id)
-        sw.restrict_search_by_asset(asset_type)
+        sw.si_query = sw.solr.query(object_id=object_id)
+        sw.restrict_search_by_object(object_type, allow_objects=True)
         sw.restrict_fields_returned(output_format, search_params)
         return sw
 
@@ -61,7 +61,7 @@ class SearchBuilder():
         return False
 
     @classmethod
-    def create_search(cls, search_params, asset_type, output_format, facet_type=None):
+    def create_search(cls, search_params, object_type, output_format, facet_type=None):
         sw = SearchWrapper()
 
         for param in search_params:
@@ -76,11 +76,11 @@ class SearchBuilder():
             if param == 'q':
                 sw.add_free_text_query(query)
             elif param in query_mapping.keys():
-                if query_mapping[param]['asset_type'] != 'all':
-                    if query_mapping[param]['asset_type'] != asset_type:
+                if query_mapping[param]['object_type'] != 'all':
+                    if query_mapping[param]['object_type'] != object_type:
                         raise InvalidQueryError(
-                                "Can only use query parameter '%s' with asset type '%s', your search had asset type '%s'" \
-                                % (param, query_mapping[param]['asset_type'], asset_type))
+                                "Can only use query parameter '%s' with object type '%s', your search had object type '%s'" \
+                                % (param, query_mapping[param]['object_type'], object_type))
                 # we might have to search across multiple fields
                 if isinstance(query_mapping[param]['solr_field'], list):
                     sw.add_multifield_parameter_query(query_mapping[param]['solr_field'], query)
@@ -96,7 +96,7 @@ class SearchBuilder():
                 if param[0] != '_':
                     raise UnknownQueryParamError(param)
 
-        sw.restrict_search_by_asset(asset_type)
+        sw.restrict_search_by_object(object_type)
         sw.restrict_fields_returned(output_format, search_params)
         sw.add_sort(search_params)
         if facet_type == None:
@@ -107,22 +107,22 @@ class SearchBuilder():
         return sw
 
     @classmethod
-    def create_all_search(cls, search_params, asset_type, output_format):
+    def create_all_search(cls, search_params, object_type, output_format):
         sw = SearchWrapper()
-        sw.restrict_search_by_asset(asset_type)
+        sw.restrict_search_by_object(object_type)
         sw.restrict_fields_returned(output_format, search_params)
         sw.add_sort(search_params)
         sw.add_paginate(search_params)
         return sw
     
     @classmethod
-    def create_category_children_search(cls, search_params, asset_type, asset_id):
-        if asset_type not in defines.ASSET_TYPES_WITH_HIERARCHY:
-            raise InvalidQueryError("Asset type '%s' does not have children" % asset_type)
+    def create_category_children_search(cls, search_params, object_type, object_id):
+        if object_type not in defines.OBJECT_TYPES_WITH_HIERARCHY:
+            raise InvalidQueryError("Object type '%s' does not have children" % object_type)
         
         sw = SearchWrapper()
-        sw.add_parameter_query('cat_parent', asset_id)
-        sw.restrict_search_by_asset(asset_type)
+        sw.add_parameter_query('cat_parent', object_id)
+        sw.restrict_search_by_object(object_type)
         sw.add_paginate(search_params)
         return sw
     
@@ -138,11 +138,19 @@ class SearchWrapper:
     def execute(self):
         return self.si_query.execute()
 
-    def restrict_search_by_asset(self, asset_type):
-        if asset_type != 'assets':
-            if not asset_type in defines.ASSET_TYPES:
-                raise UnknownAssetError(asset_type)
-            self.si_query = self.si_query.query(object_type=defines.ASSET_TYPES_TO_OBJECT_NAME[asset_type])
+    def restrict_search_by_object(self, object_type, allow_objects=False):
+        if object_type == 'assets':
+            # search for any object_type that is an asset
+            self.si_query = self.si_query.query(self.add_field_query('object_type', 
+                '|'.join(defines.ASSET_NAMES)))
+        elif allow_objects and object_type == 'objects':
+            # don't restrict search and don't raise an Error
+            # required for single object search
+            pass
+        elif object_type in defines.OBJECT_TYPES:
+            self.si_query = self.si_query.query(object_type=defines.OBJECT_TYPES_TO_OBJECT_NAME[object_type])
+        else:
+            raise UnknownObjectError(object_type)
 
     def add_paginate(self, search_params):
         try:
@@ -191,7 +199,7 @@ class SearchWrapper:
             return
         # the id format needs object_type and title to construct the metadata_url
         elif output_format in [None, '', 'short', 'id']:
-            field_list = ['asset_id', 'object_type', 'title']
+            field_list = ['object_id', 'object_type', 'title']
         else:
             raise InvalidQueryError(
                     "the output_format of data returned can be 'id', 'short' or 'full' - you gave '%s'" \
@@ -278,7 +286,7 @@ class UnknownQueryParamError(BadRequestError):
         BadRequestError.__init__(self, error_text)
         self.error_text = 'Unknown query parameter: ' + error_text
 
-class UnknownAssetError(BadRequestError):
+class UnknownObjectError(BadRequestError):
     def __init__(self, error_text=''):
         BadRequestError.__init__(self, error_text)
-        self.error_text = 'Unknown asset type: ' + error_text
+        self.error_text = 'Unknown object type: ' + error_text

@@ -14,23 +14,24 @@ the HTTP GET request. For example, using ``curl`` you would do
 
 More about XML formats, Dublin Core etc.
 
-Single Asset Response Format
-----------------------------
+Single Object Response Format
+-----------------------------
 
-The **id only format** actually has two entries per item returned:
+The **id only format** actually has two entries per object returned:
 
-:id:    The asset_id
-:metadata_url:   The url to get the full metadata for that asset. It will have a
-        "friendly" format - that is the asset type (documents/themes/etc)
+:object_id: The object_id. This is a letter followed by digits. The letter
+        indicates whether this object is an Asset or a Category.
+:metadata_url:   The url to get the full metadata for that object. It will have a
+        "friendly" format - that is the object type (documents/themes/etc)
         will appear in the URL, it will use the "full" format, and after the
-        "full" there will be a text representation of the title of the asset.
+        "full" there will be a text representation of the title of the object.
 
 The **short format** has four entries per item returned:
 
-:id:          As above.
-:object_type: The type of the object
-:title:       The full title of the asset
-:metadata_url:         As above.
+:object_id:      As above.
+:object_type:    The type of the object
+:title:          The full title of the object
+:metadata_url:   As above.
 
 The **full format** has every field available for each item returned. These
 include lots of things ...
@@ -48,7 +49,7 @@ The **metadata** section can contain:
 * **prev_page** - a link to the previous page of results (only present if there are more results before this page).
 
 The **results** section is a list of results. Each item has data as specified
-by the format part of the URL, as for the single asset response.
+by the format part of the URL, as for the single object response.
 
 The exception to all this is that if the **num_results_only** query parameter
 is present, then the response will only have the metadata section, and that
@@ -75,14 +76,14 @@ Example Responses
 *(Note that all the below examples are nicely formatted, the actual format will
 not have the whitespace.)*
 
-In response to ``/openapi/documents/12345/short`` with ``Accept: application/json`` we get::
+In response to ``/openapi/documents/A12345/short`` with ``Accept: application/json`` we get::
 
   [
     {
-      "id": "12345", 
+      "object_id": "A12345", 
       "object_type": "CDocument", 
       "title": "Sharing knowledge for community development and transformation: a handbook", 
-      "metadata_url": "http://api.ids.ac.uk/openapi/assets/12345/short"
+      "metadata_url": "http://api.ids.ac.uk/openapi/objects/A12345/short"
     }
   ]
 
@@ -90,9 +91,9 @@ The same query with ``Accept: application/xml`` gives::
 
   <root>
     <list-item>
-      <metadata_url>http://api.ids.ac.uk/openapi/assets/12345/short</metadata_url>
+      <metadata_url>http://api.ids.ac.uk/openapi/objects/A12345/short</metadata_url>
       <object_type>CDocument</object_type>
-      <id>12345</id>
+      <object_id>A12345</object_id>
       <title>
         Sharing knowledge for community development and transformation: a handbook
       </title>

@@ -8,9 +8,9 @@ URL Format For Searches
 General Search
 --------------
 
-.. http:get:: /openapi/(asset_type)/search/(format)?q
+.. http:get:: /openapi/(object_type)/search/(format)?q
 
-   Retrieve list of assets of type **asset_type** matching the search defined by
+   Retrieve list of objects of type **object_type** matching the search defined by
    **q**. The amount of information returned is controlled by **format** which can
    be one of the following:
 
@@ -22,8 +22,8 @@ General Search
    Extra fields can be requested using the **extra_fields** query parameter - see
    the :ref:`extra-fields` section for details. 
 
-   The **asset_type** can be "assets" to return results across all assets, or one
-   of the following to restrict what will be returned:
+   The **object_type** can be "assets" to return results across all
+   :ref:`assets`, or one of the following to restrict what will be returned:
 
    * documents
    * organisations
@@ -127,16 +127,16 @@ General Search
 
    **Status codes returned:**
 
-   :statuscode 200: Asset data returned.
+   :statuscode 200: Object data returned.
    :statuscode 400: The URL was in an invalid format. There will be a message explaining why.
    :statuscode 500: There was a server fault. Try again later.
 
-Get All Assets
---------------
+Get All Objects
+---------------
 
-.. http:get:: /openapi/(asset_type)/all/(format)
+.. http:get:: /openapi/(object_type)/all/(format)
 
-   Retrieve list of assets of type **asset_type**. This will return all the assets.
+   Retrieve list of objects of type **object_type**. This will return all the objects.
    The amount of information returned is controlled by **format** which can
    be id, short or full, as for search.
 
@@ -146,16 +146,16 @@ Get All Assets
 Get Count of Results by Country, Keyword etc
 --------------------------------------------
 
-.. http:get:: /openapi/(asset_type)/country_count/
-.. http:get:: /openapi/(asset_type)/keyword_count/
-.. http:get:: /openapi/(asset_type)/region_count/
-.. http:get:: /openapi/(asset_type)/sector_count/
-.. http:get:: /openapi/(asset_type)/subject_count/
-.. http:get:: /openapi/(asset_type)/theme_count/
+.. http:get:: /openapi/(object_type)/country_count/
+.. http:get:: /openapi/(object_type)/keyword_count/
+.. http:get:: /openapi/(object_type)/region_count/
+.. http:get:: /openapi/(object_type)/sector_count/
+.. http:get:: /openapi/(object_type)/subject_count/
+.. http:get:: /openapi/(object_type)/theme_count/
 
    This gives you the number of results for your query for each country (or region
-   or ...) So for ``/openapi/assets/country_count/?q=undp`` you would get a set of results
-   that told you, for each country, how many assets existed that had the text
+   or ...) So for ``/openapi/objects/country_count/?q=undp`` you would get a set of results
+   that told you, for each country, how many objects existed that had the text
    "undp" and were concerned with that country. It's easier to see than to explain.
    
    You can use all the query terms available with search, apart from:
@@ -169,9 +169,9 @@ Get Count of Results by Country, Keyword etc
 Get Child Categories
 --------------------
 
-.. http:get:: /openapi/(category_type)/(int:asset_id)/children/(format)
+.. http:get:: /openapi/(category_type)/(int:object_id)/children/(format)
 
-   Retrieve the child categories for the category with the given **asset_id**.
+   Retrieve the child categories for the category with the given **object_id**.
    The valid category types are:
    
    * itemtypes
@@ -203,19 +203,19 @@ single string. So ``q=climate%20change`` will search for anything containing
 
 To give some examples:
 
-* To search for assets that are concerned with Climate Change:
+* To search for objects that are concerned with Climate Change:
    * ``theme=climate change`` (before being URL encoded)
    * ``theme=climate%20change`` (after being URL encoded)
 
-* To search for assets that are concerned with either Angola or Lesotho:
+* To search for objects that are concerned with either Angola or Lesotho:
    * ``country=angola|lesotho`` (before being URL encoded)
    * ``country=angola%7Clesotho`` (after being URL encoded)
 
-* To search for assets that are concerned with any of Angola, Lesotho or Namibia:
+* To search for objects that are concerned with any of Angola, Lesotho or Namibia:
    * ``country=angola|lesotho|namibia`` (before being URL encoded)
    * ``country=angola%7Clesotho%7Cnamibia`` (after being URL encoded)
 
-* To search for assets that are concerned with both Angola and Lesotho:
+* To search for objects that are concerned with both Angola and Lesotho:
    * ``country=angola&lesotho`` (before being URL encoded)
    * ``country=angola%26lesotho`` (after being URL encoded)
 
@@ -234,7 +234,7 @@ combine them, rather than combining them and then encoding the whole query
 string. Also don't encode the ``=`` characters. For the above example you could
 encode the URL with (in pseudo-code)::
 
-   url = url_root + 'assets/search/?' 
+   url = url_root + 'objects/search/?' 
    url += 'country=' + url.encode('angola&lesotho')
    url += 'theme=' + url.encode('gender|climate change')
 

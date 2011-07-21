@@ -117,6 +117,8 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
+    'django_countries',
+    'profiles',
     'registration',
 
     # Tom Christie REST framework
@@ -124,7 +126,11 @@ INSTALLED_APPS = (
 
     # our code
     'openapi',
+    'userprofile',
 )
+
+# settings required for extra fields for users
+AUTH_PROFILE_MODULE = "userprofile.UserProfile"
 
 # settings required for django registration
 ACCOUNT_ACTIVATION_DAYS = 7

@@ -20,26 +20,26 @@ class RootView(View):
         url_root = 'http://' + hostname + URL_ROOT
         return {
             'all': {
-                'format': url_root + '{asset_type}/all/{id|short|full}',
+                'format': url_root + '{object_type}/all/{id|short|full}',
                 'examples': [
-                    url_root + 'assets/all/short',
+                    url_root + 'objects/all/short',
                     url_root + 'documents/all/full',
                     url_root + 'organisations/all/',
                     ]
                 },
             'search': {
-                'format': url_root + '{asset_type}/search/?q={query_term}&...',
+                'format': url_root + '{object_type}/search/?q={query_term}&...',
                 'examples': [
-                    url_root + 'assets/search/?q=undp',
+                    url_root + 'objects/search/?q=undp',
                     url_root + 'documents/search/?q=undp&document_published_year=2009',
-                    url_root + 'assets/search/?country=angola%26south%20africa&theme=gender%7Cclimate%20change',
+                    url_root + 'objects/search/?country=angola%26south%20africa&theme=gender%7Cclimate%20change',
                     ]
                 },
-            'asset': {
-                'format': url_root + 'assets/{asset_id}/{id|short|full}/friendly-name',
+            'object': {
+                'format': url_root + 'objects/{object_id}/{id|short|full}/friendly-name',
                 'examples': [
-                    url_root + 'assets/12345/full',
-                    url_root + 'assets/123/',
+                    url_root + 'objects/12345/full',
+                    url_root + 'objects/123/',
                     url_root + 'themes/123/full/capacity-building-approaches',
                     ]
                 },
@@ -64,7 +64,7 @@ class BaseSearchView(View):
         for result in self.search_response:
             formatted_results.append(self.data_munger.get_required_data(result, self.output_format))
         if self.raise_if_no_results and len(formatted_results) == 0:
-            raise NoAssetFoundError()
+            raise NoObjectFoundError()
         return formatted_results
 
     def format_result_list(self, request):
@@ -108,17 +108,17 @@ class BaseSearchView(View):
             params['start_offset'] = 0
         return 'http://' + request.get_host() + request.path + '?' + params.urlencode()
 
-class AssetView(BaseSearchView):
+class ObjectView(BaseSearchView):
     def __init__(self):
         BaseSearchView.__init__(self, True)
 
-    def get(self, request, asset_id, output_format, asset_type=None):
+    def get(self, request, object_id, output_format, object_type=None):
         self.output_format = output_format
         self.data_munger = DataMunger()
         search_params = request.GET
 
         try:
-            self.query = SearchBuilder.create_assetid_query(asset_id, asset_type, search_params, output_format)
+            self.query = SearchBuilder.create_objectid_query(object_id, object_type, search_params, output_format)
         except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
         except SolrUnavailableError as e:
@@ -127,22 +127,22 @@ class AssetView(BaseSearchView):
         # return the metadata with the output_format specified
         try:
             return {'results': self.build_response()[0]}
-        except NoAssetFoundError:
+        except NoObjectFoundError:
             return Response(status.HTTP_404_NOT_FOUND, 
-                    content='No %s found with asset_id %s' % (asset_type, asset_id))
+                    content='No %s found with object_id %s' % (object_type, object_id))
 
 
-class AssetSearchView(BaseSearchView):
-    def get(self, request, output_format, asset_type=None):
+class ObjectSearchView(BaseSearchView):
+    def get(self, request, output_format, object_type=None):
         self.output_format = output_format
         self.data_munger = DataMunger()
 
         search_params = request.GET
         if len(search_params.keys()) == 0:
             return Response(status.HTTP_400_BAD_REQUEST, 
-                    content='asset search must have some query string, eg /assets/search/short?q=undp')
+                    content='object search must have some query string, eg /objects/search/short?q=undp')
         try:
-            self.query = SearchBuilder.create_search(search_params, asset_type, output_format)
+            self.query = SearchBuilder.create_search(search_params, object_type, output_format)
         except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
         except SolrUnavailableError as e:
@@ -152,14 +152,14 @@ class AssetSearchView(BaseSearchView):
         return self.format_result_list(request)
 
 
-class AllAssetView(BaseSearchView):
-    def get(self, request, output_format, asset_type=None):
+class AllObjectView(BaseSearchView):
+    def get(self, request, output_format, object_type=None):
         self.output_format = output_format
         self.data_munger = DataMunger()
 
         search_params = request.GET
         try:
-            self.query = SearchBuilder.create_all_search(search_params, asset_type, output_format)
+            self.query = SearchBuilder.create_all_search(search_params, object_type, output_format)
         except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
         except SolrUnavailableError as e:
@@ -170,10 +170,10 @@ class AllAssetView(BaseSearchView):
 
 
 class FacetCountView(View):
-    def get(self, request, asset_type, facet_type):
+    def get(self, request, object_type, facet_type):
         search_params = request.GET
         try:
-            query = SearchBuilder.create_search(search_params, asset_type, 'id', facet_type)
+            query = SearchBuilder.create_search(search_params, object_type, 'id', facet_type)
         except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
         except SolrUnavailableError as e:
@@ -197,12 +197,12 @@ class FieldListView(View):
         return field_list
     
 class CategoryChildrenView(BaseSearchView):
-    def get(self, request, asset_type, asset_id, output_format):
+    def get(self, request, object_type, object_id, output_format):
         self.output_format = output_format
         self.data_munger = DataMunger()
 
         try:
-            self.query = SearchBuilder.create_category_children_search(request.GET, asset_type, asset_id)
+            self.query = SearchBuilder.create_category_children_search(request.GET, object_type, object_id)
         except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
         except SolrUnavailableError as e:
@@ -217,5 +217,5 @@ class The404View(View):
         return Response(status.HTTP_404_NOT_FOUND, content="Path '%s' not known." % path)
 
 
-class NoAssetFoundError(IdsApiError):
+class NoObjectFoundError(IdsApiError):
     pass

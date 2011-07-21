@@ -7,6 +7,8 @@ admin.autodiscover()
 
 import openapi.urls
 
+from userprofile.forms import ProfileForm
+
 urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'idsapi.views.home', name='home'),
@@ -19,6 +21,11 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
 
     url(r'^accounts/', include('registration.urls')),
+
+    url(r'^profiles/edit/', 'profiles.views.edit_profile',
+            {'form_class': ProfileForm, 'success_url': '/profiles/view/'}),
+    url(r'^profiles/view/', 'userprofile.views.profile_detail',),
+    #url(r'^profiles/', include('profiles.urls')),
 
     # the API stuff
     url(r'^openapi/', include(openapi.urls)),

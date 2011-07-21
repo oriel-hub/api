@@ -13,7 +13,7 @@ Contents:
    :maxdepth: 2
 
    intro
-   get_asset
+   get_object
    searching
    response
 

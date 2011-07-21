@@ -3,8 +3,8 @@ import exceptions
 
 URL_ROOT = '/openapi/'
 
-ASSET_TYPES_TO_OBJECT_NAME = {
-'assets':        None,
+OBJECT_TYPES_TO_OBJECT_NAME = {
+'assets':         None,
 'documents':     'CDocument',
 'organisations': 'COrganisation',
 'themes':        'theme',
@@ -16,17 +16,23 @@ ASSET_TYPES_TO_OBJECT_NAME = {
 'itemtypes':     'itemtype',
 }
 
-ASSET_TYPES  = ASSET_TYPES_TO_OBJECT_NAME.keys()
-OBJECT_NAMES = ASSET_TYPES_TO_OBJECT_NAME.values()
+OBJECT_TYPES  = OBJECT_TYPES_TO_OBJECT_NAME.keys()
+OBJECT_NAMES = OBJECT_TYPES_TO_OBJECT_NAME.values()
 
-ASSET_TYPES_WITH_HIERARCHY = ['themes', 'itemtypes']
+ASSET_TYPES_TO_OBJECT_NAME = dict((k, v) for k, v in OBJECT_TYPES_TO_OBJECT_NAME.items() \
+                                  if v != None and v.startswith('C'))
+
+ASSET_TYPES  = ASSET_TYPES_TO_OBJECT_NAME.keys()
+ASSET_NAMES = ASSET_TYPES_TO_OBJECT_NAME.values()
+
+OBJECT_TYPES_WITH_HIERARCHY = ['themes', 'itemtypes']
 
 HIDDEN_FIELDS = ['send_email_alerts']
 
-def object_name_to_asset_type(object_name):
-    for asset_type in ASSET_TYPES_TO_OBJECT_NAME:
-        if ASSET_TYPES_TO_OBJECT_NAME[asset_type] == object_name:
-            return asset_type
+def object_name_to_object_type(object_name):
+    for object_type in OBJECT_TYPES_TO_OBJECT_NAME:
+        if OBJECT_TYPES_TO_OBJECT_NAME[object_type] == object_name:
+            return object_type
 
 class IdsApiError(exceptions.StandardError):
     def __init__(self, error_text=''):
