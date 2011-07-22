@@ -506,7 +506,11 @@ class ApiGetObjectIntegrationTests(TestCase):
         response = self.get_object(object_type='documents')
         self.assertEqual(200, response.status_code)
 
-    def test_get_object_by_id_returns_200(self):
+    def test_get_objectt_by_id_returns_200(self):
+        response = self.get_object(object_type='objects')
+        self.assertEqual(200, response.status_code)
+
+    def test_get_asset_by_id_returns_200(self):
         response = self.get_object()
         self.assertEqual(200, response.status_code)
 
@@ -610,11 +614,16 @@ class ApiCategoryChildrenIntegrationTests(ApiTestsBase):
     def test_parents_match_for_children_search(self):
         response = self.children_search()
         search_results = json.loads(response.content)
+        self.assertTrue(0 < int(search_results['metadata']['total_results']))
         for result in search_results['results']:
-            self.assertEqual('C34', result['cat_parent'])
+            self.assertEqual('34', result['cat_parent'])
             
-    def test_400_returned_for_invalid_child(self):
+    def test_400_returned_for_asset_child_search(self):
         response = self.children_search(object_type='documents', object_id='A8346')
+        self.assertEqual(400, response.status_code)
+
+    def test_400_returned_for_invalid_child(self):
+        response = self.children_search(object_type='regions', object_id='C1346')
         self.assertEqual(400, response.status_code)
 
     def test_all_have_children_link(self):

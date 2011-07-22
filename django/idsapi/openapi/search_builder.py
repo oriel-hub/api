@@ -121,7 +121,8 @@ class SearchBuilder():
             raise InvalidQueryError("Object type '%s' does not have children" % object_type)
         
         sw = SearchWrapper()
-        sw.add_parameter_query('cat_parent', object_id)
+        # strip the prefix letter off
+        sw.add_parameter_query('cat_parent', object_id[1:])
         sw.restrict_search_by_object(object_type)
         sw.add_paginate(search_params)
         return sw
