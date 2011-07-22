@@ -25,7 +25,7 @@ class UserProfile(models.Model):
     organisation_address2 = models.CharField("Organisation address (line 2)", max_length=100, blank=True)
     organisation_address3 = models.CharField("Organisation address (line 3)", max_length=100, blank=True)
     city = models.CharField(max_length=50, blank=True)
-    country = CountryField()
+    country = CountryField(blank=True)
     zip_postal_code = models.CharField("ZIP/Postal Code", max_length=20, blank=True)
     ORGANISATION_TYPE_CHOICES = (
             ('Bilateral Aid Agency',          'Bilateral Aid Agency'),

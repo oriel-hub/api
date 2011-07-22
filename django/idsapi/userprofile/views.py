@@ -1,16 +1,16 @@
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import reverse
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.contrib.auth.decorators import login_required
 
 @login_required
 def profile_detail(request):
     """ Detail view of a user's profile."""
-    try:
-        profile_obj = request.user.get_profile()
-    except ObjectDoesNotExist:
-        return HttpResponseRedirect('/login/')
+    profile_obj = request.user.get_profile()
+    if profile_obj.name == None or profile_obj.name == '':
+        return HttpResponseRedirect(reverse('edit_profile'))
     context = RequestContext(request)
     context['email'] = request.user.email
 

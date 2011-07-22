@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django import forms
 from django.forms import ModelForm
@@ -17,7 +18,7 @@ class ProfileForm(ModelForm):
 
     class Meta:
         model = UserProfile
-        exclude = ('access_guid', 'beacon_guid',)
+        exclude = ('user', 'access_guid', 'beacon_guid',)
 
     def save(self, *args, **kwargs):
         """
@@ -27,4 +28,10 @@ class ProfileForm(ModelForm):
         u.email = self.cleaned_data['email']
         u.save()
         profile = super(ProfileForm, self).save(*args,**kwargs)
+        # if no GUID created, then make one
+        if profile.access_guid in [None, '']:
+            profile.access_guid = str(uuid.uuid4())
+        if profile.beacon_guid in [None, '']:
+            profile.beacon_guid = str(uuid.uuid4())
+        profile.save()
         return profile

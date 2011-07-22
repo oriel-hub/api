@@ -23,8 +23,9 @@ urlpatterns = patterns('',
     url(r'^accounts/', include('registration.urls')),
 
     url(r'^profiles/edit/', 'profiles.views.edit_profile',
-            {'form_class': ProfileForm, 'success_url': '/profiles/view/'}),
-    url(r'^profiles/view/', 'userprofile.views.profile_detail',),
+            {'form_class': ProfileForm, 'success_url': '/profiles/view/'},
+            name='edit_profile'),
+    url(r'^profiles/view/', 'userprofile.views.profile_detail', name='profile_detail'),
     #url(r'^profiles/', include('profiles.urls')),
 
     # the API stuff

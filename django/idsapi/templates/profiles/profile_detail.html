@@ -1,13 +1,9 @@
 {% extends "base.html" %}
-{% block title %}Your Profile{% endblock %}
+{% load i18n %}
+{% block title %}{% trans "Your Profile" %}{% endblock %}
  
 {% block content %}
-<ul>
-	<li><a href="/docs/">API Documentation</a></li>
-	<li><a href="/profiles/edit/">Edit your profile</a></li>
-	<li><a href="/logout/">Logout</a></li>
-</ul>
-<h1>Your profile</h1>
+<h1>{% trans "Your profile" %}</h1>
  
 <p>Your username is <em>{{user}}</em> and actual name is "{{profile.name}}". Your email address is
 {{email}}</p>
