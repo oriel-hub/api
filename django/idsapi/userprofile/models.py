@@ -1,9 +1,14 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.db.models import signals
 from django_countries import CountryField
 
-from django.db.models import signals
 from userprofile.signals import create_profile
+
+def validate_agreed_to_license_terms(value):
+    if value != True:
+        raise ValidationError(u'You must agree to the terms to continue')
  
 # When model instance is saved, trigger creation of corresponding profile
 signals.post_save.connect(create_profile, sender=User)
@@ -28,21 +33,21 @@ class UserProfile(models.Model):
     country = CountryField(blank=True)
     zip_postal_code = models.CharField("ZIP/Postal Code", max_length=20, blank=True)
     ORGANISATION_TYPE_CHOICES = (
-            ('Bilateral Aid Agency',          'Bilateral Aid Agency'),
-            ('Multilateral Aid Agency',       'Multilateral Aid Agency'),
-            ('International NGO or CSO',      'International NGO or CSO'),
-            ('National / Local NGO or CSO',   'National / Local NGO or CSO'),
-            ('National / Local Government',   'National / Local Government'),
-            ('Political Party',               'Political Party'),
-            ('Academic',                      'Academic'),
-            ('School / college',              'School / college'),
-            ('Library / Information Service', 'Library / Information Service'),
-            ('Commercial / Business',         'Commercial / Business'),
-            ('Health Centre / Hospital',      'Health Centre / Hospital'),
-            ('Media',                         'Media'),
-            ('Network',                       'Network'),
-            ('No affiliation',                'No affiliation'),
-            ('Other (please specify)',        'Other (please specify)'),
+            (u'Bilateral Aid Agency',          u'Bilateral Aid Agency'),
+            (u'Multilateral Aid Agency',       u'Multilateral Aid Agency'),
+            (u'International NGO or CSO',      u'International NGO or CSO'),
+            (u'National / Local NGO or CSO',   u'National / Local NGO or CSO'),
+            (u'National / Local Government',   u'National / Local Government'),
+            (u'Political Party',               u'Political Party'),
+            (u'Academic',                      u'Academic'),
+            (u'School / college',              u'School / college'),
+            (u'Library / Information Service', u'Library / Information Service'),
+            (u'Commercial / Business',         u'Commercial / Business'),
+            (u'Health Centre / Hospital',      u'Health Centre / Hospital'),
+            (u'Media',                         u'Media'),
+            (u'Network',                       u'Network'),
+            (u'No affiliation',                u'No affiliation'),
+            (u'Other (please specify)',        u'Other (please specify)'),
             )
     organisation_type = models.CharField(max_length=50, blank=True, choices=ORGANISATION_TYPE_CHOICES)
     api_usage_type = models.CharField("API usage type", max_length=50, blank=True)
@@ -54,4 +59,6 @@ class UserProfile(models.Model):
             (u'Non-Commercial', u'Non-Commercial'),
             )
     commercial = models.CharField("Usage", max_length=50, choices=COMMERCIAL_CHOICES)
-    agree_to_licensing = models.BooleanField()
+    agree_to_licensing = models.BooleanField(
+            u'I have read and agree to the Terms and Conditions',
+            validators=[validate_agreed_to_license_terms])

@@ -50,6 +50,21 @@ class RegistrationTests(TestCase):
         self.assertNotContains(response, 'guid')
         self.assertNotContains(response, 'GUID')
 
+    def test_cannot_create_profile_without_agree_to_licensing(self):
+        self.login()
+        profile_data = {
+                'name': u'User 1',
+                'email': u'user1@example.org',
+                'country': u'GB',
+                'website_using_api': u'http://www.example.org/',
+                'commercial': u'Commercial',
+                'agree_to_licensing': False,
+                }
+        response = self.client.post(reverse('edit_profile'), profile_data)
+        # check we are still on the edit page
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, 'You must agree to')
+
     def test_minimum_info_to_create_profile(self):
         self.create_profile()
         profile = self.user1.get_profile()

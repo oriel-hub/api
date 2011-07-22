@@ -79,7 +79,7 @@ table{border:1px solid  #f4f8fe; border-collapse:collapse; margin:0; padding:0;}
 
 table caption{color:#131313;font-weight:bold; line-height:1.5em;}
 
-th{color:#2B2B77;border:1px solid #f4f8fe; margin:0; padding:3px;font-weight:bold;text-align:center;}
+th{color:#2B2B77;border:1px solid #f4f8fe; margin:0; padding:3px;font-weight:bold;text-align:left;}
 
 td{border:1px solid #f4f8fe; margin:0; padding:3px; /*text-align:center;*/}
 
