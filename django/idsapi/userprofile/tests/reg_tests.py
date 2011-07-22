@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test.testcases import TestCase
@@ -6,12 +8,12 @@ from userprofile.models import UserProfile
 
 class RegistrationTests(TestCase):
     def setUp(self):
-        self.u1 = User.objects.create(username='user1', email='user1@example.org')
-        self.u1.set_password('password')
-        self.u1.save()
+        self.user1 = User.objects.create(username='user1', email='user1@example.org')
+        self.user1.set_password('password')
+        self.user1.save()
 
     def tearDown(self):
-        self.u1.delete()
+        self.user1.delete()
 
     def login(self):
         self.client.login(username='user1', password='password')
@@ -29,7 +31,7 @@ class RegistrationTests(TestCase):
         return self.client.post(reverse('edit_profile'), profile_data, follow=True)
 
     def test_profile_is_created_for_new_user(self):
-        profile = self.u1.get_profile()
+        profile = self.user1.get_profile()
         self.assertTrue(isinstance(profile, UserProfile))
 
     def test_redirected_to_edit_profile_on_first_login(self):
@@ -50,16 +52,25 @@ class RegistrationTests(TestCase):
 
     def test_minimum_info_to_create_profile(self):
         self.create_profile()
-        profile = self.u1.get_profile()
+        profile = self.user1.get_profile()
         self.assertEqual('User 1', profile.name)
 
     def test_access_guid_is_created_on_profile_edit(self):
-        profile = self.u1.get_profile()
+        profile = self.user1.get_profile()
         self.assertEqual(0, len(profile.access_guid))
         self.create_profile()
-        u = User.objects.get(username='user1')
-        profile = u.get_profile()
+        user = User.objects.get(username='user1')
+        profile = user.get_profile()
         self.assertEqual(36, len(profile.access_guid))
+
+    def test_access_guid_is_not_regenerated_after_it_exists(self):
+        profile = self.user1.get_profile()
+        orig_guid = profile.access_guid = str(uuid.uuid4())
+        profile.save()
+        self.create_profile()
+        user = User.objects.get(username='user1')
+        profile = user.get_profile()
+        self.assertEqual(orig_guid, profile.access_guid)
 
     def test_profile_details_include_email(self):
         self.test_minimum_info_to_create_profile()

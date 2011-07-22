@@ -1,8 +1,8 @@
 import uuid
-from django.db import models
 from django import forms
+from django.contrib.auth.models import User
 from django.forms import ModelForm
-from models import UserProfile
+from userprofile.models import UserProfile
  
 class ProfileForm(ModelForm):
     def __init__(self, *args, **kwargs):
@@ -14,7 +14,7 @@ class ProfileForm(ModelForm):
         except User.DoesNotExist:
             pass
 
-    email = forms.EmailField(label="Primary email",help_text='')
+    email = forms.EmailField(label="Primary email", help_text='')
 
     class Meta:
         model = UserProfile
@@ -24,10 +24,10 @@ class ProfileForm(ModelForm):
         """
         Update the primary email address on the related User object as well.
         """
-        u = self.instance.user
-        u.email = self.cleaned_data['email']
-        u.save()
-        profile = super(ProfileForm, self).save(*args,**kwargs)
+        user = self.instance.user
+        user.email = self.cleaned_data['email']
+        user.save()
+        profile = super(ProfileForm, self).save(*args, **kwargs)
         # if no GUID created, then make one
         if profile.access_guid in [None, '']:
             profile.access_guid = str(uuid.uuid4())
