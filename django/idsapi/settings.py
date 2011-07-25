@@ -8,6 +8,33 @@ PROJECT_HOME = os.path.dirname(os.path.realpath(__file__))
 SOLR_SERVER_URL = 'http://api.ids.ac.uk:8983/solr/eldis-test/'
 SOLR_SCHEMA = SOLR_SERVER_URL + 'admin/file/?file=schema.xml'
 
+GROUP_INFO = {
+        'General User': {
+            'max_calls_per_hour': 150,
+            'max_items_per_call': 500,
+            'image_beacon':       True,
+            'level':              1,
+            },
+        'Offline Application User': {
+            'max_calls_per_hour': 300,
+            'max_items_per_call': 500,
+            'image_beacon':       True,
+            'level':              2,
+            },
+        'Partner': {
+            'max_calls_per_hour': 300,
+            'max_items_per_call': 2000,
+            'image_beacon':       True,
+            'level':              3,
+            },
+        'Unlimited': {
+            'max_calls_per_hour': 0,
+            'max_items_per_call': 0,
+            'image_beacon':       False,
+            'level':              4,
+            },
+        }
+
 MAX_RESULTS = 500
 
 

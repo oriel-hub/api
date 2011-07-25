@@ -5,7 +5,7 @@
 {% block content %}
 <h1>{% trans "Your profile" %}</h1>
  
-<p>Your username is <em>{{user}}</em> and actual name is "{{profile.name}}". Your email address is
+<p>Your username is <em>{{user}}</em> and actual name is "{{profile.first_name}} {{profile.last_name}}". Your email address is
 {{email}}</p>
 
 <p>Your access GUID is <strong>{{profile.access_guid}}</strong>. TODO: explain how to

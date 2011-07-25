@@ -8,9 +8,11 @@ from django.template import RequestContext
 def profile_detail(request):
     """ Detail view of a user's profile."""
     profile_obj = request.user.get_profile()
-    if profile_obj.name == None or profile_obj.name == '':
+    if profile_obj.agree_to_licensing == False:
         return HttpResponseRedirect(reverse('edit_profile'))
     context = RequestContext(request)
+    context['first_name'] = request.user.first_name
+    context['last_name'] = request.user.last_name
     context['email'] = request.user.email
 
     return render_to_response('profiles/profile_detail.html',

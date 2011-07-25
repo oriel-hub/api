@@ -21,7 +21,8 @@ class RegistrationTests(TestCase):
     def create_profile(self):
         self.login()
         profile_data = {
-                'name': u'User 1',
+                'first_name': u'User',
+                'last_name': u'1',
                 'email': u'user1@example.org',
                 'country': u'GB',
                 'website_using_api': u'http://www.example.org/',
@@ -53,7 +54,8 @@ class RegistrationTests(TestCase):
     def test_cannot_create_profile_without_agree_to_licensing(self):
         self.login()
         profile_data = {
-                'name': u'User 1',
+                'first_name': u'User',
+                'last_name': u'1',
                 'email': u'user1@example.org',
                 'country': u'GB',
                 'website_using_api': u'http://www.example.org/',
@@ -68,7 +70,7 @@ class RegistrationTests(TestCase):
     def test_minimum_info_to_create_profile(self):
         self.create_profile()
         profile = self.user1.get_profile()
-        self.assertEqual('User 1', profile.name)
+        self.assertEqual('GB', profile.country)
 
     def test_access_guid_is_created_on_profile_edit(self):
         profile = self.user1.get_profile()

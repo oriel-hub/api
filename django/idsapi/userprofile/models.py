@@ -24,8 +24,17 @@ class UserProfile(models.Model):
     # the beacon guid is an argument to the beacon for usage tracking
     beacon_guid = models.CharField(max_length=36)
 
+    # user level
+    USER_LEVEL_CHOICES = (
+            (u'Banned',                  u'Banned'),
+            (u'General User',            u'General User'),
+            (u'Offline Application User', u'Offline Application User'),
+            (u'Partner',                 u'Partner'),
+            (u'Unlimited',               u'Unlimited'),
+            )
+    user_level = models.CharField("User Level", max_length=50, choices=USER_LEVEL_CHOICES)
+
     # things the user will edit in their profile
-    name = models.CharField(max_length=50)
     organisation = models.CharField(max_length=100, blank=True)
     organisation_url = models.URLField("Organisation Website", blank=True)
     organisation_address1 = models.CharField("Organisation address (line 1)", max_length=100, blank=True)
@@ -65,8 +74,11 @@ class UserProfile(models.Model):
             u'I have read and agree to the Terms and Conditions',
             validators=[validate_agreed_to_license_terms])
 
-    def generate_access_guid(self):
-        self.access_guid = str(uuid.uuid4())
+    def ensure_hidden_fields_set(self):
+        if self.access_guid in [None, '']:
+            self.access_guid = str(uuid.uuid4())
+        if self.beacon_guid in [None, '']:
+            self.beacon_guid = str(uuid.uuid4())
+        if self.user_level in [None, '']:
+            self.user_level = u'General User'
 
-    def generate_beacon_guid(self):
-        self.beacon_guid = str(uuid.uuid4())
