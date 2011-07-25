@@ -13,8 +13,8 @@ class GuidAuthentication(BaseAuthentication):
         Otherwise returns :const:`None`.  
         """
         auth_token = None
-        if 'TOKEN_GUID' in request.META:
-            auth_token = request.META['TOKEN_GUID']
+        if 'HTTP_TOKEN_GUID' in request.META:
+            auth_token = request.META['HTTP_TOKEN_GUID']
         elif '_token_guid' in request.GET:
             auth_token = request.GET['_token_guid']
         if auth_token:

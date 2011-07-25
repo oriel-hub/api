@@ -13,6 +13,7 @@ Contents:
    :maxdepth: 2
 
    intro
+   authorisation
    get_object
    searching
    response

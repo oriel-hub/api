@@ -15,7 +15,7 @@ class ApiAuthTests(BaseTestCase):
     def test_search_works_with_token_in_header(self):
         profile = self.user.get_profile()
         response = self.client.get('/openapi/documents/search/', {'q': 'undp'},
-                TOKEN_GUID=profile.access_guid)
+                HTTP_TOKEN_GUID=profile.access_guid)
         self.assertEqual(200, response.status_code)
 
     def test_search_works_with_token_in_url(self):

@@ -8,11 +8,9 @@ Response Format
 The data can be returned as JSON or as XML (or as a nice HTML page which by
 default shows formatted JSON - handy for exploring the interface). You specify
 which data format you want by using the "Accept" field in the header of
-the HTTP GET request. For example, using ``curl`` you would do
+the HTTP GET request. For example, using ``curl`` you would do::
 
-    ``curl -X GET -H "Accept: application/json" http://api.ids.ac.uk/openapi/documents/1234/short``
-
-More about XML formats, Dublin Core etc.
+    ``curl -X GET -H "Accept: application/json" -H "Token-Guid: 9827f62a-8bbc-4d22-96b4-771d08859926" http://api.ids.ac.uk/openapi/documents/A12345/short``
 
 Single Object Response Format
 -----------------------------
@@ -73,8 +71,8 @@ item will be the number of times the category appears in the results.
 Example Responses
 =================
 
-*(Note that all the below examples are nicely formatted, the actual format will
-not have the whitespace.)*
+*(Note that all the below examples are nicely formatted, the actual response will
+not have the whitespace, unless you are using the web interface.)*
 
 In response to ``/openapi/documents/A12345/short`` with ``Accept: application/json`` we get::
 
