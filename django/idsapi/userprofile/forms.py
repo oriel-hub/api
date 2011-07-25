@@ -1,4 +1,3 @@
-import uuid
 from django import forms
 from django.contrib.auth.models import User
 from django.forms import ModelForm
@@ -30,8 +29,8 @@ class ProfileForm(ModelForm):
         profile = super(ProfileForm, self).save(*args, **kwargs)
         # if no GUID created, then make one
         if profile.access_guid in [None, '']:
-            profile.access_guid = str(uuid.uuid4())
+            profile.generate_access_guid()
         if profile.beacon_guid in [None, '']:
-            profile.beacon_guid = str(uuid.uuid4())
+            profile.generate_beacon_guid()
         profile.save()
         return profile

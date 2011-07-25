@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -62,3 +64,9 @@ class UserProfile(models.Model):
     agree_to_licensing = models.BooleanField(
             u'I have read and agree to the Terms and Conditions',
             validators=[validate_agreed_to_license_terms])
+
+    def generate_access_guid(self):
+        self.access_guid = str(uuid.uuid4())
+
+    def generate_beacon_guid(self):
+        self.beacon_guid = str(uuid.uuid4())
