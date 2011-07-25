@@ -1,11 +1,13 @@
 # integration tests at the API level
-from django.test.testcases import TestCase
-
 import json, re, datetime
 
 from openapi import defines
+from openapi.tests.test_base import BaseTestCase
 
-class ApiTestsBase(TestCase):
+class ApiTestsBase(BaseTestCase):
+    def setUp(self):
+        BaseTestCase.setUp(self)
+        self.login()
 
     def object_search(self, object_type='assets', output_format='full', query=None,
             content_type='application/json'):
@@ -493,7 +495,10 @@ class ApiGetAllIntegrationTests(ApiTestsBase):
             self.assertTrue(result.has_key('long_abstract'))
 
 
-class ApiGetObjectIntegrationTests(TestCase):
+class ApiGetObjectIntegrationTests(BaseTestCase):
+    def setUp(self):
+        BaseTestCase.setUp(self)
+        self.login()
 
     def get_object(self, object_type='assets', object_id='A12345', output_format='', query=None,
                                 content_type='application/json'):
@@ -547,7 +552,7 @@ class ApiGetObjectIntegrationTests(TestCase):
         self.assertEqual(200, response.status_code)
 
 
-class ApiRootIntegrationTests(TestCase):
+class ApiRootIntegrationTests(BaseTestCase):
     def get_root(self):
         return self.client.get(defines.URL_ROOT, ACCEPT='application/json')
 
@@ -560,7 +565,11 @@ class ApiRootIntegrationTests(TestCase):
         response_dict = json.loads(response.content)
         self.assertTrue(response_dict['help'].startswith('http://'))
 
-class ApiFieldListIntegrationTests(TestCase):
+class ApiFieldListIntegrationTests(BaseTestCase):
+    def setUp(self):
+        BaseTestCase.setUp(self)
+        self.login()
+
     def get_field_list(self):
         return self.client.get(defines.URL_ROOT + 'fieldlist/', ACCEPT='application/json')
 
@@ -573,7 +582,11 @@ class ApiFieldListIntegrationTests(TestCase):
         response_list = json.loads(response.content)
         self.assertTrue(len(response_list) > 1)
 
-class ApiFacetIntegrationTests(TestCase):
+class ApiFacetIntegrationTests(BaseTestCase):
+    def setUp(self):
+        BaseTestCase.setUp(self)
+        self.login()
+
     def facet_search(self, object_type='assets', facet_type='country',
             content_type='application/json'):
         return self.client.get(defines.URL_ROOT + object_type + '/' + facet_type + '_count/', 

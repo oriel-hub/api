@@ -3,9 +3,11 @@
 import httplib2
 from xml.dom import minidom
 
-from djangorestframework.views import View
-from djangorestframework.response import Response
 from djangorestframework import status
+from djangorestframework.authentication import UserLoggedInAuthentication
+from djangorestframework.permissions import PerUserThrottling, IsAuthenticated
+from djangorestframework.response import Response
+from djangorestframework.views import View
 
 from django.conf import settings
 
@@ -13,6 +15,7 @@ from openapi.data import DataMunger
 from openapi.search_builder import SearchBuilder, BadRequestError, SolrUnavailableError, \
     facet_mapping
 from openapi.defines import URL_ROOT, IdsApiError, HIDDEN_FIELDS
+from openapi.guid_authentication import GuidAuthentication
 
 class RootView(View):
     def get(self, request):
@@ -51,7 +54,13 @@ class RootView(View):
                 },
             }
 
-class BaseSearchView(View):
+class BaseAuthView(View):
+    permissions = (IsAuthenticated, )
+    authentication = (GuidAuthentication, UserLoggedInAuthentication)
+    #throttle = '10/min'
+
+class BaseSearchView(BaseAuthView):
+
     def __init__(self, raise_if_no_results=False):
         View.__init__(self)
         self.output_format = None
@@ -171,7 +180,7 @@ class AllObjectView(BaseSearchView):
         return self.format_result_list(request)
 
 
-class FacetCountView(View):
+class FacetCountView(BaseAuthView):
     def get(self, request, object_type, facet_type):
         search_params = request.GET
         try:
@@ -185,7 +194,7 @@ class FacetCountView(View):
         return {'metadata': {'total_results': search_response.result.numFound}, 
                 facet_type+'_count': facet_counts}
 
-class FieldListView(View):
+class FieldListView(BaseAuthView):
     def get(self, request):
         # fetch file from SOLR_SCHEMA
         http = httplib2.Http(".cache")
@@ -215,6 +224,7 @@ class CategoryChildrenView(BaseSearchView):
         
 
 class The404View(View):
+    name = '404'
     def get(self, request, path):
         return Response(status.HTTP_404_NOT_FOUND, content="Path '%s' not known." % path)
 
