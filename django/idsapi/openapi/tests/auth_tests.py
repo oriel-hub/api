@@ -8,6 +8,13 @@ class ApiAuthTests(BaseTestCase):
         response = self.client.get('/openapi/documents/search/', {'q': 'undp'})
         self.assertEqual(403, response.status_code)
 
+    def test_403_returned_if_user_not_active(self):
+        self.login()
+        self.user.is_active = False
+        self.user.save()
+        response = self.client.get('/openapi/documents/search/', {'q': 'undp'})
+        self.assertEqual(403, response.status_code)
+
     def test_search_works_with_normal_login(self):
         self.login()
         response = self.client.get('/openapi/documents/search/', {'q': 'undp'})

@@ -5,7 +5,7 @@ from xml.dom import minidom
 
 from djangorestframework import status
 from djangorestframework.authentication import UserLoggedInAuthentication
-from djangorestframework.permissions import PerUserThrottling, IsAuthenticated
+from djangorestframework.permissions import IsAuthenticated
 from djangorestframework.response import Response
 from djangorestframework.views import View
 
@@ -62,7 +62,8 @@ class BaseAuthView(View):
 class BaseSearchView(BaseAuthView):
 
     def __init__(self, raise_if_no_results=False):
-        View.__init__(self)
+        BaseAuthView.__init__(self)
+        #View.__init__(self)
         self.output_format = None
         self.query = None
         self.raise_if_no_results = raise_if_no_results

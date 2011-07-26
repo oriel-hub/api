@@ -19,10 +19,9 @@ class GuidAuthentication(BaseAuthentication):
             auth_token = request.GET['_token_guid']
         if auth_token:
             profile = UserProfile.objects.get(access_guid=auth_token)
-            if profile is not None:
-                user = profile.user
-                if user is not None and user.is_active:
-                    return user
+            user = profile.user
+            if user is not None and user.is_active:
+                return user
         return None
 
 

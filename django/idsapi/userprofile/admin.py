@@ -1,7 +1,7 @@
 from django.contrib import admin 
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
-from models import UserProfile 
+from userprofile.models import UserProfile 
 
 #class UserProfileAdmin(admin.ModelAdmin): 
 #    list_display = ('user_level', 'access_guid', 'beacon_guid') 

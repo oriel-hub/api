@@ -83,11 +83,14 @@ class RegistrationTests(TestCase):
     def test_access_guid_is_not_regenerated_after_it_exists(self):
         profile = self.user1.get_profile()
         orig_guid = profile.access_guid = str(uuid.uuid4())
+        profile.beacon_guid = str(uuid.uuid4())
+        profile.user_level = u'Partner'
         profile.save()
         self.create_profile()
         user = User.objects.get(username='user1')
         profile = user.get_profile()
         self.assertEqual(orig_guid, profile.access_guid)
+        self.assertEqual(u'Partner', profile.user_level)
 
     def test_profile_details_include_email(self):
         self.test_minimum_info_to_create_profile()
