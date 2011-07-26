@@ -12,10 +12,10 @@ from djangorestframework.views import View
 from django.conf import settings
 
 from openapi.data import DataMunger
-from openapi.search_builder import SearchBuilder, BadRequestError, SolrUnavailableError, \
-    facet_mapping
-from openapi.defines import URL_ROOT, IdsApiError, HIDDEN_FIELDS
+from openapi.search_builder import SearchBuilder, BadRequestError, SolrUnavailableError
+from openapi.defines import URL_ROOT, IdsApiError
 from openapi.guid_authentication import GuidAuthentication
+from openapi.permissions import PerUserThrottlingRatePerGroup
 
 class RootView(View):
     def get(self, request):
@@ -55,9 +55,12 @@ class RootView(View):
             }
 
 class BaseAuthView(View):
-    permissions = (IsAuthenticated, )
+    permissions = (IsAuthenticated, PerUserThrottlingRatePerGroup)
     authentication = (GuidAuthentication, UserLoggedInAuthentication)
-    #throttle = '10/min'
+
+    def hide_fields(self):
+        profile = self.user.get_profile()
+        return settings.GROUP_INFO[profile.user_level]['hide_fields']
 
 class BaseSearchView(BaseAuthView):
 
@@ -74,7 +77,8 @@ class BaseSearchView(BaseAuthView):
         formatted_results = []
         self.search_response = self.query.execute()
         for result in self.search_response:
-            formatted_results.append(self.data_munger.get_required_data(result, self.output_format))
+            formatted_results.append(self.data_munger.get_required_data( \
+                    result, self.output_format, self.hide_fields()))
         if self.raise_if_no_results and len(formatted_results) == 0:
             raise NoObjectFoundError()
         return formatted_results
@@ -195,7 +199,7 @@ class FacetCountView(BaseAuthView):
         except SolrUnavailableError as e:
             return Response(status.HTTP_500_INTERNAL_SERVER_ERROR, content=e)
         search_response = query.execute()
-        facet_counts = search_response.facet_counts.facet_fields[facet_mapping[facet_type]]
+        facet_counts = search_response.facet_counts.facet_fields[settings.FACET_MAPPING[facet_type]]
         return {'metadata': {'total_results': search_response.result.numFound}, 
                 facet_type+'_count': facet_counts}
 
@@ -209,7 +213,9 @@ class FieldListView(BaseAuthView):
                 doc.getElementsByTagName('fields')[0].getElementsByTagName('field')]
         field_list.sort()
         field_list = [elem for elem in field_list if not elem.endswith('_facet')]
-        field_list = [elem for elem in field_list if not elem in ['text', 'word'] + HIDDEN_FIELDS]
+        field_list = [elem for elem in field_list if not elem in ['text', 'word']]
+        if self.hide_fields():
+            field_list = [elem for elem in field_list if not elem in settings.HIDDEN_FIELDS]
         return field_list
     
 class CategoryChildrenView(BaseSearchView):

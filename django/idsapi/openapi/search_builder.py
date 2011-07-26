@@ -9,36 +9,7 @@ import sunburnt
 from openapi import defines
 from django.conf import settings
 
-query_mapping = {
-        'country': {'solr_field': 'country_focus',    'object_type': 'all'},
-        'keyword': {'solr_field': 'keyword',          'object_type': 'all'},
-        'region':  {'solr_field': 'category_region',  'object_type': 'all'},
-        'sector':  {'solr_field': 'category_sector',  'object_type': 'all'},
-        'subject': {'solr_field': 'category_subject', 'object_type': 'all'},
-        'branch':  {'solr_field': 'branch',           'object_type': 'all'},
-        'theme':   {'solr_field': 'category_theme',   'object_type': 'all'},
-        'author':  {'solr_field': 'author',           'object_type': 'documents'},
-        'author_organisation': {'solr_field': 'author_organisation', 'object_type': 'documents'},
-        'organisation_name': {'solr_field': ['title', 'alternative_name'], 'object_type': 'organisations'},
-        'acronym': {'solr_field': ['acronym', 'alternative_acronym'], 'object_type': 'organisations'},
-        'item_type':  {'solr_field': 'item_type',     'object_type': 'items'},
-        }
-
-date_prefix_mapping = {
-        'metadata_published': 'timestamp',
-        'document_published': 'publication_date',
-        'item_started': 'start_date',
-        'item_finished': 'end_date', 
-        }
-
-facet_mapping = {
-        'country': 'country_focus_facet',
-        'keyword': 'keyword_facet',
-        'region':  'category_region_facet',
-        'sector':  'category_sector_facet',
-        'subject': 'category_subject_facet',
-        'theme':   'category_theme_facet',
-        }
+query_mapping = settings.QUERY_MAPPING
 
 class SearchBuilder():
 
@@ -55,7 +26,7 @@ class SearchBuilder():
 
     @classmethod
     def _is_date_query(cls, param):
-        for date_prefix in date_prefix_mapping.keys():
+        for date_prefix in settings.DATE_PREFIX_MAPPING.keys():
             if param.startswith(date_prefix):
                 return True
         return False
@@ -193,9 +164,9 @@ class SearchWrapper:
         self.si_query = self.si_query.query(search_text.lower())
 
     def add_facet(self, facet_type):
-        if not facet_type in facet_mapping.keys():
+        if not facet_type in settings.FACET_MAPPING.keys():
             raise InvalidQueryError("Unknown count type: '%s_count'" % facet_type)
-        self.si_query = self.si_query.facet_by(facet_mapping[facet_type])
+        self.si_query = self.si_query.facet_by(settings.FACET_MAPPING[facet_type])
 
     def restrict_fields_returned(self, output_format, search_params):
         if output_format == 'full':
@@ -217,7 +188,7 @@ class SearchWrapper:
         if match == None:
             raise InvalidQueryError("Unknown date query '%s'." % param)
         param_prefix = match.group(1)
-        solr_param = date_prefix_mapping[param_prefix]
+        solr_param = settings.DATE_PREFIX_MAPPING[param_prefix]
         if param.endswith('_year'):
             if len(date) != 4 or not date.isdigit():
                 raise InvalidQueryError("Invalid year, should be 4 digits but is %s" % date)

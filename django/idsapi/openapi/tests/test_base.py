@@ -12,6 +12,11 @@ class BaseTestCase(TestCase):
         profile.ensure_hidden_fields_set()
         profile.save()
 
+    def setUserLevel(self, level):
+        profile = self.user.get_profile()
+        profile.user_level = level
+        profile.save()
+
     def tearDown(self):
         self.user.delete()
 

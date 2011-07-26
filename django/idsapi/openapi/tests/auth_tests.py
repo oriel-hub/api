@@ -35,37 +35,36 @@ class ApiAuthTests(BaseTestCase):
 
 class UserLimitTests(ApiTestsBase):
     def test_200_returned_for_500_results_requested_general_user(self):
-        profile = self.user.get_profile()
-        profile.user_level = u'General User'
-        profile.save()
+        self.setUserLevel(u'General User')
         response = self.object_search(query={'q': 'un', 'num_results': '500'})
         self.assertEqual(200, response.status_code)
 
     def test_400_returned_if_more_than_500_results_requested_general_user(self):
-        profile = self.user.get_profile()
-        profile.user_level = u'General User'
-        profile.save()
+        self.setUserLevel(u'General User')
         response = self.object_search(query={'q': 'un', 'num_results': '501'})
         self.assertEqual(400, response.status_code)
 
     def test_200_returned_for_2000_results_requested_partner_user(self):
-        profile = self.user.get_profile()
-        profile.user_level = u'Partner'
-        profile.save()
+        self.setUserLevel(u'Partner')
         response = self.object_search(query={'q': 'un', 'num_results': '2000'})
         self.assertEqual(200, response.status_code)
 
     def test_400_returned_if_more_than_2000_results_requested_partner_user(self):
-        profile = self.user.get_profile()
-        profile.user_level = u'Partner'
-        profile.save()
+        self.setUserLevel(u'Partner')
         response = self.object_search(query={'q': 'un', 'num_results': '2001'})
         self.assertEqual(400, response.status_code)
 
     def test_200_returned_for_more_than_2000_results_requested_unlimited_user(self):
-        profile = self.user.get_profile()
-        profile.user_level = u'Unlimited'
-        profile.save()
+        self.setUserLevel(u'Unlimited')
         response = self.object_search(query={'q': 'un', 'num_results': '2001'})
         self.assertEqual(200, response.status_code)
 
+    def test_throttle_set_for_general_user(self):
+        self.setUserLevel(u'General User')
+        response = self.object_search(query={'q': 'un'})
+        self.assertTrue(response.has_header('X-Throttle'))
+
+    def test_throttle_not_set_for_unlimited_user(self):
+        self.setUserLevel(u'Unlimited')
+        response = self.object_search(query={'q': 'unaid'})
+        self.assertFalse(response.has_header('X-Throttle'))

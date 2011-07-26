@@ -1,6 +1,8 @@
 # integration tests at the API level
 import json, re, datetime
 
+from django.conf import settings
+
 from openapi import defines
 from openapi.tests.test_base import BaseTestCase
 
@@ -73,7 +75,7 @@ class ApiSearchResponseTests(ApiTestsBase):
         search_results = json.loads(response.content)['results']
         for result in search_results:
             for key in result.keys():
-                self.assertFalse(key in defines.HIDDEN_FIELDS)
+                self.assertFalse(key in settings.HIDDEN_FIELDS)
 
     def test_can_specify_content_type_in_query(self):
         response = self.object_search(query={'q': 'undp', '_accept': 'application/json'},

@@ -1,44 +1,134 @@
-# Django settings for idsapi project.
-import os
-#import private_settings #@UnresolvedImport
-
-PROJECT_HOME = os.path.dirname(os.path.realpath(__file__))
-
 # Settings for the openapi app
+
+# This is used to send email alerts to the admins of the system
+ADMINS = (
+    # ('Your Name', 'your_email@example.com'),
+)
+
+# Where to find SOLR
 SOLR_SERVER_URL = 'http://api.ids.ac.uk:8983/solr/eldis-test/'
 SOLR_SCHEMA = SOLR_SERVER_URL + 'admin/file/?file=schema.xml'
 
+# These set the user limits
 GROUP_INFO = {
         'General User': {
-            'max_calls_per_hour': 150,
+            'max_call_rate':     '150/hour',
             'max_items_per_call': 500,
             'image_beacon':       True,
+            'hide_fields':        True,
             'level':              1,
             },
         'Offline Application User': {
-            'max_calls_per_hour': 300,
+            'max_call_rate':     '300/hour',
             'max_items_per_call': 500,
             'image_beacon':       True,
+            'hide_fields':        True,
             'level':              2,
             },
         'Partner': {
-            'max_calls_per_hour': 300,
+            'max_call_rate':     '300/hour',
             'max_items_per_call': 2000,
             'image_beacon':       True,
+            'hide_fields':        True,
             'level':              3,
             },
         'Unlimited': {
-            'max_calls_per_hour': 0,
+            'max_call_rate':      '0/sec',
             'max_items_per_call': 0,
             'image_beacon':       False,
+            'hide_fields':        False,
             'level':              4,
             },
         }
 
+# these fields will be hidden from those with 'hide_fields' set to True
+HIDDEN_FIELDS = ['send_email_alerts']
 
-ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
-)
+# this maps from the query parameter used in the URL to:
+# * the name (or names) of the field in SOLR to search across
+# * the type of object you can use the query parameter with
+QUERY_MAPPING = {
+        'country': {
+            'solr_field': 'country_focus',    
+            'object_type': 'all'
+            },
+        'keyword': {
+            'solr_field': 'keyword',          
+            'object_type': 'all'
+            },
+        'region':  {
+            'solr_field': 'category_region',  
+            'object_type': 'all'
+            },
+        'sector':  {
+            'solr_field': 'category_sector',  
+            'object_type': 'all'
+            },
+        'subject': {
+            'solr_field': 'category_subject', 
+            'object_type': 'all'
+            },
+        'branch':  {
+            'solr_field': 'branch',           
+            'object_type': 'all'
+            },
+        'theme':   {
+            'solr_field': 'category_theme',   
+            'object_type': 'all'
+            },
+        'author':  {
+            'solr_field': 'author',           
+            'object_type': 'documents'
+            },
+        'author_organisation': {
+            'solr_field': 'author_organisation', 
+            'object_type': 'documents'
+            },
+        'organisation_name': {
+            'solr_field': ['title', 'alternative_name'], 
+            'object_type': 'organisations'
+            },
+        'acronym': {
+            'solr_field': ['acronym', 'alternative_acronym'], 
+            'object_type': 'organisations'
+            },
+        'item_type':  {
+            'solr_field': 'item_type',     
+            'object_type': 'items'
+            },
+        }
+
+# this maps from the date-based query parameter to the SOLR field used
+# so document_published_year would use the publication_date as the field.
+DATE_PREFIX_MAPPING = {
+        'metadata_published': 'timestamp',
+        'document_published': 'publication_date',
+        'item_started': 'start_date',
+        'item_finished': 'end_date', 
+        }
+
+# this maps from the URL for faceted search (eg country_count) to the 
+# facet field used
+FACET_MAPPING = {
+        'country': 'country_focus_facet',
+        'keyword': 'keyword_facet',
+        'region':  'category_region_facet',
+        'sector':  'category_sector_facet',
+        'subject': 'category_subject_facet',
+        'theme':   'category_theme_facet',
+        }
+
+######################################################################
+#
+# PLEASE DON'T EDIT ANYTHING BELOW HERE UNLESS YOU KNOW ABOUT DJANGO
+# PROGRAMMING.
+#
+######################################################################
+
+import os
+#import private_settings #@UnresolvedImport
+
+PROJECT_HOME = os.path.dirname(os.path.realpath(__file__))
 
 MANAGERS = ADMINS
 
