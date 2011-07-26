@@ -35,8 +35,6 @@ GROUP_INFO = {
             },
         }
 
-MAX_RESULTS = 500
-
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),

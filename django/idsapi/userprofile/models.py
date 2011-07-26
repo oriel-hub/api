@@ -6,6 +6,8 @@ from django.db import models
 from django.db.models import signals
 from django_countries import CountryField
 
+from django.conf import settings
+
 from userprofile.signals import create_profile
 
 def validate_agreed_to_license_terms(value):
@@ -25,13 +27,11 @@ class UserProfile(models.Model):
     beacon_guid = models.CharField(max_length=36)
 
     # user level
-    USER_LEVEL_CHOICES = (
-            (u'Banned',                  u'Banned'),
-            (u'General User',            u'General User'),
-            (u'Offline Application User', u'Offline Application User'),
-            (u'Partner',                 u'Partner'),
-            (u'Unlimited',               u'Unlimited'),
-            )
+    user_levels = sorted(settings.GROUP_INFO.keys())
+    choices = []
+    for level in user_levels:
+        choices.append((level, level))
+    USER_LEVEL_CHOICES = tuple(choices)
     user_level = models.CharField("User Level", max_length=50, choices=USER_LEVEL_CHOICES)
 
     # things the user will edit in their profile

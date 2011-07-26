@@ -43,11 +43,11 @@ facet_mapping = {
 class SearchBuilder():
 
     @classmethod
-    def create_objectid_query(cls, object_id, object_type, search_params, output_format):
+    def create_objectid_query(cls, user_level, object_id, object_type, search_params, output_format):
         for key in search_params.keys():
             if key[0] != '_' and key not in ['extra_fields']:
                 raise InvalidQueryError("Unknown query parameter '%s'" % key)
-        sw = SearchWrapper()
+        sw = SearchWrapper(user_level)
         sw.si_query = sw.solr.query(object_id=object_id)
         sw.restrict_search_by_object(object_type, allow_objects=True)
         sw.restrict_fields_returned(output_format, search_params)
@@ -61,8 +61,8 @@ class SearchBuilder():
         return False
 
     @classmethod
-    def create_search(cls, search_params, object_type, output_format, facet_type=None):
-        sw = SearchWrapper()
+    def create_search(cls, user_level, search_params, object_type, output_format, facet_type=None):
+        sw = SearchWrapper(user_level)
 
         for param in search_params:
             query_list = search_params.getlist(param)
@@ -107,8 +107,8 @@ class SearchBuilder():
         return sw
 
     @classmethod
-    def create_all_search(cls, search_params, object_type, output_format):
-        sw = SearchWrapper()
+    def create_all_search(cls, user_level, search_params, object_type, output_format):
+        sw = SearchWrapper(user_level)
         sw.restrict_search_by_object(object_type)
         sw.restrict_fields_returned(output_format, search_params)
         sw.add_sort(search_params)
@@ -116,11 +116,11 @@ class SearchBuilder():
         return sw
     
     @classmethod
-    def create_category_children_search(cls, search_params, object_type, object_id):
+    def create_category_children_search(cls, user_level, search_params, object_type, object_id):
         if object_type not in defines.OBJECT_TYPES_WITH_HIERARCHY:
             raise InvalidQueryError("Object type '%s' does not have children" % object_type)
         
-        sw = SearchWrapper()
+        sw = SearchWrapper(user_level)
         # strip the prefix letter off
         sw.add_parameter_query('cat_parent', object_id[1:])
         sw.restrict_search_by_object(object_type)
@@ -129,12 +129,13 @@ class SearchBuilder():
     
 
 class SearchWrapper:
-    def __init__(self):
+    def __init__(self, user_level):
         try:
             self.solr = sunburnt.SolrInterface(settings.SOLR_SERVER_URL)
         except:
             raise SolrUnavailableError('Solr is not responding (using %s )' % settings.SOLR_SERVER_URL)
         self.si_query = self.solr.query()
+        self.user_level = user_level
 
     def execute(self):
         return self.si_query.execute()
@@ -168,9 +169,10 @@ class SearchWrapper:
             raise InvalidQueryError("'start_offset' cannot be negative - you gave %d" % start_offset)
         if num_results < 0:
             raise InvalidQueryError("'num_results' cannot be negative - you gave %d" % num_results)
-        if num_results > settings.MAX_RESULTS:
+        max_results = settings.GROUP_INFO[self.user_level]['max_items_per_call']
+        if max_results != 0 and num_results > max_results:
             raise InvalidQueryError("'num_results' cannot be more than %d - you gave %d" \
-                    % (settings.MAX_RESULTS, num_results))
+                    % (max_results, num_results))
 
         if search_params.has_key('num_results_only'):
             num_results = 0

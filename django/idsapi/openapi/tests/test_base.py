@@ -9,7 +9,7 @@ class BaseTestCase(TestCase):
         self.user.save()
         self.user = User.objects.get(username='user1')
         profile = self.user.get_profile()
-        profile.generate_access_guid()
+        profile.ensure_hidden_fields_set()
         profile.save()
 
     def tearDown(self):

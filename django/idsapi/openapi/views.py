@@ -127,9 +127,10 @@ class ObjectView(BaseSearchView):
         self.output_format = output_format
         self.data_munger = DataMunger()
         search_params = request.GET
+        user_level = self.user.get_profile().user_level
 
         try:
-            self.query = SearchBuilder.create_objectid_query(object_id, object_type, search_params, output_format)
+            self.query = SearchBuilder.create_objectid_query(user_level, object_id, object_type, search_params, output_format)
         except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
         except SolrUnavailableError as e:
@@ -147,13 +148,14 @@ class ObjectSearchView(BaseSearchView):
     def get(self, request, output_format, object_type=None):
         self.output_format = output_format
         self.data_munger = DataMunger()
+        user_level = self.user.get_profile().user_level
 
         search_params = request.GET
         if len(search_params.keys()) == 0:
             return Response(status.HTTP_400_BAD_REQUEST, 
                     content='object search must have some query string, eg /objects/search/short?q=undp')
         try:
-            self.query = SearchBuilder.create_search(search_params, object_type, output_format)
+            self.query = SearchBuilder.create_search(user_level, search_params, object_type, output_format)
         except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
         except SolrUnavailableError as e:
@@ -167,10 +169,11 @@ class AllObjectView(BaseSearchView):
     def get(self, request, output_format, object_type=None):
         self.output_format = output_format
         self.data_munger = DataMunger()
+        user_level = self.user.get_profile().user_level
 
         search_params = request.GET
         try:
-            self.query = SearchBuilder.create_all_search(search_params, object_type, output_format)
+            self.query = SearchBuilder.create_all_search(user_level, search_params, object_type, output_format)
         except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
         except SolrUnavailableError as e:
@@ -183,8 +186,9 @@ class AllObjectView(BaseSearchView):
 class FacetCountView(BaseAuthView):
     def get(self, request, object_type, facet_type):
         search_params = request.GET
+        user_level = self.user.get_profile().user_level
         try:
-            query = SearchBuilder.create_search(search_params, object_type, 'id', facet_type)
+            query = SearchBuilder.create_search(user_level, search_params, object_type, 'id', facet_type)
         except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
         except SolrUnavailableError as e:
@@ -211,9 +215,10 @@ class CategoryChildrenView(BaseSearchView):
     def get(self, request, object_type, object_id, output_format):
         self.output_format = output_format
         self.data_munger = DataMunger()
+        user_level = self.user.get_profile().user_level
 
         try:
-            self.query = SearchBuilder.create_category_children_search(request.GET, object_type, object_id)
+            self.query = SearchBuilder.create_category_children_search(user_level, request.GET, object_type, object_id)
         except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
         except SolrUnavailableError as e:
