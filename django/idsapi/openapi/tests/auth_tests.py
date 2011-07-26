@@ -1,23 +1,24 @@
-from django.contrib.auth.models import User
-
 from openapi.tests.test_base import BaseTestCase
 from openapi.tests.api_tests import ApiTestsBase
 
 class ApiAuthTests(BaseTestCase):
+    def do_search(self):
+        return self.client.get('/openapi/documents/search/', {'q': 'undp'})
+
     def test_403_returned_if_not_logged_in(self):
-        response = self.client.get('/openapi/documents/search/', {'q': 'undp'})
+        response = self.do_search()
         self.assertEqual(403, response.status_code)
 
     def test_403_returned_if_user_not_active(self):
         self.login()
         self.user.is_active = False
         self.user.save()
-        response = self.client.get('/openapi/documents/search/', {'q': 'undp'})
+        response = self.do_search()
         self.assertEqual(403, response.status_code)
 
     def test_search_works_with_normal_login(self):
         self.login()
-        response = self.client.get('/openapi/documents/search/', {'q': 'undp'})
+        response = self.do_search()
         self.assertEqual(200, response.status_code)
 
     def test_search_works_with_token_in_header(self):
