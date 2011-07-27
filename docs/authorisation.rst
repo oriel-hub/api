@@ -27,3 +27,10 @@ Alternatively, to have a play in a web browser, you can add the token to the
 URL as the query parameter ``_token_guid``, for example::
 
     http://api.ids.ac.uk/openapi/documents/search?q=undp&_token_guid=9827f62a-8bbc-4d22-96b4-771d08859926
+
+User Levels
+===========
+
+By default you will be limited to a subset of the full field list, and
+relatively few calls per hour. If you want to get a higher level of access you
+will have to contact IDS - api@ids.ac.uk *(email address to be confirmed)*.
