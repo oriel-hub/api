@@ -76,6 +76,7 @@ GENERAL_FIELDS = [
     'cat_parent',
         ]
 
+# these are the entries in the dropdown box for user registration
 ORGANISATION_TYPES = [
         u'Bilateral Aid Agency',
         u'Multilateral Aid Agency',
@@ -93,6 +94,9 @@ ORGANISATION_TYPES = [
         u'No affiliation',
         u'Other (please specify',
         ]
+
+# this is the URL used for the image beacon stuff
+IMAGE_BEACON_STUB_URL = 'http://api.ids.ac.uk/tracking/trackimg.cfm?beacon_guid='
 
 # this maps from the query parameter used in the URL to:
 # * the name (or names) of the field in SOLR to search across

@@ -17,8 +17,14 @@ class DataMunger():
             elif user_level_info['hide_admin_fields']:
                 object_data = dict((k, v) for k, v in object_data.items() if not k in settings.ADMIN_ONLY_FIELDS)
 
+            # add the parent category, if relevant
             if defines.object_name_to_object_type(result['object_type']) in defines.OBJECT_TYPES_WITH_HIERARCHY:
                 self._add_child_parent_links(object_data, object_id, result)
+
+            # add image beacon to long_abstract
+            if object_data.has_key('long_abstract') and user_level_info['image_beacon']:
+                object_data['long_abstract'] += '<img src="' + \
+                                settings.IMAGE_BEACON_STUB_URL + '" width="1" height="1">'
         else:
             object_data = result
 

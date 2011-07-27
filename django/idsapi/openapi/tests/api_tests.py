@@ -90,6 +90,21 @@ class ApiSearchResponseTests(ApiTestsBase):
         for result in search_results:
             self.assertTrue(result['object_type'] in defines.ASSET_NAMES)
 
+    def test_long_abstract_contains_image_beacon(self):
+        response = self.object_search(object_type='documents', output_format='full')
+        search_results = json.loads(response.content)['results']
+        for result in search_results:
+            if result.has_key('long_abstract'):
+                self.assertTrue(result['long_abstract'].find(settings.IMAGE_BEACON_STUB_URL) > -1)
+
+    def test_long_abstract_does_not_contain_image_beacon_for_unlimited_user(self):
+        self.setUserLevel('Unlimited')
+        response = self.object_search(object_type='documents', output_format='full')
+        search_results = json.loads(response.content)['results']
+        for result in search_results:
+            if result.has_key('long_abstract'):
+                self.assertTrue(result['long_abstract'].find(settings.IMAGE_BEACON_STUB_URL) == -1)
+
 class ApiSearchIntegrationTests(ApiTestsBase):
 
     def test_query_by_country(self):
