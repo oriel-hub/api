@@ -5,6 +5,9 @@ ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
 
+# the email server at IDS
+EMAIL_HOST = '139.184.194.19'
+
 # Where to find SOLR
 SOLR_SERVER_URL = 'http://api.ids.ac.uk:8983/solr/eldis-test/'
 SOLR_SCHEMA = SOLR_SERVER_URL + 'admin/file/?file=schema.xml'
@@ -42,7 +45,8 @@ GROUP_INFO = {
         }
 
 # these fields will be hidden from those with 'hide_fields' set to True
-HIDDEN_FIELDS = ['send_email_alerts']
+HIDDEN_FIELDS = ['send_email_alerts', 'legacy_id', 'category_sector', 
+                'category_subject']
 
 # this maps from the query parameter used in the URL to:
 # * the name (or names) of the field in SOLR to search across
