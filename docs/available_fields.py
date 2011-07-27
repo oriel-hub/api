@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import unicodecsv
 
@@ -7,13 +7,18 @@ with open('available_fields.csv', 'rb') as f:
     header_row = reader.next()
     
     assert header_row[0] == 'Field name'
+    assert header_row[10] == 'User tier restriction'
     assert header_row[11] == 'Description'
     
     with open('available_fields.rst', 'w') as out:
+        out.write('=================\nAvailable Fields\n=================\n\n')
         for i, row in enumerate(reader):
             if len(row) >= 12:
+                restrict = row[10]
                 name = row[0]
-                if len(name) == 0:
+                if restrict.lower().find('admin only') > -1:
+                    print "ignoring 'admin only' field: %s" % name
+                elif len(name) == 0:
                     print "Ignoring row %d with no field name" % (i + 2)
                 else:
                     out.write(name + '\n')

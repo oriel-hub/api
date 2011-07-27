@@ -17,6 +17,7 @@ Contents:
    get_object
    searching
    response
+   available_fields
 
 Indices and tables
 ==================

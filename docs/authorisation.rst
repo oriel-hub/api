@@ -21,7 +21,7 @@ http://api.ids.ac.uk/profiles/view/
 Once you have your token, tell your code to add it to the headers as
 "Token-Guid". So using curl, you could do::
 
-    ``curl -X GET -H "Accept: application/json" -H "Token-Guid: 9827f62a-8bbc-4d22-96b4-771d08859926" http://api.ids.ac.uk/openapi/documents/A12345/short``
+    curl -X GET -H "Accept: application/json" -H "Token-Guid: 9827f62a-8bbc-4d22-96b4-771d08859926" http://api.ids.ac.uk/openapi/documents/A12345/short
 
 Alternatively, to have a play in a web browser, you can add the token to the
 URL as the query parameter ``_token_guid``, for example::

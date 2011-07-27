@@ -58,7 +58,8 @@ both cases.
 Field List Response Format
 --------------------------
 
-This is just a list of the names of the fields present.
+This is just a list of the names of the fields present. For a full list, see
+:doc:`available_fields`.
 
 Category Count Response Format
 ------------------------------
