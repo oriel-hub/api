@@ -61,6 +61,7 @@ class UserProfile(models.Model):
             (u'Other (please specify)',        u'Other (please specify)'),
             )
     organisation_type = models.CharField(max_length=50, blank=True, choices=ORGANISATION_TYPE_CHOICES)
+    organisation_type_text = models.CharField("Organisation Type (if other selected)", max_length=50, blank=True)
     api_usage_type = models.CharField("API usage type", max_length=50, blank=True)
     cms_technology_platform = models.CharField("CMS/Technology platform", max_length=50, blank=True)
     heard_about = models.CharField("How did you hear about us?", max_length=250, blank=True)
