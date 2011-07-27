@@ -67,6 +67,9 @@ class SearchBuilder():
                 if param[0] != '_':
                     raise UnknownQueryParamError(param)
 
+        # always have default site
+        if 'site' not in search_params:
+            sw.add_parameter_query('site', 'eldis')
         sw.restrict_search_by_object(object_type)
         sw.restrict_fields_returned(output_format, search_params)
         sw.add_sort(search_params)

@@ -241,6 +241,13 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         self.assertEqual(response_upper_data['metadata']['total_results'],
                 response_lower_data['metadata']['total_results'])
 
+    def test_search_has_default_site_eldis(self):
+        response = self.object_search(object_type='documents', output_format='full',
+                query={'q': 'un', 'num_results': '500'})
+        results = json.loads(response.content)['results']
+        for result in results:
+            self.assertEqual('eldis', result['site'])
+
 class ApiPaginationTests(ApiTestsBase):
 
     def test_search_response_has_metadata(self):
