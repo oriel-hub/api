@@ -9,6 +9,7 @@
        .errorlist {display: inline !important}
        .errorlist li {display: inline !important; background: white !important; color: black !important; border: 0 !important;}
      </style>
+     <link rel="icon" type="image/vnd.microsoft.icon" href="/site_media/favicon.ico" />
      <link rel="stylesheet" type="text/css" href='{{ADMIN_MEDIA_PREFIX}}css/base.css'/>
      <link rel="stylesheet" type="text/css" href='{{ADMIN_MEDIA_PREFIX}}css/forms.css'/>
      <link href="/site_media/footer.css" rel="stylesheet" type="text/css" media="screen" />
@@ -19,10 +20,17 @@
   
 	<div id="header">
 		<div id="branding">
-		  <h1 id="site-name"><a href='http://api.ids.ac.uk/docs/'>IDS Web API</a></h1>
+		  <h1 id="site-name"><a href="/">IDS Web API</a></h1>
 		</div>
 		<div id="user-tools">
-		  {% if user.is_active %}Welcome, {{ user }}.{% if logout_url %} <a href='{{ logout_url }}'>Log out</a>{% endif %}{% else %}Anonymous {% if login_url %}<a href='{{ login_url }}'>Log in</a>{% endif %}{% endif %}
+    {% if user.is_active %}Welcome, <a href="/profiles/view/">{{ user }}</a> | 
+      <a href="/docs/">API Documentation</a> |
+      <a href='{{ logout_url }}'>Log out</a>
+    {% else %}
+      Anonymous | 
+      <a href="/docs/">API Documentation</a> |
+      <a href='{{ login_url }}'>Log in</a>
+    {% endif %}
 		</div>
 	</div>
 	
