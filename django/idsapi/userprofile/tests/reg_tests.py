@@ -101,12 +101,14 @@ class RegistrationTests(TestCase):
         response = self.client.get(reverse('profile_detail'))
         self.assertContains(response, 'user1@example.org')
 
-    def test_profile_csv_download_output(self):
+    def test_profile_csv_download_requires_staff(self):
+        self.login()
         response = self.client.get(reverse(userprofile.admin.download_view))
         self.assertContains(response, 'Log in')
         
+    def test_profile_csv_download_output(self):
         self.user1.is_staff = True
-        self.user1.save
+        self.user1.save()
         self.login()
 
         response = self.client.get(reverse(userprofile.admin.download_view))
@@ -142,6 +144,8 @@ class RegistrationTests(TestCase):
                 profile.website_using_api,
                 profile.commercial,
                 profile.agree_to_licensing,
+                profile.access_guid,
+                profile.beacon_guid,
                 ])
         
         self.assertEqual(expected.getvalue(), response.content)

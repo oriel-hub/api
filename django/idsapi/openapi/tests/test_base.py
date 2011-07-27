@@ -10,6 +10,7 @@ class BaseTestCase(TestCase):
         self.user = User.objects.get(username='user1')
         profile = self.user.get_profile()
         profile.ensure_hidden_fields_set()
+        profile.user_level = 'Partner'
         profile.save()
 
     def setUserLevel(self, level):

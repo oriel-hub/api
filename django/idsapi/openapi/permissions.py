@@ -11,7 +11,7 @@ class PerUserThrottlingRatePerGroup(PerUserThrottling):
         Return `None` or raise an :exc:`.ErrorResponse`.
         """
         profile = user.get_profile()
-        rate = settings.GROUP_INFO[profile.user_level]['max_call_rate']
+        rate = settings.USER_LEVEL_INFO[profile.user_level]['max_call_rate']
         num, period = rate.split('/')
         self.num_requests = int(num)
         if self.num_requests == 0:

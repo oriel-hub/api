@@ -44,6 +44,8 @@ def download_view(request):
             profile.website_using_api,
             profile.commercial,
             profile.agree_to_licensing,
+            profile.access_guid,
+            profile.beacon_guid,
             ])
     return response
 

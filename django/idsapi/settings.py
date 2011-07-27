@@ -13,40 +13,86 @@ SOLR_SERVER_URL = 'http://api.ids.ac.uk:8983/solr/eldis-test/'
 SOLR_SCHEMA = SOLR_SERVER_URL + 'admin/file/?file=schema.xml'
 
 # These set the user limits
-GROUP_INFO = {
+USER_LEVEL_INFO = {
         'General User': {
             'max_call_rate':     '150/hour',
             'max_items_per_call': 500,
             'image_beacon':       True,
-            'hide_fields':        True,
+            'hide_admin_fields':  True,
+            'general_fields_only': True,
             'level':              1,
             },
         'Offline Application User': {
             'max_call_rate':     '300/hour',
             'max_items_per_call': 500,
             'image_beacon':       True,
-            'hide_fields':        True,
+            'hide_admin_fields':  True,
+            'general_fields_only': False,
             'level':              2,
             },
         'Partner': {
             'max_call_rate':     '300/hour',
             'max_items_per_call': 2000,
             'image_beacon':       True,
-            'hide_fields':        True,
+            'hide_admin_fields':  True,
+            'general_fields_only': False,
             'level':              3,
             },
         'Unlimited': {
             'max_call_rate':      '0/sec',
             'max_items_per_call': 0,
             'image_beacon':       False,
-            'hide_fields':        False,
+            'hide_admin_fields':  False,
+            'general_fields_only': False,
             'level':              4,
             },
         }
 
-# these fields will be hidden from those with 'hide_fields' set to True
-HIDDEN_FIELDS = ['send_email_alerts', 'legacy_id', 'category_sector', 
-                'category_subject']
+# these fields will be hidden from those with 'hide_admin_fields' set to True
+ADMIN_ONLY_FIELDS = [
+    'send_email_alerts', 
+    'legacy_id', 
+    'category_sector', 
+    'category_subject',
+    ]
+
+GENERAL_FIELDS = [
+    'title',
+    'long_abstract',
+    'object_id',
+    'object_type',
+    'metadata_url',
+    'url',
+    'website_url',
+    'keyword',
+    'country_focus',
+    'category_theme',
+    'publication_date',
+    'item_type',
+    'item_start_date',
+    'item_end_date',
+    'country_name',
+    'iso_two_letter_code',
+    'cat_parent',
+        ]
+
+ORGANISATION_TYPES = [
+        u'Bilateral Aid Agency',
+        u'Multilateral Aid Agency',
+        u'International NGO or CSO',
+        u'National / Local NGO or CSO',
+        u'National / Local Government',
+        u'Political Party',
+        u'Academic',
+        u'School / college',
+        u'Library / Information Service',
+        u'Commercial / Business',
+        u'Health Centre / Hospital',
+        u'Media',
+        u'Network',
+        u'No affiliation',
+        u'Other (please specify',
+        ]
 
 # this maps from the query parameter used in the URL to:
 # * the name (or names) of the field in SOLR to search across
@@ -72,8 +118,8 @@ QUERY_MAPPING = {
             'solr_field': 'category_subject', 
             'object_type': 'all'
             },
-        'branch':  {
-            'solr_field': 'branch',           
+        'site':  {
+            'solr_field': 'site',           
             'object_type': 'all'
             },
         'theme':   {

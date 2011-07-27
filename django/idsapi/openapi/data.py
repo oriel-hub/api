@@ -5,14 +5,18 @@ from django.core.urlresolvers import reverse
 from openapi import defines
 
 class DataMunger():
-    def get_required_data(self, result, output_format, hide_fields):
+    def get_required_data(self, result, output_format, user_level_info):
         object_id = result['object_id']
         if output_format == 'id':
             object_data = {'object_id': object_id}
         elif output_format == 'full':
+            # filter out fields we don't want
             object_data = dict((k, v) for k, v in result.items() if not k.endswith('_facet'))
-            if hide_fields:
-                object_data = dict((k, v) for k, v in object_data.items() if not k in settings.HIDDEN_FIELDS)
+            if user_level_info['general_fields_only']:
+                object_data = dict((k, v) for k, v in object_data.items() if k in settings.GENERAL_FIELDS)
+            elif user_level_info['hide_admin_fields']:
+                object_data = dict((k, v) for k, v in object_data.items() if not k in settings.ADMIN_ONLY_FIELDS)
+
             if defines.object_name_to_object_type(result['object_type']) in defines.OBJECT_TYPES_WITH_HIERARCHY:
                 self._add_child_parent_links(object_data, object_id, result)
         else:

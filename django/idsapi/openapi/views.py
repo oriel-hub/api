@@ -58,9 +58,15 @@ class BaseAuthView(View):
     permissions = (IsAuthenticated, PerUserThrottlingRatePerGroup)
     authentication = (GuidAuthentication, UserLoggedInAuthentication)
 
-    def hide_fields(self):
+    def get_user_level_info(self):
         profile = self.user.get_profile()
-        return settings.GROUP_INFO[profile.user_level]['hide_fields']
+        return settings.USER_LEVEL_INFO[profile.user_level]
+
+    def hide_admin_fields(self):
+        return self.get_user_level_info()['hide_admin_fields']
+
+    def general_fields_only(self):
+        return self.get_user_level_info()['general_fields_only']
 
 class BaseSearchView(BaseAuthView):
 
@@ -78,7 +84,7 @@ class BaseSearchView(BaseAuthView):
         self.search_response = self.query.execute()
         for result in self.search_response:
             formatted_results.append(self.data_munger.get_required_data( \
-                    result, self.output_format, self.hide_fields()))
+                    result, self.output_format, self.get_user_level_info()))
         if self.raise_if_no_results and len(formatted_results) == 0:
             raise NoObjectFoundError()
         return formatted_results
@@ -214,8 +220,10 @@ class FieldListView(BaseAuthView):
         field_list.sort()
         field_list = [elem for elem in field_list if not elem.endswith('_facet')]
         field_list = [elem for elem in field_list if not elem in ['text', 'word']]
-        if self.hide_fields():
-            field_list = [elem for elem in field_list if not elem in settings.HIDDEN_FIELDS]
+        if self.general_fields_only():
+            field_list = [elem for elem in field_list if elem in settings.GENERAL_FIELDS]
+        elif self.hide_admin_fields():
+            field_list = [elem for elem in field_list if not elem in settings.ADMIN_ONLY_FIELDS]
         return field_list
     
 class CategoryChildrenView(BaseSearchView):

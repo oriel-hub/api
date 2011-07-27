@@ -75,7 +75,7 @@ class ApiSearchResponseTests(ApiTestsBase):
         search_results = json.loads(response.content)['results']
         for result in search_results:
             for key in result.keys():
-                self.assertFalse(key in settings.HIDDEN_FIELDS)
+                self.assertFalse(key in settings.ADMIN_ONLY_FIELDS)
 
     def test_can_specify_content_type_in_query(self):
         response = self.object_search(query={'q': 'undp', '_accept': 'application/json'},
@@ -109,8 +109,8 @@ class ApiSearchIntegrationTests(ApiTestsBase):
                 {'keyword': 'gender'},
                 {'region': 'africa'},
                 {'sector': 'report'},
-                {'branch': 'bridge'},
-                {'branch': 'eldis'},
+                {'site': 'bridge'},
+                {'site': 'eldis'},
                 {'subject': 'gdn'},
                 {'theme': 'climate'},
                 ]
@@ -228,7 +228,7 @@ class ApiSearchIntegrationTests(ApiTestsBase):
     
     def test_extra_fields_with_object_search(self):
         response = self.object_search(object_type='documents', output_format='short',
-                query={'q': 'undp', 'extra_fields': 'short_abstract long_abstract'})
+                query={'q': 'undp', 'extra_fields': 'long_abstract'})
         # not all the results have the abstracts, so just check it doesn't
         # immediately complain
         self.assertEqual(200, response.status_code)
@@ -446,10 +446,6 @@ class ApiSearchErrorTests(ApiTestsBase):
         response = self.object_search(query={'author': 'John'})
         self.assertEqual(400, response.status_code)
 
-    def test_400_returned_if_more_than_500_results_requested(self):
-        response = self.object_search(query={'q': 'undp', 'num_results': '501'})
-        self.assertEqual(400, response.status_code)
-
     def test_400_returned_if_num_results_is_negative(self):
         response = self.object_search(query={'q': 'undp', 'num_results': '-1'})
         self.assertEqual(400, response.status_code)
@@ -490,10 +486,9 @@ class ApiGetAllIntegrationTests(ApiTestsBase):
 
     def test_extra_fields_with_all_assets(self):
         response = self.get_all(object_type='documents', 
-                query={'extra_fields': 'short_abstract long_abstract'})
+                query={'extra_fields': 'long_abstract'})
         result_list = json.loads(response.content)['results']
         for result in result_list:
-            self.assertTrue(result.has_key('short_abstract'))
             self.assertTrue(result.has_key('long_abstract'))
 
 
@@ -523,9 +518,8 @@ class ApiGetObjectIntegrationTests(BaseTestCase):
 
     def test_extra_fields_with_get_object(self):
         response = self.get_object(object_type='documents', 
-                query={'extra_fields': 'short_abstract long_abstract'})
+                query={'extra_fields': 'long_abstract'})
         result = json.loads(response.content)['results']
-        self.assertTrue(result.has_key('short_abstract'))
         self.assertTrue(result.has_key('long_abstract'))
 
     def test_404_returned_if_no_object(self):
@@ -548,7 +542,7 @@ class ApiGetObjectIntegrationTests(BaseTestCase):
 
     def test_extra_fields_with_object_search(self):
         response = self.get_object(object_type='documents', output_format='short',
-                query={'extra_fields': 'short_abstract long_abstract'})
+                query={'extra_fields': 'long_abstract'})
         # not all the results have the abstracts, so just check it doesn't
         # immediately complain
         self.assertEqual(200, response.status_code)

@@ -140,7 +140,7 @@ class SearchWrapper:
             raise InvalidQueryError("'start_offset' cannot be negative - you gave %d" % start_offset)
         if num_results < 0:
             raise InvalidQueryError("'num_results' cannot be negative - you gave %d" % num_results)
-        max_results = settings.GROUP_INFO[self.user_level]['max_items_per_call']
+        max_results = settings.USER_LEVEL_INFO[self.user_level]['max_items_per_call']
         if max_results != 0 and num_results > max_results:
             raise InvalidQueryError("'num_results' cannot be more than %d - you gave %d" \
                     % (max_results, num_results))

@@ -27,7 +27,7 @@ class UserProfile(models.Model):
     beacon_guid = models.CharField(max_length=36)
 
     # user level
-    user_levels = sorted(settings.GROUP_INFO.keys())
+    user_levels = sorted(settings.USER_LEVEL_INFO.keys())
     choices = []
     for level in user_levels:
         choices.append((level, level))
@@ -43,25 +43,15 @@ class UserProfile(models.Model):
     city = models.CharField(max_length=50, blank=True)
     country = CountryField(blank=True)
     zip_postal_code = models.CharField("ZIP/Postal Code", max_length=20, blank=True)
-    ORGANISATION_TYPE_CHOICES = (
-            (u'Bilateral Aid Agency',          u'Bilateral Aid Agency'),
-            (u'Multilateral Aid Agency',       u'Multilateral Aid Agency'),
-            (u'International NGO or CSO',      u'International NGO or CSO'),
-            (u'National / Local NGO or CSO',   u'National / Local NGO or CSO'),
-            (u'National / Local Government',   u'National / Local Government'),
-            (u'Political Party',               u'Political Party'),
-            (u'Academic',                      u'Academic'),
-            (u'School / college',              u'School / college'),
-            (u'Library / Information Service', u'Library / Information Service'),
-            (u'Commercial / Business',         u'Commercial / Business'),
-            (u'Health Centre / Hospital',      u'Health Centre / Hospital'),
-            (u'Media',                         u'Media'),
-            (u'Network',                       u'Network'),
-            (u'No affiliation',                u'No affiliation'),
-            (u'Other (please specify)',        u'Other (please specify)'),
-            )
+
+    # organisation types - from settings
+    choices = []
+    for organisation_type in settings.ORGANISATION_TYPES:
+        choices.append((organisation_type, organisation_type))
+    ORGANISATION_TYPE_CHOICES = tuple(choices)
     organisation_type = models.CharField(max_length=50, blank=True, choices=ORGANISATION_TYPE_CHOICES)
     organisation_type_text = models.CharField("Organisation Type (if other selected)", max_length=50, blank=True)
+
     api_usage_type = models.CharField("API usage type", max_length=50, blank=True)
     cms_technology_platform = models.CharField("CMS/Technology platform", max_length=50, blank=True)
     heard_about = models.CharField("How did you hear about us?", max_length=250, blank=True)
