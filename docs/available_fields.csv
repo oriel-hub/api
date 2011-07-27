@@ -1,0 +1,63 @@
+Field name,Used in Docs,Used in Orgs,Used in Items,Implemented,SOLR name,Usage,Original DB field name,Always present?,Facet?,User tier restriction,Description,Dublin Core,IATI,Notes,Comments,Complex query
+,,,,In SOLR,The name used in the SOLR config,"Search, Display or Both",,,,,"A shared, plain English description for use in the documentation"
+et al,y,,,,,,,,,,"Appends ""et al"" to the end of the list of authors",,,DE requested to be added, - added as another string in the Author array in SOLR
+Publisher,y,,,y,,,,,Y,,Name of the Organisation ,,,DE requested to be added,) so we might want to remove those?
+PublisherID,y,,,,,,,,,,,,,DE requested to be added,)
+notification email,y,y,y,,,,,,,admin only,Email contact author,,,DE requested to be added
+copyright clearance,y,,,,,,,,,,signifies that the Copyright Holder for the document has given permission for a copy of the document to be hosted by Eldis.,,,DE requested to be added
+redistribute clearance,y,,,,,,,,,,copyright holder for the document has given permission for a copy of the document to be redistributed by the editing branch. ,,,DE requested to be added
+license type,y,y,,,,,,,y,,,,,DE requested to be added
+permission to host info,y,y,,,,,,,,admin only,This field should contain a brief summary of any correspondence giving details of permissions given and who gave it. ,,,DE requested to be added
+related information links,y,y,y,,,,,,,,link the document to existing published assets or add links to external pages on the web. These will appear in a related links box in the asset record display on your website. ,,,DE requested to be added
+expiry date,,,y,,,,,,,,Date at which the item asset should be deleted,,,DE requested to be added
+link,,,y,,,,,,,,,,,DE requested to be added
+contact name,,,y,,,,,,,,,,,DE requested to be added
+contact position,,,y,,,,,,,,,,,DE requested to be added
+contact organisation,,,y,,,,,,,,,,,DE requested to be added
+telephone number,,,y,,,,,,,,,,,DE requested to be added
+email address,,,y,,,,,,,,,,,DE requested to be added
+website url,y,y,y,,website_url,display,,y,n,n,The URL for the asset on the Eldis/Bridge website,,,DE requested to be added
+document urls,y,,,y,urls,display,,,N,,Link to the external url of the object (document/organisation/item) itself,,,"List of encoded URLs, separated by space",Needs updating to deal with local links
+sectors,y,y,y,y,category_sector,,,,y,admin only,one or more Country profile sector categories for the document asset. ,,,Makes this field available in the API to admin only users
+subjects of focus,y,y,y,y,category_subject,,,,y,admin only,one or more Subjects of Focus ???categories??? for the document asset. These subjects are used for defining service level outputs eg DFID Education.,,,Makes this field available in the API to admin only users
+,,,,y,word,,,,,,all indexed words,,,need to clarify 
+Country of publication,y,,,y,publisher_country,,,,Y,,,,,Need to get from publisher country,,Y
+associated image,y,,,,,,,,,,"link the document asset to an image asset, which will be displayed in the body of the asset.",,,Not required
+associated_organisation,y,,,y,associated_organisation,,,,,,Publisher,,,Not required,Needed to remove duplicates
+branch,y,y,y,y,branch,both,,Y,N,,Either Eldis or Bridge,,,Only Eldis exposed so far,Change to site?
+,y,,,y,author_organisation,,,,,,,,,Remove
+Short abstract,y,y,,y,headline,,short_abstract,,,,,,,"Should be renamed ""Headline""? Also make conditional, so if empty then Title field is copied into this one"
+Asset Language,y,,,y,language_name,both,name,,Y,,The language in which the title and abstracts are written,DC:Language (example),,"This is assumed to be the parallel language version of an asset, which describes the title and summary language, not the language of the attached document. It is not applied consistently across the dataset",Requires change to the indexing of the search so that asset_id and lang_id are concetenated into a new unique identifier. this brings it into line with ultraseek. 
+,,,,y,text,,,,,,"catchall field, containing all other searchable text fields ",,,to list all fields this includes
+,y,y,y,y,asset_id
+Send email alerts flag,,,,y,send_email_alerts,,has_email_alerts,,,admin only
+Region of focus,y,,,y,category_region,,,,y,,one or more Regions that the document focuses on. 
+,,,,y,category_path,,,,y
+Themes,y,y,y,y,category_theme,,,,y,,one or more Resource Guide Themes ???categories??? for the document asset
+,,,,y,alternative_name
+,,,,y,country_name,,,,y
+,y,y,y,y,object_type,,,,,,Describes the type of asset: Document / Item / Organisation
+,,,,y,cat_superparent
+Country of focus,,,y,y,country_focus,,,,y,,one or more Countries that the document focuses on. 
+,y,y,y,y,category_theme_ids
+,,,,y,iso_two_letter_code
+,,,,y,iso_three_letter_code
+,,,,y,cat_first_parent
+,,,,y,cat_parent
+,,,,y,iso_number
+,,,,y,cat_level
+,y,y,y,y,timestamp,,,,,,indicates when field was indexed
+Author,y,,,y,author,,,,,,Author
+Title,y,y,y,y,title,,,,,,Title/Name of Document/Organisation/Item,dc:title
+Long abstract,y,y,y,y,long_abstract,,,,,,Abstract of document or description of item/organisation
+Legacy id,y,y,,y,legacy_id,,,,,admin only
+subject keywords,y,y,y,y,keyword,,,,y,, free text Subject Keywords that relate to the document asset. 
+,y,,,y,publication_date,,,,,,Date of publication,dc:date > dc:created
+org acronym,,y,,y,acronym,,,,,,Acronym of organisation
+,,,,y,alternative_acronym
+Org type,,y,,y,organisation_type_id,,,,,,Organisation type categories
+item type,,,y,y,item_type,,,,y,,"The type of item, eg job, announcement etc. "
+,,,y,y,item_type_id
+start date,,,y,y,start_date,,,,,,"start date of the item, for example the start date for an event, meeting or job advert"
+end date,,,y,y,end_date,,,,,,"end date of the item, for example the end date for an event or job advert"
+Publication year,y,,,,pub_year,Both
