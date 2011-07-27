@@ -1,6 +1,9 @@
 from django.conf.urls.defaults import patterns, include, url
 from django.views.generic.simple import redirect_to
 
+import userprofile.urls
+urlpatterns = userprofile.urls.urlpatterns
+
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
@@ -11,7 +14,7 @@ import openapi.urls
 
 from userprofile.forms import ProfileForm
 
-urlpatterns = patterns('',
+urlpatterns += patterns('',
     (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT }),
 
     # Uncomment the admin/doc line below to enable admin documentation:

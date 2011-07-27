@@ -5,6 +5,10 @@ from django.core.urlresolvers import reverse
 from django.test.testcases import TestCase
 
 from userprofile.models import UserProfile
+import userprofile.admin
+
+import unicodecsv
+import StringIO
 
 class RegistrationTests(TestCase):
     def setUp(self):
@@ -97,4 +101,50 @@ class RegistrationTests(TestCase):
         response = self.client.get(reverse('profile_detail'))
         self.assertContains(response, 'user1@example.org')
 
+    def test_profile_csv_download_output(self):
+        response = self.client.get(reverse(userprofile.admin.download_view))
+        self.assertContains(response, 'Log in')
+        
+        self.user1.is_staff = True
+        self.user1.save
+        self.login()
 
+        response = self.client.get(reverse(userprofile.admin.download_view))
+        
+        expected = StringIO.StringIO()
+        writer = unicodecsv.writer(expected)
+        for user in User.objects.all():
+            profile = user.get_profile()
+            writer.writerow([
+                user.username,
+                user.first_name,
+                user.last_name,
+                user.email,
+                user.is_staff,
+                user.is_active,
+                user.is_superuser,
+                user.last_login,
+                user.date_joined,
+                str(user.groups.all()),
+                profile.user_level,
+                profile.organisation,
+                profile.organisation_url,
+                profile.organisation_address1,
+                profile.organisation_address2,
+                profile.organisation_address3,
+                profile.city,
+                profile.country,
+                profile.zip_postal_code,
+                profile.organisation_type,
+                profile.api_usage_type,
+                profile.cms_technology_platform,
+                profile.heard_about,
+                profile.website_using_api,
+                profile.commercial,
+                profile.agree_to_licensing,
+                ])
+        
+        self.assertEqual(expected.getvalue(), response.content)
+        self.assertEqual('text/csv', response['Content-Type'])
+        self.assertEqual('attachment; filename=users.csv',
+            response['Content-Disposition'])
