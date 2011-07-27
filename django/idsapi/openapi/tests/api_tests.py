@@ -564,19 +564,39 @@ class ApiRootIntegrationTests(BaseTestCase):
 class ApiFieldListIntegrationTests(BaseTestCase):
     def setUp(self):
         BaseTestCase.setUp(self)
-        self.login()
 
     def get_field_list(self):
         return self.client.get(defines.URL_ROOT + 'fieldlist/', ACCEPT='application/json')
 
     def test_field_list_returns_200(self):
+        self.login()
         response = self.get_field_list()
         self.assertEqual(200, response.status_code)
 
-    def test_field_list_has_items(self):
+    def test_field_list_has_admin_items_for_unlimited_user(self):
+        self.setUserLevel('Unlimited')
+        self.login()
         response = self.get_field_list()
         response_list = json.loads(response.content)
         self.assertTrue(len(response_list) > 1)
+        self.assertTrue('send_email_alerts' in response_list)
+
+    def test_field_list_has_no_admin_items_for_partner_user(self):
+        self.setUserLevel('Partner')
+        self.login()
+        response = self.get_field_list()
+        response_list = json.loads(response.content)
+        self.assertTrue(len(response_list) > 1)
+        self.assertFalse('send_email_alerts' in response_list)
+        self.assertTrue('publisher_country' in response_list)
+
+    def test_field_list_has_no_admin_items_for_general_user(self):
+        self.setUserLevel('General User')
+        self.login()
+        response = self.get_field_list()
+        response_list = json.loads(response.content)
+        self.assertTrue(len(response_list) > 1)
+        self.assertFalse('publisher_country' in response_list)
 
 class ApiFacetIntegrationTests(BaseTestCase):
     def setUp(self):
