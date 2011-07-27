@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from openapi import defines
 
 class DataMunger():
-    def get_required_data(self, result, output_format, user_level_info):
+    def get_required_data(self, result, output_format, user_level_info, beacon_guid):
         object_id = result['object_id']
         if output_format == 'id':
             object_data = {'object_id': object_id}
@@ -21,10 +21,16 @@ class DataMunger():
             if defines.object_name_to_object_type(result['object_type']) in defines.OBJECT_TYPES_WITH_HIERARCHY:
                 self._add_child_parent_links(object_data, object_id, result)
 
-            # add image beacon to long_abstract
-            if object_data.has_key('long_abstract') and user_level_info['image_beacon']:
-                object_data['long_abstract'] += '<img src="' + \
-                                settings.IMAGE_BEACON_STUB_URL + '" width="1" height="1">'
+            if object_data.has_key('long_abstract'):
+                # truncate for general level users
+                if user_level_info['general_fields_only'] and len(object_data['long_abstract']) > 250:
+                    object_data['long_abstract'] = object_data['long_abstract'][:246] + '...'
+                # add image beacon
+                if user_level_info['image_beacon']:
+                    object_data['long_abstract'] += " <img src='" + \
+                                    settings.IMAGE_BEACON_STUB_URL + \
+                                    '?beacon_guid=' + beacon_guid + \
+                                    "' width='1' height='1'>"
         else:
             object_data = result
 

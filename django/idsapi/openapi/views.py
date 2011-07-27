@@ -68,6 +68,10 @@ class BaseAuthView(View):
     def general_fields_only(self):
         return self.get_user_level_info()['general_fields_only']
 
+    def get_beacon_guid(self):
+        profile = self.user.get_profile()
+        return profile.beacon_guid
+
 class BaseSearchView(BaseAuthView):
 
     def __init__(self, raise_if_no_results=False):
@@ -84,7 +88,7 @@ class BaseSearchView(BaseAuthView):
         self.search_response = self.query.execute()
         for result in self.search_response:
             formatted_results.append(self.data_munger.get_required_data( \
-                    result, self.output_format, self.get_user_level_info()))
+                    result, self.output_format, self.get_user_level_info(), self.get_beacon_guid()))
         if self.raise_if_no_results and len(formatted_results) == 0:
             raise NoObjectFoundError()
         return formatted_results

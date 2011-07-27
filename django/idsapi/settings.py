@@ -96,7 +96,7 @@ ORGANISATION_TYPES = [
         ]
 
 # this is the URL used for the image beacon stuff
-IMAGE_BEACON_STUB_URL = 'http://api.ids.ac.uk/tracking/trackimg.cfm?beacon_guid='
+IMAGE_BEACON_STUB_URL = 'http://api.ids.ac.uk/tracking/trackimg.cfm'
 
 # this maps from the query parameter used in the URL to:
 # * the name (or names) of the field in SOLR to search across

@@ -93,9 +93,20 @@ class ApiSearchResponseTests(ApiTestsBase):
     def test_long_abstract_contains_image_beacon(self):
         response = self.object_search(object_type='documents', output_format='full')
         search_results = json.loads(response.content)['results']
+        profile = self.user.get_profile()
         for result in search_results:
             if result.has_key('long_abstract'):
                 self.assertTrue(result['long_abstract'].find(settings.IMAGE_BEACON_STUB_URL) > -1)
+                self.assertTrue(result['long_abstract'].find(profile.beacon_guid) > -1)
+
+    def test_long_abstract_truncated_for_general_user(self):
+        self.setUserLevel('General User')
+        response = self.object_search(object_type='documents', output_format='full')
+        search_results = json.loads(response.content)['results']
+        for result in search_results:
+            if result.has_key('long_abstract'):
+                abstract_without_beacon = result['long_abstract'].split('<img')[0]
+                self.assertTrue(250 >= len(abstract_without_beacon))
 
     def test_long_abstract_does_not_contain_image_beacon_for_unlimited_user(self):
         self.setUserLevel('Unlimited')
