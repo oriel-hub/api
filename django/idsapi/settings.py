@@ -54,6 +54,7 @@ ADMIN_ONLY_FIELDS = [
     'legacy_id', 
     'category_sector', 
     'category_subject',
+    'timestamp',
     ]
 
 # these are the fields that will be given to a 'General User'
@@ -168,7 +169,7 @@ QUERY_MAPPING = {
 # this maps from the date-based query parameter to the SOLR field used
 # so document_published_year would use the publication_date as the field.
 DATE_PREFIX_MAPPING = {
-        'metadata_published': 'timestamp',
+        #'metadata_published': 'timestamp',
         'document_published': 'publication_date',
         'item_started': 'start_date',
         'item_finished': 'end_date', 

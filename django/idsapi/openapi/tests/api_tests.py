@@ -319,32 +319,6 @@ class ApiPaginationTests(ApiTestsBase):
 
 class ApiDateQueryTests(ApiTestsBase):
 
-    def test_200_returned_for_metadata_published_before(self):
-        response = self.object_search(query={'metadata_published_before': '2011-12-31'})
-        query_date = datetime.datetime.strptime('2011-12-31', "%Y-%m-%d")
-        results = json.loads(response.content)['results']
-        for result in results:
-            metadata_published = datetime.datetime.strptime(
-                    result['timestamp'][0:19], "%Y-%m-%d %H:%M:%S")
-            self.assertTrue(metadata_published < query_date)
-    
-    def test_200_returned_for_metadata_published_after(self):
-        response = self.object_search(query={'metadata_published_after': '2008-12-31'})
-        query_date = datetime.datetime.strptime('2008-12-31', "%Y-%m-%d")
-        results = json.loads(response.content)['results']
-        for result in results:
-            metadata_published = datetime.datetime.strptime(
-                    result['timestamp'][0:19], "%Y-%m-%d %H:%M:%S")
-            self.assertTrue(metadata_published >= query_date)
-    
-    def test_200_returned_for_metadata_published_year(self):
-        response = self.object_search(query={'metadata_published_year': '2011'})
-        results = json.loads(response.content)['results']
-        for result in results:
-            metadata_published = datetime.datetime.strptime(
-                    result['timestamp'][0:19], "%Y-%m-%d %H:%M:%S")
-            self.assertEqual(2011, metadata_published.year)
-    
     def test_200_returned_for_document_published_before(self):
         response = self.object_search(query={'document_published_before': '2008-12-31'})
         query_date = datetime.datetime.strptime('2008-12-31', "%Y-%m-%d")
@@ -381,6 +355,18 @@ class ApiDateQueryTests(ApiTestsBase):
         for query_param in ['item_started_year', 'item_finished_year',]:
             response = self.object_search(query={query_param: '2008'})
             self.assertEqual(200, response.status_code)
+
+    def test_400_returned_for_document_published_before_bad_date_format(self):
+        bad_dates = ['200-12-31', '2008-1-01', '2008-01-1', '20080101', '200A-01-01']
+        for date in bad_dates:
+            response = self.object_search(object_type='documents', query={'document_published_before': date})
+            self.assertEqual(400, response.status_code)
+
+    def test_400_returned_for_document_published_year_bad_date_format(self):
+        bad_dates = ['200', '200A', '20080',]
+        for date in bad_dates:
+            response = self.object_search(object_type='documents', query={'document_published_year': date})
+            self.assertEqual(400, response.status_code)
 
 class ApiSearchSortTests(ApiTestsBase):
 
@@ -460,24 +446,12 @@ class ApiSearchErrorTests(ApiTestsBase):
         response = self.object_search(query={'keyword': '*ca'})
         self.assertEqual(400, response.status_code)
     
-    def test_400_returned_for_metadata_published_before_bad_date_format(self):
-        bad_dates = ['200-12-31', '2008-1-01', '2008-01-1', '20080101', '200A-01-01']
-        for date in bad_dates:
-            response = self.object_search(query={'metadata_published_before': date})
-            self.assertEqual(400, response.status_code)
-
-    def test_400_returned_for_metadata_published_year_bad_date_format(self):
-        bad_dates = ['200', '200A', '20080',]
-        for date in bad_dates:
-            response = self.object_search(query={'metadata_published_year': date})
-            self.assertEqual(400, response.status_code)
-
     def test_400_returned_for_bad_date_query_param_prefix(self):
         response = self.object_search(query={'foobar_published_year': '2009'})
         self.assertEqual(400, response.status_code)
 
     def test_400_returned_for_bad_date_query_param_postfix(self):
-        response = self.object_search(query={'metadata_published_foobar': '2009'})
+        response = self.object_search(object_type='documents', query={'document_published_foobar': '2009'})
         self.assertEqual(400, response.status_code)
 
     def test_400_returned_if_document_specific_query_param_used(self):

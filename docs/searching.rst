@@ -69,15 +69,6 @@ General Search
 
    ``/openapi/documents/search/full?keyword=*ca``
 
-   **Date based query fields:**
-
-   :query metadata_published_after: Date after which the metadata was published.
-   :query metadata_published_before: Date before which the metadata was published.
-   :query metadata_published_year: The metadata was published during the specified year.
-
-   For the first two, the date should be specified as YYYY-MM-DD (year, month,
-   day). For the last option, the value is just the 4 digit year.
-
    **Special query fields:**
 
    :query extra_fields: Extra fields to include in the response. See the :ref:`extra-fields` section for details. 
@@ -111,6 +102,10 @@ General Search
    :query document_published_before: Date before which the document was published.
    :query document_published_year: The document was published during the specified year.
 
+   For the ``document_published_after`` and ``document_published_before``
+   fields, the date should be specified as YYYY-MM-DD (year, month, day). For
+   the ``document_published_year`` field, the value is just the 4 digit year.
+
    **Organisation specific query fields:**
 
    These fields are only valid when searching for organisations, ie when the URL
@@ -131,6 +126,10 @@ General Search
    :query item_finished_after: Date after which the item finished.
    :query item_finished_before: Date before which the item finished.
    :query item_finished_year: The item finished during the specified year.
+
+   For the ``xyz_published_after`` and ``xyz_published_before``
+   fields, the date should be specified as YYYY-MM-DD (year, month, day). For
+   the ``xyz_published_year`` field, the value is just the 4 digit year.
 
    **Status codes returned:**
 
