@@ -84,6 +84,7 @@ SORT_FIELDS = [
         'asset_id',
         'category_id',
         'publication_date',
+        'asset_publication_date',
         'start_date',
         'end_date',
         'publisher_id',
@@ -148,9 +149,41 @@ QUERY_MAPPING = {
             'solr_field': 'author',           
             'object_type': 'documents'
             },
-        'author_organisation': {
-            'solr_field': 'author_organisation', 
+        'publisher': {
+            'solr_field': 'publisher', 
             'object_type': 'documents'
+            },
+        'publisher_id' : {
+            'solr_field': 'publisher_id',
+            'object_type': 'documents',
+            },
+        'copyright_clearance': {
+            'solr_field': 'copyright_clearance',
+            'object_type': 'documents',
+            },
+        'redistribute_clearance': {
+            'solr_field': 'redistribute_clearance',
+            'object_type': 'documents',
+            },
+        'license_type': {
+            'solr_field': 'license_type',
+            'object_type': 'all',
+            },
+        'permission_to_host_info': {
+            'solr_field': 'permission_to_host_info',
+            'object_type': 'all',
+            },
+        'related_information_links': {
+            'solr_field': 'related_information_links',
+            'object_type': 'all',
+            },
+        'language_name': {
+            'solr_field': 'language_name',
+            'object_type': 'documents',
+            },
+        'publisher_country': {
+            'solr_field': 'publisher_country',
+            'object_type': 'documents',
             },
         'organisation_name': {
             'solr_field': ['title', 'alternative_name'], 
@@ -169,7 +202,7 @@ QUERY_MAPPING = {
 # this maps from the date-based query parameter to the SOLR field used
 # so document_published_year would use the publication_date as the field.
 DATE_PREFIX_MAPPING = {
-        #'metadata_published': 'timestamp',
+        'metadata_published': 'asset_publication_date',
         'document_published': 'publication_date',
         'item_started': 'start_date',
         'item_finished': 'end_date', 

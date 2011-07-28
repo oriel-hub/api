@@ -55,9 +55,9 @@ General Search
    :query country: The name of a country to search for.
    :query keyword: The name of a keyword to search for.
    :query region: The name of a region to search for.
-   :query sector: The name of a sector to search for.
-   :query subject: The name of a subject to search for.
    :query theme: The name of a theme to search for.
+   :query license_type: The type of license for this data.
+   :query related_information_links: Links to related information.
 
    Note that you can use ``*`` in your query, but not as the first character.
    So you can use:
@@ -68,6 +68,15 @@ General Search
    but not:
 
    ``/openapi/documents/search/full?keyword=*ca``
+
+   **Date based query fields:**
+
+   :query metadata_published_after: Date after which the metadata was published.
+   :query metadata_published_before: Date before which the metadata was published.
+   :query metadata_published_year: The metadata was published during the specified year.
+
+   For the first two, the date should be specified as YYYY-MM-DD (year, month,
+   day). For the last option, the value is just the 4 digit year.
 
    **Special query fields:**
 
@@ -83,6 +92,7 @@ General Search
 
    * asset_id
    * category_id
+   * asset_published_date
    * publication_date
    * start_date
    * end_date
@@ -97,7 +107,12 @@ General Search
    starts with ``/openapi/documents/``.
 
    :query author: The author(s) of the document.
-   :query author_organisation: The organisation that authored the document.
+   :query publisher: The publisher of the document.
+   :query publisher_id: The ID of the publisher of the document.
+   :query publisher_country: The country the publisher is in.
+   :query copyright_clearance: Whether the copyright holder has given permission for ELDIS to host the information.
+   :query redistribute_clearance: Whether the copyright holder has given permission for the information to be redistributed.
+   :query language_name: The language the document is written in.
    :query document_published_after: Date after which the document was published.
    :query document_published_before: Date before which the document was published.
    :query document_published_year: The document was published during the specified year.
