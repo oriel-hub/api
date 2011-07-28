@@ -157,8 +157,12 @@ class SearchWrapper:
             raise InvalidQueryError("Cannot use both 'sort_asc' and 'sort_desc'")
         try:
             if search_params.has_key('sort_asc'):
+                if search_params['sort_asc'] not in settings.SORT_FIELDS:
+                    raise InvalidQueryError("Sorry, you can't sort by %s" % search_params['sort_asc'])
                 self.si_query = self.si_query.sort_by(search_params['sort_asc'])
             if search_params.has_key('sort_desc'):
+                if search_params['sort_desc'] not in settings.SORT_FIELDS:
+                    raise InvalidQueryError("Sorry, you can't sort by %s" % search_params['sort_desc'])
                 self.si_query = self.si_query.sort_by('-' + search_params['sort_desc'])
         except sunburnt.SolrError as e:
             raise InvalidQueryError("Can't do sort - " + str(e))

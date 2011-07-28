@@ -56,8 +56,10 @@ ADMIN_ONLY_FIELDS = [
     'category_subject',
     ]
 
+# these are the fields that will be given to a 'General User'
 GENERAL_FIELDS = [
     'title',
+    'headline',
     'long_abstract',
     'object_id',
     'object_type',
@@ -74,6 +76,17 @@ GENERAL_FIELDS = [
     'country_name',
     'iso_two_letter_code',
     'cat_parent',
+        ]
+
+# these are the fields you can use for sorting
+SORT_FIELDS = [
+        'asset_id',
+        'category_id',
+        'publication_date',
+        'start_date',
+        'end_date',
+        'publisher_id',
+        'acronym',
         ]
 
 # these are the entries in the dropdown box for user registration

@@ -402,6 +402,11 @@ class ApiSearchSortTests(ApiTestsBase):
             date2 = datetime.datetime.strptime(results[i+1]['publication_date'][0:19], "%Y-%m-%d %H:%M:%S")
             self.assertTrue(date1 >= date2)
 
+    def test_400_returned_for_disallowed_sort_field(self):
+        response = self.object_search(object_type='documents', output_format='full',
+                query={'q': 'undp', 'sort_asc': 'long_abstract'})
+        self.assertEqual(400, response.status_code)
+
     def test_400_returned_for_unknown_sort_field(self):
         response = self.object_search(object_type='documents', output_format='full',
                 query={'q': 'undp', 'sort_desc': 'foobar'})
