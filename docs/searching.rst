@@ -88,10 +88,17 @@ General Search
    :query sort_asc: Sort by the field named, in ascending order.
    :query sort_desc: Sort by the field named, in descending order.
 
-   You can use any field that comes in the results, though it makes most sense
-   to use fields that are numbers or dates.
+   You can only use the following fields to sort by:
 
-   Note that you can only use one of these fields, and only once.
+   * asset_id
+   * category_id
+   * publication_date
+   * start_date
+   * end_date
+   * publisher_id
+   * acronym
+
+   Note that you can only use one of ``sort_asc`` and ``sort_desc``, and only once.
 
    **Document specific query fields:**
 
