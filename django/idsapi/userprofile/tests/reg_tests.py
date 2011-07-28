@@ -115,6 +115,7 @@ class RegistrationTests(TestCase):
         
         expected = StringIO.StringIO()
         writer = unicodecsv.writer(expected)
+        writer.writerow(userprofile.admin.CSV_COL_NAMES)
         for user in User.objects.all():
             profile = user.get_profile()
             writer.writerow([
@@ -127,7 +128,6 @@ class RegistrationTests(TestCase):
                 user.is_superuser,
                 user.last_login,
                 user.date_joined,
-                str(user.groups.all()),
                 profile.user_level,
                 profile.organisation,
                 profile.organisation_url,

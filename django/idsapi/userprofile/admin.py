@@ -7,6 +7,36 @@ from django.contrib.admin.views.decorators import staff_member_required
 from userprofile.models import UserProfile
 
 import unicodecsv
+
+CSV_COL_NAMES = [
+            'Username',
+            'First name',
+            'Last name',
+            'Email',
+            'Is staff',
+            'Is active',
+            'Is superuser',
+            'Last login',
+            'Date joined',
+            'User level',
+            'Organisation',
+            'Organisation url',
+            'Organisation address line 1',
+            'Organisation address line 2',
+            'Organisation address line 3',
+            'City',
+            'Country',
+            'Zip/postal code',
+            'Organisation type',
+            'API usage type',
+            'CMS technology platform',
+            'Heard about',
+            'Website using API',
+            'Commercial',
+            'Agree to licensing',
+            'Access GUID',
+            'Beacon GUID',
+        ]
  
 @staff_member_required
 def download_view(request):
@@ -15,6 +45,7 @@ def download_view(request):
     response['Content-Disposition'] = 'attachment; filename=users.csv'
     
     writer = unicodecsv.writer(response)
+    writer.writerow(CSV_COL_NAMES)
     for user in User.objects.all():
         profile = user.get_profile()
         writer.writerow([
@@ -27,7 +58,6 @@ def download_view(request):
             user.is_superuser,
             user.last_login,
             user.date_joined,
-            str(user.groups.all()),
             profile.user_level,
             profile.organisation,
             profile.organisation_url,
