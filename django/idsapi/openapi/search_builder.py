@@ -76,7 +76,7 @@ class SearchBuilder():
         if facet_type == None:
             sw.add_paginate(search_params)
         else:
-            sw.add_facet(facet_type)
+            sw.add_facet(facet_type, search_params)
             sw.add_paginate({'num_results': 0})
         return sw
 
@@ -170,10 +170,14 @@ class SearchWrapper:
     def add_free_text_query(self, search_text):
         self.si_query = self.si_query.query(search_text.lower())
 
-    def add_facet(self, facet_type):
+    def add_facet(self, facet_type, search_params):
         if not facet_type in settings.FACET_MAPPING.keys():
             raise InvalidQueryError("Unknown count type: '%s_count'" % facet_type)
-        self.si_query = self.si_query.facet_by(settings.FACET_MAPPING[facet_type])
+        if search_params.has_key('num_results'):
+            self.si_query = self.si_query.facet_by(settings.FACET_MAPPING[facet_type], 
+                    limit=int(search_params['num_results']))
+        else:
+            self.si_query = self.si_query.facet_by(settings.FACET_MAPPING[facet_type])
 
     def restrict_fields_returned(self, output_format, search_params):
         if output_format == 'full':

@@ -154,8 +154,8 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         response = self.object_search(query={'country':'angola&namibia'})
         search_results = json.loads(response.content)['results']
         for result in search_results:
-            self.assertTrue(' '.join(result['country_focus']).lower().find('angola'))
-            self.assertTrue(' '.join(result['country_focus']).lower().find('namibia'))
+            self.assertTrue(' '.join(result['country_focus']).lower().find('angola') > -1)
+            self.assertTrue(' '.join(result['country_focus']).lower().find('namibia') > -1)
 
     def test_query_by_country_with_or(self):
         response = self.object_search(query={'country':'namibia|iran'})
@@ -615,10 +615,10 @@ class ApiFacetIntegrationTests(BaseTestCase):
         BaseTestCase.setUp(self)
         self.login()
 
-    def facet_search(self, object_type='assets', facet_type='country',
-            content_type='application/json'):
+    def facet_search(self, object_type='assets', facet_type='country', query=None):
+        query = query or {'q': 'undp'}
         return self.client.get(defines.URL_ROOT + object_type + '/' + facet_type + '_count/', 
-                {'q': 'undp'}, ACCEPT=content_type)
+                query, ACCEPT='application/json')
 
     def test_200_returned_for_all_facet_types(self):
         for facet_type in ('country', 'region', 'keyword', 'sector', 'subject', 'theme'):
@@ -628,7 +628,20 @@ class ApiFacetIntegrationTests(BaseTestCase):
     def test_200_returned_for_individual_object_type(self):
         response = self.facet_search(object_type='documents')
         self.assertEqual(200, response.status_code)
-            
+
+    def test_facet_num_results(self):
+        response = self.facet_search(query={'q': 'undp', 'num_results': '123'})
+        search_results = json.loads(response.content)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(123, len(search_results['country_count']))
+
+    def test_facet_num_results_with_minus_one(self):
+        response = self.facet_search(query={'q': 'undp', 'num_results': '-1'})
+        search_results = json.loads(response.content)
+        self.assertEqual(200, response.status_code)
+        self.assertTrue(
+            len(search_results['country_count']) > 0)
+
     def test_400_returned_if_unknown_facet_type(self):
         response = self.facet_search(facet_type='foobars')
         self.assertEqual(400, response.status_code)

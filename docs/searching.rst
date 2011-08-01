@@ -182,8 +182,9 @@ Get Count of Results by Country, Keyword etc
    You can use all the query terms available with search, apart from:
    
    * extra_fields
-   * num_results
    * start_offset
+
+   :query num_results: Alters how many results you can get. If you use ``-1`` you will get *all* the counts.
    
    **Example:** ``/openapi/documents/country_count/?q=undp``
 
