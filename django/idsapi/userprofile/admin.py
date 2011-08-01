@@ -2,6 +2,7 @@ from django.conf.urls.defaults import patterns, url
 from django.contrib import admin 
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 from django.contrib.admin.views.decorators import staff_member_required
 from userprofile.models import UserProfile
@@ -88,6 +89,14 @@ class UserProfileInline(admin.StackedInline):
     model = UserProfile
     
 class MyUserAdmin(UserAdmin):
+    list_display = UserAdmin.list_display + ('user_level',)
+
+    def user_level(self, obj):
+        try:
+            return obj.get_profile().user_level
+        except obj.DoesNotExist, ObjectDoesNotExist:
+            return "not set yet"
+
     inlines = [
         UserProfileInline,
     ]
