@@ -215,6 +215,8 @@ class FacetCountView(BaseAuthView):
 
 class FieldListView(BaseAuthView):
     def get(self, request):
+        if self.general_fields_only():
+            return sorted(settings.GENERAL_FIELDS)
         # fetch file from SOLR_SCHEMA
         http = httplib2.Http(".cache")
         _, content = http.request(settings.SOLR_SCHEMA, "GET") #@UnusedVariable
@@ -224,9 +226,7 @@ class FieldListView(BaseAuthView):
         field_list.sort()
         field_list = [elem for elem in field_list if not elem.endswith('_facet')]
         field_list = [elem for elem in field_list if not elem in ['text', 'word']]
-        if self.general_fields_only():
-            field_list = [elem for elem in field_list if elem in settings.GENERAL_FIELDS]
-        elif self.hide_admin_fields():
+        if self.hide_admin_fields():
             field_list = [elem for elem in field_list if not elem in settings.ADMIN_ONLY_FIELDS]
         return field_list
     
