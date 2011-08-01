@@ -94,7 +94,7 @@ class MyUserAdmin(UserAdmin):
     def user_level(self, obj):
         try:
             return obj.get_profile().user_level
-        except obj.DoesNotExist, ObjectDoesNotExist:
+        except (obj.DoesNotExist, ObjectDoesNotExist):
             return "not set yet"
 
     inlines = [
