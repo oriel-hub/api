@@ -145,13 +145,12 @@ def rollback(version='last', migrate=False, restore_db=False):
       The default is False
 
     Note that migrate and restore_db cannot both be True."""
-    utils.abort('rollback has not been implemented yet')
     require('prev_root', 'vcs_root', 'tasks_bin', provided_by=env.valid_envs)
     if migrate and restore_db:
         utils.abort('rollback cannot do both migrate and restore_db')
     if migrate:
         utils.abort("rollback: haven't worked out how to do migrate yet ...")
-    if restort_db:
+    if restore_db:
         utils.abort("rollback: haven't worked out how to restore the database yet ...")
 
     if version == 'last':
@@ -159,10 +158,11 @@ def rollback(version='last', migrate=False, restore_db=False):
         # list directories in env.prev_root, use last one
         version = run('ls ' + env.prev_root).split('\n')[-1]
     # check version specified exists
-    rollback_dir = os.path.join(env.prev_root, version)
+    rollback_dir = os.path.join(env.prev_root, version, 'dev')
     if not files.exists(rollback_dir):
         utils.abort("Cannot rollback to version %s, it does not exist, use list_previous to see versions available" % version)
         
+    apache_cmd("stop")
     # first copy this version out of the way
     create_copy_for_rollback(-1)
     if migrate:
@@ -170,12 +170,13 @@ def rollback(version='last', migrate=False, restore_db=False):
         # but how to work out what the old version is??
         pass
     # delete everything - don't want stray files left over
-    sudo('rm -rf %s' % env.vcs_root + '/*')
+    sudo('rm -rf %s' % env.vcs_root)
     # cp -a from rollback_dir to vcs_root
-    sudo('cp -a %s/* %s' % (rollback_dir, env.vcs_root))
+    sudo('cp -a %s %s' % (rollback_dir, env.vcs_root))
     if restore_db:
         # feed the dump file into mysql command
         pass
+    apache_cmd("start")
 
 
 def local_test():
