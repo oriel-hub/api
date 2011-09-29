@@ -251,6 +251,25 @@ def dump_db(dump_filename='db_dump.sql'):
     dump_file.close()
 
 
+def load_dbdump(dump_filename='db_dump.sql'):
+    """Load a database dump into the database"""
+    project_name = project_settings.django_dir.split('/')[-1]
+    db_engine, db_name, db_user, db_pw, db_port = _get_django_db_settings()
+    if not db_engine.endswith('mysql'):
+        print 'load_dbdump only knows how to load mysql so far'
+        sys.exit(1)
+    load_cmd = ['/usr/bin/mysql', '--user='+db_user, '--password='+db_pw, '--host=127.0.0.1']
+    if db_port != None and len(db_port) > 0:
+        load_cmd += ['--port=%s' % db_port]
+    load_cmd += [db_name]
+    # open the file to write to
+    dump_file = open(dump_filename, 'r')
+    if env['verbose']:
+        print 'Executing dump command: %s - stdin from %s' % (' '.join(load_cmd), dump_filename)
+    subprocess.call(load_cmd, stdin=dump_file)
+    dump_file.close()
+
+
 def setup_db_dumps(dump_dir):
     """ set up mysql database dumps in root crontab """
     if not os.path.isabs(dump_dir):
