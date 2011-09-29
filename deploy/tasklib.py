@@ -232,18 +232,23 @@ def update_db():
     if use_migrations:
         _manage_py(['migrate', '--noinput'])
 
-def dump_db():
+def dump_db(dump_filename='db_dump.sql'):
     """Dump the database in the current working directory"""
     project_name = project_settings.django_dir.split('/')[-1]
     db_engine, db_name, db_user, db_pw, db_port = _get_django_db_settings()
     if not db_engine.endswith('mysql'):
         print 'dump_db only knows how to dump mysql so far'
         sys.exit(1)
-    dump_cmd = '/usr/bin/mysqldump --user=%s --password=%s --host=127.0.0.1 ' %\
-            (db_user, db_pw)
-    if db_port != None:
-        dump_cmd += '--port=%s ' % db_port
-    dump_cmd += '%s > db_dump.sql' % db_name
+    dump_cmd = ['/usr/bin/mysqldump', '--user='+db_user, '--password='+db_pw, '--host=127.0.0.1']
+    if db_port != None and len(db_port) > 0:
+        dump_cmd += ['--port=%s' % db_port]
+    dump_cmd += [db_name]
+    # open the file to write to
+    dump_file = open(dump_filename, 'w')
+    if env['verbose']:
+        print 'Executing dump command: %s - stdout to %s' % (' '.join(dump_cmd), dump_filename)
+    subprocess.call(dump_cmd, stdout=dump_file)
+    dump_file.close()
 
 
 def setup_db_dumps(dump_dir):
