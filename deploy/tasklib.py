@@ -1,5 +1,3 @@
-#!/usr/bin/python2.6
-#
 # This script is to set up various things for our projects. It can be used by:
 #
 # * developers - setting up their own environment
@@ -52,7 +50,14 @@ def _manage_py(args, cwd=None):
     # for manage.py, always use the system python 2.6
     # otherwise the update_ve will fail badly, as it deletes
     # the virtualenv part way through the process ...
-    manage_cmd = ['/usr/bin/python2.6', env['manage_py']]
+
+    if sys.platform == 'win32':
+        system_python = 'python.exe'
+    else:
+        system_python = '/usr/bin/python2.6'
+
+    manage_cmd = [system_python, env['manage_py']]
+
     if isinstance(args, str):
         manage_cmd.append(args)
     else:
@@ -391,7 +396,6 @@ def deploy(environment=None):
     link_local_settings(environment)
     create_ve()
     update_db()
-
 def patch_south():
     """ patch south to fix pydev errors """
     south_db_init = os.path.join(env['ve_dir'],
@@ -399,3 +403,4 @@ def patch_south():
     patch_file = os.path.join(env['deploy_dir'], 'south.patch')
     cmd = ['patch', '-N', '-p0', south_db_init, patch_file]
     subprocess.call(cmd)
+
