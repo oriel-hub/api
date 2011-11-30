@@ -55,19 +55,19 @@ USER_LEVEL_INFO = {
 # these fields will be hidden from those with #'hide_admin_fields' set to True
 ADMIN_ONLY_FIELDS = [
     'send_email_alerts',
-	'notification_email', 
-	'copyright_clearance', 
-	'redistribute_clearance', 
-	'licence_type',
-	'permission_to_host_info',
-	'et_al',
+    'notification_email', 
+    'copyright_clearance', 
+    'redistribute_clearance', 
+    'licence_type',
+    'permission_to_host_info',
+    'et_al',
     'legacy_id', 
     'category_sector', 
     'category_subject',
     'timestamp',
-	'publisher_id',
-	'cat_level',
-	'date_updated',
+    'publisher_id',
+    'cat_level',
+    'date_updated',
     ]
 
 # these are the fields that will be given to a 'General User'
@@ -102,10 +102,10 @@ GENERAL_FIELDS = [
 # these are the fields you can use for sorting
 SORT_FIELDS = [
         'title',
-	   'asset_id',
+       'asset_id',
         'category_id',
         'publication_date',
-	   'date_created',
+       'date_created',
         'asset_publication_date',
         'start_date',
         'end_date',
@@ -219,15 +219,15 @@ QUERY_MAPPING = {
             'solr_field': 'item_type',     
             'object_type': 'items'
             },
-	   'cat_level':  {
+       'cat_level':  {
             'solr_field': 'cat_level',     
             'object_type': 'themes'
             },
-	   'theme_id':  {
+       'theme_id':  {
             'solr_field': 'category_theme_ids',     
             'object_type': 'all'
             },
-		}
+        }
 
 # this maps from the date-based query parameter to the SOLR field used
 # so document_published_year would use the publication_date as the field.
