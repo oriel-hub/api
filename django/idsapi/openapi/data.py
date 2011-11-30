@@ -18,7 +18,7 @@ class DataMunger():
                 object_data = dict((k, v) for k, v in object_data.items() if not k in settings.ADMIN_ONLY_FIELDS)
 
             # add the parent category, if relevant
-            if defines.object_name_to_object_type(result['object_type']) in defines.OBJECT_TYPES_WITH_HIERARCHY:
+            if defines.object_name_to_object_type(result['object_type']) in settings.OBJECT_TYPES_WITH_HIERARCHY:
                 self._add_child_parent_links(object_data, object_id, result)
 
             if object_data.has_key('long_abstract'):

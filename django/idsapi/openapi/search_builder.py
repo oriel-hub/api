@@ -91,7 +91,7 @@ class SearchBuilder():
     
     @classmethod
     def create_category_children_search(cls, user_level, search_params, object_type, object_id):
-        if object_type not in defines.OBJECT_TYPES_WITH_HIERARCHY:
+        if object_type not in settings.OBJECT_TYPES_WITH_HIERARCHY:
             raise InvalidQueryError("Object type '%s' does not have children" % object_type)
         
         sw = SearchWrapper(user_level)
@@ -124,7 +124,7 @@ class SearchWrapper:
             # required for single object search
             pass
         elif object_type in defines.OBJECT_TYPES:
-            self.si_query = self.si_query.query(object_type=defines.OBJECT_TYPES_TO_OBJECT_NAME[object_type])
+            self.si_query = self.si_query.query(object_type=settings.OBJECT_TYPES_TO_OBJECT_NAME[object_type])
         else:
             raise UnknownObjectError(object_type)
 

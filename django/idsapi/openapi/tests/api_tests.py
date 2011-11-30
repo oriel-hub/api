@@ -693,7 +693,7 @@ class ApiCategoryChildrenIntegrationTests(ApiTestsBase):
         self.assertEqual(400, response.status_code)
 
     def test_all_have_children_link(self):
-        for object_type in defines.OBJECT_TYPES_WITH_HIERARCHY:
+        for object_type in settings.OBJECT_TYPES_WITH_HIERARCHY:
             response = self.get_all(object_type=object_type, output_format='full') 
             search_results = json.loads(response.content)
             for result in search_results['results']:

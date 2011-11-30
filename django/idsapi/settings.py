@@ -249,6 +249,32 @@ FACET_MAPPING = {
         'theme':   'category_theme_path_facet',
         }
 
+# the mapping of how the api refers to objects, to the object name
+# in SOLR
+OBJECT_TYPES_TO_OBJECT_NAME = {
+        'assets':         None,
+        'documents':     'CDocument',
+        'organisations': 'COrganisation',
+        'themes':        'theme',
+        'items':         'CItem',
+        'subjects':      'subject',
+        'sectors':       'sector',
+        'countries':     'CCountry',
+        'regions':       'region',
+        'itemtypes':     'itemtype',
+}
+
+# the list of objects that are actually assets
+ASSET_TYPES = [
+        'documents',
+        'organisations',
+        'items',
+        'countries',
+]
+
+# the object types where we actually show the heirarchy
+OBJECT_TYPES_WITH_HIERARCHY = ['themes', 'itemtypes']
+
 ######################################################################
 #
 # PLEASE DON'T EDIT ANYTHING BELOW HERE UNLESS YOU KNOW ABOUT DJANGO

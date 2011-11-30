@@ -1,35 +1,20 @@
 # some defines to use
 import exceptions
+from django.conf import settings
 
 URL_ROOT = '/openapi/'
 
-OBJECT_TYPES_TO_OBJECT_NAME = {
-'assets':         None,
-'documents':     'CDocument',
-'organisations': 'COrganisation',
-'themes':        'theme',
-'items':         'CItem',
-'subjects':      'subject',
-'sectors':       'sector',
-'countries':     'CCountry',
-'regions':       'region',
-'itemtypes':     'itemtype',
-}
+OBJECT_TYPES  = settings.OBJECT_TYPES_TO_OBJECT_NAME.keys()
+OBJECT_NAMES = settings.OBJECT_TYPES_TO_OBJECT_NAME.values()
 
-OBJECT_TYPES  = OBJECT_TYPES_TO_OBJECT_NAME.keys()
-OBJECT_NAMES = OBJECT_TYPES_TO_OBJECT_NAME.values()
+ASSET_TYPES_TO_OBJECT_NAME = dict((k, v) for k, v in settings.OBJECT_TYPES_TO_OBJECT_NAME.items() \
+                                if k in settings.ASSET_TYPES)
 
-ASSET_TYPES_TO_OBJECT_NAME = dict((k, v) for k, v in OBJECT_TYPES_TO_OBJECT_NAME.items() \
-                                  if v != None and v.startswith('C'))
-
-ASSET_TYPES  = ASSET_TYPES_TO_OBJECT_NAME.keys()
 ASSET_NAMES = ASSET_TYPES_TO_OBJECT_NAME.values()
 
-OBJECT_TYPES_WITH_HIERARCHY = ['themes', 'itemtypes']
-
 def object_name_to_object_type(object_name):
-    for object_type in OBJECT_TYPES_TO_OBJECT_NAME:
-        if OBJECT_TYPES_TO_OBJECT_NAME[object_type] == object_name:
+    for object_type in settings.OBJECT_TYPES_TO_OBJECT_NAME:
+        if settings.OBJECT_TYPES_TO_OBJECT_NAME[object_type] == object_name:
             return object_type
 
 class IdsApiError(exceptions.StandardError):
