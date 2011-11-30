@@ -3,7 +3,11 @@
 # This is used to send email alerts to the admins of the system
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
+    ('Peter Mason', 'p.mason@ids.ac.uk'),
+    # ('Duncan Edwards', 'd.edwards@ids.ac.uk'),
 )
+# Default email address
+DEFAULT_FROM_EMAIL = 'd.edwards@ids.ac.uk'
 
 # the email server at IDS
 EMAIL_HOST = '139.184.194.19'
@@ -48,13 +52,22 @@ USER_LEVEL_INFO = {
             },
         }
 
-# these fields will be hidden from those with 'hide_admin_fields' set to True
+# these fields will be hidden from those with #'hide_admin_fields' set to True
 ADMIN_ONLY_FIELDS = [
-    'send_email_alerts', 
+    'send_email_alerts',
+	'notification_email', 
+	'copyright_clearance', 
+	'redistribute_clearance', 
+	'licence_type',
+	'permission_to_host_info',
+	'et_al',
     'legacy_id', 
     'category_sector', 
     'category_subject',
     'timestamp',
+	'publisher_id',
+	'cat_level',
+	'date_updated',
     ]
 
 # these are the fields that will be given to a 'General User'
@@ -70,20 +83,29 @@ GENERAL_FIELDS = [
     'keyword',
     'country_focus',
     'category_theme',
+    'category_theme_path',
     'publication_date',
+    'publication_year',
+    'publisher',
+    'publisher_country',
     'item_type',
     'start_date',
     'end_date',
     'country_name',
     'iso_two_letter_code',
     'cat_parent',
+    'date_created',
+    'date_updated',
+    'cat_level',
         ]
 
 # these are the fields you can use for sorting
 SORT_FIELDS = [
-        'asset_id',
+        'title',
+	   'asset_id',
         'category_id',
         'publication_date',
+	   'date_created',
         'asset_publication_date',
         'start_date',
         'end_date',
@@ -142,7 +164,7 @@ QUERY_MAPPING = {
             'object_type': 'all'
             },
         'theme':   {
-            'solr_field': 'category_theme',   
+            'solr_field': 'category_theme_path',   
             'object_type': 'all'
             },
         'author':  {
@@ -165,8 +187,8 @@ QUERY_MAPPING = {
             'solr_field': 'redistribute_clearance',
             'object_type': 'documents',
             },
-        'license_type': {
-            'solr_field': 'license_type',
+        'licence_type': {
+            'solr_field': 'licence_type',
             'object_type': 'all',
             },
         'permission_to_host_info': {
@@ -197,7 +219,15 @@ QUERY_MAPPING = {
             'solr_field': 'item_type',     
             'object_type': 'items'
             },
-        }
+	   'cat_level':  {
+            'solr_field': 'cat_level',     
+            'object_type': 'themes'
+            },
+	   'theme_id':  {
+            'solr_field': 'category_theme_ids',     
+            'object_type': 'all'
+            },
+		}
 
 # this maps from the date-based query parameter to the SOLR field used
 # so document_published_year would use the publication_date as the field.
@@ -216,7 +246,7 @@ FACET_MAPPING = {
         'region':  'category_region_facet',
         'sector':  'category_sector_facet',
         'subject': 'category_subject_facet',
-        'theme':   'category_theme_facet',
+        'theme':   'category_theme_path_facet',
         }
 
 ######################################################################
