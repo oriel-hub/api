@@ -586,7 +586,10 @@ class ApiFieldListIntegrationTests(BaseTestCase):
         self.assertEqual(200, response.status_code)
 
     def test_field_list_has_admin_items_for_unlimited_user(self):
+        # first check our assumptions
+        self.assertTrue('send_email_alerts' in settings.ADMIN_ONLY_FIELDS)
         self.setUserLevel('Unlimited')
+        # now run the test
         self.login()
         response = self.get_field_list()
         response_list = json.loads(response.content)
@@ -594,21 +597,30 @@ class ApiFieldListIntegrationTests(BaseTestCase):
         self.assertTrue('send_email_alerts' in response_list)
 
     def test_field_list_has_no_admin_items_for_partner_user(self):
+        # first check our assumptions
+        self.assertTrue('send_email_alerts' in settings.ADMIN_ONLY_FIELDS)
+        self.assertFalse('asset_publication_date' in settings.GENERAL_FIELDS)
+        # now run the test
         self.setUserLevel('Partner')
         self.login()
         response = self.get_field_list()
         response_list = json.loads(response.content)
         self.assertTrue(len(response_list) > 1)
         self.assertFalse('send_email_alerts' in response_list)
-        self.assertTrue('publisher_country' in response_list)
+        self.assertTrue('asset_publication_date' in response_list)
 
     def test_field_list_has_no_admin_items_for_general_user(self):
+        # first check our assumptions
+        self.assertTrue('send_email_alerts' in settings.ADMIN_ONLY_FIELDS)
+        self.assertFalse('asset_publication_date' in settings.GENERAL_FIELDS)
+        # now run the test
         self.setUserLevel('General User')
         self.login()
         response = self.get_field_list()
         response_list = json.loads(response.content)
         self.assertTrue(len(response_list) > 1)
-        self.assertFalse('publisher_country' in response_list)
+        self.assertFalse('send_email_alerts' in response_list)
+        self.assertFalse('asset_publication_date' in response_list)
 
 class ApiFacetIntegrationTests(BaseTestCase):
     def setUp(self):
