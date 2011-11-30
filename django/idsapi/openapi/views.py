@@ -11,6 +11,8 @@ from djangorestframework.views import View
 
 from django.conf import settings
 
+from sunburnt import SolrError
+
 from openapi.data import DataMunger
 from openapi.search_builder import SearchBuilder, BadRequestError, SolrUnavailableError
 from openapi.defines import URL_ROOT, IdsApiError
@@ -85,7 +87,13 @@ class BaseSearchView(BaseAuthView):
 
     def build_response(self):
         formatted_results = []
-        self.search_response = self.query.execute()
+        try:
+            self.search_response = self.query.execute()
+        except SolrError as e:
+            if str(e).find('is invalid value') != -1:
+                raise IdsApiParseError('Could not parse Solr output. Original error was "%s"' % str(e))
+            else:
+                raise
         for result in self.search_response:
             formatted_results.append(self.data_munger.get_required_data( \
                     result, self.output_format, self.get_user_level_info(), self.get_beacon_guid()))
@@ -254,4 +262,7 @@ class The404View(View):
 
 
 class NoObjectFoundError(IdsApiError):
+    pass
+
+class IdsApiParseError(IdsApiError):
     pass
