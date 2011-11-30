@@ -33,7 +33,10 @@ class SearchBuilder():
 
     @classmethod
     def create_search(cls, user_level, search_params, object_type, output_format, facet_type=None):
-        sw = SearchWrapper(user_level)
+        if 'site' in search_params:
+            sw = SearchWrapper(user_level, search_params['site'])
+        else:
+            sw = SearchWrapper(user_level)
 
         for param in search_params:
             query_list = search_params.getlist(param)
@@ -60,16 +63,16 @@ class SearchBuilder():
             elif SearchBuilder._is_date_query(param):
                 sw.add_date_query(param, query)
             # if param not in our list of allowed params
-            elif not param in ['num_results', 'num_results_only', 'start_offset', 
+            elif not param in ['num_results', 'num_results_only', 'start_offset',
                     'extra_fields', 'sort_asc', 'sort_desc']:
                 # params that start with _ are allowed - the django rest
                 # framework deals with them
                 if param[0] != '_':
                     raise UnknownQueryParamError(param)
 
-        # always have default site
+        # leave this in until
         if 'site' not in search_params:
-            sw.add_parameter_query('site', 'eldis')
+            sw.add_parameter_query('site', settings.DEFAULT_SITE)
         sw.restrict_search_by_object(object_type)
         sw.restrict_fields_returned(output_format, search_params)
         sw.add_sort(search_params)
@@ -88,24 +91,26 @@ class SearchBuilder():
         sw.add_sort(search_params)
         sw.add_paginate(search_params)
         return sw
-    
+
     @classmethod
     def create_category_children_search(cls, user_level, search_params, object_type, object_id):
         if object_type not in settings.OBJECT_TYPES_WITH_HIERARCHY:
             raise InvalidQueryError("Object type '%s' does not have children" % object_type)
-        
+
         sw = SearchWrapper(user_level)
         # strip the prefix letter off
         sw.add_parameter_query('cat_parent', object_id[1:])
         sw.restrict_search_by_object(object_type)
         sw.add_paginate(search_params)
         return sw
-    
+
 
 class SearchWrapper:
-    def __init__(self, user_level):
+    def __init__(self, user_level, site=None):
+        if site == None:
+            site = settings.DEFAULT_SITE
         try:
-            self.solr = sunburnt.SolrInterface(settings.SOLR_SERVER_URL)
+            self.solr = sunburnt.SolrInterface(settings.SOLR_SERVER_URLS[site])
         except:
             raise SolrUnavailableError('Solr is not responding (using %s )' % settings.SOLR_SERVER_URL)
         self.si_query = self.solr.query()
@@ -117,7 +122,7 @@ class SearchWrapper:
     def restrict_search_by_object(self, object_type, allow_objects=False):
         if object_type == 'assets':
             # search for any object_type that is an asset
-            self.si_query = self.si_query.query(self.add_field_query('object_type', 
+            self.si_query = self.si_query.query(self.add_field_query('object_type',
                 '|'.join(defines.ASSET_NAMES)))
         elif allow_objects and object_type == 'objects':
             # don't restrict search and don't raise an Error
@@ -174,7 +179,7 @@ class SearchWrapper:
         if not facet_type in settings.FACET_MAPPING.keys():
             raise InvalidQueryError("Unknown count type: '%s_count'" % facet_type)
         if search_params.has_key('num_results'):
-            self.si_query = self.si_query.facet_by(settings.FACET_MAPPING[facet_type], 
+            self.si_query = self.si_query.facet_by(settings.FACET_MAPPING[facet_type],
                     limit=int(search_params['num_results']))
         else:
             self.si_query = self.si_query.facet_by(settings.FACET_MAPPING[facet_type])

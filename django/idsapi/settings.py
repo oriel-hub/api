@@ -16,6 +16,12 @@ EMAIL_HOST = '139.184.194.19'
 SOLR_SERVER_URL = 'http://api.ids.ac.uk:8983/solr/eldis-test/'
 SOLR_SCHEMA = SOLR_SERVER_URL + 'admin/file/?file=schema.xml'
 
+DEFAULT_SITE = 'eldis'
+SOLR_SERVER_URLS = {
+        'eldis': 'http://api.ids.ac.uk:8983/solr/eldis-test/',
+        'bridge': 'http://api.ids.ac.uk:8983/solr/eldis-test/',
+        }
+
 # These set the user limits
 USER_LEVEL_INFO = {
         'General User': {
