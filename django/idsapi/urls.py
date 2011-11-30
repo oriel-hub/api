@@ -33,7 +33,7 @@ urlpatterns += patterns('',
 
     # the API stuff
     url(r'^openapi/', include(openapi.urls)),
-
-    url(r'^$', redirect_to, {'url': '/openapi/'}),
+    url(r'^$', redirect_to, {'url': '/about/'}),
+    #url(r'^$', redirect_to, {'url': '/openapi/'}),
 
 )
