@@ -13,14 +13,14 @@ DEFAULT_FROM_EMAIL = 'd.edwards@ids.ac.uk'
 EMAIL_HOST = '139.184.194.19'
 
 # Where to find SOLR
-SOLR_SERVER_URL = 'http://api.ids.ac.uk:8983/solr/eldis-test/'
-SOLR_SCHEMA = SOLR_SERVER_URL + 'admin/file/?file=schema.xml'
-
 DEFAULT_SITE = 'eldis'
 SOLR_SERVER_URLS = {
         'eldis': 'http://api.ids.ac.uk:8983/solr/eldis-test/',
-        'bridge': 'http://api.ids.ac.uk:8983/solr/eldis-test/',
+        'bridge': 'http://api.ids.ac.uk:8983/solr/bridge-test/',
         }
+SOLR_SCHEMA_SUFFIX = 'admin/file/?file=schema.xml'
+
+SOLR_SCHEMA = SOLR_SERVER_URLS[DEFAULT_SITE] + SOLR_SCHEMA_SUFFIX
 
 # These set the user limits
 USER_LEVEL_INFO = {

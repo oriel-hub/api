@@ -112,7 +112,8 @@ class SearchWrapper:
         try:
             self.solr = sunburnt.SolrInterface(settings.SOLR_SERVER_URLS[site])
         except:
-            raise SolrUnavailableError('Solr is not responding (using %s )' % settings.SOLR_SERVER_URL)
+            raise SolrUnavailableError('Solr is not responding (using %s )' %
+                    settings.SOLR_SERVER_URLS[site])
         self.si_query = self.solr.query()
         self.user_level = user_level
 
