@@ -1,11 +1,9 @@
-import os, sys
+import os
 import getpass
 import time
-import shutil
 
 from fabric.api import *
-from fabric.contrib import files, console
-from fabric.contrib.files import exists
+from fabric.contrib import files
 from fabric import utils
 
 def _setup_path():
