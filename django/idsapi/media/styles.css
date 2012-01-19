@@ -32,10 +32,7 @@ table {
 	border-spacing: 0;
 }
 
-
-
 /*--styles--*/
-
 
 html {width:100%;font-size:101%;}
 
@@ -91,21 +88,23 @@ ol li{margin:0 0 .3em 0;}
 
 .noBullet{ list-style:none;margin:0.5em 0;padding:0;}
 
+strong{color: #4795d8;}
+
 /*media*/
 
 img {border:none;}
 address {font-style:normal; text-align:center;margin:0;padding:0;font-size:1em;}
 small{ color:#666}
-p { font-size: 1.2em; margin: 10px 0; color: #392d1c; }
+p { font-size: 1.4em; margin: 10px 0; color: #392d1c; }
 blockquote{color:#131313; padding:0 1em; margin:0;}
 q{color:#fff; padding:0 1em; margin:0;}
 cite{ padding:0 0 0 3em; margin:0;}
 fieldset{ border:none; padding:1em 0;}
 table{border:1px solid  #f4f8fe; border-collapse:collapse; margin:0; padding:0;}
 table caption{color:#131313;font-weight:bold; line-height:1.5em;}
-th{color:#094c6f;border:1px solid #f4f8fe; margin:0; padding:3px;font-weight:bold;text-align:left;}
+th{border:1px solid #f4f8fe; margin:0; padding:3px;text-align:left;}
 td{border:1px solid #f4f8fe; margin:0; padding:3px; /*text-align:center;*/}
-
+#content table {font-size: 14px;}
 
 /*---   tab skip nav   ---*/
 
@@ -254,11 +253,14 @@ ol {
 
 ol p {
   	font: normal 0.9em "Lucida Sans Unicode", "Lucida Grande", sans-serif;
-  	color: #000000;
+  	color: #392D1C;
 	margin: 0;
 	padding: 0;
 
 }
+
+
+#terms ul li {margin-left:20px; color:#392D1C;}
 
 .sub-link {
 	display: inline-block;
@@ -281,6 +283,15 @@ ol p {
 
 form {
 	padding: 10px 0;
+}
+
+.register label {
+	display: inline-block;
+	float:	left;
+	clear:	left;
+	width:	10%;
+	margin-right:	10px;
+	text-align:	left;
 }
 
 label {
@@ -374,7 +385,7 @@ button.submitBtn:hover span, button.submitBtnHover span {
 #footer img {padding:5px;}
 
 #footer ul li {display:inline;padding:4px 5px;}
-#footer ul li a {color:#2668a1;}
+#footer ul li a {color:#094c6f;}
 #footer ul li a:hover {color:#ac3533;}
 #footer ul li a.active, #nav ul li a.active:hover {color:#ac3533;}
 
@@ -390,23 +401,22 @@ ul#contact-details {
 }
 
 
-.errorlist {float:right;}
+.errorlist {float:right; color:#ac3533;}
 .loggedin {float:right; font-size:10px;margin-top:-20px;}
 
 .examplesHome, .examplesHome li{
   list-style-type:none; 
   margin:0;
-  padding:0;
   }
 
 .examplesHome {
   width:700px; 
+  padding: 0 0 10px 0;
   }
 
 .examplesHome li{
   display:block;
   float:left;
   clear:none;
-  width:250x;
   padding:0 4px 0 4px;
   }
