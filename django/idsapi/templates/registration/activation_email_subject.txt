@@ -1,1 +1,1 @@
-Please activate your account to use the IDS API
+Please verify your email address to complete your registration for the IDS Knowledge Services API
