@@ -520,7 +520,7 @@ class ApiGetObjectIntegrationTests(BaseTestCase):
         response = self.get_object(object_type='documents')
         self.assertEqual(200, response.status_code)
 
-    def test_get_objectt_by_id_returns_200(self):
+    def test_get_object_by_id_returns_200(self):
         response = self.get_object(object_type='objects')
         self.assertEqual(200, response.status_code)
 
