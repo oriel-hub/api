@@ -273,13 +273,13 @@ FACET_MAPPING = {
 # in SOLR
 OBJECT_TYPES_TO_OBJECT_NAME = {
         'assets':         None,
-        'documents':     'CDocument',
-        'organisations': 'COrganisation',
+        'documents':     'Document',
+        'organisations': 'Organisation',
         'themes':        'theme',
-        'items':         'CItem',
+        'items':         'Item',
         'subjects':      'subject',
         'sectors':       'sector',
-        'countries':     'CCountry',
+        'countries':     'Country',
         'regions':       'region',
         'itemtypes':     'itemtype',
 }
