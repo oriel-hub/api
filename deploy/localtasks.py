@@ -8,6 +8,7 @@ def deploy(environment=None):
         if tasklib.env['verbose']:
             print "Inferred environment as %s" % environment
 
+    tasklib.create_private_settings()
     tasklib.link_local_settings(environment)
     tasklib.create_ve()
     tasklib.update_db()
