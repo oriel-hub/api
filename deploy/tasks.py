@@ -1,4 +1,4 @@
-#!/usr/bin/python2.6
+#!/usr/bin/python
 #
 # This script is to set up various things for our projects. It can be used by:
 #
@@ -46,16 +46,11 @@ function in tasklib.py (or localtasks.py) to see what arguments the
 function accepts.
 """
 
-import os, sys
+import sys
 import getopt
-import getpass
-import subprocess 
 import inspect
 
 import tasklib
-
-# import per-project settings
-import project_settings
 
 # are there any local tasks for this project?
 try:
@@ -148,13 +143,23 @@ def describe_task(args):
             print
         sys.exit(0)
 
+def convert_args(value):
+    if value.lower() == 'true':
+        return True
+    elif value.lower() == 'false':
+        return False
+    elif value.isdigit():
+        return int(value)
+    else:
+        return value
 
 def main():
     # parse command line options
     verbose = False
+    quiet = False
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "dhv", 
-                ["description", "help", "verbose"])
+        opts, args = getopt.getopt(sys.argv[1:], "dhqv", 
+                ["description", "help", "quiet", "verbose"])
     except getopt.error, msg:
         print msg
         print "for help use --help"
@@ -165,15 +170,21 @@ def main():
             print_help_text()
         if o in ("-v", "--verbose"):
             verbose = True
+        if o in ("-q", "--quiet"):
+            quiet = True
         if o in ("-d", "--description"):
             describe_task(args)
-    # process arguments - just call the function with that name
+    if verbose and quiet:
+        print "Cannot set both verbose and quiet"
+        sys.exit(2)
+    tasklib.env['verbose'] = verbose
+    tasklib.env['quiet'] = quiet
     tasklib._setup_paths()
     if (hasattr(localtasks, '_setup_paths')):
         localtasks._setup_paths()
-    tasklib.env['verbose'] = verbose
     if len(args) == 0:
         print_help_text()
+    # process arguments - just call the function with that name
     for arg in args:
         task_bits = arg.split(':', 1)
         fname = task_bits[0]
@@ -191,12 +202,12 @@ def main():
             f()
         else:
             f_args = task_bits[1].split(',')
-            pos_args = [arg for arg in f_args if arg.find('=') == -1]
+            pos_args = [convert_args(arg) for arg in f_args if arg.find('=') == -1]
             kwargs = [arg for arg in f_args if arg.find('=') >= 0]
             kwargs_dict = {}
             for kwarg in kwargs:
                 kw, value = kwarg.split('=', 1)
-                kwargs_dict[kw] = value
+                kwargs_dict[kw] = convert_args(value)
             f(*pos_args, **kwargs_dict)
 
 

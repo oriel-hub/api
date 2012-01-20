@@ -4,6 +4,10 @@
 # application
 project_name = "idsapi"
 
+# put "django" here if you want django specific stuff to run
+# put "plain" here for a basic apache app
+project_type = "django"
+
 django_dir   = "django/" + project_name
 
 django_apps  = ['openapi', 'userprofile']
