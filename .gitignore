@@ -1,0 +1,6 @@
+*.pyc
+.*.swp
+django/idsapi/.ve
+django/idsapi/distribute-*.tar.gz
+django/idsapi/local_settings.py
+
