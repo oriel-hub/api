@@ -70,9 +70,6 @@ class SearchBuilder():
                 if param[0] != '_':
                     raise UnknownQueryParamError(param)
 
-        # leave this in until
-        if 'site' not in search_params:
-            sw.add_parameter_query('site', settings.DEFAULT_SITE)
         sw.restrict_search_by_object(object_type)
         sw.restrict_fields_returned(output_format, search_params)
         sw.add_sort(search_params)
@@ -118,6 +115,7 @@ class SearchWrapper:
         self.user_level = user_level
 
     def execute(self):
+        #print self.si_query.params()
         return self.si_query.execute()
 
     def restrict_search_by_object(self, object_type, allow_objects=False):
