@@ -69,7 +69,7 @@ def deploy_clean(revision=None):
     deploy(revision)
 
 def clean_files():
-    sudo('rm -rf %s' % env.project_root)
+    sudo_or_run('rm -rf %s' % env.project_root)
 
 def _create_dir_if_not_exists(path):
     if not files.exists(path):
@@ -140,7 +140,7 @@ def delete_old_versions(keep=None):
     prev_versions_to_delete = prev_versions[:versions_to_keep]
     for version_to_delete in prev_versions_to_delete:
         with cd(env.prev_root):
-            sudo('rm -rf ' + version_to_delete)
+            sudo_or_run('rm -rf ' + version_to_delete)
 
 
 def list_previous():
@@ -191,11 +191,11 @@ def rollback(version='last', migrate=False, restore_db=False):
     if restore_db:
         # feed the dump file into mysql command
         with cd(rollback_dir_base):
-            sudo(env.tasks_bin + ' load_dbdump')
+            sudo_or_run(env.tasks_bin + ' load_dbdump')
     # delete everything - don't want stray files left over
-    sudo('rm -rf %s' % env.vcs_root)
+    sudo_or_run('rm -rf %s' % env.vcs_root)
     # cp -a from rollback_dir to vcs_root
-    sudo('cp -a %s %s' % (rollback_dir, env.vcs_root))
+    sudo_or_run('cp -a %s %s' % (rollback_dir, env.vcs_root))
     apache_cmd("start")
 
 
@@ -210,7 +210,7 @@ def remote_test():
     """ run the django tests remotely - staging only """
     require('django_root', 'python_bin', 'test_cmd', provided_by=env.valid_non_prod_envs)
     with cd(env.django_root):
-        sudo(env.python_bin + env.test_cmd)
+        sudo_or_run(env.python_bin + env.test_cmd)
 
 def version():
     """ return the deployed VCS revision and commit comments"""
@@ -218,13 +218,13 @@ def version():
         provided_by=env.valid_envs)
     if env.repo_type == "git":
         with cd(env.vcs_root):
-            sudo('git log | head -5')
+            sudo_or_run('git log | head -5')
     elif env.repo_type == "svn":
         _get_svn_user_and_pass()
         with cd(env.vcs_root):
             with hide('running'):
                 cmd = 'svn log --non-interactive --username %s --password %s | head -4' % (env.svnuser, env.svnpass)
-                sudo(cmd)
+                sudo_or_run(cmd)
     else:
         utils.abort('Unsupported repo type: %s' % (env.repo_type))
 
@@ -255,7 +255,7 @@ def _checkout_or_update_svn(revision=None):
             cmd += " --revision " + revision
         with cd(env.vcs_root):
             with hide('running'):
-                sudo(cmd)
+                sudo_or_run(cmd)
     else:
         cmd = cmd + " %s"
         cmd = cmd % ('checkout', env.svnuser, env.svnpass, env.repository)
@@ -263,23 +263,23 @@ def _checkout_or_update_svn(revision=None):
             cmd += "@" + revision
         with cd(env.project_root):
             with hide('running'):
-                sudo(cmd)
+                sudo_or_run(cmd)
 
 def _checkout_or_update_git(revision=None):
     # if the .git directory exists, do an update, otherwise do
     # a clone
     if files.exists(os.path.join(env.vcs_root, ".git")):
         with cd(env.vcs_root):
-            sudo('git pull')
+            sudo_or_run('git pull')
     else:
         with cd(env.project_root):
-            sudo('git clone %s dev' % env.repository)
+            sudo_or_run('git clone %s dev' % env.repository)
     if revision:
         with cd(env.vcs_root):
-            sudo('git checkout %s' % revision)
+            sudo_or_run('git checkout %s' % revision)
     if files.exists(os.path.join(env.vcs_root, ".gitmodules")):
         with cd(env.vcs_root):
-            sudo('git submodule update --init')
+            sudo_or_run('git submodule update --init')
 
 def _checkout_or_update_cvs(revision):
     if files.exists(env.vcs_root):
@@ -315,7 +315,7 @@ def sudo_or_run(command):
 def update_requirements():
     """ update external dependencies on remote host """
     require('tasks_bin', provided_by=env.valid_envs)
-    sudo(env.tasks_bin + ' update_ve')
+    sudo_or_run(env.tasks_bin + ' update_ve')
 
 
 def clean_db(revision=None):
@@ -339,7 +339,7 @@ def touch():
     """ touch wsgi file to trigger reload """
     require('vcs_root', provided_by=env.valid_envs)
     wsgi_dir = os.path.join(env.vcs_root, 'wsgi')
-    sudo('touch ' + os.path.join(wsgi_dir, 'wsgi_handler.py'))
+    sudo_or_run('touch ' + os.path.join(wsgi_dir, 'wsgi_handler.py'))
 
 def create_private_settings():
     require('tasks_bin', provided_by=env.valid_envs)
@@ -366,7 +366,7 @@ def rm_pyc_files():
     require('django_root', provided_by=env.valid_envs)
     with settings(warn_only=True):
         with cd(env.django_root):
-            sudo('find . -name \*.pyc | xargs rm')
+            sudo_or_run('find . -name \*.pyc | xargs rm')
 
 def link_apache_conf():
     """link the apache.conf file"""
