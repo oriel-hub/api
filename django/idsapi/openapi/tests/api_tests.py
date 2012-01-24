@@ -507,6 +507,10 @@ class ApiGetAllIntegrationTests(ApiTestsBase):
         response = self.get_all(object_type='documents')
         self.assertEqual(200, response.status_code)
 
+    def test_get_all_documents_returns_200_no_trailing_slash(self):
+        response = self.get_all(object_type='documents', output_format='no_slash')
+        self.assertEqual(200, response.status_code)
+
     def test_get_all_bridge_documents_returns_200(self):
         response = self.get_all(site="bridge", object_type='documents')
         self.assertEqual(200, response.status_code)
