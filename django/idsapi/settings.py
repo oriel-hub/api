@@ -22,6 +22,11 @@ SOLR_SCHEMA_SUFFIX = 'admin/file/?file=schema.xml'
 
 SOLR_SCHEMA = SOLR_SERVER_URLS[DEFAULT_SITE] + SOLR_SCHEMA_SUFFIX
 
+# whether to send solr search parameters to logs/console
+# default to False - best to override in local_settings
+# don't forget to turn it off again!
+LOG_SEARCH_PARAMS = False
+
 # These set the user limits
 USER_LEVEL_INFO = {
         'General User': {
@@ -304,6 +309,10 @@ OBJECT_TYPES_WITH_HIERARCHY = ['themes', 'itemtypes']
 
 import os
 #import private_settings #@UnresolvedImport
+
+# override in local_settings if you want to
+DEBUG = False
+TEMPLATE_DEBUG = DEBUG
 
 PROJECT_HOME = os.path.dirname(os.path.realpath(__file__))
 

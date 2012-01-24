@@ -1,6 +1,7 @@
 # a class to build searches
 #
 # TODO: create a mock version of this class for tests
+import sys
 import urllib2
 import re
 
@@ -115,7 +116,9 @@ class SearchWrapper:
         self.user_level = user_level
 
     def execute(self):
-        #print self.si_query.params()
+        if settings.LOG_SEARCH_PARAMS:
+            # this will print to console or error log as appropriate
+            print >>sys.stderr, self.si_query.params()
         return self.si_query.execute()
 
     def restrict_search_by_object(self, object_type, allow_objects=False):

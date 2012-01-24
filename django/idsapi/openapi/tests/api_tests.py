@@ -135,8 +135,6 @@ class ApiSearchIntegrationTests(ApiTestsBase):
                 {'keyword': 'gender'},
                 {'region': 'africa'},
                 {'sector': 'report'},
-                {'site': 'bridge'},
-                {'site': 'eldis'},
                 {'subject': 'gdn'},
                 {'theme': 'climate'},
                 ]
