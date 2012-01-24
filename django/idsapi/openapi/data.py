@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from openapi import defines
 
 class DataMunger():
-    def get_required_data(self, result, output_format, user_level_info, beacon_guid):
+    def get_required_data(self, result, site, output_format, user_level_info, beacon_guid):
         object_id = result['object_id']
         if output_format == 'id':
             object_data = {'object_id': object_id}
@@ -19,7 +19,7 @@ class DataMunger():
 
             # add the parent category, if relevant
             if defines.object_name_to_object_type(result['object_type']) in settings.OBJECT_TYPES_WITH_HIERARCHY:
-                self._add_child_parent_links(object_data, object_id, result)
+                self._add_child_parent_links(object_data, site, object_id, result)
 
             if object_data.has_key('long_abstract'):
                 # truncate for general level users
@@ -34,35 +34,39 @@ class DataMunger():
         else:
             object_data = result
 
-        object_data['metadata_url'] = self._make_get_object_url(object_id, result)
+        object_data['metadata_url'] = self._make_get_object_url(object_id, site, result)
         return object_data
 
-    def _make_get_object_url(self, object_id, result):
+    def _make_get_object_url(self, object_id, site, result):
         object_type = defines.object_name_to_object_type(result['object_type'])
         title = re.sub('\W+', '-', result['title']).lower().strip('-')
         return reverse('object', kwargs = {
             'object_type': object_type,
             'object_id': object_id,
-            'output_format': 'full'
+            'output_format': 'full',
+            'site': site,
             }) + '/' + title + '/'
 
-    def _add_child_parent_links(self, object_data, object_id, result):
+    def _add_child_parent_links(self, object_data, site, object_id, result):
         object_type = defines.object_name_to_object_type(result['object_type'])
         object_data['children_url'] = reverse('category_children', kwargs = {
             'object_type': object_type,
             'object_id': object_id,
-            'output_format': 'full'
+            'output_format': 'full',
+            'site': site,
             }) + '/'
         if result['cat_parent'] != result['cat_superparent']:
             object_data['parent_url'] = reverse('object', kwargs = {
                 'object_type': object_type,
                 'object_id': 'C' + result['cat_parent'],
-                'output_format': 'full'
+                'output_format': 'full',
+                'site': site,
                 }) + '/'
         if result['cat_first_parent'] != result['cat_parent'] and \
                 result['cat_first_parent'] != result['object_id']:
             object_data['toplevel_parent_url'] = reverse('object', kwargs = {
                 'object_type': object_type,
                 'object_id': 'C' + result['cat_first_parent'],
-                'output_format': 'full'
+                'output_format': 'full',
+                'site': site,
                 }) + '/'

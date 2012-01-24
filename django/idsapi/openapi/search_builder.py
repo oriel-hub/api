@@ -15,11 +15,11 @@ query_mapping = settings.QUERY_MAPPING
 class SearchBuilder():
 
     @classmethod
-    def create_objectid_query(cls, user_level, object_id, object_type, search_params, output_format):
+    def create_objectid_query(cls, user_level, site, object_id, object_type, search_params, output_format):
         for key in search_params.keys():
             if key[0] != '_' and key not in ['extra_fields']:
                 raise InvalidQueryError("Unknown query parameter '%s'" % key)
-        sw = SearchWrapper(user_level)
+        sw = SearchWrapper(user_level, site)
         sw.si_query = sw.solr.query(object_id=object_id)
         sw.restrict_search_by_object(object_type, allow_objects=True)
         sw.restrict_fields_returned(output_format, search_params)
@@ -33,11 +33,8 @@ class SearchBuilder():
         return False
 
     @classmethod
-    def create_search(cls, user_level, search_params, object_type, output_format, facet_type=None):
-        if 'site' in search_params:
-            sw = SearchWrapper(user_level, search_params['site'])
-        else:
-            sw = SearchWrapper(user_level)
+    def create_search(cls, user_level, site, search_params, object_type, output_format, facet_type=None):
+        sw = SearchWrapper(user_level, site)
 
         for param in search_params:
             query_list = search_params.getlist(param)
@@ -82,8 +79,8 @@ class SearchBuilder():
         return sw
 
     @classmethod
-    def create_all_search(cls, user_level, search_params, object_type, output_format):
-        sw = SearchWrapper(user_level)
+    def create_all_search(cls, user_level, site, search_params, object_type, output_format):
+        sw = SearchWrapper(user_level, site)
         sw.restrict_search_by_object(object_type)
         sw.restrict_fields_returned(output_format, search_params)
         sw.add_sort(search_params)
@@ -91,11 +88,11 @@ class SearchBuilder():
         return sw
 
     @classmethod
-    def create_category_children_search(cls, user_level, search_params, object_type, object_id):
+    def create_category_children_search(cls, user_level, site, search_params, object_type, object_id):
         if object_type not in settings.OBJECT_TYPES_WITH_HIERARCHY:
             raise InvalidQueryError("Object type '%s' does not have children" % object_type)
 
-        sw = SearchWrapper(user_level)
+        sw = SearchWrapper(user_level, site)
         # strip the prefix letter off
         sw.add_parameter_query('cat_parent', object_id[1:])
         sw.restrict_search_by_object(object_type)
@@ -104,9 +101,9 @@ class SearchBuilder():
 
 
 class SearchWrapper:
-    def __init__(self, user_level, site=None):
-        if site == None:
-            site = settings.DEFAULT_SITE
+    def __init__(self, user_level, site):
+        if site not in settings.SOLR_SERVER_URLS:
+            raise InvalidQueryError("Unknown site: %s" % site)
         try:
             self.solr = sunburnt.SolrInterface(settings.SOLR_SERVER_URLS[site])
         except:

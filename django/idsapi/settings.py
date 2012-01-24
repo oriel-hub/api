@@ -66,16 +66,16 @@ USER_LEVEL_INFO = {
 # these fields will be hidden from those with #'hide_admin_fields' set to True
 ADMIN_ONLY_FIELDS = [
     'send_email_alerts',
-    'notification_email', 
-    'copyright_clearance', 
-    'redistribute_clearance', 
+    'notification_email',
+    'copyright_clearance',
+    'redistribute_clearance',
     'licence_type',
     'permission_to_host_info',
     'et_al',
-    'legacy_id', 
+    'legacy_id',
 	'category_theme_array',
     'category_region_array',
-	'category_sector', 
+	'category_sector',
     'category_subject',
     'timestamp',
     'publisher_id',
@@ -165,39 +165,39 @@ IMAGE_BEACON_STUB_URL = 'http://api.ids.ac.uk/tracking/trackimg.cfm'
 # * the type of object you can use the query parameter with
 QUERY_MAPPING = {
         'country': {
-            'solr_field': 'country_focus',    
+            'solr_field': 'country_focus',
             'object_type': 'all'
             },
         'keyword': {
-            'solr_field': 'keyword',          
+            'solr_field': 'keyword',
             'object_type': 'all'
             },
         'region':  {
-            'solr_field': 'category_region',  
+            'solr_field': 'category_region',
             'object_type': 'all'
             },
         'sector':  {
-            'solr_field': 'category_sector',  
+            'solr_field': 'category_sector',
             'object_type': 'all'
             },
         'subject': {
-            'solr_field': 'category_subject', 
+            'solr_field': 'category_subject',
             'object_type': 'all'
             },
         'site':  {
-            'solr_field': 'site',           
+            'solr_field': 'site',
             'object_type': 'all'
             },
         'theme':   {
-            'solr_field': 'category_theme_path',   
+            'solr_field': 'category_theme_path',
             'object_type': 'all'
             },
         'author':  {
-            'solr_field': 'author',           
+            'solr_field': 'author',
             'object_type': 'documents'
             },
         'publisher': {
-            'solr_field': 'publisher', 
+            'solr_field': 'publisher',
             'object_type': 'documents'
             },
         'publisher_id' : {
@@ -233,23 +233,23 @@ QUERY_MAPPING = {
             'object_type': 'documents',
             },
         'organisation_name': {
-            'solr_field': ['title', 'alternative_name'], 
+            'solr_field': ['title', 'alternative_name'],
             'object_type': 'organisations'
             },
         'acronym': {
-            'solr_field': ['acronym', 'alternative_acronym'], 
+            'solr_field': ['acronym', 'alternative_acronym'],
             'object_type': 'organisations'
             },
         'item_type':  {
-            'solr_field': 'item_type',     
+            'solr_field': 'item_type',
             'object_type': 'items'
             },
        'cat_level':  {
-            'solr_field': 'cat_level',     
+            'solr_field': 'cat_level',
             'object_type': 'themes'
             },
        'theme_id':  {
-            'solr_field': 'category_theme_ids',     
+            'solr_field': 'category_theme_ids',
             'object_type': 'all'
             },
         }
@@ -260,10 +260,10 @@ DATE_PREFIX_MAPPING = {
         'metadata_published': 'asset_publication_date',
         'document_published': 'publication_date',
         'item_started': 'start_date',
-        'item_finished': 'end_date', 
+        'item_finished': 'end_date',
         }
 
-# this maps from the URL for faceted search (eg country_count) to the 
+# this maps from the URL for faceted search (eg country_count) to the
 # facet field used
 FACET_MAPPING = {
         'country': 'country_focus_facet',

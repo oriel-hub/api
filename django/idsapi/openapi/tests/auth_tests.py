@@ -1,9 +1,11 @@
 from openapi.tests.test_base import BaseTestCase
 from openapi.tests.api_tests import ApiTestsBase
 
+SEARCH_URL_BASE = '/openapi/eldis/search/documents/'
+
 class ApiAuthTests(BaseTestCase):
     def do_search(self):
-        return self.client.get('/openapi/documents/search/', {'q': 'undp'})
+        return self.client.get(SEARCH_URL_BASE, {'q': 'undp'})
 
     def test_403_returned_if_not_logged_in(self):
         response = self.do_search()
@@ -23,13 +25,13 @@ class ApiAuthTests(BaseTestCase):
 
     def test_search_works_with_token_in_header(self):
         profile = self.user.get_profile()
-        response = self.client.get('/openapi/documents/search/', {'q': 'undp'},
+        response = self.client.get(SEARCH_URL_BASE, {'q': 'undp'},
                 HTTP_TOKEN_GUID=profile.access_guid)
         self.assertEqual(200, response.status_code)
 
     def test_search_works_with_token_in_url(self):
         profile = self.user.get_profile()
-        response = self.client.get('/openapi/documents/search/', 
+        response = self.client.get(SEARCH_URL_BASE,
                 {'q': 'undp', '_token_guid': profile.access_guid})
         self.assertEqual(200, response.status_code)
 

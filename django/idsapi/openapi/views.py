@@ -92,11 +92,12 @@ class BaseSearchView(BaseAuthView):
         except SolrError as e:
             if str(e).find('is invalid value') != -1:
                 raise IdsApiParseError('Could not parse Solr output. Original error was "%s"' % str(e))
+                #raise
             else:
                 raise
         for result in self.search_response:
-            formatted_results.append(self.data_munger.get_required_data( \
-                    result, self.output_format, self.get_user_level_info(), self.get_beacon_guid()))
+            formatted_results.append(self.data_munger.get_required_data(result,
+                self.site, self.output_format, self.get_user_level_info(), self.get_beacon_guid()))
         if self.raise_if_no_results and len(formatted_results) == 0:
             raise NoObjectFoundError()
         return formatted_results
@@ -146,14 +147,16 @@ class ObjectView(BaseSearchView):
     def __init__(self):
         BaseSearchView.__init__(self, True)
 
-    def get(self, request, object_id, output_format, object_type=None):
+    def get(self, request, site, object_id, output_format, object_type=None):
         self.output_format = output_format
+        self.site = site
         self.data_munger = DataMunger()
         search_params = request.GET
         user_level = self.user.get_profile().user_level
 
         try:
-            self.query = SearchBuilder.create_objectid_query(user_level, object_id, object_type, search_params, output_format)
+            self.query = SearchBuilder.create_objectid_query(user_level, site,
+                    object_id, object_type, search_params, output_format)
         except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
         except SolrUnavailableError as e:
@@ -168,8 +171,9 @@ class ObjectView(BaseSearchView):
 
 
 class ObjectSearchView(BaseSearchView):
-    def get(self, request, output_format, object_type=None):
+    def get(self, request, site, output_format, object_type=None):
         self.output_format = output_format
+        self.site = site
         self.data_munger = DataMunger()
         user_level = self.user.get_profile().user_level
 
@@ -178,7 +182,8 @@ class ObjectSearchView(BaseSearchView):
             return Response(status.HTTP_400_BAD_REQUEST, 
                     content='object search must have some query string, eg /objects/search/short?q=undp')
         try:
-            self.query = SearchBuilder.create_search(user_level, search_params, object_type, output_format)
+            self.query = SearchBuilder.create_search(user_level, site,
+                    search_params, object_type, output_format)
         except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
         except SolrUnavailableError as e:
@@ -189,14 +194,16 @@ class ObjectSearchView(BaseSearchView):
 
 
 class AllObjectView(BaseSearchView):
-    def get(self, request, output_format, object_type=None):
+    def get(self, request, site, output_format, object_type=None):
         self.output_format = output_format
+        self.site = site
         self.data_munger = DataMunger()
         user_level = self.user.get_profile().user_level
 
         search_params = request.GET
         try:
-            self.query = SearchBuilder.create_all_search(user_level, search_params, object_type, output_format)
+            self.query = SearchBuilder.create_all_search(user_level, site,
+                    search_params, object_type, output_format)
         except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
         except SolrUnavailableError as e:
@@ -207,11 +214,13 @@ class AllObjectView(BaseSearchView):
 
 
 class FacetCountView(BaseAuthView):
-    def get(self, request, object_type, facet_type):
+    def get(self, request, site, object_type, facet_type):
+        self.site = site
         search_params = request.GET
         user_level = self.user.get_profile().user_level
         try:
-            query = SearchBuilder.create_search(user_level, search_params, object_type, 'id', facet_type)
+            query = SearchBuilder.create_search(user_level, site,
+                    search_params, object_type, 'id', facet_type)
         except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
         except SolrUnavailableError as e:
@@ -222,12 +231,16 @@ class FacetCountView(BaseAuthView):
                 facet_type+'_count': facet_counts}
 
 class FieldListView(BaseAuthView):
-    def get(self, request):
+    def get(self, request, site):
+        self.site = site
         if self.general_fields_only():
             return sorted(settings.GENERAL_FIELDS)
         # fetch file from SOLR_SCHEMA
         http = httplib2.Http(".cache")
-        _, content = http.request(settings.SOLR_SCHEMA, "GET") #@UnusedVariable
+        if site not in settings.SOLR_SERVER_URLS:
+            return Response(status.HTTP_400_BAD_REQUEST, content="Unknown site: %s" % site)
+        schema_url = settings.SOLR_SERVER_URLS[site] + settings.SOLR_SCHEMA_SUFFIX
+        _, content = http.request(schema_url, "GET") #@UnusedVariable
         doc = minidom.parseString(content)
         field_list = [field.getAttribute('name') for field in 
                 doc.getElementsByTagName('fields')[0].getElementsByTagName('field')]
@@ -237,15 +250,17 @@ class FieldListView(BaseAuthView):
         if self.hide_admin_fields():
             field_list = [elem for elem in field_list if not elem in settings.ADMIN_ONLY_FIELDS]
         return field_list
-    
+
 class CategoryChildrenView(BaseSearchView):
-    def get(self, request, object_type, object_id, output_format):
+    def get(self, request, site, object_type, object_id, output_format):
         self.output_format = output_format
+        self.site = site
         self.data_munger = DataMunger()
         user_level = self.user.get_profile().user_level
 
         try:
-            self.query = SearchBuilder.create_category_children_search(user_level, request.GET, object_type, object_id)
+            self.query = SearchBuilder.create_category_children_search(user_level,
+                    site, request.GET, object_type, object_id)
         except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
         except SolrUnavailableError as e:
@@ -253,7 +268,7 @@ class CategoryChildrenView(BaseSearchView):
 
         # return the metadata with the output_format specified
         return self.format_result_list(request)
-        
+
 
 class The404View(View):
     name = '404'
