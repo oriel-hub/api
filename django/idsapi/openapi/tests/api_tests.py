@@ -49,6 +49,10 @@ class ApiSearchResponseTests(ApiTestsBase):
             sorted_keys.sort()
             self.assertEqual(['metadata_url', 'object_id'], sorted_keys)
 
+    def test_search_works_without_trailing_slash(self):
+        response = self.object_search(output_format='no_slash')
+        self.assertEqual(200, response.status_code)
+
     def test_json_short_search_returns_short_fields(self):
         response = self.object_search(output_format='short')
         search_results = json.loads(response.content)['results']
@@ -543,6 +547,11 @@ class ApiGetObjectIntegrationTests(BaseTestCase):
         response = self.get_object(object_type='documents')
         self.assertEqual(200, response.status_code)
 
+    def test_get_document_by_id_no_trailing_slash_returns_200(self):
+        response = self.get_object(object_type='documents',
+                output_format='no_slash')
+        self.assertEqual(200, response.status_code)
+
 # TODO: reinstate when bridge is sorted out
 #    def test_bridge_get_document_by_id_returns_200(self):
 #        response = self.get_object(site='bridge', object_type='documents',
@@ -606,13 +615,23 @@ class ApiFieldListIntegrationTests(BaseTestCase):
     def setUp(self):
         BaseTestCase.setUp(self)
 
-    def get_field_list(self):
-        return self.client.get(defines.URL_ROOT + 'eldis/fieldlist/', ACCEPT='application/json')
+    def get_field_list(self, site='eldis'):
+        return self.client.get(defines.URL_ROOT + site + '/fieldlist/', ACCEPT='application/json')
 
     def test_field_list_returns_200(self):
         self.login()
         response = self.get_field_list()
         self.assertEqual(200, response.status_code)
+
+    def test_bridge_field_list_returns_200(self):
+        self.login()
+        response = self.get_field_list(site='bridge')
+        self.assertEqual(200, response.status_code)
+
+    def test_bad_site_field_list_returns_400(self):
+        self.login()
+        response = self.get_field_list(site='no_such_site')
+        self.assertEqual(400, response.status_code)
 
     def test_field_list_has_admin_items_for_unlimited_user(self):
         # first check our assumptions

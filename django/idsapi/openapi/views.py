@@ -81,6 +81,7 @@ class BaseSearchView(BaseAuthView):
         #View.__init__(self)
         self.output_format = None
         self.query = None
+        self.site = None
         self.raise_if_no_results = raise_if_no_results
         self.data_munger = None
         self.search_response = None

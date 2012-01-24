@@ -18,10 +18,13 @@ class GuidAuthentication(BaseAuthentication):
         elif '_token_guid' in request.GET:
             auth_token = request.GET['_token_guid']
         if auth_token:
-            profile = UserProfile.objects.get(access_guid=auth_token)
-            user = profile.user
-            if user is not None and user.is_active:
-                return user
+            try:
+                profile = UserProfile.objects.get(access_guid=auth_token)
+                user = profile.user
+                if user is not None and user.is_active:
+                    return user
+            except UserProfile.DoesNotExist:
+                return None
         return None
 
 
