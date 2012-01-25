@@ -4,4 +4,5 @@ django/idsapi/.ve
 django/idsapi/distribute-*.tar.gz
 django/idsapi/local_settings.py
 django/idsapi/private_settings.py
+docs/_build
 
