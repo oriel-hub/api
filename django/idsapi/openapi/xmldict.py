@@ -7,20 +7,17 @@ from xml.parsers.expat import ExpatError
 class XmlListConfig(list):
     def __init__(self, a_list):
         list.__init__(self)
-        #import pdb
-        #pdb.set_trace()
         for element in a_list:
             if element:
                 # treat like dict
                 if len(element) == 1 or element[0].tag != element[1].tag:
                     self.append(XmlDictConfig(element))
                 # treat like list
-                elif element[0].tag == element[1].tag:
+                else:
                     self.append(XmlListConfig(element))
             elif element.text:
                 text = element.text.strip()
-                if text:
-                    self.append(text)
+                self.append(text)
 
 
 class XmlDictConfig(dict):
@@ -62,19 +59,6 @@ class XmlDictConfig(dict):
                     a_dict.update(dict(element.items()))
                 self._update_or_add_to_tag(element.tag, a_dict, children_names,
                         single_item_list)
-#                if children_names.count(element.tag) > 1:
-#                    try:
-#                        current_value = self[element.tag]
-#                        current_value.append(a_dict)
-#                        self.update({element.tag: current_value})
-#                    except: #the first of its kind, an empty list must be created
-#                        #a_dict is written in [], i.e. it will be a list
-#                        self.update({element.tag: [a_dict]})
-#                elif single_item_list:
-#                    #a_dict is written in [], i.e. it will be a list
-#                    self.update({element.tag: [a_dict]})
-#                else:
-#                    self.update({element.tag: a_dict})
             # this assumes that if you've got an attribute in a tag,
             # you won't be having any text. This may or may not be a 
             # good idea -- time will tell. It works for the way we are
