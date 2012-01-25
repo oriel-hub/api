@@ -1,4 +1,4 @@
-#from xml.etree import ElementTree
+from xml.etree import ElementTree
 
 # from http://code.activestate.com/recipes/410469-xml-as-dictionary/
 
@@ -73,3 +73,8 @@ class XmlDictConfig(dict):
             # the text
             else:
                 self.update({element.tag: element.text})
+
+    @classmethod
+    def xml_string_to_dict(cls, xml_string):
+        root = ElementTree.fromstring(xml_string)
+        return XmlDictConfig(root)
