@@ -3,7 +3,7 @@ import re
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from openapi import defines
-from xmldict import XmlDictConfig
+from openapi.xmldict import XmlDictConfig
 
 class DataMunger():
     def get_required_data(self, result, site, output_format, user_level_info, beacon_guid):

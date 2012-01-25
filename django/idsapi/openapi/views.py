@@ -60,6 +60,10 @@ class BaseAuthView(View):
     permissions = (IsAuthenticated, PerUserThrottlingRatePerGroup)
     authentication = (GuidAuthentication, UserLoggedInAuthentication)
 
+    def __init__(self):
+        View.__init__(self)
+        self.site = None
+
     def get_user_level_info(self):
         profile = self.user.get_profile()
         return settings.USER_LEVEL_INFO[profile.user_level]
@@ -81,7 +85,6 @@ class BaseSearchView(BaseAuthView):
         #View.__init__(self)
         self.output_format = None
         self.query = None
-        self.site = None
         self.raise_if_no_results = raise_if_no_results
         self.data_munger = None
         self.search_response = None
