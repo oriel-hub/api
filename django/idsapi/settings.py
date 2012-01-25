@@ -138,6 +138,11 @@ SORT_FIELDS = [
         'acronym',
         ]
 
+# these are fields that contain XML data
+STRUCTURED_XML_FIELDS = [
+        'category_theme_array',
+        ]
+
 # these are the entries in the dropdown box for user registration
 ORGANISATION_TYPES = [
         u'Bilateral Aid Agency',

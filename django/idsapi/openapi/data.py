@@ -3,6 +3,7 @@ import re
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from openapi import defines
+from xmldict import XmlDictConfig
 
 class DataMunger():
     def get_required_data(self, result, site, output_format, user_level_info, beacon_guid):
@@ -16,6 +17,11 @@ class DataMunger():
                 object_data = dict((k, v) for k, v in object_data.items() if k in settings.GENERAL_FIELDS)
             elif user_level_info['hide_admin_fields']:
                 object_data = dict((k, v) for k, v in object_data.items() if not k in settings.ADMIN_ONLY_FIELDS)
+
+            for xml_field in settings.STRUCTURED_XML_FIELDS:
+                if xml_field in object_data:
+                    object_data[xml_field] = \
+                        XmlDictConfig.xml_string_to_dict(object_data[xml_field])
 
             # add the parent category, if relevant
             if defines.object_name_to_object_type(result['object_type']) in settings.OBJECT_TYPES_WITH_HIERARCHY:
