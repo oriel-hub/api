@@ -1,4 +1,6 @@
+import sys
 from xml.etree import ElementTree
+from xml.parsers.expat import ExpatError
 
 # from http://code.activestate.com/recipes/410469-xml-as-dictionary/
 
@@ -76,5 +78,9 @@ class XmlDictConfig(dict):
 
     @classmethod
     def xml_string_to_dict(cls, xml_string):
-        root = ElementTree.fromstring(xml_string)
+        try:
+            root = ElementTree.fromstring(xml_string)
+        except ExpatError as e:
+            print >>sys.stderr, "Failed to parse XML: %s" % xml_string
+            return xml_string
         return XmlDictConfig(root)
