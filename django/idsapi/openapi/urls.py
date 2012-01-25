@@ -13,29 +13,17 @@ urlpatterns = patterns('idsapi.openapi.views',
     # /eldis/search/documents?q=undp&author=lopez
     url(r'^(?P<site>\w+)/search/(?P<object_type>\w+)(?:/(?P<output_format>\w*)/?)?$',
         ObjectSearchView.as_view(), name='object_search'),
-    # /assets/search/short
-    # /themes/search/
-    # /documents/search/full
-    #url(r'^(?P<object_type>\w+)/search(?:/(?P<output_format>\w*)/?)?$',
-    #    ObjectSearchView.as_view(), name='object_search'),
 
     # eg:
     # /eldis/get_children/themes/34/full
     url(r'^(?P<site>\w+)/get_children/(?P<object_type>\w+)/(?P<object_id>[AC]\d+)(?:/(?P<output_format>\w*)/?)?$',
         CategoryChildrenView.as_view(), name='category_children'),
-    # /themes/C34/children/full
-    #url(r'^(?P<object_type>\w+)/(?P<object_id>C\d+)/children(?:/(?P<output_format>\w*)/?)?$',
-    #    CategoryChildrenView.as_view(), name='category_children'),
 
     # eg:
     # /eldis/get/assets/C1234/full
     # /eldis/get/countries/A1100/full
     url(r'^(?P<site>\w+)/get/(?P<object_type>\w+)/(?P<object_id>[AC]\d+)(?:/(?P<output_format>\w*)(/\S*)?)?$',
         ObjectView.as_view(), name='object'),
-    # /objects/A1234/full
-    # /documents/A5678/
-    #url(r'^(?P<object_type>\w+)/(?P<object_id>[AC]\d+)(?:/(?P<output_format>\w*)(/\S*)?)?$',
-    #    ObjectView.as_view(), name='object'),
 
     # eg:
     # /eldis/get_all/assets/full/
