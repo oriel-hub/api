@@ -6,6 +6,9 @@ from xml.parsers.expat import ExpatError
 
 class XmlListConfig(list):
     def __init__(self, a_list):
+        list.__init__(self)
+        #import pdb
+        #pdb.set_trace()
         for element in a_list:
             if element:
                 # treat like dict
@@ -36,6 +39,7 @@ class XmlDictConfig(dict):
     And then use xmldict for what it is... a dict.
     '''
     def __init__(self, parent_element, single_item_list=False):
+        dict.__init__(self)
         children_names = [child.tag for child in parent_element.getchildren()]
         if parent_element.items():
             self.update(dict(parent_element.items()))
