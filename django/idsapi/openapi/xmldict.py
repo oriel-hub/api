@@ -5,8 +5,8 @@ from xml.parsers.expat import ExpatError
 # from http://code.activestate.com/recipes/410469-xml-as-dictionary/
 
 class XmlListConfig(list):
-    def __init__(self, aList):
-        for element in aList:
+    def __init__(self, a_list):
+        for element in a_list:
             if element:
                 # treat like dict
                 if len(element) == 1 or element[0].tag != element[1].tag:
@@ -35,8 +35,8 @@ class XmlDictConfig(dict):
 
     And then use xmldict for what it is... a dict.
     '''
-    def __init__(self, parent_element):
-        childrenNames = [child.tag for child in parent_element.getchildren()]
+    def __init__(self, parent_element, single_item_list=False):
+        children_names = [child.tag for child in parent_element.getchildren()]
         if parent_element.items():
             self.update(dict(parent_element.items()))
         for element in parent_element:
@@ -44,43 +44,67 @@ class XmlDictConfig(dict):
                 # treat like dict - we assume that if the first two tags
                 # in a series are different, then they are all different.
                 if len(element) == 1 or element[0].tag != element[1].tag:
-                    aDict = XmlDictConfig(element)
+                    a_dict = XmlDictConfig(element)
                 # treat like list - we assume that if the first two tags
                 # in a series are the same, then the rest are the same.
                 else:
                     # here, we put the list in dictionary; the key is the
                     # tag name the list elements all share in common, and
-                    # the value is the list itself 
-                    aDict = {element[0].tag: XmlListConfig(element)}
+                    # the value is the list itself
+                    a_dict = {element[0].tag: XmlListConfig(element)}
+
                 # if the tag has attributes, add those to the dict
                 if element.items():
-                    aDict.update(dict(element.items()))
-                if childrenNames.count(element.tag) > 1:
-                    try:
-                        currentValue = self[element.tag]
-                        currentValue.append(aDict)
-                        self.update({element.tag: currentValue})
-                    except: #the first of its kind, an empty list must be created
-                        #aDict is written in [], i.e. it will be a list
-                        self.update({element.tag: [aDict]}) 
-                else:
-                    self.update({element.tag: aDict})
+                    a_dict.update(dict(element.items()))
+                self._update_or_add_to_tag(element.tag, a_dict, children_names,
+                        single_item_list)
+#                if children_names.count(element.tag) > 1:
+#                    try:
+#                        current_value = self[element.tag]
+#                        current_value.append(a_dict)
+#                        self.update({element.tag: current_value})
+#                    except: #the first of its kind, an empty list must be created
+#                        #a_dict is written in [], i.e. it will be a list
+#                        self.update({element.tag: [a_dict]})
+#                elif single_item_list:
+#                    #a_dict is written in [], i.e. it will be a list
+#                    self.update({element.tag: [a_dict]})
+#                else:
+#                    self.update({element.tag: a_dict})
             # this assumes that if you've got an attribute in a tag,
             # you won't be having any text. This may or may not be a 
             # good idea -- time will tell. It works for the way we are
             # currently doing XML configuration files...
             elif element.items():
-                self.update({element.tag: dict(element.items())})
+                self._update_or_add_to_tag(element.tag, dict(element.items()), children_names,
+                        single_item_list)
+                #self.update({element.tag: dict(element.items())})
             # finally, if there are no child tags and no attributes, extract
             # the text
             else:
-                self.update({element.tag: element.text})
+                self._update_or_add_to_tag(element.tag, element.text, children_names,
+                        single_item_list)
+
+    def _update_or_add_to_tag(self, tag, item, children_names, single_item_list):
+        if children_names.count(tag) > 1:
+            try:
+                current_value = self[tag]
+                current_value.append(item)
+                self.update({tag: current_value})
+            except: #the first of its kind, an empty list must be created
+                #item is written in [], i.e. it will be a list
+                self.update({tag: [item]})
+        elif single_item_list:
+            #item is written in [], i.e. it will be a list
+            self.update({tag: [item]})
+        else:
+            self.update({tag: item})
 
     @classmethod
-    def xml_string_to_dict(cls, xml_string):
+    def xml_string_to_dict(cls, xml_string, single_item_list=False):
         try:
             root = ElementTree.fromstring(xml_string)
-        except ExpatError as e:
-            print >>sys.stderr, "Failed to parse XML: %s" % xml_string
+        except ExpatError:
+            print >> sys.stderr, "Failed to parse XML: %s" % xml_string
             return xml_string
-        return XmlDictConfig(root)
+        return XmlDictConfig(root, single_item_list)
