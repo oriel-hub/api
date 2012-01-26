@@ -8,6 +8,8 @@ from openapi.xmldict import XmlDictConfig
 class DataMunger():
     def __init__(self, site):
         self.site = site
+        self.object_id = None
+        self.object_type = None
 
     def get_required_data(self, result, output_format, user_level_info, beacon_guid):
         self.object_id = result['object_id']

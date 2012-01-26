@@ -4,6 +4,7 @@
 import sys
 import urllib2
 import re
+import datetime
 
 import sunburnt
 
@@ -111,6 +112,7 @@ class SearchWrapper:
                     settings.SOLR_SERVER_URLS[site])
         self.si_query = self.solr.query()
         self.user_level = user_level
+        self.has_free_text_query = False
 
     def execute(self):
         if settings.LOG_SEARCH_PARAMS:
@@ -157,21 +159,30 @@ class SearchWrapper:
         self.si_query = self.si_query.paginate(start=start_offset, rows=num_results)
 
     def add_sort(self, search_params):
-        if search_params.has_key('sort_asc') and search_params.has_key('sort_desc'):
+        if 'sort_asc' in search_params and 'sort_desc' in search_params:
             raise InvalidQueryError("Cannot use both 'sort_asc' and 'sort_desc'")
         try:
-            if search_params.has_key('sort_asc'):
+            if 'sort_asc' in search_params:
                 if search_params['sort_asc'] not in settings.SORT_FIELDS:
                     raise InvalidQueryError("Sorry, you can't sort by %s" % search_params['sort_asc'])
                 self.si_query = self.si_query.sort_by(search_params['sort_asc'])
-            if search_params.has_key('sort_desc'):
+            elif 'sort_desc' in search_params:
                 if search_params['sort_desc'] not in settings.SORT_FIELDS:
                     raise InvalidQueryError("Sorry, you can't sort by %s" % search_params['sort_desc'])
                 self.si_query = self.si_query.sort_by('-' + search_params['sort_desc'])
+            elif not self.has_free_text_query:
+                # do default sort order, but only if no free text query -
+                # if there is a free text query then the sort order will be by
+                # score
+                if settings.DEFAULT_SORT_ASCENDING:
+                    self.si_query = self.si_query.sort_by(settings.DEFAULT_SORT_FIELD)
+                else:
+                    self.si_query = self.si_query.sort_by('-' + settings.DEFAULT_SORT_FIELD)
         except sunburnt.SolrError as e:
             raise InvalidQueryError("Can't do sort - " + str(e))
 
     def add_free_text_query(self, search_text):
+        self.has_free_text_query = True
         self.si_query = self.si_query.query(search_text.lower())
 
     def add_facet(self, facet_type, search_params):
@@ -208,7 +219,9 @@ class SearchWrapper:
             if len(date) != 4 or not date.isdigit():
                 raise InvalidQueryError("Invalid year, should be 4 digits but is %s" % date)
             year = int(date)
-            kwargs = {solr_param + '__range': (str(year), str(year+1))}
+            start_of_year = datetime.datetime(year, 1, 1, 0, 0)
+            end_of_year = datetime.datetime(year, 12, 31, 23, 59)
+            kwargs = {solr_param + '__range': (start_of_year, end_of_year)}
             self.si_query = self.si_query.query(**kwargs)
         else:
             if re.match(r'\d{4}-\d{2}-\d{2}', date) == None:

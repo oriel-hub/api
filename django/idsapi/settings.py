@@ -63,6 +63,10 @@ USER_LEVEL_INFO = {
             },
         }
 
+# this is the default sort field
+DEFAULT_SORT_FIELD = 'date_created'
+DEFAULT_SORT_ASCENDING = False
+
 # these fields will be hidden from those with #'hide_admin_fields' set to True
 ADMIN_ONLY_FIELDS = [
     'send_email_alerts',
@@ -141,6 +145,7 @@ SORT_FIELDS = [
 # these are fields that contain XML data
 STRUCTURED_XML_FIELDS = [
         'category_theme_array',
+        'publisher_array',
         ]
 
 # these are the entries in the dropdown box for user registration
