@@ -90,7 +90,6 @@ class BaseSearchView(BaseAuthView):
         self.search_response = None
 
     def build_response(self):
-        formatted_results = []
         try:
             self.search_response = self.query.execute()
         except SolrError as e:
@@ -99,9 +98,10 @@ class BaseSearchView(BaseAuthView):
                 #raise
             else:
                 raise
+        formatted_results = []
         for result in self.search_response:
             formatted_results.append(self.data_munger.get_required_data(result,
-                self.site, self.output_format, self.get_user_level_info(), self.get_beacon_guid()))
+                self.output_format, self.get_user_level_info(), self.get_beacon_guid()))
         if self.raise_if_no_results and len(formatted_results) == 0:
             raise NoObjectFoundError()
         return formatted_results
@@ -154,7 +154,7 @@ class ObjectView(BaseSearchView):
     def get(self, request, site, object_id, output_format, object_type=None):
         self.output_format = output_format
         self.site = site
-        self.data_munger = DataMunger()
+        self.data_munger = DataMunger(site)
         search_params = request.GET
         user_level = self.user.get_profile().user_level
 
@@ -178,7 +178,7 @@ class ObjectSearchView(BaseSearchView):
     def get(self, request, site, output_format, object_type=None):
         self.output_format = output_format
         self.site = site
-        self.data_munger = DataMunger()
+        self.data_munger = DataMunger(site)
         user_level = self.user.get_profile().user_level
 
         search_params = request.GET
@@ -201,7 +201,7 @@ class AllObjectView(BaseSearchView):
     def get(self, request, site, output_format, object_type=None):
         self.output_format = output_format
         self.site = site
-        self.data_munger = DataMunger()
+        self.data_munger = DataMunger(site)
         user_level = self.user.get_profile().user_level
 
         search_params = request.GET
@@ -259,7 +259,7 @@ class CategoryChildrenView(BaseSearchView):
     def get(self, request, site, object_type, object_id, output_format):
         self.output_format = output_format
         self.site = site
-        self.data_munger = DataMunger()
+        self.data_munger = DataMunger(site)
         user_level = self.user.get_profile().user_level
 
         try:
