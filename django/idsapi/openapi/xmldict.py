@@ -91,7 +91,7 @@ class XmlDictConfig(dict):
     @classmethod
     def xml_string_to_dict(cls, xml_string, single_item_list=False):
         try:
-            root = ElementTree.fromstring(xml_string)
+            root = ElementTree.fromstring(xml_string.encode('ascii', 'xmlcharrefreplace'))
         except ExpatError:
             print >> sys.stderr, "Failed to parse XML: %s" % xml_string
             return xml_string
