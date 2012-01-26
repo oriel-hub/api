@@ -27,31 +27,31 @@ class RootView(View):
             'help': 'http://' + hostname + '/docs/',
             'some_api_calls': {
                 'all': {
-                    'format': url_root + '{object_type}/all/{id|short|full}',
+                    'format': url_root + '{site}/get_all/{object_type}/{id|short|full}/',
                     'examples': [
-                        url_root + 'assets/all/short',
-                        url_root + 'documents/all/full',
-                        url_root + 'organisations/all/',
+                        url_root + 'eldis/get_all/assets/short',
+                        url_root + 'eldis/get_all/documents/full',
+                        url_root + 'bridge/get_all/organisations/',
                         ]
                     },
                 'search': {
-                    'format': url_root + '{object_type}/search/?q={query_term}&...',
+                    'format': url_root + '{site}/search/{object_type}/{id|short|full}/?q={query_term}&...',
                     'examples': [
-                        url_root + 'assets/search/?q=undp',
-                        url_root + 'documents/search/?q=undp&document_published_year=2009',
-                        url_root + 'assets/search/?country=angola%26south%20africa&theme=gender%7Cclimate%20change',
+                        url_root + 'eldis/search/assets/?q=undp',
+                        url_root + 'bridge/search/documents/full?q=undp&document_published_year=2009',
+                        url_root + 'eldis/search/assets?country=angola%26south%20africa&theme=gender%7Cclimate%20change',
                         ]
                     },
                 'object': {
-                    'format': url_root + 'objects/{object_id}/{id|short|full}/friendly-name',
+                    'format': url_root + '{site}/get/{object_type}/{object_id}/{id|short|full}/friendly-name',
                     'examples': [
-                        url_root + 'objects/A12345/full',
-                        url_root + 'objects/C123/',
-                        url_root + 'themes/C123/full/capacity-building-approaches',
+                        url_root + 'eldis/get/assets/A12345/full',
+                        url_root + 'eldis/get/themes/C123/',
+                        url_root + 'eldis/get/themes/C123/full/capacity-building-approaches',
                         ]
                     },
                 'field list': {
-                    'format': url_root + 'fieldlist/',
+                    'format': url_root + 'eldis/fieldlist/',
                     },
                 },
             }
