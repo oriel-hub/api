@@ -7,7 +7,7 @@ ADMINS = (
     # ('Duncan Edwards', 'd.edwards@ids.ac.uk'),
 )
 # Default email address
-DEFAULT_FROM_EMAIL = 'd.edwards@ids.ac.uk'
+DEFAULT_FROM_EMAIL = 'api@ids.ac.uk'
 
 # the email server at IDS
 EMAIL_HOST = '139.184.194.19'
@@ -110,6 +110,7 @@ GENERAL_FIELDS = [
     'publication_year',
     'publisher',
     'publisher_country',
+	'publisher_array',
     'item_type',
     'start_date',
     'end_date',
