@@ -282,7 +282,7 @@ FACET_MAPPING = {
         'region':  'category_region_facet',
         'sector':  'category_sector_facet',
         'subject': 'category_subject_facet',
-        'theme':   'category_theme_path_facet',
+        'theme':   'category_theme_facet',
         }
 
 # the mapping of how the api refers to objects, to the object name
