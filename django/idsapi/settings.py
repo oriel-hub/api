@@ -15,8 +15,8 @@ EMAIL_HOST = '139.184.194.19'
 # Where to find SOLR
 DEFAULT_SITE = 'eldis'
 SOLR_SERVER_URLS = {
-        'eldis': 'http://api.ids.ac.uk:8983/solr/eldis-test/',
-        'bridge': 'http://api.ids.ac.uk:8983/solr/bridge-test/',
+        'eldis': 'http://beta.api.ids.ac.uk:8983/solr/eldis-test/',
+        'bridge': 'http://beta.api.ids.ac.uk:8983/solr/bridge-test/',
         }
 SOLR_SCHEMA_SUFFIX = 'admin/file/?file=schema.xml'
 
@@ -90,8 +90,9 @@ ADMIN_ONLY_FIELDS = [
 # these are the fields that will be given to a 'General User'
 GENERAL_FIELDS = [
     'title',
+	'name',
     'headline',
-    'long_abstract',
+    'description',
     'object_id',
     'object_type',
     'metadata_url',
@@ -116,7 +117,6 @@ GENERAL_FIELDS = [
     'end_date',
     'country_name',
     'iso_two_letter_code',
-    'cat_parent',
     'date_created',
     'date_updated',
 	'publisher_id',
@@ -132,14 +132,13 @@ GENERAL_FIELDS = [
 # these are the fields you can use for sorting
 SORT_FIELDS = [
         'title',
-       'asset_id',
+		'name',
+        'asset_id',
         'category_id',
         'publication_date',
-       'date_created',
-        'asset_publication_date',
+        'date_created',
         'start_date',
         'end_date',
-        'publisher_id',
         'acronym',
         ]
 
@@ -147,7 +146,9 @@ SORT_FIELDS = [
 STRUCTURED_XML_FIELDS = [
         'category_theme_array',
         'publisher_array',
-        ]
+        'country_array',
+		'category_region_array',
+		]
 
 # these are the entries in the dropdown box for user registration
 ORGANISATION_TYPES = [
@@ -211,10 +212,6 @@ QUERY_MAPPING = {
             'solr_field': 'publisher',
             'object_type': 'documents'
             },
-        'publisher_id' : {
-            'solr_field': 'publisher_id',
-            'object_type': 'documents',
-            },
         'copyright_clearance': {
             'solr_field': 'copyright_clearance',
             'object_type': 'documents',
@@ -244,7 +241,7 @@ QUERY_MAPPING = {
             'object_type': 'documents',
             },
         'organisation_name': {
-            'solr_field': ['title', 'alternative_name'],
+            'solr_field': ['name', 'alternative_name'],
             'object_type': 'organisations'
             },
         'acronym': {
@@ -258,10 +255,6 @@ QUERY_MAPPING = {
        'cat_level':  {
             'solr_field': 'cat_level',
             'object_type': 'themes'
-            },
-       'theme_id':  {
-            'solr_field': 'category_theme_ids',
-            'object_type': 'all'
             },
         }
 
