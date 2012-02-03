@@ -107,6 +107,7 @@ GENERAL_FIELDS = [
 	'category_region',
     'category_theme_path',
 	'category_theme_array',
+	'organisation_url',
 	'publication_date',
     'publication_year',
     'publisher',
