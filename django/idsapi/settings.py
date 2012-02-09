@@ -117,6 +117,8 @@ GENERAL_FIELDS = [
     'end_date',
     'country_name',
     'iso_two_letter_code',
+    'iso_three_letter_code',
+    'iso_number',
     'date_created',
     'date_updated',
 	'cat_level',
