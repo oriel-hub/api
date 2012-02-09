@@ -77,12 +77,9 @@ ADMIN_ONLY_FIELDS = [
     'permission_to_host_info',
     'et_al',
     'legacy_id',
-	'category_theme_array',
-    'category_region_array',
 	'category_sector',
     'category_subject',
     'timestamp',
-    'publisher_id',
     'cat_level',
     'date_updated',
     ]
@@ -103,8 +100,10 @@ GENERAL_FIELDS = [
     'legacy_id',
 	'keyword',
     'country_focus',
+	'country_array',
     'category_theme',
 	'category_region',
+	'category_region_array',	
     'category_theme_path',
 	'category_theme_array',
 	'organisation_url',
@@ -120,15 +119,14 @@ GENERAL_FIELDS = [
     'iso_two_letter_code',
     'date_created',
     'date_updated',
-	'publisher_id',
-    'cat_level',
+	'cat_level',
 	'site',
 	'language_name',
 	'acronym',
 	'alternative_acronym',
 	'alternative_name',
 	'timestamp',
-        ]
+]
 
 # these are the fields you can use for sorting
 SORT_FIELDS = [
