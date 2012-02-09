@@ -112,6 +112,7 @@ GENERAL_FIELDS = [
     'publisher',
     'publisher_country',
 	'publisher_array',
+	'organisation_type',
     'item_type',
     'start_date',
     'end_date',
