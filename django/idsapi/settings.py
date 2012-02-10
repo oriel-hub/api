@@ -102,9 +102,9 @@ GENERAL_FIELDS = [
     'country_focus',
 	'country_array',
     'category_theme',
-	'category_region',
-	'category_region_array',	
-    'category_theme_path',
+	'category_region_path',
+	'category_region_array',
+	'category_theme_path',
 	'category_theme_array',
 	'organisation_url',
 	'publication_date',
@@ -136,6 +136,7 @@ SORT_FIELDS = [
         'title',
 		'name',
         'asset_id',
+		'object_id',
         'category_id',
         'publication_date',
         'date_created',
@@ -203,7 +204,7 @@ QUERY_MAPPING = {
             'object_type': 'all'
             },
         'theme':   {
-            'solr_field': 'category_theme_path',
+            'solr_field': 'category_theme_facet',
             'object_type': 'all'
             },
         'author':  {
@@ -274,10 +275,10 @@ DATE_PREFIX_MAPPING = {
 FACET_MAPPING = {
         'country': 'country_focus_facet',
         'keyword': 'keyword_facet',
-        'region':  'category_region_facet',
+        'region':  'category_region_objects_facet',
         'sector':  'category_sector_facet',
         'subject': 'category_subject_facet',
-        'theme':   'category_theme_facet',
+        'theme':   'category_theme_objects_facet',
         }
 
 # the mapping of how the api refers to objects, to the object name
