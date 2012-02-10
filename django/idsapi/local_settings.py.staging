@@ -1,5 +1,5 @@
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 DATABASES = {
@@ -13,4 +13,4 @@ DATABASES = {
     }
 }
 
-EMAIL_HOST = 'localhost'
+EMAIL_HOST = '139.184.194.19'
