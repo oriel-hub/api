@@ -188,7 +188,7 @@ QUERY_MAPPING = {
             'object_type': 'all'
             },
         'region':  {
-            'solr_field': 'category_region',
+            'solr_field': 'category_region_facet',
             'object_type': 'all'
             },
         'sector':  {
