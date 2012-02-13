@@ -40,6 +40,7 @@ class RootView(View):
                         url_root + 'eldis/search/assets/?q=undp',
                         url_root + 'bridge/search/documents/full?q=undp&document_published_year=2009',
                         url_root + 'eldis/search/assets?country=angola%26south%20africa&theme=gender%7Cclimate%20change',
+						url_root + 'eldis/search/documents/full?theme=C123|full|capacity-building-approaches',
                         ]
                     },
                 'object': {
