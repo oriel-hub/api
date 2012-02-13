@@ -30,8 +30,8 @@ class RootView(View):
                     'format': url_root + '{site}/get_all/{object_type}/{id|short|full}/',
                     'examples': [
                         url_root + 'eldis/get_all/assets/short',
-                        url_root + 'eldis/get_all/documents/full',
-                        url_root + 'bridge/get_all/organisations/',
+                        url_root + 'bridge/get_all/documents/full',
+                        url_root + 'eldis/get_all/organisations/',
                         ]
                     },
                 'search': {
