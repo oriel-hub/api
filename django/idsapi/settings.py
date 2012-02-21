@@ -73,7 +73,6 @@ ADMIN_ONLY_FIELDS = [
     'notification_email',
     'copyright_clearance',
     'redistribute_clearance',
-    'licence_type',
     'permission_to_host_info',
     'et_al',
     'legacy_id',
@@ -129,6 +128,7 @@ GENERAL_FIELDS = [
 	'alternative_acronym',
 	'alternative_name',
 	'timestamp',
+    'licence_type',
 ]
 
 # these are the fields you can use for sorting
