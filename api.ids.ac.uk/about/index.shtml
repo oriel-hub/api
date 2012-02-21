@@ -1,0 +1,88 @@
+
+<!--#include VIRTUAL="/includes/header.html"-->
+
+<div id="mainLeft">
+<h4 style="color:#B2352E;font-weight:bold">
+Please note we are currently deploying the new Knowledge Services API. 
+This TEST system will be live on Monday 6th February but may be used to explore the API in the meantime.
+</h4>
+
+<div class="callout boxed">
+<h3>Free access to the latest research on international development</h3>
+
+<p class="clear">The Knowledge Services <strong>Open API</strong> provides easy <strong>programmatic access</strong> to <strong>tens of thousands</strong> of thematically organised <strong>research documents</strong> that are freely available online.</p>
+<p>Via the API, this research can be <strong>utilised</strong>, <strong>repurposed</strong> and <strong>contextualised</strong> by your organisation to serve your, and your users', needs and inform <strong>evidence based policy making</strong> and <strong>practice</strong>.</p>
+<p>Data is published under the Creative Commons BY Attribution licence and is therefore free to distribute, remix, and build applications using our work</p>
+<p><a href="http://api.ids.ac.uk/profiles/view/" class="link">Sign up to access the data</a></p>
+
+</div>
+
+<div class="callout boxed">
+<h3>Examples</h3>
+<p class="clear">We have developed a number of applications that illustrate not only the things that you can do with the Knowledge Services API, but also what information you can obtain from the Knowledge Services datasets.</p>
+		<ul class="examplesHome">
+			<li><a href="http://api.ids.ac.uk/about/examples.shtml#regionmap"><img src="http://api.ids.ac.uk/site_media/images/regionmap.jpg" height="200px" /></a><br /><br />Region map</li>
+			<li><a href="http://api.ids.ac.uk/about/examples.shtml#mobileapp"><img src="http://api.ids.ac.uk/site_media/images/iPhoneApp.gif"  /></a><br /><br />Mobile app</li>
+			<li><a href="http://api.ids.ac.uk/about/examples.shtml#tagcloud"><img src="http://api.ids.ac.uk/site_media/images/tagcloud.jpg"  /></a><br /><br />Tag Cloud Generator</li>
+		</ul>
+<p>See some of the <a href="http://api.ids.ac.uk/about/examples.shtml">example applications</a> we have developed using the IDS Knowledge Services API.</p>
+<p><a href="mailto:api@ids.ac.uk?Subject=KS%20API%20use " class="link">Tell us what you have done with our data</a></p>
+<p>What will you make with IDS Knowledge Services data?</p>
+
+
+</div>
+
+<div class="article">
+<h4>Why have we developed an API?</h4>
+
+<p class="clear">We have developed an Open API to make the datasets held within Knowledge Services accessible programmatically to other organisations and individuals to enable others to repurpose, contextualise this knowledge and build and extend applications in new and creative ways.</p>
+<p>As an organisation, we strongly believe in open access to research materials and believe that information is vital in the process of poverty alleviation policy-making.</p>
+
+</div>
+
+<div class="article">
+
+			<h4>Who are we?</h4>
+				<p class="clear">IDS Knowledge Services seek to provide a bridge between research, policy and practice in international development by delivering and supporting a range of information-sharing services, and strengthening the ability of others to do the same.</p>
+				<p>With over forty years experience in this field, we aim to help people understand and make sense of the complexities and realities of poverty and injustice, emphasising the importance of using diverse and credible information in decision-making processes. We work closely with other knowledge brokers across the world, and with partners in South Asia and sub-Saharan Africa.</p>
+				<p>Our flagship services include <a href="http://www.bridge.ids.ac.uk" target="_blank">BRIDGE</a>, which supports gender advocacy and mainstreaming with print and online information services; and <a href="http://www.eldis.org" target="_blank">Eldis</a>, a web portal sharing a broad range of publications on development research, policy and practice.</p>
+
+
+</div>
+</div>
+
+<div id="sidepanel">
+<div id="signup">		  
+	<ul>
+	  <li><a href="/profiles/view/">Sign up for your API key here</a></li>
+	</ul>
+</div>
+</div>
+
+<div id="sidepanelB">
+	<h3>Our data includes:</h3>
+	<p class="clear"><strong>32343</strong> abstracts or summaries of development research documents</p>
+	<p><strong>8255</strong> development organisations</p>
+	<p><strong>28</strong> different development themes</p>
+	<p>research on <strong>225</strong> countries and territories</p>
+</div>
+
+<div id="sidepanel">
+
+<h3>What is the data?</h3>
+<p class="clear">Have a look at our <a href="http://api.ids.ac.uk/about/fields.shtml">example data</a> and see what it contains.</p>
+<p><a href="http://api.ids.ac.uk/about/fields.shtml"><img src="http://api.ids.ac.uk/site_media/images/fields_sm.jpg"></a></p>
+</div>
+
+<div id="sidepanel">
+
+<h3>Get data from our flagship services:</h3>
+<p class="clear"><a href="http://www.bridge.ids.ac.uk"><img src="http://api.ids.ac.uk/site_media/images/bridge_logo.gif"></a></p><p><a href="http://www.bridge.ids.ac.uk">BRIDGE</a>, which supports gender advocacy and mainstreaming with print and online information services</p>
+<p><a href="http://www.eldis.org"><img src="http://api.ids.ac.uk/site_media/images/eldis_logo.gif"></a></p><p><a href="http://www.eldis.org">Eldis</a>, a web portal sharing a broad range of publications on development research, policy and practice.</p>
+
+</div>
+
+<div id="sidepanel">
+<a rel="license" href="http://creativecommons.org/licenses/by/3.0/"><img alt="Creative Commons Licence" style="border-width:0" src="http://i.creativecommons.org/l/by/3.0/88x31.png" /></a><br />This <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text" rel="dct:type">work</span> by <span xmlns:cc="http://creativecommons.org/ns#" property="cc:attributionName">IDS Knowledge Services</span> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/3.0/">Creative Commons Attribution 3.0 Unported License</a>.
+</div>
+<!--#include VIRTUAL="/includes/footer.html"-->

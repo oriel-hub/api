@@ -1,0 +1,11 @@
+<!--#include FILE="includes/header.html"-->
+<h1>api.ids.ac.uk</h1>
+<h2>HOME PAGE<h2>
+<ul>
+<li><a href="/about">HOME</a></li>
+<li><a href="/about">About</a></li>
+<li><a href="/openapi">Open API</a></li>
+<li><a href="/docs">Docs</a></li>
+</ul>
+test
+<!--#include FILE="includes/footer.html"-->

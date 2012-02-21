@@ -1,0 +1,72 @@
+
+<!--#include VIRTUAL="/includes/header.html"-->
+<h1>Examples of using the IDS Knowledge Services API</h1>
+<p class="clear">We have developed a number of applications that illustrate not only the things that you can do with the Knowledge Services API, but also what information you can obtain from the Knowledge Services datasets.</p>
+<div id="mainLeft">
+
+<div class="callout boxed">
+
+	<a href="" name="regionmap"></a>
+		<h3>Eldis Documents Region/Theme Breakdown app</h3>
+		<div class="clear"></div>
+				
+					<ul class="examples">
+						<li><a href="http://www.eldis.org/apidemos/regionmap/index.cfm"><img src="http://api.ids.ac.uk/site_media/images/regionmap.jpg" height="200px" /></a></li>
+						<li>This visualisation shows the number of documents currently published on the Eldis website for each region. By clicking on a region label you will be shown the breakdown of the documents for that region by thematic area.<br /><br /><a href="http://www.eldis.org/apidemos/regionmap/index.cfm">View the application here</a></li>
+					</ul>
+			<div class="clear"></div>	
+			
+	<a href="" name="mobileapp"></a>
+		<h3>Latest Research Documents on Eldis Mobile app</h3>
+			<div class="clear"></div>
+			
+				<ul class="examples">
+					<li><a href="http://www.eldis.org/apidemos/mobile/"><img src="http://api.ids.ac.uk/site_media/images/iPhoneApp.gif" /></a></li>
+					<li>The mobile phone application enables you to search a number of thematic areas and return the latest documents from these subject areas. You can view the abstract of the research document and search the dataset using this application.<br /><br /><a href="http://www.eldis.org/apidemos/mobile/">View the application here</a></li>
+				</ul>
+			<div class="clear"></div>
+			
+	<a href="" name="tagcloud"></a>
+		<h3>Eldis Tag Cloud generator</h3>
+			<div class="clear"></div>
+				
+					<ul class="examples">
+						<li><a href="http://api.dev.ids.ac.uk/tagcloud.php"><img src="http://api.ids.ac.uk/site_media/images/tagcloud.jpg" /></a></li>
+						<li>This visualisation shows the frequency of themes, keywords and countries that occur in the documents, organisation records and jobs and announcements held in the Eldis dataset.<br /><br /><a href="http://api.dev.ids.ac.uk/tagcloud.php">View the application here</a></li>
+					</ul>
+				
+</div>
+</div>
+
+
+<div id="sidepanel">
+<div id="signup">		  
+	<ul>
+	  <li><a href="/profiles/view/">Sign up for your API key here</a></li>
+	</ul>
+</div>
+</div>
+
+<div id="sidepanelB">
+	<h3>Our data includes:</h3>
+	<p class="clear"><strong>31893</strong> abstracts of development documents</p>
+	<p><strong>8250</strong> development organisations</p>
+	<p>Organised in <strong>28</strong> different development themes</p>
+	<p>Covering research on <strong>225</strong> countries and territories</p>
+</div>
+
+<div id="sidepanel">
+
+<h3>Get data from our flagship services:</h3>
+<p class="clear"><a href="http://www.bridge.ids.ac.uk"><img src="http://api.ids.ac.uk/site_media/images/bridge_logo.gif"></a></p><p><a href="http://www.bridge.ids.ac.uk">BRIDGE</a>, which supports gender advocacy and mainstreaming with print and online information services</p>
+<p><a href="http://www.eldis.org"><img src="http://api.ids.ac.uk/site_media/images/eldis_logo.gif"></a></p><p><a href="http://www.eldis.org">Eldis</a>, a web portal sharing a broad range of publications on development research, policy and practice.</p>
+
+</div>
+
+<div id="sidepanel">
+<a rel="license" href="http://creativecommons.org/licenses/by/3.0/"><img alt="Creative Commons Licence" style="border-width:0" src="http://i.creativecommons.org/l/by/3.0/88x31.png" /></a><br />This <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text" rel="dct:type">work</span> by <span xmlns:cc="http://creativecommons.org/ns#" property="cc:attributionName">IDS Knowledge Services</span> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/3.0/">Creative Commons Attribution 3.0 Unported License</a>.
+</div>
+
+
+
+<!--#include VIRTUAL="/includes/footer.html"-->

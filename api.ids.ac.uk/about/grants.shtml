@@ -1,0 +1,206 @@
+
+<!--#include VIRTUAL="/includes/header.html"-->
+<div id="grants">
+<h1>Call for Proposals - Guidelines</h1>
+<p>IDS Knowledge Services invites your organisation to apply for a small technical grant. These grants are available to application developers in developing countries (see the <a href="http://api.ids.ac.uk/about/grantcountries.shtml">list of eligble countries</a>) wishing to use information and communication technologies to repurpose, and contextualise research on development issues and so inform evidence based policy making.</p>
+
+<p><strong>Individual grant maximum:</strong> GBP &pound;3000</p>
+<p><strong>Implementation period:</strong> 5 weeks</p>
+<p><strong>Application deadline:</strong> 13 February 2012</p>
+<hr />
+
+<p><strong>Aim of the grant invitation</strong></p>
+<p>Knowledge matters and how it is shared shapes the decisions, policies and actions that can improve the lives of people living in poverty. Our Mobilising Knowledge for Development (MK4D) programme aims to increase access to, and effective use of, research-based knowledge. At the IDS Knowledge Services department we develop a number of products and services that support this process and use academic research, in the areas of climate change, food and agriculture, health, governance and gender, in policy and practice.</p>
+<p>As part of this programme, we have developed an <a href="http://api.ids.ac.uk">Open Application Programming Interface (API)</a> to make the datasets held within IDS Knowledge Services accessible programmatically to other organisations and individuals. We aim to develop related Open API applications with Southern partners, to enable others to repurpose and contextualise this knowledge; and to facilitate the development by Southern partners of Open APIs and related applications. Through this work we hope to encourage south-south technical cooperation.</p>
+
+ 
+<p><strong>Who is eligible to apply?</strong></p>
+
+<p>This invitation is primarily open to technical staff / application developers based in an organisation in a developing country - see list of countries here. Individuals are encouraged to apply but must nominate an organisation as a partner grant applicant and to whom the grant will be paid through.</p>
+
+<p>An organisation or individual may submit more than one proposal.</p>
+
+<p><strong>Grants available</strong></p>
+<p>Two types of grants are available in this call for proposals:</p>
+
+<h2>1)	Plug in grants</h2>
+<p>These grants are allocated to design and build plug ins/modules/add ons to existing content management systems and web platforms. The plug-ins will import or display a user defined selection of data from the KS data sets. There are two grants currently available, these are:</p>
+
+<h3>WORDPRESS PLUG-IN</h3>
+
+<p class="clear"><strong>OBJECTIVES</strong></p>
+<ul>
+	<li><p>To develop a Wordpress Plug-in to enable access to relevant content from the IDS Open API for use by development organisations using the Wordpress CMS.</p></li>
+	<li><p>To release this Wordpress Plug-in to the Wordpress Open Source community.</p></li>
+	<li><p>To develop and implement an approach to usage monitoring to enable IDS to report on the usage of IDS data by the plug-in.</p></li>
+</ul>
+
+<p><strong>APPROACH</strong></p>
+<ol>
+	<li><p>The grant-seeking organisation will be the technical lead on this project and will be responsible for gathering functional requirements, developing, managing the testing of the module, and providing support for the implementation of the plug-in within their services.</p></li>
+	<li><p>The grant-seeking organisation will work with IDS to develop a project plan and will keep IDS up- to-date with progress of the project.</p></li>
+</ol>
+
+
+
+<h3>HTML widget</h3>
+
+<p class="clear"><strong>OBJECTIVES</strong></p>
+<ul>
+	<li><p>To develop an embeddable "widget", preferably using an existing Open Source framework, to enable access to relevant content from the IDS Open API for use by development organisations' websites and services.</p></li>
+	<li><p>To develop and implement an approach to usage monitoring to enable IDS to report on the usage of IDS data by the plug-in.</p></li>
+</ul>
+
+<p><strong>APPROACH</strong></p>
+<ol>
+	<li><p>The grant-seeking organisation will be the technical lead on this project and will be responsible for gathering functional requirements, developing, managing the testing of the module, and providing support for the implementation of the plug-in within their services.</p></li>
+	<li><p>The grant-seeking organisation will work with IDS to develop a project plan and will keep IDS up to date with progress of the project.</p></li>
+</ol>
+
+	
+<p><strong>Key requirements</strong></p>
+<ul>
+	<li><p>The grant-seeking organisation must be based in a developing country (see the <a href="http://api.ids.ac.uk/about/grantcountries.shtml">list of eligble countries</a>).</p></li>
+	<li><p>The plug in must be developed using open source technologies and be released back into the open source community.</p></li>
+</ul>
+
+<p><strong>How to apply</strong></p>
+<p>Proposals, using our <a href="http://api.ids.ac.uk/about/IDS_KS_CFP_AppForm.doc">template</a>, must be submitted in English by e-mail to <a href="mailto:api@ids.ac.uk">api@ids.ac.uk</a>, by 17:00 (GMT) 13 February, 2012.</p>
+<p>The proposal must:</p>
+<ul>
+	<li><p>Specify which plug-in you would like to develop;</p></li>
+	<li><p>Describe any similar work you have done in the past, giving examples (and links to live applications) where possible;</p></li>
+	<li><p>Describe what development outcomes you might expect from this implementation, giving examples where possible;</p></li>
+	<li><p>Describe the expected timetable for delivery of the application.</p></li>
+</ul>
+
+<h2>2)	Innovation grants</h2>
+<p>These grants are allocated to design and build applications or services that use innovative ways of combining data and information from different sources, to create new tools, applications and systems which are useful, meaningful and relevant for informing development policy and practice.</p>
+<p>Preference will be given to proposals that focus on the programme's key thematic or technological areas, as follows:</p>
+<p><strong>THEMES</strong></p>
+<ul>
+	<li><p>Climate Change</p></li>
+	<li><p>Food and Agriculture</p></li>
+	<li><p>Health</p></li>
+	<li><p>Governance</p></li>
+	<li><p>Gender</p></li>
+</ul>
+<p><strong>TECHNOLOGY</strong></p>
+<ul>
+	<li><p>Mobile</p></li>
+	<li><p>Mapping</p></li>
+	<li><p>Applications supporting people in areas of limited connectivity</p></li>
+</ul>
+<p><strong>Key requirements</strong></p>
+<ul>
+	<li><p>The grant-seeking organisation must be based in a developing country (see the <a href="http://api.ids.ac.uk/about/grantcountries.shtml">list of eligble countries</a>).</p></li>
+	<li><p>The application must be developed using open source technologies and be released back into the open source community.</p></li>
+</ul>
+<p><strong>How to apply</strong></p>
+<p>Proposals, using our <a href="http://api.ids.ac.uk/about/IDS_KS_CFP_AppForm.doc">template</a>, must be submitted in English by e-mail to <a href="mailto:api@ids.ac.uk">api@ids.ac.uk</a>, by 17:00 (GMT) 13 February, 2012.</p>
+<p>The proposal must:</p>
+<ul>
+	<li><p>Explain why the service is needed, how it meets user needs and how it supports IDS KS's aims to get more evidence based research into policy and practice;</p></li>
+	<li><p>Describe the origin of the idea (e.g. what application, tool or service you are replicating and adapting in your proposal);</p></li>
+	<li><p>Describe any similar work you have done in the past, giving examples (and links to live applications) where possible;</p></li>
+	<li><p>Describe what  development outcomes you might expect from this application or service, giving examples where possible;</p></li>
+	<li><p>Describe the expected timetable for delivery of the application;</p></li>
+	<li><p>Explain in what way[s] the proposed application or service is innovative.</p></li>
+</ul>
+ 
+<p><strong>Grant timeline</strong></p>
+
+<table>
+	<tr>
+		<td>Call for proposals</td><td>30 January 2012 - 13 February</td>
+	</tr>
+	<tr>
+		<td>Evaluation of proposals</td><td>13 February  - 17 February</td>
+	</tr>
+	<tr>	
+		<td>Successful candidates notified</td><td>17 February</td>
+	</tr>
+	<tr>
+		<td>Project implementation</td><td>20 February - 26 March (5 weeks)</td>
+	</tr>
+	<tr>
+		<td>App delivery</td><td>26 March</td>
+	</tr>
+</table>
+	
+<p><strong>Selection criteria</strong></p>
+<p>Proposals which do not meet above stated key requirements will not be eligible for evaluation.</p>
+<p>In evaluation stage, a group of internal evaluators will score proposals using the following criteria:</p>
+<h4>Plug-in grants</h4>
+<ol>
+	<li><p><em>Clear demonstrable experience in designing, building and deploying applications for the web.</em><br />
+The Proposal clearly describes the experience of the developer and the applications that have previously been developed.</p></li>
+	<li><p><em>Use of technology</em><br />
+The proposal describes the technology that will be used in the project and its appropriateness for this project.</p></li>
+	<li><p><em>Standards compliance, accessibility and commitment to open development</em><br />
+The proposal describes how the plug-in will adhere to current guidelines on standards and accessibility, as well as how the application contributes to open source development.</p></li>
+</ol>
+<p>This process will create a shortlist for the final stage of evaluation.</p>
+
+<h4>Innovation grants</h4>
+<ol>
+	<li><p><em>Clear description of idea, application and service</em><br />
+Proposal clearly describes the project and the idea to be implemented.</p></li>
+	<li><p><em>Innovation</em><br />
+The service is new for the user or focused on a target group never served before, demonstrates new partnerships, uses new organisational, programmatic or promotional approaches, or deploys new technologies.</p></li>
+	<li><p><em>Use of technology</em><br />
+The proposal describes technology that will be used in the project, how fit for purpose it is and clearly explains how it will help to support project goals.</p></li>
+	<li><p><em>Standards compliance, accessibility and commitment to open development</em><br />
+The proposal describes how the plug-in will adhere to current guidelines on standards and accessibility, as well as how the application contributes to open source development.</p></li>
+</ol>
+<p>This process will create a shortlist for the final stage of evaluation.</p>
+<p><strong>Submitting Your Proposal</strong></p>
+<ol>
+	<li><p>Proposals must be written in English using our <a href="http://api.ids.ac.uk/about/IDS_KS_CFP_AppForm.doc">template</a>.</p></li>
+	<li><p>Proposals must be signed by an authorised representative of the organisation. The signature page can be scanned and added as attachment.</p></li>
+	<li><p>Only proposals submitted by e-mail will be accepted.</p></li>
+	<li><p>In order to avoid errors and incomplete information, we encourage applicants to read the Call for proposals carefully to understand eligibility and selection criteria.</p></li>
+	<li><p>The proposals must be received by the deadline of 17.00 GMT), 13 February, 2012.</p></li>
+</ol>
+<p>An e-mail help desk will be available during the period the call for proposals is open. Please feel free to contact us at <a href="mailto:api@ids.ac.uk">api@ids.ac.uk</a>. The communication language is English.</p>
+
+<hr />
+ <p>&nbsp;</p>
+<h3>Appendix A:</h3>
+<p class="clear"><strong>Intellectual Property Agreement</strong></p>
+<p>In general, the use and modification of the software applications submitted by applicants to this call are guided by Open Source Definitions (OSD) and GNU General Public License (GPL) used in licensing free and open source software.</p>
+<p><strong>Application</strong></p>
+<p>In submitting proposals to IDS, the applicants will:</p>
+<ol>
+	<li><p>Agree to submit proposals that have not been selected as the winners of past competitions</p></li>
+	<li><p>Explicitly cite and acknowledge the use of ideas, which do not belong to contestants, in the development of proposals</p></li>
+	<li><p>Grant the Knowledge Services Department of the Institute of Development Studies rights to use, modify, add to and present the proposal using any media, while properly citing the source.</p></li>
+</ol>	
+<p><strong>Grants Awarded</strong></p>
+<p>Those selected for a grant will submit applications and the associated source code to the Knowledge Services and will:</p>
+<ol>
+	<li><p>Ensure that their submissions have not been selected as the winners of past competitions;</p></li>
+	<li><p>Explicitly cite and acknowledge the use of ideas, source code and software applications, which do not belong to the applicants, in the development of the software applications;</p></li>
+	<li><p>Acquire the rights to use, modify and add to source code and software applications, which do not belong to the applicants and are used in the development of software applications;</p></li>
+	<li><p>Ensure that the source code and the associated software application adhere to open source definitions and, on this basis allow:</p>
+
+		<ul>
+			<li><p>Free redistribution of the software application, inclusive of the source code;</p></li>
+			<li><p>Creation of derivative works and modifications, which must be allowed to be freely distributed, giving credit to author(s);</p></li>
+		</ul>
+	</li>
+	<li><p>Grant Knowledge Services rights to present the source code, software application and accompanying documentation using any media, while properly citing the source.</p></li>
+	<li><p>Provide no warranty as to performance of the software application.</p></li>
+</ol>
+<p><strong>Additional Rules</strong></p>
+<ul>	
+	<li><p>IDS reserves the right to disqualify any entry if it does not meet the criteria;</p></li>
+	<li><p>By entering, participants warrant that their ideas are original and do not infringe on any third party's rights;</p></li>
+	<li><p>Application  to the grant constitutes an agreement to allow IDS to make application details public;</p></li>
+	<li><p>In addition it constitutes an agreement to allow IDS to use the material in its publications and in the framework of promotional activities;</p></li>
+	<li><p>IDS will not be able to return submitted applications;</p></li>
+	<li><p>If, for any reason, the grant is not completed as planned, IDS reserves the right at its sole discretion to cancel, terminate, modify or suspend it;</p></li>
+	<li><p>The decisions made by the IDS selection committee are final and beyond dispute.</p></li>
+</ul>
+</div>
+<!--#include VIRTUAL="/includes/footer.html"-->

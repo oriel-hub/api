@@ -1,0 +1,28 @@
+
+<!--#include VIRTUAL="/includes/header.html"-->
+<script type="text/javascript" src="js/tinybox.js"></script>
+<link rel="stylesheet" href="css/fields_style.css" />
+
+<h1>Knowledge Services Data</h1>
+<h4>What is the data?</h4>
+<p>Thematically organised and hand selected academic research on poverty reduction in the developing world that is freely available to access online.</p>
+<h4>What does it contain?</h4>
+<p>Bibliographic information about the research such as title, authors' name, published date, as well as the organisation that published it.</p>
+<p>In addition, each piece of research has been selected by our thematic experts. Abstracts or summaries are specifically written for each piece of research to enable a user to make a judgement as to whether to download the full text of the document (often large pdf files). This is especially useful when a large proportion of users access the data from locations with low internet connectivity. These experts also assign relevant keywords and organise and add categories and themes to each document. All of this data is available via the KS API.</p>
+<p>&nbsp;</p>
+<p style="font-size:1.3em; font-weight:bold;">Click on the areas of an example Eldis document record to see further details about the field.</p>
+
+<img src="images/fields.jpg" width="939" height="843" border="0" usemap="#map" />
+
+<map name="map">
+<area shape="rect" coords="312,295,550,307" onclick="TINY.box.show({url:'headline.html',width:300,height:125})" />
+<area shape="rect" coords="335,199,712,284" onclick="TINY.box.show({url:'title.html',width:300,height:100})" />
+<area shape="rect" coords="312,326,505,338" onclick="TINY.box.show({url:'authors.html',width:300,height:160})" />
+<area shape="rect" coords="312,342,531,354" onclick="TINY.box.show({url:'publisher.html',width:300,height:150})" />
+<area shape="rect" coords="535,341,559,356" onclick="TINY.box.show({url:'pub_year.html',width:300,height:100})" />
+<area shape="rect" coords="312,365,435,380" onclick="TINY.box.show({url:'url.html',width:300,height:125})" />
+<area shape="rect" coords="312,397,732,611" onclick="TINY.box.show({url:'abstract.html',width:300,height:175})" />
+<area shape="rect" coords="128,191,303,544" onclick="TINY.box.show({url:'themes.html',width:300,height:150})" />
+</map>
+
+<!--#include VIRTUAL="/includes/footer.html"-->

@@ -1,0 +1,30 @@
+
+<!--#include VIRTUAL="/includes/header.html"-->
+<h1>Useful Development API Resources</h1>
+<h4>IDS Knowledge Services Resources</h4>
+<p>We will shortly be adding some useful resources for using the IDS Knowledge Services API, such as a PHP library and CF wrappers for the API.</p>
+<p>In the mean time, please look at the <a href="http://api.ids.ac.uk/docs/">API documentation</a> or <a href="mailto:api@ids.ac.uk">email us</a> for further information about the API</p>
+
+<div class="callout boxed">
+<h3>Plug ins</h3>
+<p class="clear"></p>
+<table style="margin:0 auto;">
+	<tr>
+		<td><a href="http://www.joomla.org/"><img src="http://api.ids.ac.uk/site_media/images/JoomlaLogo.jpg" /></a></td>
+		<td style="vertical-align:top;"><a href="http://southasia.oneworld.net/">OneWorld South Asia</a> have developed a IDS Knowledge Services plug in for the popular <a href="http://www.joomla.org/">Joomla</a> CMS</td>
+		<td style="vertical-align:top;"><a href="http://api.ids.ac.uk/site_media/apps/eldisapi-1.5.zip">Plug in for Joomla 1.6</a><br /><a href="http://api.ids.ac.uk/site_media/apps/eldisapi-1.6.zip">Plug in for Joomla 1.7</a></td>
+	</tr>
+</table>
+
+
+</div>
+
+
+<h4>Other Development API Resources</h4>
+<p><a href="http://data.worldbank.org/developers">World Bank API</a> - Access World Bank indicator, projects and financial data via their API</p>
+<p><a href="http://www.aidinfo.org/">AidInfo</a> - Explore the International Aid Transparency Initiative (IATI) Registry of aid-spending data by using their <a href="http://www.aidinfolabs.org/archives/200">API</a>, their <a href="http://www.aidinfolabs.org/archives/422">IATI Explorer XML Toolkit</a> or their <a href="http://www.aidinfolabs.org/archives/690">IATI Codelist API</a>.</p>
+<p><a href="http://www.guardian.co.uk/open-platform">Guardian Open Platform</a> - Search the large global development section of this UK news source for the latest news and commentary from around the world.</p>
+</ul>	
+</p>
+
+<!--#include VIRTUAL="/includes/footer.html"-->

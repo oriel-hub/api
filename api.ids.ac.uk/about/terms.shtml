@@ -1,0 +1,222 @@
+
+<!--#include VIRTUAL="/includes/header.html"-->
+<div id="terms">
+<h1>Terms and conditions</h1>
+
+<h4>TERMS OF USE - IDS KNOWLEDGE SERVICES API</h4>
+<ol>
+	
+	<li>
+		<h4>Welcome to the IDS Knowledge Services API</h4>
+		<p>(a) IDS Knowledge Services ("<strong>we</strong>" or "<strong>us</strong>") welcomes you to the <strong>IDS Knowledge Services API</strong> ("<strong>KS API</strong>"), our open services through which you may access our selection of ELDIS, BRIDGE and third party content and data ("<strong>KS API Content</strong>"). The KS API includes our Content API that requires you to register before first use. Set out below are our terms and conditions for use of the KS API and KS API Content (the "<strong>KS API Terms</strong>"). The KS API Terms apply whenever you access the KS API Content, on whatever device and by any means.</p>
+		<p>(b) By applying to register for the KS API you are deemed to have accepted the KS API Terms, as may be updated from time to time, and to have entered into an agreement with us on such terms.</p>
+		<p>(c) Registration is personal to you. An API key will be provided for each of Your Websites (as defined in 3(a) below), and the restrictions in these KS API Terms shall apply separately to each of Your Websites. API keys are non-transferable.</p>
+	</li>
+	
+	<li>
+		<h4>Content API</h4>
+		<p>(a) Our Content API is available in three distinct packages: (1) General; (2) Offline Application; and (3) Partner. You are required to register for an API key prior to using all three packages.</p>
+		<p>(b) The KS API Content available through the General service consists of basic metadata about the asset. These Terms of Use will apply in their entirety to your use of the General service.</p>
+		<p>(c) The KS API Content available through the Offline Application service consists of full metadata about the asset. These Terms of Use will apply in their entirety to your use of the Approved service.</p>
+		<p>(d) The Partner service allows you to access full metadata content with few restrictions on rate limiting. Partner packages are only available by prior arrangement with us - please email us at <a href="mailto:api@ids.ac.uk">api@ids.ac.uk</a> to find out more.</p>
+	</li>
+	
+	<li><h4>Getting Started</h4>
+		<p>(a) You will:
+			<ul>
+				<li>Apply for a separate API key for each website through which you wish to access KS API and on which you will publish KS API Content ("Your Website").
+				<li>Provide complete and accurate information at registration.</li>
+				<li>Control, and retain control of, Your Websites.</li>
+			</ul>
+		</p>
+		
+		<p>(b) You will not:
+			<ul>
+				<li>Attempt to register with KS API if you have, or Your Website has, previously been refused access or had access rights cancelled.</li>
+				<li>Create, or facilitate the creation of, additional registration accounts or other technology for the purpose of accessing, or facilitating third party access to, the KS API or KS API Content without permission.</li>
+				<li>Share your API key with any third party.</li>
+			</ul>
+		</p>
+
+		<p>(c) Your Website will not: (i) contain material that is illegal or discriminatory; (ii) promote or incite violence or an illegal activity; and (iii) be capable, in our sole discretion, of interpretation as racist, sexist or homophobic or promoting such views.</p>
+	</li>
+
+	<li><h4>Access to KS API and KS API Content</h4>
+
+		<p>(a) You may access the KS API and request KS API Content only using the API key registered to Your Website.</p>
+		<p>(b) Depending on your package, you may make up to a certain number of requests for KS API Content per API key per hour (if you need to increase this quote please contact us at <a href="mailto:api@ids.ac.uk">api@ids.ac.uk</a>). These are (1) General - 150 (2); Offline Application - 300; and (3) Partner - 300.  This allowance will expire at the close of each day - any unused requests may not be carried over or used in respect of any other of Your Websites.</p>
+		<p>(c) For the purposes of 4(b) a "request" means a single http request from Your Website to the KS API.</p>
+		<p>(d) The KS API Content includes analytics code that allows us to track the location and popularity of the KS API Content (including any embedded advertising). This provides us with information about how the KS API Content is being used, and allows us to measure interest in certain topics. While the data collected allows us to link this information with you and your websites, we will not collect any personal data relating to your end users and we will not publish or disclose to any third party data that identifies you or your websites.</p>
+	</li>
+	
+	<li><h4>Your Non-Transferable Licence to Use KS API Content</h4>
+
+		<p>(a) Subject to our acceptance of your registration application, and your compliance with the remainder of the KS API Terms (including but not limited to your obligation under 7(a)), you are hereby granted a <a target="_blank" href="http://creativecommons.org/licenses/by/3.0/">Creative Commons Attribution 3.0 Unported License</a> with the additional terms below:
+			<ul>
+				<li>Access, copy, publish, distribute and display the KS API Content in electronic form on Your Website(s).</li>
+				<li>Make KS API Content available to Your Website's end users.</li>
+				<li>Reproduce our trade marks, logos and branding solely in the form and position provided in the KS API Content, and as set out in 5(b) below</li>
+			</ul>
+		</p>
+		
+		<p>(b) You will:
+			<ul>
+				<li>Retain the analytics code embedded in KS API Content</li>
+				<li>Retain any disclaimer footnote, correction or other notice that is linked to the KS API Content</li>
+				<li>Include a link to the original article published on ELDIS or BRIDGE in all KS API Content published on Your Website.</li>
+				<li>Include a "Powered by IDS Knowledge Services" logo on the same webpage as any republished KS API Content, or any tool or function that is based on KS API Content. Such logo must be a reproduction of the "Powered By" file found at <a href="http://api.ids.ac.uk/site_media/images/KS_powered.gif">http://api.ids.ac.uk/site_media/images/KS_powered.gif</a>, and comply with any special terms set out by us. The "Powered by IDS Knowledge Services" logo must not be used in conjunction with any content other than the KS API Content.</li>
+			</ul>
+		</p>
+
+		<p>(c) You will not:
+			<ul>
+				<li>Distort the meaning or message of the KS API Content by association, implication or juxtaposition.</li>
+				<li>Use KS API Content in a manner that could amount to derogatory treatment of its author.</li>
+				<li>Present KS API Content in a way that seeks to replicate, or pass off Your Website as a resource belonging to or endorsed by us.</li>
+				<li>Use headlines from the KS API Content to create links to any content other than the full text of the underlying article in its original format.</li>
+			</ul>
+		</p>
+
+		<p>(d) This licence is personal to you and Your Website(s). You may not use the KS API Content in conjunction with any website to which an API key has not been registered.</p>
+		<p>(e) This licence extends to KS API Content only - it does not grant you any rights in respect of material appearing on any of our websites or in any of our publications (including but not limited to ELDIS or BRIDGE).</p>
+		<p>(f) Use of KS API and KS API Content is at your own risk.</p>
+
+	</li>
+
+	<li><h4>Your End Users</h4>
+
+		<p>(a) You may make KS API Content available to end users of Your Website (as more particularly described in IDS Terms and Conditions of Use, currently located at <a href="http://www.ids.ac.uk/go/disclaimer">http://www.ids.ac.uk/go/disclaimer</a>).
+		<p>(b) You may not make or give any representations, warranties or other promises in respect of the KS API Content other than as set out in the IDS Terms and Conditions of Use at <a href="http://www.ids.ac.uk/go/disclaimer">http://www.ids.ac.uk/go/disclaimer</a>.
+		<p>(c) You are solely responsible for ensuring that the KS API Content you select for publication is appropriate and lawful, taking into account the location and likely characteristics (including but not limited to age) of your target audience.
+		<p>(d) You are solely responsible for imposing and enforcing appropriate terms (which at least meet the requirements of 6(a) and 6(b) above) in respect of KS API Content on end users of Your Website.
+	</li>
+
+	<li><h4>Advertising and Commercial Use</h4>
+
+		<p>(a) As a condition of your licence to publish KS API Content, you must display on Your Website any advertisement that we supply to you with the KS API Content. The position, form and size of any such advertisement must be retained as embedded in the KS API Content.</p>
+		<p>(b) Provided that you continue to comply with Clause 7(a), you may attach third party advertising to Your Website without accounting to us for any share in the revenue generated by such advertising, provided that:
+			<ul>
+				<li>You do not sell advertising space that directly attaches to, or using the goodwill associated with, KS API Content.</li>
+				<li>You do not associate KS API Content, directly or indirectly, with advertisements or advertisers that could be regarded by us as illegal or discriminatory.</li>
+				<li>You comply with any additional restrictions that we may introduce from time to time as part of the KS API Terms.</li>
+			</ul>
+		</p>
+			
+		<p>(c) You may not syndicate or otherwise charge a fee for access to KS API Content.</p>
+		<p>(d) We do not accept any responsibility for ensuring that the advertisements embedded in the KS API Content will be appropriate for your audience and/or lawful when published on Your Website.</p>
+	</li>
+
+	<li><h4>Your Compliance</h4>
+
+		<p>(a) You will:
+			<ul>
+				<li>Follow the instructions contained in any legal or other notice that we send you in respect of the KS API Content (which may require you to cease using certain KS API Content). Unless a different period is specified on the face of any notice, you must comply with the instructions within 24 hours of our sending such notice.</li>
+				<li>Keep confidential the existence and content of any legal notice sent to you by us (in accordance with the terms stated on the face of such notice).</li>
+				<li>Ensure that your use of KS API Content complies with all relevant local laws and take independent legal advice where appropriate.</li>
+				<li>Comply with relevant court reporting restrictions and, where publishing KS API Content, any local laws applicable to publishers (including but not limited to the law on Contempt in the UK).</li>
+			</ul>
+		</p>
+		<p>(b) You must inform us in writing as soon as possible if you receive any complaint or claim by a third party in relation to the KS API Content.</p>
+		<p>(c) You will not use KS API Content for any unlawful purpose or in any way that infringes or is likely to infringe the rights (including but not limited to intellectual property rights) of any third party.</p>
+	</li>
+
+	<li><h4>Termination</h4>
+
+		<p>(a) We may cancel or suspend the KS API issued to Your Website(s), at any time for any period and without notice.</p>
+		<p>(b) Your permission to access KS API and to use KS API Content shall terminate automatically on the occurrence of any of the following:
+			<ul>
+				<li>You commit a breach of the KS API Terms.</li>
+				<li>We cancel or suspend one or all of the API keys issued to Your Website(s).</li>
+				<li>We provide written notice to you of such termination.</li>
+			</ul>
+		</p>
+		<p>(c) Our right to cancel your API key is in addition to any other rights and remedies that we may have under the KS API Terms or as provided by law.</p>
+		<p>(d) You may terminate the agreement between us by ceasing to access the KS API.</p>
+		<p>(e) On suspension or termination of your permission to access KS API for any reason (including those in 9(d) above), your KS API Content licence will automatically terminate, and you will immediately cease publication, or other use, of all KS API Content.</p>
+		<p>(f) On termination of your permission to access KS API for any reason, you will remove immediately all KS API Content from Your Website(s) and delete any remaining KS API Content in your possession.</p>
+	</li>
+
+	<li><h4>Our Liability</h4>
+
+		<p>(a) Your use of, and any reliance on, the KS API and KS API Content is at your own risk.</p>
+		<p>(b) We hereby exclude liability for indirect, special or consequential damages, even if you have previously advised us of the possibility of such damages. In addition, we will not be liable for any loss of revenue, profits, opportunity or data arising in connection with your access to KS API or use of KS API Content.</p>
+		<p>(c) We hereby exclude liability for the consequences of any inaccuracy, interruptions or errors in the KS API Content or KS API. We are not obliged to make any particular KS API Content available to you via KS API or by any other means.</p>
+		<p>(d) We will not be liable in any circumstances to your end users of KS API Content.</p>
+	</li>
+
+	<li><h4>Disclaimer</h4>
+
+		<p>(a) We are under no obligation to approve your application for registration and may refuse access to KS API to you or any of Your Websites.</p>
+		<p>(b) We are under no obligation to make any particular content available as KS API Content. Access to and availability of the KS API or KS API Content is not guaranteed, nor can we ensure that it will be uninterrupted or error free.</p>
+		<p>(c) We make no representation that the KS API or KS API Content will be available, complete, accurate, uninterrupted, error free or free from viruses or anything else of similar destructive qualities.</p>
+		<p>(d) The KS API Content is intended for general information and you are solely responsible for determining whether the KS API Content is suitable for your purposes. We make no representation that the KS API Content will be legally compliant or otherwise appropriate for your intended use.</p>
+		<p>(e) All implied warranties, conditions or other terms are excluded to the fullest extent permitted by law.</p>
+		<p>(f) Content may contain links to websites provided by independent third parties. We are not responsible for the availability or content of such sites and shall not be responsible for any transaction concerning goods or services available from those sites.</p>
+	</li>
+
+	<li><h4>Rights</h4>
+		<p>Nothing in the KS API Terms shall operate to transfer to you or create for your benefit any interest (including but not limited to goodwill) in the KS API, KS API Content, our branding or other logos and trade marks included in the KS API, which shall remain at all times the property of IDS, its licensors or third parties.</p>
+	</li>
+
+	<li><h4>Amendments to the KS API Terms</h4>
+
+		<p>(a) These KS API Terms may be varied from time to time (including to take account of any additional or special terms required in respect of any third party content included in the KS API Content). Please ensure that you review this page at <a href="http://api.ids.ac.uk/docs/terms.html">http://api.ids.ac.uk/docs/terms.html</a> regularly as you will be deemed to have accepted a variation if you continue to use KS API after it has been posted.</p>
+		<p>(b) Details of variations will be posted in 18 below.</p>
+		<p>(c) Any supplemental terms notified to you directly (including but not limited to as part of the supply of KS API Content to you) will, if you continue to use the applicable KS API Content or function, form part of these KS API Terms for the purposes of our agreement with you.</p>
+	</li>
+
+	<li><h4>General</h4>
+
+		<p>(a) If Your Details Change:<br />
+		If your details change following registration you must inform us immediately by emailing <a href="mailto:api@ids.ac.uk">api@ids.ac.uk</a></p>
+		<p>(b) Your Data<br />
+		We will collect personal data from you during the registration process, and will use such data for the purposes of performing this agreement. Specifically, we will use your data to provide you with access to the KS API, to provide notices to you under the agreement and for general administration of your authorisation to access KS API and the KS API Content. We will pass your personal data to our service providers and partners to the extent necessary for these purposes.</p>
+		<p>(c) Third Party Operators<br />
+		Parts of the KS API, including the means of accessing the KS API Content, will be powered by, hosted or otherwise managed by third parties. Such third parties may impose their terms of use on you in respect of the KS API area they control. In the event of a conflict between the KS API Terms and those of any third party, these terms shall prevail to the extent that such conflict concerns KS API Content (as opposed to access to it).
+		<p>(d) Fees
+		We reserve the right to introduce charges for accessing the KS API and/or KS API Content in the future. Any such introduction will be notified to you in advance.</p>
+		<p>(e) Publicity<br />
+		You agree that we may use your name, logo and URL on KS API, associated publicity for and reporting literature regarding KS API.</p>
+		<p>(f) Assignment<br />
+		Except as expressly set out in these terms, you are not permitted to assign, sub-licence, transfer or dispose of the rights licensed under the agreement.</p>
+		<p>(g) Waiver<br />
+	The non-exercise of, or delay in exercise, by us of any power, right or remedy provided by this agreement or law shall not operate as a waiver of that power, right or remedy. Similarly, any single or partial exercise of by us of a power, right or remedy provided by this agreement or law shall not preclude any other or further exercise of such. A power, right or remedy will only be waived by us if notified to you in writing.</p>
+	</li>
+
+	<li><h4>Our Values and Brands</h4>
+
+		<p>You will not use the KS API Content or any aspect of our relationship with you in a manner that could, in our reasonable opinion, cause harm to our goodwill, conflict with our values or which could cause our brand to be brought into disrepute.</p>
+
+	</li>
+	
+	<li><h4>Governing Law and Jurisdiction</h4>
+
+		<p>The agreement between us is governed by English law and the parties agree to submit to the exclusive jurisdiction of the English courts.</p>
+	</li>
+
+	<li><h4>Contact Us:</h4>
+
+		<p>Please contact us at <a href="mailto:api@ids.ac.uk">api@ids.ac.uk</a> if you would like to discuss any aspect of these licence terms, or if you wish to do any of the following:
+			<ul>
+				<li>Edit or adapt KS API Content</li>
+				<li>Receive KS API Content in another language</li>
+				<li>Make your own translations of KS API Content</li>
+				<li>Increase your quota limit on API key requests</li>
+				<li>Syndicate or resell KS API Content</li>
+				<li>Base Your Website entirely around KS API Content or a single KS API contributor</li>
+			</ul>
+		</p>
+		<p>If you need to tell us about a complaint or claim you have received in relation to KS API Content (in accordance with 8(b)), please email us at <a href="mailto:api@ids.ac.uk">api@ids.ac.uk</a></p>
+		<p>We'd also love to hear from you about any new products or applications that you have created using KS API. Tell us all about it by email <a href="mailto:api@ids.ac.uk">api@ids.ac.uk</a> and we might be in touch.</p>
+		<p>Please remember to direct your end users to the KS API Site to set up their own access to and licence to use KS API Content.</p>
+	</li>
+
+	<li><h4>Variations</h4>
+	<p>None to date</p>
+	</li>
+
+</ol>
+
+</div>
+
+<!--#include VIRTUAL="/includes/footer.html"-->
