@@ -211,8 +211,12 @@ QUERY_MAPPING = {
             'solr_field': 'author',
             'object_type': 'documents'
             },
-        'publisher': {
+        'publisher_name': {
             'solr_field': 'publisher',
+            'object_type': 'documents'
+            },
+		'publisher': {
+            'solr_field': 'publisher_id',
             'object_type': 'documents'
             },
         'copyright_clearance': {
