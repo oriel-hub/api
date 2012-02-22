@@ -6,8 +6,8 @@ sunburnt==0.6
 django-countries==1.0.5
 django-profiles==0.2
 django-registration==0.7
-#djangorestframework==0.2.3
--e git+https://github.com/tomchristie/django-rest-framework.git#egg=Package
+djangorestframework==0.2.4
+#-e git+https://github.com/tomchristie/django-rest-framework.git#egg=Package
 sphinx==1.0.7
 sphinxcontrib-httpdomain==1.1.4
 git+https://github.com/jdunck/python-unicodecsv.git
