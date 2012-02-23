@@ -149,7 +149,7 @@ SORT_FIELDS = [
 STRUCTURED_XML_FIELDS = [
         'category_theme_array',
         'publisher_array',
-        'country_array',
+        'country_focus_array',
 		'category_region_array',
 		]
 
