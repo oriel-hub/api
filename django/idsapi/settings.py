@@ -180,7 +180,7 @@ IMAGE_BEACON_STUB_URL = 'http://api.ids.ac.uk/tracking/trackimg.cfm'
 # * the type of object you can use the query parameter with
 QUERY_MAPPING = {
         'country': {
-            'solr_field': 'country_focus',
+            'solr_field': 'country_focus_facet',
             'object_type': 'all'
             },
         'keyword': {
@@ -277,7 +277,7 @@ DATE_PREFIX_MAPPING = {
 # this maps from the URL for faceted search (eg country_count) to the
 # facet field used
 FACET_MAPPING = {
-        'country': 'country_focus_facet',
+        'country': 'country_focus_objects_facet',
         'keyword': 'keyword_facet',
         'region':  'category_region_objects_facet',
         'sector':  'category_sector_facet',
