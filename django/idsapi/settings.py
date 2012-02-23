@@ -99,7 +99,7 @@ GENERAL_FIELDS = [
     'legacy_id',
 	'keyword',
     'country_focus',
-	'country_focus_array',
+	'country_array',
 	'country_array',
     'category_theme',
 	'category_region_path',
