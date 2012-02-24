@@ -129,6 +129,7 @@ GENERAL_FIELDS = [
 	'alternative_name',
 	'timestamp',
     'licence_type',
+	'location_country',
 ]
 
 # these are the fields you can use for sorting
@@ -255,7 +256,11 @@ QUERY_MAPPING = {
             'solr_field': ['acronym', 'alternative_acronym'],
             'object_type': 'organisations'
             },
-        'item_type':  {
+        'location_country': {
+            'solr_field': 'location_country',
+            'object_type': 'organisations',
+            },
+		'item_type':  {
             'solr_field': 'item_type',
             'object_type': 'items'
             },
