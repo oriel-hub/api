@@ -455,6 +455,7 @@ def _manage_py_jenkins():
 
 def run_jenkins():
     """ make sure the local settings is correct and the database exists """
+    env['verbose'] = True
     update_ve()
     _install_django_jenkins()
     create_private_settings()
