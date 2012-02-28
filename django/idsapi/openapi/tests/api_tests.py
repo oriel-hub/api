@@ -98,31 +98,31 @@ class ApiSearchResponseTests(ApiTestsBase):
         for result in search_results:
             self.assertTrue(result['object_type'] in defines.ASSET_NAMES)
 
-    def test_long_abstract_contains_image_beacon(self):
+    def test_description_contains_image_beacon(self):
         response = self.object_search(object_type='documents', output_format='full')
         search_results = json.loads(response.content)['results']
         profile = self.user.get_profile()
         for result in search_results:
-            if result.has_key('long_abstract'):
-                self.assertTrue(result['long_abstract'].find(settings.IMAGE_BEACON_STUB_URL) > -1)
-                self.assertTrue(result['long_abstract'].find(profile.beacon_guid) > -1)
+            if result.has_key('description'):
+                self.assertTrue(result['description'].find(settings.IMAGE_BEACON_STUB_URL) > -1)
+                self.assertTrue(result['description'].find(profile.beacon_guid) > -1)
 
-    def test_long_abstract_truncated_for_general_user(self):
+    def test_description_truncated_for_general_user(self):
         self.setUserLevel('General User')
         response = self.object_search(object_type='documents', output_format='full')
         search_results = json.loads(response.content)['results']
         for result in search_results:
-            if result.has_key('long_abstract'):
-                abstract_without_beacon = result['long_abstract'].split('<img')[0]
+            if result.has_key('description'):
+                abstract_without_beacon = result['description'].split('<img')[0]
                 self.assertTrue(250 >= len(abstract_without_beacon))
 
-    def test_long_abstract_does_not_contain_image_beacon_for_unlimited_user(self):
+    def test_description_does_not_contain_image_beacon_for_unlimited_user(self):
         self.setUserLevel('Unlimited')
         response = self.object_search(object_type='documents', output_format='full')
         search_results = json.loads(response.content)['results']
         for result in search_results:
-            if result.has_key('long_abstract'):
-                self.assertTrue(result['long_abstract'].find(settings.IMAGE_BEACON_STUB_URL) == -1)
+            if result.has_key('description'):
+                self.assertTrue(result['description'].find(settings.IMAGE_BEACON_STUB_URL) == -1)
 
 class ApiSearchIntegrationTests(ApiTestsBase):
 
@@ -269,7 +269,7 @@ class ApiSearchIntegrationTests(ApiTestsBase):
 
     def test_extra_fields_with_object_search(self):
         response = self.object_search(object_type='documents', output_format='short',
-                query={'q': 'undp', 'extra_fields': 'long_abstract'})
+                query={'q': 'undp', 'extra_fields': 'description'})
         # not all the results have the abstracts, so just check it doesn't
         # immediately complain
         self.assertEqual(200, response.status_code)
@@ -405,7 +405,7 @@ class ApiSearchSortTests(ApiTestsBase):
 
     def test_400_returned_for_disallowed_sort_field(self):
         response = self.object_search(object_type='documents', output_format='full',
-                query={'q': 'undp', 'sort_asc': 'long_abstract'})
+                query={'q': 'undp', 'sort_asc': 'description'})
         self.assertEqual(400, response.status_code)
 
     def test_400_returned_for_unknown_sort_field(self):
@@ -525,10 +525,10 @@ class ApiGetAllIntegrationTests(ApiTestsBase):
 
     def test_extra_fields_with_all_assets(self):
         response = self.get_all(object_type='documents',
-                query={'extra_fields': 'long_abstract'})
+                query={'extra_fields': 'description'})
         result_list = json.loads(response.content)['results']
         for result in result_list:
-            self.assertTrue(result.has_key('long_abstract'))
+            self.assertTrue(result.has_key('description'))
 
 
 class ApiGetObjectIntegrationTests(BaseTestCase):
@@ -572,9 +572,9 @@ class ApiGetObjectIntegrationTests(BaseTestCase):
 
     def test_extra_fields_with_get_object(self):
         response = self.get_object(object_type='documents',
-                query={'extra_fields': 'long_abstract'})
+                query={'extra_fields': 'description'})
         result = json.loads(response.content)['results']
-        self.assertTrue(result.has_key('long_abstract'))
+        self.assertTrue(result.has_key('description'))
 
     def test_404_returned_if_no_object(self):
         response = self.get_object(object_id='A1234567890')
@@ -596,7 +596,7 @@ class ApiGetObjectIntegrationTests(BaseTestCase):
 
     def test_extra_fields_with_object_search(self):
         response = self.get_object(object_type='documents', output_format='short',
-                query={'extra_fields': 'long_abstract'})
+                query={'extra_fields': 'description'})
         # not all the results have the abstracts, so just check it doesn't
         # immediately complain
         self.assertEqual(200, response.status_code)

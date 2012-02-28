@@ -32,9 +32,9 @@ class DataMunger():
             if self.object_type in settings.OBJECT_TYPES_WITH_HIERARCHY:
                 self._add_child_parent_links(object_data, result)
 
-            if 'long_abstract' in object_data:
-                object_data['long_abstract'] = self._process_long_abstract(
-                        object_data['long_abstract'], user_level_info, beacon_guid)
+            if 'description' in object_data:
+                object_data['description'] = self._process_description(
+                        object_data['description'], user_level_info, beacon_guid)
         else:
             object_data = result
 
@@ -56,16 +56,16 @@ class DataMunger():
                             item['object_name'])
         return field_dict
 
-    def _process_long_abstract(self, long_abstract, user_level_info, beacon_guid):
-        """truncate the long_abstract for general level users and
+    def _process_description(self, description, user_level_info, beacon_guid):
+        """truncate the description for general level users and
         add an image beacon for most users"""
-        if user_level_info['general_fields_only'] and len(long_abstract) > 250:
-            long_abstract = long_abstract[:246] + '...'
+        if user_level_info['general_fields_only'] and len(description) > 250:
+            description = description[:246] + '...'
         # add image beacon
         if user_level_info['image_beacon']:
-            long_abstract += " <img src='" + settings.IMAGE_BEACON_STUB_URL + \
+            description += " <img src='" + settings.IMAGE_BEACON_STUB_URL + \
                     '?beacon_guid=' + beacon_guid + "' width='1' height='1'>"
-        return long_abstract
+        return description
 
     def _create_metadata_url(self, object_type=None, object_id=None, object_name=None,
             url_name='object'):
