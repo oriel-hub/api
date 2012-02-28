@@ -278,7 +278,7 @@ def link_local_settings(environment):
         os.path.join(env['django_dir'],'local_settings.py'))
 
 
-def update_db(syncdb=True, drop_test_db=True):
+def update_db(syncdb=True, drop_test_db=True, use_migrations=False):
     """ create the database, and do syncdb and migrations (if syncdb==True)"""
     if not env['quiet']:
         print "### Creating and updating the databases"
@@ -297,7 +297,6 @@ def update_db(syncdb=True, drop_test_db=True):
     #print 'syncdb: %s' % type(syncdb)
     if env['project_type'] == "django" and syncdb:
         # if we are using South we need to do the migrations aswell
-        use_migrations = False
         for app in project_settings.django_apps:
             if os.path.exists(os.path.join(env['django_dir'], app, 'migrations')):
                 use_migrations = True
