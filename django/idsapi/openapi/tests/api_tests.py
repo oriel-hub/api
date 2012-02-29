@@ -691,7 +691,7 @@ class ApiFacetIntegrationTests(BaseTestCase):
     def test_200_returned_for_all_facet_types(self):
         for facet_type in ('country', 'region', 'keyword', 'sector', 'subject', 'theme'):
             response = self.facet_search(facet_type=facet_type)
-            self.assertEqual(200, response.status_code)
+            self.assertEqual(200, response.status_code, response.content)
 
     def test_200_returned_for_individual_object_type(self):
         response = self.facet_search(object_type='documents')
@@ -707,19 +707,20 @@ class ApiFacetIntegrationTests(BaseTestCase):
         response = self.facet_search(query={'q': 'un', 'num_results': '-1'})
         search_results = json.loads(response.content)
         self.assertEqual(200, response.status_code)
-        self.assertTrue(
-            len(search_results['country_count']) > 0)
+        self.assertTrue(len(search_results['country_count']) > 0)
 
     def test_400_returned_if_unknown_facet_type(self):
         response = self.facet_search(facet_type='foobars')
         self.assertEqual(400, response.status_code)
 
-    def test_all_counts_from_facet_gt_0(self):
+    def test_all_facets_have_an_integer_count(self):
         response = self.facet_search()
         search_results = json.loads(response.content)
+        self.assertTrue(len(search_results['country_count']) > 0)
         for country_count in search_results['country_count']:
-            self.assertTrue(isinstance(country_count[0], unicode))
-            self.assertTrue(isinstance(country_count[1], int))
+            self.assertTrue('object_id' in country_count)
+            self.assertTrue('metadata_url' in country_count)
+            self.assertIsInstance(country_count['count'], int)
 
 class ApiCategoryChildrenIntegrationTests(ApiTestsBase):
     def children_search(self, site='eldis', object_type='themes', object_id='C34',

@@ -97,3 +97,21 @@ class DataMunger():
                 result['cat_first_parent'] != result['object_id']:
             object_data['toplevel_parent_url'] = self._create_metadata_url(
                     object_id='C' + result['cat_first_parent'])
+
+
+    def convert_facet_string(self, string):
+        if string:
+            if string.find('|') > -1:
+                object_id, object_type, object_name = string.split('|', 2)
+                metadata_url = self._create_metadata_url(object_type, object_id, object_name)
+            else:
+                object_name = string
+                object_id, object_type, metadata_url = ('','','')
+        else:
+            object_id, object_type, object_name = ('','','')
+            metadata_url = ''
+
+        return {'object_id': object_id,
+                'object_type': object_type,
+                'object_name': object_name,
+                'metadata_url': metadata_url}

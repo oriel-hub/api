@@ -40,7 +40,7 @@ class RootView(View):
                         url_root + 'eldis/search/assets/?q=undp',
                         url_root + 'bridge/search/documents/full?q=undp&document_published_year=2009',
                         url_root + 'eldis/search/assets?country=angola%26south%20africa&theme=gender%7Cclimate%20change',
-						url_root + 'eldis/search/documents/full?theme=C123|full|capacity-building-approaches',
+                        url_root + 'eldis/search/documents/full?theme=C123|full|capacity-building-approaches',
                         ]
                     },
                 'object': {
@@ -53,6 +53,13 @@ class RootView(View):
                     },
                 'field list': {
                     'format': url_root + 'eldis/fieldlist/',
+                    },
+                'facet count': {
+                    'format': url_root + 'eldis/count/{object_type}/{category}/?q={query_term}&...',
+                    'examples': [
+                        url_root + 'eldis/count/documents/theme?q=undp',
+                        url_root + 'bridge/count/assets/country?q=undp&document_published_year=2009',
+                        ]
                     },
                 },
             }
@@ -232,8 +239,14 @@ class FacetCountView(BaseAuthView):
             return Response(status.HTTP_500_INTERNAL_SERVER_ERROR, content=e)
         search_response = query.execute()
         facet_counts = search_response.facet_counts.facet_fields[settings.FACET_MAPPING[facet_type]]
+        data = DataMunger(site)
+        facet_dict_list = []
+        for category, count in facet_counts:
+            facet_dict = data.convert_facet_string(category)
+            facet_dict['count'] = count
+            facet_dict_list.append(facet_dict)
         return {'metadata': {'total_results': search_response.result.numFound}, 
-                facet_type+'_count': facet_counts}
+                facet_type+'_count': facet_dict_list}
 
 class FieldListView(BaseAuthView):
     def get(self, request, site):
