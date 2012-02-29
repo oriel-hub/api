@@ -28,6 +28,8 @@ SOLR_SCHEMA = SOLR_SERVER_URLS[DEFAULT_SITE] + SOLR_SCHEMA_SUFFIX
 LOG_SEARCH_PARAMS = False
 
 # These set the user limits
+EXCLUDE_ZERO_COUNT_FACETS = True
+
 USER_LEVEL_INFO = {
         'General User': {
             'max_call_rate':     '150/hour',

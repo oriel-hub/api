@@ -188,11 +188,13 @@ class SearchWrapper:
     def add_facet(self, facet_type, search_params):
         if not facet_type in settings.FACET_MAPPING.keys():
             raise InvalidQueryError("Unknown count type: '%s_count'" % facet_type)
+        facet_kwargs = {}
+        if settings.EXCLUDE_ZERO_COUNT_FACETS:
+            facet_kwargs['mincount'] = 1
         if search_params.has_key('num_results'):
-            self.si_query = self.si_query.facet_by(settings.FACET_MAPPING[facet_type],
-                    limit=int(search_params['num_results']))
-        else:
-            self.si_query = self.si_query.facet_by(settings.FACET_MAPPING[facet_type])
+            facet_kwargs['limit'] = int(search_params['num_results'])
+
+        self.si_query = self.si_query.facet_by(settings.FACET_MAPPING[facet_type], **facet_kwargs)
 
     def restrict_fields_returned(self, output_format, search_params):
         if output_format == 'full':

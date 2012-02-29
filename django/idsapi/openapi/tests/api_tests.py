@@ -33,24 +33,28 @@ class ApiTestsBase(BaseTestCase):
         return self.client.get(defines.URL_ROOT + site + '/get_all/' + object_type + output_format,
                 query, ACCEPT=content_type)
 
-    def assert_results_list(self, response, pass_test, msg=None):
-        search_results = json.loads(response.content)['results']
+    def assert_non_zero_result_len(self, response, element='results'):
+        search_results = json.loads(response.content)[element]
         self.assertTrue(len(search_results) > 0, "Expected more than zero search results")
-        for result in search_results:
+        return search_results
+
+    def assert_results_list(self, response, pass_test, element='results', msg=None):
+        for result in self.assert_non_zero_result_len(response, element):
             self.assertTrue(pass_test(result), msg)
 
-    def assert_results_list_if_present(self, response, required_field, pass_test, msg=None):
-        search_results = json.loads(response.content)['results']
-        self.assertTrue(len(search_results) > 0, "Expected more than zero search results")
-        for result in search_results:
+    def assert_results_list_if_present(self, response, required_field, pass_test, element='results', msg=None):
+        for result in self.assert_non_zero_result_len(response, element):
             if required_field in result:
                 self.assertTrue(pass_test(result[required_field]), msg)
+
+    def assertStatusCode(self, response, status_code=200):
+        self.assertEqual(status_code, response.status_code, response.content)
 
 class ApiSearchResponseTests(ApiTestsBase):
 
     def test_id_only_search_returns_200(self):
         response = self.object_search(output_format='id')
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
 
     def test_json_id_only_search_returns_only_ids(self):
         response = self.object_search(output_format='id')
@@ -58,7 +62,7 @@ class ApiSearchResponseTests(ApiTestsBase):
 
     def test_search_works_without_trailing_slash(self):
         response = self.object_search(output_format='no_slash')
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
 
     def test_json_short_search_returns_short_fields(self):
         response = self.object_search(output_format='short')
@@ -66,23 +70,23 @@ class ApiSearchResponseTests(ApiTestsBase):
 
     def test_json_full_search_returns_more_than_3_fields(self):
         response = self.object_search(output_format='full')
-        self.assert_results_list(response, lambda x: len(x.keys()) > 3, "Full search should have more than 3 fields")
+        self.assert_results_list(response, lambda x: len(x.keys()) > 3, msg="Full search should have more than 3 fields")
 
     def test_json_full_search_does_not_contain_facet_fields(self):
         response = self.object_search(output_format='full')
-        self.assert_results_list(response, lambda x: all(not key.endswith('_facet') for key in x.keys()), "Full search should not show facet fields")
+        self.assert_results_list(response, lambda x: all(not key.endswith('_facet') for key in x.keys()), msg="Full search should not show facet fields")
 
     def test_json_full_search_does_not_contain_hidden_fields(self):
         response = self.object_search(output_format='full')
         search_results = json.loads(response.content)['results']
         self.assert_results_list(response,
                 lambda x: all(key not in settings.ADMIN_ONLY_FIELDS for key in x.keys()),
-                "Full search should not show hidden fields")
+                msg="Full search should not show hidden fields")
 
     def test_can_specify_content_type_in_query(self):
         response = self.object_search(query={'q': 'un', '_accept': 'application/json'},
                 content_type='text/html')
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
         self.assertEqual(response['Content-Type'].lower(), 'application/json')
 
     def test_assets_search_contains_only_assets(self):
@@ -90,7 +94,7 @@ class ApiSearchResponseTests(ApiTestsBase):
                 query={'q': 'Agricultural', 'num_results': '500'})
         self.assert_results_list(response,
                 lambda x: x['object_type'] in defines.ASSET_NAMES,
-                "Search should have only asset objects")
+                msg="Search should have only asset objects")
 
     def test_description_contains_image_beacon(self):
         response = self.object_search(object_type='documents', output_format='full')
@@ -126,14 +130,11 @@ class ApiSearchIntegrationTests(ApiTestsBase):
 
     def test_query_by_country(self):
         response = self.object_search(query={'country':'namibia'})
-        # no assert - if the above line throws an exception then the test fails
-        search_results = json.loads(response.content)['results']
-        for result in search_results:
-            self.assertTrue(' '.join(result['country_focus']).lower().find('namibia') > -1)
+        self.assert_results_list(response, 'country_focus', lambda x: ' '.join(x).lower().find('namibia') > -1)
 
     def test_query_by_country_and_free_text(self):
         response = self.object_search(query={'q':'un', 'country':'angola'})
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
 
     def test_query_by_each_query_term(self):
         query_term_list = [
@@ -146,20 +147,20 @@ class ApiSearchIntegrationTests(ApiTestsBase):
                 ]
         for query_term in query_term_list:
             response = self.object_search(query=query_term)
-            self.assertEqual(200, response.status_code)
+            self.assertStatusCode(response)
             search_results = json.loads(response.content)
             self.assertTrue(search_results['metadata']['total_results'] > 0)
 
     def test_query_using_bridge(self):
         response = self.object_search(site='bridge')
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
         # TODO: reinstate when bridge is sorted out
         #search_results = json.loads(response.content)
         #self.assertTrue(search_results['metadata']['total_results'] > 0)
 
     def test_query_by_boolean_country_and_free_text(self):
         response = self.object_search(query={'q':'un', 'country':'angola&tanzania'})
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
 
     def test_query_by_country_with_and(self):
         response = self.object_search(query={'country':'angola&namibia'})
@@ -207,15 +208,15 @@ class ApiSearchIntegrationTests(ApiTestsBase):
 
     def test_document_search_returns_200(self):
         response = self.object_search(object_type='documents')
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
 
     def test_all_document_search_returns_400(self):
         response = self.object_search(query={'all':''})
-        self.assertEqual(400, response.status_code)
+        self.assertStatusCode(response, 400)
 
     def test_200_returned_if_no_results(self):
         response = self.object_search(query={'country':'NoddyLand'})
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
         # this test is just to check the search actually returned zero results
         search_results = json.loads(response.content)
         self.assertEqual(0, search_results['metadata']['total_results'])
@@ -223,22 +224,22 @@ class ApiSearchIntegrationTests(ApiTestsBase):
 
     def test_200_returned_for_trailing_star(self):
         response = self.object_search(query={'keyword': 'af*'})
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
 
     def test_200_returned_for_middle_star(self):
         response = self.object_search(query={'keyword': 'af*ca'})
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
 
     def test_document_specific_query_param_author(self):
         response = self.object_search(object_type='documents', query={'author': 'john'})
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
         search_results = json.loads(response.content)['results']
         for result in search_results:
             self.assertTrue(' '.join(result['author']).lower().find('john') > -1)
 
     def test_organisation_specific_query_param_acronym(self):
         response = self.object_search(object_type='organisations', query={'acronym': 'UN*'})
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
         self.assertTrue(0 < json.loads(response.content)['metadata']['total_results'])
         search_results = json.loads(response.content)['results']
         for result in search_results:
@@ -250,7 +251,7 @@ class ApiSearchIntegrationTests(ApiTestsBase):
 
     def test_item_specific_query_param_item_type(self):
         response = self.object_search(object_type='items', query={'item_type': 'Other*'})
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
         self.assertTrue(0 < json.loads(response.content)['metadata']['total_results'])
         search_results = json.loads(response.content)['results']
         for result in search_results:
@@ -258,7 +259,7 @@ class ApiSearchIntegrationTests(ApiTestsBase):
 
     def test_num_results_only_returns_only_total_results(self):
         response = self.object_search(query={'q': 'un', 'num_results_only': None})
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
         response_dict = json.loads(response.content)
         self.assertTrue(response_dict.has_key('metadata'))
         self.assertFalse(response_dict.has_key('results'))
@@ -270,7 +271,7 @@ class ApiSearchIntegrationTests(ApiTestsBase):
                 query={'q': 'un', 'extra_fields': 'description'})
         # not all the results have the abstracts, so just check it doesn't
         # immediately complain
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
 
     def test_search_is_case_insensitive(self):
         response_upper = self.object_search(object_type='documents', query={'q': 'AGRI*'})
@@ -362,24 +363,24 @@ class ApiDateQueryTests(ApiTestsBase):
         for query_param in ['item_started_after', 'item_started_before', 'item_finished_after',
                 'item_finished_before']:
             response = self.object_search(query={query_param: '2008-12-31'})
-            self.assertEqual(200, response.status_code)
+            self.assertStatusCode(response)
 
     def test_200_returned_for_item_years(self):
         for query_param in ['item_started_year', 'item_finished_year',]:
             response = self.object_search(query={query_param: '2008'})
-            self.assertEqual(200, response.status_code)
+            self.assertStatusCode(response)
 
     def test_400_returned_for_document_published_before_bad_date_format(self):
         bad_dates = ['200-12-31', '2008-1-01', '2008-01-1', '20080101', '200A-01-01']
         for date in bad_dates:
             response = self.object_search(object_type='documents', query={'document_published_before': date})
-            self.assertEqual(400, response.status_code)
+            self.assertStatusCode(response, 400)
 
     def test_400_returned_for_document_published_year_bad_date_format(self):
         bad_dates = ['200', '200A', '20080',]
         for date in bad_dates:
             response = self.object_search(object_type='documents', query={'document_published_year': date})
-            self.assertEqual(400, response.status_code)
+            self.assertStatusCode(response, 400)
 
 class ApiSearchSortTests(ApiTestsBase):
 
@@ -406,52 +407,52 @@ class ApiSearchSortTests(ApiTestsBase):
     def test_400_returned_for_disallowed_sort_field(self):
         response = self.object_search(object_type='documents', output_format='full',
                 query={'q': 'un', 'sort_asc': 'description'})
-        self.assertEqual(400, response.status_code)
+        self.assertStatusCode(response, 400)
 
     def test_400_returned_for_unknown_sort_field(self):
         response = self.object_search(object_type='documents', output_format='full',
                 query={'q': 'un', 'sort_desc': 'foobar'})
-        self.assertEqual(400, response.status_code)
+        self.assertStatusCode(response, 400)
 
 class ApiSearchErrorTests(ApiTestsBase):
 
     def test_400_returned_if_no_q_parameter(self):
         response = self.object_search(query={})
-        self.assertEqual(400, response.status_code)
+        self.assertStatusCode(response, 400)
 
     def test_400_returned_if_unknown_site(self):
         response = self.object_search(site="no_site")
-        self.assertEqual(400, response.status_code)
+        self.assertStatusCode(response, 400)
 
     def test_400_returned_if_unknown_object_type(self):
         response = self.object_search(object_type='foobars')
-        self.assertEqual(400, response.status_code)
+        self.assertStatusCode(response, 400)
 
     def test_400_returned_if_unknown_output_format(self):
         response = self.object_search(output_format='foobar')
-        self.assertEqual(400, response.status_code)
+        self.assertStatusCode(response, 400)
 
     def test_400_returned_if_unknown_query_parameter(self):
         response = self.object_search(query={'foo': 'bar'})
-        self.assertEqual(400, response.status_code)
+        self.assertStatusCode(response, 400)
 
     def test_400_returned_if_query_parameter_has_no_value(self):
         response = self.object_search(query={'country': ''})
-        self.assertEqual(400, response.status_code)
+        self.assertStatusCode(response, 400)
 
     def test_404_returned_for_unknown_path(self):
         response = self.client.get('/openapi/foobar')
-        self.assertEqual(404, response.status_code)
+        self.assertStatusCode(response, 404)
 
     # TODO: fails - framework bug? think about this ...
     #def test_406_returned_if_unknown_return_format(self):
     #    response = self.object_search(content_type='application/foobar')
-    #    self.assertEqual(406, response.status_code)
+    #    self.assertStatusCode(response, 406)
 
     def test_405_returned_for_post_method_not_allowed(self):
         response = self.client.post(defines.URL_ROOT + 'eldis/search/documents',
                 {'q': 'un'}, ACCEPT='application/json')
-        self.assertEqual(405, response.status_code)
+        self.assertStatusCode(response, 405)
 
     def test_400_returned_for_repeated_country_search(self):
         response = self.object_search(query={'country':['namibia','angola']})
@@ -459,39 +460,39 @@ class ApiSearchErrorTests(ApiTestsBase):
 
     def test_query_by_country_with_both_or_and_and(self):
         response = self.object_search(query={'country':'angola|iran&namibia'})
-        self.assertEqual(400, response.status_code)
+        self.assertStatusCode(response, 400)
 
     def test_400_returned_for_leading_star(self):
         response = self.object_search(query={'keyword': '*ca'})
-        self.assertEqual(400, response.status_code)
+        self.assertStatusCode(response, 400)
 
     def test_400_returned_for_bad_date_query_param_prefix(self):
         response = self.object_search(query={'foobar_published_year': '2009'})
-        self.assertEqual(400, response.status_code)
+        self.assertStatusCode(response, 400)
 
     def test_400_returned_for_bad_date_query_param_postfix(self):
         response = self.object_search(object_type='documents', query={'document_published_foobar': '2009'})
-        self.assertEqual(400, response.status_code)
+        self.assertStatusCode(response, 400)
 
     def test_400_returned_if_document_specific_query_param_used(self):
         response = self.object_search(query={'author': 'John'})
-        self.assertEqual(400, response.status_code)
+        self.assertStatusCode(response, 400)
 
     def test_400_returned_if_num_results_is_negative(self):
         response = self.object_search(query={'q': 'un', 'num_results': '-1'})
-        self.assertEqual(400, response.status_code)
+        self.assertStatusCode(response, 400)
 
     def test_400_returned_if_start_offset_is_negative(self):
         response = self.object_search(query={'q': 'un', 'start_offset': '-1'})
-        self.assertEqual(400, response.status_code)
+        self.assertStatusCode(response, 400)
 
     def test_400_returned_if_num_results_is_non_numeric(self):
         response = self.object_search(query={'q': 'un', 'num_results': 'not_a_number'})
-        self.assertEqual(400, response.status_code)
+        self.assertStatusCode(response, 400)
 
     def test_400_returned_if_start_offset_is_non_numeric(self):
         response = self.object_search(query={'q': 'un', 'start_offset': 'not_a_number'})
-        self.assertEqual(400, response.status_code)
+        self.assertStatusCode(response, 400)
 
     def test_400_returned_if_sort_asc_and_sort_desc_used(self):
         response = self.object_search(query={
@@ -499,29 +500,29 @@ class ApiSearchErrorTests(ApiTestsBase):
             'sort_asc': 'publication_date',
             'sort_desc': 'object_id'
             })
-        self.assertEqual(400, response.status_code)
+        self.assertStatusCode(response, 400)
 
 class ApiGetAllIntegrationTests(ApiTestsBase):
 
     def test_get_all_documents_returns_200(self):
         response = self.get_all(object_type='documents')
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
 
     def test_get_all_documents_returns_200_no_trailing_slash(self):
         response = self.get_all(object_type='documents', output_format='no_slash')
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
 
     def test_get_all_bridge_documents_returns_200(self):
         response = self.get_all(site="bridge", object_type='documents')
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
 
     def test_get_all_assets_returns_200(self):
         response = self.get_all()
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
 
     def test_400_returned_if_unknown_object_type(self):
         response = self.get_all(object_type='foobars')
-        self.assertEqual(400, response.status_code)
+        self.assertStatusCode(response, 400)
 
     def test_extra_fields_with_all_assets(self):
         response = self.get_all(object_type='documents',
@@ -551,26 +552,26 @@ class ApiGetObjectIntegrationTests(BaseTestCase):
 
     def test_get_document_by_id_returns_200(self):
         response = self.get_object(object_type='documents')
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
 
     def test_get_document_by_id_no_trailing_slash_returns_200(self):
         response = self.get_object(object_type='documents',
                 output_format='no_slash')
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
 
 # TODO: reinstate when bridge is sorted out
 #    def test_bridge_get_document_by_id_returns_200(self):
 #        response = self.get_object(site='bridge', object_type='documents',
 #                object_id='A20922')
-#        self.assertEqual(200, response.status_code)
+#       self.assertStatusCode(response)
 
     def test_get_object_by_id_returns_200(self):
         response = self.get_object(object_type='objects')
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
 
     def test_get_asset_by_id_returns_200(self):
         response = self.get_object()
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
 
     def test_extra_fields_with_get_object(self):
         response = self.get_object(object_type='documents',
@@ -580,20 +581,20 @@ class ApiGetObjectIntegrationTests(BaseTestCase):
 
     def test_404_returned_if_no_object(self):
         response = self.get_object(object_id='A1234567890')
-        self.assertEqual(404, response.status_code)
+        self.assertStatusCode(response, 404)
 
     def test_400_returned_if_unknown_object_type(self):
         response = self.get_object(object_type='foobars')
-        self.assertEqual(400, response.status_code)
+        self.assertStatusCode(response, 400)
 
     def test_400_returned_if_unknown_query_param(self):
         response = self.get_object(object_type='documents', query={'country': 'angola'})
-        self.assertEqual(400, response.status_code)
+        self.assertStatusCode(response, 400)
 
     def test_can_specify_content_type_in_query(self):
         response = self.get_object(query={'_accept': 'application/xml'},
                 content_type='text/html')
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
         self.assertEqual(response['Content-Type'].lower(), 'application/xml')
 
     def test_extra_fields_with_object_search(self):
@@ -601,7 +602,7 @@ class ApiGetObjectIntegrationTests(BaseTestCase):
                 query={'extra_fields': 'description'})
         # not all the results have the abstracts, so just check it doesn't
         # immediately complain
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
 
 
 class ApiRootIntegrationTests(BaseTestCase):
@@ -610,7 +611,7 @@ class ApiRootIntegrationTests(BaseTestCase):
 
     def test_root_url_returns_200(self):
         response = self.get_root()
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
 
     def test_root_url_contains_help_link(self):
         response = self.get_root()
@@ -627,17 +628,17 @@ class ApiFieldListIntegrationTests(BaseTestCase):
     def test_field_list_returns_200(self):
         self.login()
         response = self.get_field_list()
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
 
     def test_bridge_field_list_returns_200(self):
         self.login()
         response = self.get_field_list(site='bridge')
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
 
     def test_bad_site_field_list_returns_400(self):
         self.login()
         response = self.get_field_list(site='no_such_site')
-        self.assertEqual(400, response.status_code)
+        self.assertStatusCode(response, 400)
 
     def test_field_list_has_admin_items_for_unlimited_user(self):
         # first check our assumptions
@@ -676,10 +677,7 @@ class ApiFieldListIntegrationTests(BaseTestCase):
         self.assertFalse('send_email_alerts' in response_list)
         self.assertFalse('asset_publication_date' in response_list)
 
-class ApiFacetIntegrationTests(BaseTestCase):
-    def setUp(self):
-        BaseTestCase.setUp(self)
-        self.login()
+class ApiFacetIntegrationTests(ApiTestsBase):
 
     def facet_search(self, site='eldis', object_type='assets', facet_type='country', query=None):
         query = query or {'q': 'un'}
@@ -689,36 +687,59 @@ class ApiFacetIntegrationTests(BaseTestCase):
     def test_200_returned_for_all_facet_types(self):
         for facet_type in ('country', 'region', 'keyword', 'sector', 'subject', 'theme'):
             response = self.facet_search(facet_type=facet_type)
-            self.assertEqual(200, response.status_code, response.content)
+            self.assertStatusCode(response)
 
     def test_200_returned_for_individual_object_type(self):
         response = self.facet_search(object_type='documents')
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
 
     def test_facet_num_results(self):
-        response = self.facet_search(query={'q': 'un', 'num_results': '66'})
+        num_results = 12
+        response = self.facet_search(query={'q': 'un', 'num_results': str(num_results)})
         search_results = json.loads(response.content)
-        self.assertEqual(200, response.status_code)
-        self.assertEqual(66, len(search_results['country_count']))
+        self.assertStatusCode(response)
+        self.assertEqual(num_results, len(search_results['country_count']))
 
     def test_facet_num_results_with_minus_one(self):
         response = self.facet_search(query={'q': 'un', 'num_results': '-1'})
         search_results = json.loads(response.content)
-        self.assertEqual(200, response.status_code)
+        self.assertStatusCode(response)
         self.assertTrue(len(search_results['country_count']) > 0)
 
     def test_400_returned_if_unknown_facet_type(self):
         response = self.facet_search(facet_type='foobars')
-        self.assertEqual(400, response.status_code)
+        self.assertStatusCode(response, 400)
 
     def test_all_facets_have_an_integer_count(self):
         response = self.facet_search()
-        search_results = json.loads(response.content)
-        self.assertTrue(len(search_results['country_count']) > 0)
-        for country_count in search_results['country_count']:
-            self.assertTrue('object_id' in country_count)
-            self.assertTrue('metadata_url' in country_count)
-            self.assertIsInstance(country_count['count'], int)
+        def check_all_facets_have_an_integer_count(country_count):
+            return ('object_id' in country_count and 'metadata_url' in country_count and
+                    isinstance(country_count['count'], int))
+        self.assert_results_list(response, check_all_facets_have_an_integer_count,
+                element='country_count')
+
+    def test_facets_with_zero_count_excluded_by_setting(self):
+        old_setting = settings.EXCLUDE_ZERO_COUNT_FACETS
+        try:
+            settings.EXCLUDE_ZERO_COUNT_FACETS = True
+            response = self.facet_search()
+            self.assert_results_list(response, lambda x: x['count'] > 0,
+                    element='country_count')
+        finally:
+            settings.EXCLUDE_ZERO_COUNT_FACETS = old_setting
+
+    def test_facets_with_zero_count_included_by_setting(self):
+        old_setting = settings.EXCLUDE_ZERO_COUNT_FACETS
+        try:
+            settings.EXCLUDE_ZERO_COUNT_FACETS = False
+            response = self.facet_search()
+            zero_found = False
+            for result in self.assert_non_zero_result_len(response, element='country_count'):
+                if result['count'] == 0:
+                    zero_found = True
+            self.assertTrue(zero_found, "Did not find any results with a zero count")
+        finally:
+            settings.EXCLUDE_ZERO_COUNT_FACETS = old_setting
 
 class ApiCategoryChildrenIntegrationTests(ApiTestsBase):
     def children_search(self, site='eldis', object_type='themes', object_id='C34',
@@ -730,7 +751,7 @@ class ApiCategoryChildrenIntegrationTests(ApiTestsBase):
         child_searches = {'themes': 'C34', 'itemtypes': 'C1067'}
         for object_type, object_id in child_searches.items():
             response = self.children_search(object_type=object_type, object_id=object_id)
-            self.assertEqual(200, response.status_code)
+            self.assertStatusCode(response)
 
     def test_parents_match_for_children_search(self):
         response = self.children_search()
@@ -741,11 +762,11 @@ class ApiCategoryChildrenIntegrationTests(ApiTestsBase):
 
     def test_400_returned_for_asset_child_search(self):
         response = self.children_search(object_type='documents', object_id='A8346')
-        self.assertEqual(400, response.status_code)
+        self.assertStatusCode(response, 400)
 
     def test_400_returned_for_invalid_child(self):
         response = self.children_search(object_type='regions', object_id='C1346')
-        self.assertEqual(400, response.status_code)
+        self.assertStatusCode(response, 400)
 
     def test_all_have_children_link(self):
         for object_type in settings.OBJECT_TYPES_WITH_HIERARCHY:
