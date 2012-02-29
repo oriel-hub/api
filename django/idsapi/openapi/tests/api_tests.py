@@ -33,6 +33,19 @@ class ApiTestsBase(BaseTestCase):
         return self.client.get(defines.URL_ROOT + site + '/get_all/' + object_type + output_format,
                 query, ACCEPT=content_type)
 
+    def assert_results_list(self, response, pass_test, msg=None):
+        search_results = json.loads(response.content)['results']
+        self.assertTrue(len(search_results) > 0, "Expected more than zero search results")
+        for result in search_results:
+            self.assertTrue(pass_test(result), msg)
+
+    def assert_results_list_if_present(self, response, required_field, pass_test, msg=None):
+        search_results = json.loads(response.content)['results']
+        self.assertTrue(len(search_results) > 0, "Expected more than zero search results")
+        for result in search_results:
+            if required_field in result:
+                self.assertTrue(pass_test(result[required_field]), msg)
+
 class ApiSearchResponseTests(ApiTestsBase):
 
     def test_id_only_search_returns_200(self):
@@ -41,13 +54,7 @@ class ApiSearchResponseTests(ApiTestsBase):
 
     def test_json_id_only_search_returns_only_ids(self):
         response = self.object_search(output_format='id')
-        search_results = json.loads(response.content)['results']
-        # no assert - if the above line throws an exception then the test fails
-        # check that the results only contain the id field
-        for result in search_results:
-            sorted_keys = result.keys()
-            sorted_keys.sort()
-            self.assertEqual(['metadata_url', 'object_id'], sorted_keys)
+        self.assert_results_list(response, lambda x: sorted(x.keys()) == ['metadata_url', 'object_id'])
 
     def test_search_works_without_trailing_slash(self):
         response = self.object_search(output_format='no_slash')
@@ -55,35 +62,22 @@ class ApiSearchResponseTests(ApiTestsBase):
 
     def test_json_short_search_returns_short_fields(self):
         response = self.object_search(output_format='short')
-        search_results = json.loads(response.content)['results']
-        # no assert - if the above line throws an exception then the test fails
-        # check that the results only contain the correct field
-        for result in search_results:
-            sorted_keys = result.keys()
-            sorted_keys.sort()
-            self.assertEqual(['metadata_url', 'object_id', 'object_type', 'title'], sorted_keys)
+        self.assert_results_list(response, lambda x: sorted(x.keys()) == ['metadata_url', 'object_id', 'object_type', 'title'])
 
     def test_json_full_search_returns_more_than_3_fields(self):
         response = self.object_search(output_format='full')
-        search_results = json.loads(response.content)['results']
-        # no assert - if the above line throws an exception then the test fails
-        # check that the results only contain the correct field
-        for result in search_results:
-            self.assertTrue(len(result.keys()) > 3)
+        self.assert_results_list(response, lambda x: len(x.keys()) > 3, "Full search should have more than 3 fields")
 
     def test_json_full_search_does_not_contain_facet_fields(self):
         response = self.object_search(output_format='full')
-        search_results = json.loads(response.content)['results']
-        for result in search_results:
-            for key in result.keys():
-                self.assertFalse(key.endswith('_facet'))
+        self.assert_results_list(response, lambda x: all(not key.endswith('_facet') for key in x.keys()), "Full search should not show facet fields")
 
     def test_json_full_search_does_not_contain_hidden_fields(self):
         response = self.object_search(output_format='full')
         search_results = json.loads(response.content)['results']
-        for result in search_results:
-            for key in result.keys():
-                self.assertFalse(key in settings.ADMIN_ONLY_FIELDS)
+        self.assert_results_list(response,
+                lambda x: all(key not in settings.ADMIN_ONLY_FIELDS for key in x.keys()),
+                "Full search should not show hidden fields")
 
     def test_can_specify_content_type_in_query(self):
         response = self.object_search(query={'q': 'un', '_accept': 'application/json'},
@@ -94,35 +88,39 @@ class ApiSearchResponseTests(ApiTestsBase):
     def test_assets_search_contains_only_assets(self):
         response = self.object_search(output_format='short',
                 query={'q': 'Agricultural', 'num_results': '500'})
-        search_results = json.loads(response.content)['results']
-        for result in search_results:
-            self.assertTrue(result['object_type'] in defines.ASSET_NAMES)
+        self.assert_results_list(response,
+                lambda x: x['object_type'] in defines.ASSET_NAMES,
+                "Search should have only asset objects")
 
     def test_description_contains_image_beacon(self):
         response = self.object_search(object_type='documents', output_format='full')
-        search_results = json.loads(response.content)['results']
         profile = self.user.get_profile()
-        for result in search_results:
-            if result.has_key('description'):
-                self.assertTrue(result['description'].find(settings.IMAGE_BEACON_STUB_URL) > -1)
-                self.assertTrue(result['description'].find(profile.beacon_guid) > -1)
+        def check_image_beacon_exists_and_has_correct_id(description):
+            return ((description.find(settings.IMAGE_BEACON_STUB_URL) > -1) and
+                    (description.find(profile.beacon_guid) > -1))
+        self.assert_results_list_if_present(response, 'description', check_image_beacon_exists_and_has_correct_id)
 
     def test_description_truncated_for_general_user(self):
         self.setUserLevel('General User')
         response = self.object_search(object_type='documents', output_format='full')
-        search_results = json.loads(response.content)['results']
-        for result in search_results:
-            if result.has_key('description'):
-                abstract_without_beacon = result['description'].split('<img')[0]
-                self.assertTrue(250 >= len(abstract_without_beacon))
+        def check_description_truncated_for_general_user(description):
+            abstract_without_beacon = description.split('<img')[0]
+            return 250 >= len(abstract_without_beacon)
+        self.assert_results_list_if_present(response, 'description', check_description_truncated_for_general_user)
 
     def test_description_does_not_contain_image_beacon_for_unlimited_user(self):
         self.setUserLevel('Unlimited')
         response = self.object_search(object_type='documents', output_format='full')
-        search_results = json.loads(response.content)['results']
-        for result in search_results:
-            if result.has_key('description'):
-                self.assertTrue(result['description'].find(settings.IMAGE_BEACON_STUB_URL) == -1)
+        self.assert_results_list_if_present(response, 'description', lambda x: x.find(settings.IMAGE_BEACON_STUB_URL) == -1)
+
+    def test_full_search_converts_structured_xml_fields(self):
+        response = self.object_search(object_type='documents', output_format='full')
+        self.assert_results_list_if_present(response, 'category_theme_array', lambda x: isinstance(x["theme"], list))
+
+    def test_short_search_converts_structured_xml_fields(self):
+        response = self.object_search(object_type='documents', output_format='short',
+                query={'q': 'un', 'extra_fields': 'category_theme_array'})
+        self.assert_results_list_if_present(response, 'category_theme_array', lambda x: isinstance(x["theme"], list))
 
 class ApiSearchIntegrationTests(ApiTestsBase):
 

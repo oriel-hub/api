@@ -23,20 +23,20 @@ class DataMunger():
                 object_data = dict((k, v) for k, v in object_data.items() if k in settings.GENERAL_FIELDS)
             elif user_level_info['hide_admin_fields']:
                 object_data = dict((k, v) for k, v in object_data.items() if not k in settings.ADMIN_ONLY_FIELDS)
-
-            for xml_field in settings.STRUCTURED_XML_FIELDS:
-                if xml_field in object_data:
-                    object_data[xml_field] = self._convert_xml_field(object_data[xml_field])
-
-            # add the parent category, if relevant
-            if self.object_type in settings.OBJECT_TYPES_WITH_HIERARCHY:
-                self._add_child_parent_links(object_data, result)
-
-            if 'description' in object_data:
-                object_data['description'] = self._process_description(
-                        object_data['description'], user_level_info, beacon_guid)
         else:
             object_data = result
+
+        for xml_field in settings.STRUCTURED_XML_FIELDS:
+            if xml_field in object_data:
+                object_data[xml_field] = self._convert_xml_field(object_data[xml_field])
+
+        # add the parent category, if relevant
+        if self.object_type in settings.OBJECT_TYPES_WITH_HIERARCHY:
+            self._add_child_parent_links(object_data, result)
+
+        if 'description' in object_data:
+            object_data['description'] = self._process_description(
+                    object_data['description'], user_level_info, beacon_guid)
 
         object_data['metadata_url'] = self._create_metadata_url(object_name=result['title'])
         return object_data
