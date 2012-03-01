@@ -128,8 +128,8 @@ class ApiSearchResponseTests(ApiTestsBase):
 class ApiSearchIntegrationTests(ApiTestsBase):
 
     def test_query_by_country(self):
-        response = self.object_search(query={'country':'namibia'})
-        self.assert_results_list(response, 'country_focus', lambda x: ' '.join(x).lower().find('namibia') > -1)
+        response = self.object_search(query={'country': 'Namibia|NA'})
+        self.assert_results_list(response, lambda x: ' '.join(x['country_focus']).lower().find('namibia') > -1)
 
     def test_query_by_country_and_free_text(self):
         response = self.object_search(query={'q':'un', 'country':'angola'})
