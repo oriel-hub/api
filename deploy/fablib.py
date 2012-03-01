@@ -6,45 +6,45 @@ from fabric.api import *
 from fabric.contrib import files
 from fabric import utils
 
+def _set_dict_if_not_set(thedict, key, value):
+    if key not in thedict:
+        thedict[key] = value
+
 def _setup_path():
-    # TODO: something like
-    # if not defined env.project_subdir:
-    #     env.project_subdir = env.project
-    # env.project_root    = os.path.join(env.home, env.project_subdir)
-
     # allow for the fabfile having set up some of these differently
-    if not env.has_key('use_sudo'):
-        env.use_sudo        = True
-    if not env.has_key('cvs_rsh'):
-        env.cvs_rsh         = 'CVS_RSH="ssh"'
-    if not env.has_key('project_root'):
-        env.project_root    = os.path.join(env.home, env.project_dir)
-    if not env.has_key('vcs_root'):
-        env.vcs_root        = os.path.join(env.project_root, 'dev')
-    if not env.has_key('prev_root'):
-        env.prev_root       = os.path.join(env.project_root, 'previous')
-    if not env.has_key('dump_dir'):
-        env.dump_dir        = os.path.join(env.project_root, 'dbdumps')
-    if not env.has_key('deploy_root'):
-        env.deploy_root     = os.path.join(env.vcs_root, 'deploy')
-    if env.project_type == "django":
-        if not env.has_key('django_dir'):
-            env.django_dir      = env.project
-        if not env.has_key('django_root'):
-            env.django_root     = os.path.join(env.vcs_root, env.django_dir)
-    if not env.has_key('settings'):
-        env.settings        = '%(project)s.settings' % env
-    if env.use_virtualenv:
-        if not env.has_key('virtualenv_root'):
-            env.virtualenv_root = os.path.join(env.django_root, '.ve')
-        if not env.has_key('python_bin'):
-            python26 = os.path.join('/', 'usr', 'bin', 'python2.6')
-            if os.path.exists(python26):
-                env.python_bin = python26
-            else:
-                env.python_bin = os.path.join('/', 'usr', 'bin', 'python')
-    env.tasks_bin = env.python_bin + ' ' + os.path.join(env.deploy_root, 'tasks.py')
+    _set_dict_if_not_set(env, 'verbose',      False)
+    _set_dict_if_not_set(env, 'use_sudo',     True)
+    _set_dict_if_not_set(env, 'cvs_rsh',      'CVS_RSH="ssh"')
+    _set_dict_if_not_set(env, 'project_root', os.path.join(env.home, env.project_dir))
+    _set_dict_if_not_set(env, 'vcs_root',     os.path.join(env.project_root, 'dev'))
+    _set_dict_if_not_set(env, 'prev_root',    os.path.join(env.project_root, 'previous'))
+    _set_dict_if_not_set(env, 'dump_dir',     os.path.join(env.project_root, 'dbdumps'))
+    _set_dict_if_not_set(env, 'deploy_root',  os.path.join(env.vcs_root, 'deploy'))
+    _set_dict_if_not_set(env, 'settings',     '%(project)s.settings' % env)
 
+    if env.project_type == "django":
+        _set_dict_if_not_set(env, 'django_dir', env.project)
+        _set_dict_if_not_set(env, 'django_root', os.path.join(env.vcs_root, env.django_dir))
+
+    if env.use_virtualenv:
+        _set_dict_if_not_set(env, 'virtualenv_root', os.path.join(env.django_root, '.ve'))
+
+    python26 = os.path.join('/', 'usr', 'bin', 'python2.6')
+    if os.path.exists(python26):
+        _set_dict_if_not_set(env, 'python_bin', python26)
+    else:
+        _set_dict_if_not_set(env, 'python_bin', os.path.join('/', 'usr', 'bin', 'python'))
+
+    _set_dict_if_not_set(env, 'tasks_bin', 
+            env.python_bin + ' ' + os.path.join(env.deploy_root, 'tasks.py'))
+
+
+def _tasks(tasks_args, verbose=False):
+    require('tasks_bin', provided_by=env.valid_envs)
+    tasks_cmd = env.tasks_bin
+    if env.verbose or verbose:
+        tasks_cmd += ' -v'
+    sudo_or_run(tasks_cmd + ' ' + tasks_args)
 
 def _get_svn_user_and_pass():
     if not env.has_key('svnuser') or len(env.svnuser) == 0:
@@ -54,6 +54,10 @@ def _get_svn_user_and_pass():
         # prompt user for password
         env.svnpass = getpass.getpass('Enter SVN password:')
 
+
+def verbose(verbose=True):
+    """Set verbose output"""
+    env.verbose = verbose
 
 
 def deploy_clean(revision=None):
@@ -114,7 +118,7 @@ def deploy(revision=None, keep=None):
 
 def create_copy_for_rollback(keep):
     """Copy the current version out of the way so we can rollback to it if required."""
-    require('prev_root', 'vcs_root', 'tasks_bin', provided_by=env.valid_envs)
+    require('prev_root', 'vcs_root', provided_by=env.valid_envs)
     # create directory for it
     prev_dir = os.path.join(env.prev_root, time.strftime("%Y-%m-%d_%H-%M-%S"))
     _create_dir_if_not_exists(prev_dir)
@@ -122,7 +126,7 @@ def create_copy_for_rollback(keep):
     sudo_or_run('cp -a %s %s' % (env.vcs_root, prev_dir))
     # dump database
     with cd(prev_dir):
-        sudo_or_run(env.tasks_bin + ' dump_db')
+        _tasks('dump_db')
     if keep == None or int(keep) > 0:
         delete_old_versions(keep)
 
@@ -165,7 +169,7 @@ def rollback(version='last', migrate=False, restore_db=False):
       The default is False
 
     Note that migrate and restore_db cannot both be True."""
-    require('prev_root', 'vcs_root', 'tasks_bin', provided_by=env.valid_envs)
+    require('prev_root', 'vcs_root', provided_by=env.valid_envs)
     if migrate and restore_db:
         utils.abort('rollback cannot do both migrate and restore_db')
     if migrate:
@@ -191,7 +195,7 @@ def rollback(version='last', migrate=False, restore_db=False):
     if restore_db:
         # feed the dump file into mysql command
         with cd(rollback_dir_base):
-            sudo_or_run(env.tasks_bin + ' load_dbdump')
+            _tasks('load_dbdump')
     # delete everything - don't want stray files left over
     sudo_or_run('rm -rf %s' % env.vcs_root)
     # cp -a from rollback_dir to vcs_root
@@ -314,26 +318,23 @@ def sudo_or_run(command):
 
 def update_requirements():
     """ update external dependencies on remote host """
-    require('tasks_bin', provided_by=env.valid_envs)
-    sudo_or_run(env.tasks_bin + ' update_ve')
+    _tasks('update_ve')
 
 
 def clean_db(revision=None):
     """ delete the entire database """
     if env.environment == 'production':
         utils.abort('do not delete the production database!!!')
-    require('tasks_bin', provided_by=env.valid_non_prod_envs)
-    sudo_or_run(env.tasks_bin + " clean_db")
+    _tasks("clean_db")
 
 def update_db():
     """ create and/or update the database, do migrations etc """
-    require('tasks_bin', provided_by=env.valid_envs)
-    sudo_or_run(env.tasks_bin + ' update_db')
+    _tasks('update_db')
 
 def setup_db_dumps():
     """ set up mysql database dumps """
     require('dump_dir', provided_by=env.valid_envs)
-    sudo_or_run(env.tasks_bin + ' setup_db_dumps:' + env.dump_dir)
+    _tasks('setup_db_dumps:' + env.dump_dir)
 
 def touch():
     """ touch wsgi file to trigger reload """
@@ -342,13 +343,11 @@ def touch():
     sudo_or_run('touch ' + os.path.join(wsgi_dir, 'wsgi_handler.py'))
 
 def create_private_settings():
-    require('tasks_bin', provided_by=env.valid_envs)
-    sudo_or_run(env.tasks_bin + ' create_private_settings')
+    _tasks('create_private_settings')
 
 def link_local_settings():
     """link the local_settings.py file for this environment"""
-    require('tasks_bin', provided_by=env.valid_envs)
-    sudo_or_run(env.tasks_bin + ' link_local_settings:' + env.environment)
+    _tasks('link_local_settings:' + env.environment)
 
     # check that settings imports local_settings, as it always should,
     # and if we forget to add that to our project, it could cause mysterious
