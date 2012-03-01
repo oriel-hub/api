@@ -89,6 +89,7 @@ def deploy(revision=None, keep=None):
     * keep is the number of old versions to keep around for rollback (default
       5)"""
     require('project_root', provided_by=env.valid_envs)
+    check_for_local_changes()
     with settings(warn_only=True):
         apache_cmd('stop')
 
@@ -232,6 +233,28 @@ def version():
     else:
         utils.abort('Unsupported repo type: %s' % (env.repo_type))
 
+def check_for_local_changes():
+    """ check if there are local changes on the remote server """
+    require('repo_type', 'vcs_root', provided_by=env.valid_envs)
+    status_cmd = {
+            'svn': 'svn status --quiet',
+            'git': 'git status --short',
+            'cvs': '#not worked out yet'
+            }
+    if env.repo_type == 'cvs':
+        print "TODO: write CVS status command"
+        return
+    if files.exists(os.path.join(env.vcs_root, "." + env.repo_type)):
+        with cd(env.vcs_root):
+            status = sudo_or_run(status_cmd[env.repo_type])
+            if status:
+                print 'Found local changes on %s server' % env.environment
+                print status
+                cont = prompt('Would you like to continue with deployment? (yes/no)',
+                        default='no', validate=r'^yes|no$')
+                if cont == 'no':
+                    utils.abort('Aborting deployment')
+
 def checkout_or_update(revision=None):
     """ checkout or update the project from version control.
 
@@ -311,9 +334,9 @@ def _checkout_or_update_cvs(revision):
 
 def sudo_or_run(command):
     if env.use_sudo:
-        sudo(command)
+        return sudo(command)
     else:
-        run(command)
+        return run(command)
 
 
 def update_requirements():
