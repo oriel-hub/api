@@ -78,7 +78,6 @@ class ApiSearchResponseTests(ApiTestsBase):
 
     def test_json_full_search_does_not_contain_hidden_fields(self):
         response = self.object_search(output_format='full')
-        search_results = json.loads(response.content)['results']
         self.assert_results_list(response,
                 lambda x: all(key not in settings.ADMIN_ONLY_FIELDS for key in x.keys()),
                 msg="Full search should not show hidden fields")
@@ -532,10 +531,7 @@ class ApiGetAllIntegrationTests(ApiTestsBase):
             self.assertTrue(result.has_key('description'))
 
 
-class ApiGetObjectIntegrationTests(BaseTestCase):
-    def setUp(self):
-        BaseTestCase.setUp(self)
-        self.login()
+class ApiGetObjectIntegrationTests(ApiTestsBase):
 
     def get_object(self, site='eldis', object_type='assets', object_id='A1543',
             output_format='', query=None, content_type='application/json'):
@@ -605,7 +601,7 @@ class ApiGetObjectIntegrationTests(BaseTestCase):
         self.assertStatusCode(response)
 
 
-class ApiRootIntegrationTests(BaseTestCase):
+class ApiRootIntegrationTests(ApiTestsBase):
     def get_root(self):
         return self.client.get(defines.URL_ROOT, ACCEPT='application/json')
 
@@ -618,10 +614,7 @@ class ApiRootIntegrationTests(BaseTestCase):
         response_dict = json.loads(response.content)
         self.assertTrue(response_dict['help'].startswith('http://'))
 
-class ApiFieldListIntegrationTests(BaseTestCase):
-    def setUp(self):
-        BaseTestCase.setUp(self)
-
+class ApiFieldListIntegrationTests(ApiTestsBase):
     def get_field_list(self, site='eldis'):
         return self.client.get(defines.URL_ROOT + site + '/fieldlist/', ACCEPT='application/json')
 
