@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # integration tests at the API level
 from django.test.testcases import TestCase
 
@@ -78,9 +79,11 @@ class XmlDictTestCase(TestCase):
 </themeList>"""
 
     def test_single_item_list(self):
-        xml_dict = XmlDictConfig.xml_string_to_dict(self.xml_single_item_list, True)
+        xml_dict = XmlDictConfig.xml_string_to_dict(self.xml_single_item_list,
+                single_item_list=True)
         self.assertEqual(xml_dict['theme'][0]['category_name'], 'MDGs health')
-        xml_dict2 = XmlDictConfig.xml_string_to_dict(self.xml_single_item_list, False)
+        xml_dict2 = XmlDictConfig.xml_string_to_dict(self.xml_single_item_list,
+                single_item_list=False)
         self.assertEqual(xml_dict2['theme']['category_name'], 'MDGs health')
 
     xml_full_list = """<themeList>
@@ -108,6 +111,25 @@ class XmlDictTestCase(TestCase):
 </themeList>"""
 
     def test_full_list(self):
-        xml_dict = XmlDictConfig.xml_string_to_dict(self.xml_full_list, True)
+        xml_dict = XmlDictConfig.xml_string_to_dict(self.xml_full_list,
+                single_item_list=True)
         self.assertEqual(xml_dict['theme'][2]['cat_id'], '595')
         self.assertEqual(xml_dict['theme'][3]['category_name'], 'Poverty')
+
+    xml_non_ascii_text = u"""<themeList>
+<theme>
+    <cat_id>153</cat_id>
+    <category_name>Stäckövérfløw</category_name>
+    <deleted>0</deleted>
+</theme>
+</themeList>"""
+
+    def test_utf8_encoded_string_input(self):
+        xml_dict = XmlDictConfig.xml_string_to_dict(self.xml_non_ascii_text.encode('utf-8'),
+                single_item_list=True, set_encoding="UTF-8")
+        self.assertEqual(xml_dict['theme'][0]['category_name'], u'Stäckövérfløw')
+
+    def test_utf8_unicode_string_input(self):
+        xml_dict = XmlDictConfig.xml_string_to_dict(self.xml_non_ascii_text,
+                single_item_list=True)
+        self.assertEqual(xml_dict['theme'][0]['category_name'], u'Stäckövérfløw')

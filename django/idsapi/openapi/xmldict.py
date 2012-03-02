@@ -89,10 +89,17 @@ class XmlDictConfig(dict):
             self.update({tag: item})
 
     @classmethod
-    def xml_string_to_dict(cls, xml_string, single_item_list=False):
+    def xml_string_to_dict(cls, xml_string, single_item_list=False,
+            set_encoding=None):
         try:
-            root = ElementTree.fromstring(xml_string.encode('ascii', 'xmlcharrefreplace'))
-        except ExpatError:
-            print >> sys.stderr, "Failed to parse XML: %s" % xml_string
+            if set_encoding:
+                xml_header = '<?xml version="1.0" encoding="%s" ?>\n' % set_encoding
+                xml_string = xml_header + xml_string
+                root = ElementTree.fromstring(xml_string)
+            else:
+                root = ElementTree.fromstring(xml_string.encode('ascii', 'xmlcharrefreplace'))
+        except ExpatError as e:
+            print >> sys.stderr, "Failed to parse XML\nXML string was: %s\nError was: %s" % \
+                    (xml_string, e)
             return xml_string
         return XmlDictConfig(root, single_item_list)
