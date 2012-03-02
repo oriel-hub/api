@@ -48,6 +48,14 @@ class ApiAuthTests(BaseTestCase):
                 HTTP_TOKEN_GUID=profile.access_guid)
         self.assertEqual(403, response.status_code)
 
+    def test_403_returned_if_user_profile_incomplete(self):
+        profile = self.user.get_profile()
+        profile.user_level = -1
+        profile.save()
+        self.login()
+        response = self.client.get(SEARCH_URL_BASE, {'q': 'undp'})
+        self.assertEqual(403, response.status_code)
+
 class UserLimitTests(ApiTestsBase):
     def test_200_returned_for_500_results_requested_general_user(self):
         self.setUserLevel(u'General User')
