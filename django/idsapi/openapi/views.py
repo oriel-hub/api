@@ -90,7 +90,6 @@ class BaseSearchView(BaseAuthView):
 
     def __init__(self, raise_if_no_results=False):
         BaseAuthView.__init__(self)
-        #View.__init__(self)
         self.output_format = None
         self.query = None
         self.raise_if_no_results = raise_if_no_results
@@ -103,7 +102,6 @@ class BaseSearchView(BaseAuthView):
         except SolrError as e:
             if str(e).find('is invalid value') != -1:
                 raise IdsApiParseError('Could not parse Solr output. Original error was "%s"' % str(e))
-                #raise
             else:
                 raise
         formatted_results = []
