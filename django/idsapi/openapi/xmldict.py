@@ -91,12 +91,28 @@ class XmlDictConfig(dict):
     @classmethod
     def xml_string_to_dict(cls, xml_string, single_item_list=False,
             set_encoding=None):
+        """
+            Args:
+                xml_string (xml string):
+                    The XML fragment to parse, suitably encoded (eg, if setting
+                    the 'set_encoding' header to 'utf-8' and the xml_string is
+                    unicode, first re-encode xml_string with xml_string.encode('utf-8')).
+
+                single_item_list (boolean flag):
+                     Indicates to the parser the XML fragment is a list containg one value.
+
+                set_encoding (string encoding type):
+                     If set, add an XML header with the given value for the encoding attr.
+        """
+
+
         try:
             if set_encoding:
                 xml_header = '<?xml version="1.0" encoding="%s" ?>\n' % set_encoding
                 xml_string = xml_header + xml_string
                 root = ElementTree.fromstring(xml_string)
             else:
+                #TODO: Is this a useful feature?
                 root = ElementTree.fromstring(xml_string.encode('ascii', 'xmlcharrefreplace'))
         except ExpatError as e:
             print >> sys.stderr, "Failed to parse XML\nXML string was: %s\nError was: %s" % \

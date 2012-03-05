@@ -44,7 +44,7 @@ class DataMunger():
     def _convert_xml_field(self, xml_field):
         """convert an XML string into a list of dictionaries and add
         metadata URLs"""
-        field_dict = XmlDictConfig.xml_string_to_dict(xml_field, True, set_encoding="UTF-8")
+        field_dict = XmlDictConfig.xml_string_to_dict(xml_field.encode('utf-8'), True, set_encoding="UTF-8")
         for _, list_value in field_dict.items():
             for item in list_value:
                 if 'object_id' in item and \
@@ -88,6 +88,11 @@ class DataMunger():
     def _add_child_parent_links(self, object_data, result):
         """Add links to child and parent categories"""
         object_data['children_url'] = self._create_metadata_url(url_name='category_children')
+
+        # TODO: write test for condition when parent links not set
+        if not all(result.has_key(field) for field in ['cat_parent', 'cat_superparent']):
+            print result
+            return
 
         if result['cat_parent'] != result['cat_superparent']:
             object_data['parent_url'] = self._create_metadata_url(

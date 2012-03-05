@@ -130,6 +130,7 @@ class XmlDictTestCase(TestCase):
         self.assertEqual(xml_dict['theme'][0]['category_name'], u'Stäckövérfløw')
 
     def test_utf8_unicode_string_input(self):
+        #TODO: This is testing the conversion of unicode to ascii.
         xml_dict = XmlDictConfig.xml_string_to_dict(self.xml_non_ascii_text,
                 single_item_list=True)
         self.assertEqual(xml_dict['theme'][0]['category_name'], u'Stäckövérfløw')
