@@ -141,7 +141,7 @@ class ApiSearchIntegrationTests(ApiTestsBase):
                 {'keyword': 'agriculture'},
                 {'region': 'C21|region|Africa'},
                 {'sector': 'agriculture'},
-                #{'subject': 'gdn'},
+                #{'subject': 'gdn'},                # TODO: Why is this commented out?
                 {'theme': 'C531|theme|Governance'},
                 ]
         for query_term in query_term_list:
@@ -734,6 +734,7 @@ class ApiFacetIntegrationTests(ApiTestsBase):
         finally:
             settings.EXCLUDE_ZERO_COUNT_FACETS = old_setting
 
+
 class ApiCategoryChildrenIntegrationTests(ApiTestsBase):
     def children_search(self, site='eldis', object_type='themes', object_id='C34',
             content_type='application/json'):
@@ -767,3 +768,29 @@ class ApiCategoryChildrenIntegrationTests(ApiTestsBase):
             search_results = json.loads(response.content)
             for result in search_results['results']:
                 self.assertTrue(result['children_url'].find('children') > -1)
+
+    def test_metadata_includes_solr_query_when_hide_admin_fields_is_false(self):
+        self.setUserLevel('Unlimited')
+        self.login()
+        test_user_level = self.user.get_profile().user_level
+        self.assertFalse(settings.USER_LEVEL_INFO[test_user_level]['hide_admin_fields'],
+            "We expect hide_admin_fields to be False.")
+
+        # now run the test
+        response = self.children_search(object_type='themes', object_id='C34')
+        response_list = json.loads(response.content)
+        self.assertTrue('solr_query' in response_list['metadata'])
+
+
+    def test_metadata_excludes_solr_query_when_hide_admin_fields_is_true(self):
+        self.setUserLevel('General User')
+        self.login()
+        test_user_level = self.user.get_profile().user_level
+        self.assertTrue(settings.USER_LEVEL_INFO[test_user_level]['hide_admin_fields'],
+            "We expect hide_admin_fields to be False.")
+
+        # now run the test
+        response = self.children_search(object_type='themes', object_id='C34')
+        response_list = json.loads(response.content)
+        self.assertTrue('solr_query' in response_list['metadata'])
+

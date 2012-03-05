@@ -98,7 +98,7 @@ class BaseSearchView(BaseAuthView):
 
     def build_response(self):
         try:
-            self.search_response = self.query.execute()
+            self.search_response, self.solr_query = self.query.execute()
         except SolrError as e:
             if str(e).find('is invalid value') != -1:
                 raise IdsApiParseError('Could not parse Solr output. Original error was "%s"' % str(e))
@@ -126,6 +126,8 @@ class BaseSearchView(BaseAuthView):
             metadata['next_page'] = self.generate_next_page_link(request)
         if self.prev_page_available():
             metadata['prev_page'] = self.generate_prev_page_link(request)
+        if not self.hide_admin_fields():
+            metadata['solr_query'] = self.solr_query
         return {'metadata': metadata, 'results': results }
 
     def next_page_available(self):
@@ -235,7 +237,7 @@ class FacetCountView(BaseAuthView):
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
         except SolrUnavailableError as e:
             return Response(status.HTTP_500_INTERNAL_SERVER_ERROR, content=e)
-        search_response = query.execute()
+        search_response, solr_query = query.execute()
         facet_counts = search_response.facet_counts.facet_fields[settings.FACET_MAPPING[facet_type]]
         data = DataMunger(site)
         facet_dict_list = []

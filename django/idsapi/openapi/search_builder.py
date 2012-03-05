@@ -2,6 +2,7 @@
 #
 # TODO: create a mock version of this class for tests
 import sys
+import urllib
 import urllib2
 import re
 import datetime
@@ -110,15 +111,18 @@ class SearchWrapper:
         except:
             raise SolrUnavailableError('Solr is not responding (using %s )' %
                     settings.SOLR_SERVER_URLS[site])
+        self.site = site
         self.si_query = self.solr.query()
         self.user_level = user_level
         self.has_free_text_query = False
 
     def execute(self):
+        solr_query = settings.SOLR_SERVER_URLS[self.site] + 'select/?' + urllib.urlencode(self.si_query.params())
         if settings.LOG_SEARCH_PARAMS:
             # this will print to console or error log as appropriate
             print >> sys.stderr, self.si_query.params()
-        return self.si_query.execute()
+            print >> sys.stderr, solr_query
+        return self.si_query.execute(), solr_query
 
     def restrict_search_by_object(self, object_type, allow_objects=False):
         if object_type == 'assets':
