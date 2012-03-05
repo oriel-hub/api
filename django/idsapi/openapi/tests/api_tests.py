@@ -792,5 +792,5 @@ class ApiCategoryChildrenIntegrationTests(ApiTestsBase):
         # now run the test
         response = self.children_search(object_type='themes', object_id='C34')
         response_list = json.loads(response.content)
-        self.assertTrue('solr_query' in response_list['metadata'])
+        self.assertTrue('solr_query' not in response_list['metadata'])
 
