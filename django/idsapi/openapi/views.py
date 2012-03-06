@@ -259,10 +259,12 @@ class FieldListView(BaseAuthView):
         if self.general_fields_only():
             return sorted(settings.GENERAL_FIELDS)
         # fetch file from SOLR_SCHEMA
+        # TODO: Is this caching useful?
         http = httplib2.Http("/tmp/.cache")
         if site not in settings.SOLR_SERVER_URLS:
             return Response(status.HTTP_400_BAD_REQUEST, content="Unknown site: %s" % site)
         schema_url = settings.SOLR_SERVER_URLS[site] + settings.SOLR_SCHEMA_SUFFIX
+        # TODO: Check the response code here, so that SOLR errors are gracefully handled.
         _, content = http.request(schema_url, "GET") #@UnusedVariable
         doc = minidom.parseString(content)
         field_list = [field.getAttribute('name') for field in 
