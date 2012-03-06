@@ -146,6 +146,7 @@ SORT_FIELDS = [
         'start_date',
         'end_date',
         'acronym',
+		'timestamp',
         ]
 
 # these are fields that contain XML data
@@ -275,8 +276,10 @@ QUERY_MAPPING = {
 # this maps from the date-based query parameter to the SOLR field used
 # so document_published_year would use the publication_date as the field.
 DATE_PREFIX_MAPPING = {
-        'metadata_published': 'asset_publication_date',
-        'document_published': 'publication_date',
+        'metadata_published': 'date_created',
+        'metadata_updated': 'date_updated',
+		'timestamp': 'timestamp',
+		'document_published': 'publication_date',
         'item_started': 'start_date',
         'item_finished': 'end_date',
         }
