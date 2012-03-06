@@ -212,7 +212,11 @@ class SearchWrapper:
                     % output_format)
         if search_params.has_key('extra_fields'):
             field_list.extend(search_params['extra_fields'].lower().split(' '))
-        self.si_query = self.si_query.field_limit(field_list)
+
+        try:
+            self.si_query = self.si_query.field_limit(field_list)
+        except sunburnt.SolrError as e:
+            raise InvalidQueryError("Can't limit Fields - " + str(e))
 
     def add_date_query(self, param, date):
         # strip the _year/_after/_before

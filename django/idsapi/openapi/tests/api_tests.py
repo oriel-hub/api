@@ -627,6 +627,12 @@ class ApiGetObjectIntegrationTests(ApiTestsBase):
         # immediately complain
         self.assertStatusCode(response)
 
+    def test_invalid_extra_field_in_object_search_returns_api_error(self):
+        response = self.get_object(object_type='documents', output_format='short',
+                query={'extra_fields': 'not_a_valid_field'})
+        self.assertStatusCode(response, 400)
+        expected_message = '"Invalid query: Can\'t limit Fields - Fields not defined in schema: [u\'not_a_valid_field\']"'
+        self.assertEquals(response.content, expected_message)
 
 class ApiRootIntegrationTests(ApiTestsBase):
     def get_root(self):
