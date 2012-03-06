@@ -245,7 +245,12 @@ class FacetCountView(BaseAuthView):
             facet_dict = data.convert_facet_string(category)
             facet_dict['count'] = count
             facet_dict_list.append(facet_dict)
-        return {'metadata': {'total_results': search_response.result.numFound}, 
+
+        metadata = {'total_results': search_response.result.numFound}
+        if not self.hide_admin_fields():
+            metadata['solr_query'] = solr_query
+
+        return {'metadata': metadata,
                 facet_type+'_count': facet_dict_list}
 
 class FieldListView(BaseAuthView):

@@ -50,6 +50,28 @@ class ApiTestsBase(BaseTestCase):
     def assertStatusCode(self, response, status_code=200):
         self.assertEqual(status_code, response.status_code, response.content)
 
+    def assert_metadata_solr_query_included_when_admin_fields_is_false(self, returns_response):
+        self.setUserLevel('Unlimited')
+        self.login()
+        test_user_level = self.user.get_profile().user_level
+        self.assertFalse(settings.USER_LEVEL_INFO[test_user_level]['hide_admin_fields'],
+            "We expect hide_admin_fields to be False.")
+
+        response = returns_response(self)
+        response_list = json.loads(response.content)
+        self.assertTrue('solr_query' in response_list['metadata'])
+
+    def assert_metadata_solr_query_not_included_when_admin_fields_is_true(self, returns_response):
+        self.setUserLevel('General User')
+        self.login()
+        test_user_level = self.user.get_profile().user_level
+        self.assertTrue(settings.USER_LEVEL_INFO[test_user_level]['hide_admin_fields'],
+            "We expect hide_admin_fields to be False.")
+
+        response = returns_response(self)
+        response_list = json.loads(response.content)
+        self.assertFalse('solr_query' in response_list['metadata'])
+
 class ApiSearchResponseTests(ApiTestsBase):
 
     def test_id_only_search_returns_200(self):
@@ -286,6 +308,11 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         results = json.loads(response.content)['results']
         for result in results:
             self.assertEqual('eldis', result['site'])
+
+    def test_metadata_solr_query_depends_on_hide_admin_field_value(self):
+        returns_response = lambda x: x.object_search()
+        self.assert_metadata_solr_query_included_when_admin_fields_is_false(returns_response)
+        self.assert_metadata_solr_query_not_included_when_admin_fields_is_true(returns_response)
 
 class ApiPaginationTests(ApiTestsBase):
 
@@ -734,6 +761,10 @@ class ApiFacetIntegrationTests(ApiTestsBase):
         finally:
             settings.EXCLUDE_ZERO_COUNT_FACETS = old_setting
 
+    def test_metadata_solr_query_depends_on_hide_admin_field_value(self):
+        returns_response = lambda x: x.facet_search()
+        self.assert_metadata_solr_query_included_when_admin_fields_is_false(returns_response)
+        self.assert_metadata_solr_query_not_included_when_admin_fields_is_true(returns_response)
 
 class ApiCategoryChildrenIntegrationTests(ApiTestsBase):
     def children_search(self, site='eldis', object_type='themes', object_id='C34',
@@ -769,28 +800,7 @@ class ApiCategoryChildrenIntegrationTests(ApiTestsBase):
             for result in search_results['results']:
                 self.assertTrue(result['children_url'].find('children') > -1)
 
-    def test_metadata_includes_solr_query_when_hide_admin_fields_is_false(self):
-        self.setUserLevel('Unlimited')
-        self.login()
-        test_user_level = self.user.get_profile().user_level
-        self.assertFalse(settings.USER_LEVEL_INFO[test_user_level]['hide_admin_fields'],
-            "We expect hide_admin_fields to be False.")
-
-        # now run the test
-        response = self.children_search(object_type='themes', object_id='C34')
-        response_list = json.loads(response.content)
-        self.assertTrue('solr_query' in response_list['metadata'])
-
-
-    def test_metadata_excludes_solr_query_when_hide_admin_fields_is_true(self):
-        self.setUserLevel('General User')
-        self.login()
-        test_user_level = self.user.get_profile().user_level
-        self.assertTrue(settings.USER_LEVEL_INFO[test_user_level]['hide_admin_fields'],
-            "We expect hide_admin_fields to be False.")
-
-        # now run the test
-        response = self.children_search(object_type='themes', object_id='C34')
-        response_list = json.loads(response.content)
-        self.assertTrue('solr_query' not in response_list['metadata'])
-
+    def test_metadata_solr_query_depends_on_hide_admin_field_value(self):
+        returns_response = lambda x: x.children_search(object_type='themes', object_id='C34')
+        self.assert_metadata_solr_query_included_when_admin_fields_is_false(returns_response)
+        self.assert_metadata_solr_query_not_included_when_admin_fields_is_true(returns_response)
