@@ -329,6 +329,7 @@ OBJECT_TYPES_WITH_HIERARCHY = ['themes', 'itemtypes']
 ######################################################################
 
 import os
+import sys
 #import private_settings #@UnresolvedImport
 
 # override in local_settings if you want to
@@ -473,11 +474,16 @@ LOGGING = {
         'mail_admins': {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler'
-        }
+        },
+        'console':{
+            'level':'ERROR',
+            'class':'logging.StreamHandler',
+            'strm': sys.stdout
+        },
     },
     'loggers': {
         'django.request': {
-            'handlers': ['mail_admins'],
+            'handlers': ['mail_admins', 'console'],
             'level': 'ERROR',
             'propagate': True,
         },
