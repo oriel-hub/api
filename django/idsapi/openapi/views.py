@@ -254,7 +254,7 @@ class FieldListView(BaseAuthView):
         if self.general_fields_only():
             return sorted(settings.GENERAL_FIELDS)
         # fetch file from SOLR_SCHEMA
-        http = httplib2.Http(".cache")
+        http = httplib2.Http("/tmp/.cache")
         if site not in settings.SOLR_SERVER_URLS:
             return Response(status.HTTP_400_BAD_REQUEST, content="Unknown site: %s" % site)
         schema_url = settings.SOLR_SERVER_URLS[site] + settings.SOLR_SCHEMA_SUFFIX
