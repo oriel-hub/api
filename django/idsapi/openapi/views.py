@@ -256,8 +256,6 @@ class FacetCountView(BaseAuthView):
 class FieldListView(BaseAuthView):
     def get(self, request, site):
         self.site = site
-        if self.general_fields_only():
-            return sorted(settings.GENERAL_FIELDS)
         # fetch file from SOLR_SCHEMA
         # TODO: Is this caching useful?
         http = httplib2.Http("/tmp/.cache")
@@ -270,10 +268,13 @@ class FieldListView(BaseAuthView):
         field_list = [field.getAttribute('name') for field in 
                 doc.getElementsByTagName('fields')[0].getElementsByTagName('field')]
         field_list.sort()
-        field_list = [elem for elem in field_list if not elem.endswith('_facet')]
-        field_list = [elem for elem in field_list if not elem in ['text', 'word']]
-        if self.hide_admin_fields():
-            field_list = [elem for elem in field_list if not elem in settings.ADMIN_ONLY_FIELDS]
+        if self.general_fields_only():
+            field_list = [elem for elem in field_list if elem in settings.GENERAL_FIELDS]
+        else:
+            field_list = [elem for elem in field_list if not elem.endswith('_facet')]
+            field_list = [elem for elem in field_list if not elem in ['text', 'word']]
+            if self.hide_admin_fields():
+                field_list = [elem for elem in field_list if not elem in settings.ADMIN_ONLY_FIELDS]
         return field_list
 
 class CategoryChildrenView(BaseSearchView):
