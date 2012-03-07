@@ -1,8 +1,6 @@
 from django.utils import unittest
-from django.test.client import RequestFactory
-from django.contrib.auth.models import User
 from django.conf import settings
-from openapi.search_builder import SearchWrapper, InvalidQueryError
+from openapi.search_builder import SearchWrapper, InvalidFieldError
 
 class MockSolrInterface:
     def __init__(self, site_url=None):
@@ -36,7 +34,7 @@ class SearchWrapperTests(unittest.TestCase):
         self.assertTrue(extra_field not in settings.GENERAL_FIELDS)
         self.assertTrue(extra_field not in settings.ADMIN_ONLY_FIELDS)
 
-        self.assertRaises(InvalidQueryError, sw.restrict_fields_returned, 'short', {'extra_fields': extra_field})
+        self.assertRaises(InvalidFieldError, sw.restrict_fields_returned, 'short', {'extra_fields': extra_field})
 
     def test_partner_user_can_request_field_not_in_whitelist(self):
         sw = SearchWrapper('Partner', 'eldis', self.msi)
@@ -54,7 +52,7 @@ class SearchWrapperTests(unittest.TestCase):
         extra_field = 'legacy_id'
         self.assertTrue(extra_field in settings.ADMIN_ONLY_FIELDS)
 
-        self.assertRaises(InvalidQueryError, sw.restrict_fields_returned, 'short', {'extra_fields': extra_field})
+        self.assertRaises(InvalidFieldError, sw.restrict_fields_returned, 'short', {'extra_fields': extra_field})
 
     def test_admin_user_can_request_field_admin_only_field(self):
         sw = SearchWrapper('Unlimited', 'eldis', self.msi)

@@ -11,6 +11,7 @@ import sunburnt
 
 from openapi import defines
 from django.conf import settings
+from django.core.urlresolvers import reverse
 
 query_mapping = settings.QUERY_MAPPING
 
@@ -224,11 +225,9 @@ class SearchWrapper:
             level_info = settings.USER_LEVEL_INFO[self.user_level]
             for field in fields:
                 if level_info['general_fields_only'] and field not in settings.GENERAL_FIELDS:
-                    raise InvalidQueryError("%s is not a valid field name. " % field +
-                        "Please see the field list for a list of possible fields.")
+                    raise InvalidFieldError(field, self.site)
                 if level_info['hide_admin_fields'] and field in settings.ADMIN_ONLY_FIELDS:
-                    raise InvalidQueryError("%s is not a valid field name. " % field +
-                        "Please see the field list for a list of possible fields.")
+                    raise InvalidFieldError(field, self.site)
             field_list.extend(search_params['extra_fields'].lower().split(' '))
 
         try:
@@ -308,15 +307,23 @@ class BadRequestError(defines.IdsApiError):
 
 class InvalidQueryError(BadRequestError):
     def __init__(self, error_text=''):
-        BadRequestError.__init__(self, error_text)
+        BadRequestError.__init__(self)
         self.error_text = 'Invalid query: ' + error_text
+
+class InvalidFieldError(BadRequestError):
+    def __init__(self, invalid_field, site):
+        BadRequestError.__init__(self)
+        field_list_url = reverse('field_list', kwargs={'site': site})
+        self.error_text = 'Unknown field requested: %s ' % invalid_field + \
+                        'Please see the <a href="%s">field list</a> for a list of possible fields.' % \
+                        field_list_url
 
 class UnknownQueryParamError(BadRequestError):
     def __init__(self, error_text=''):
-        BadRequestError.__init__(self, error_text)
+        BadRequestError.__init__(self)
         self.error_text = 'Unknown query parameter: ' + error_text
 
 class UnknownObjectError(BadRequestError):
     def __init__(self, error_text=''):
-        BadRequestError.__init__(self, error_text)
+        BadRequestError.__init__(self)
         self.error_text = 'Unknown object type: ' + error_text
