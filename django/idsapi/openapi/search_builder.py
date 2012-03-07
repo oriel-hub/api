@@ -103,14 +103,23 @@ class SearchBuilder():
 
 
 class SearchWrapper:
-    def __init__(self, user_level, site):
-        if site not in settings.SOLR_SERVER_URLS:
-            raise InvalidQueryError("Unknown site: %s" % site)
-        try:
-            self.solr = sunburnt.SolrInterface(settings.SOLR_SERVER_URLS[site])
-        except:
-            raise SolrUnavailableError('Solr is not responding (using %s )' %
-                    settings.SOLR_SERVER_URLS[site])
+    def __init__(self, user_level, site, solr=None):
+        """
+            Args:
+                user_level (string): A String representing the user level. Eg 'General User'.
+                site (string): A String representing the SOLR site to use. Eg 'eldis' or 'bridge'.
+                solr (object): an object to be the solr interface (to allow for mocking)
+        """
+        if solr is None:
+            if site not in settings.SOLR_SERVER_URLS:
+                raise InvalidQueryError("Unknown site: %s" % site)
+            try:
+                self.solr = sunburnt.SolrInterface(settings.SOLR_SERVER_URLS[site])
+            except:
+                raise SolrUnavailableError('Solr is not responding (using %s )' %
+                        settings.SOLR_SERVER_URLS[site])
+        else:
+            self.solr = solr
         self.site = site
         self.si_query = self.solr.query()
         self.user_level = user_level
@@ -211,6 +220,15 @@ class SearchWrapper:
                     "the output_format of data returned can be 'id', 'short' or 'full' - you gave '%s'" \
                     % output_format)
         if search_params.has_key('extra_fields'):
+            fields = search_params['extra_fields'].lower().split(' ')
+            level_info = settings.USER_LEVEL_INFO[self.user_level]
+            for field in fields:
+                if level_info['general_fields_only'] and field not in settings.GENERAL_FIELDS:
+                    raise InvalidQueryError("%s is not a valid field name. " % field +
+                        "Please see the field list for a list of possible fields.")
+                if level_info['hide_admin_fields'] and field in settings.ADMIN_ONLY_FIELDS:
+                    raise InvalidQueryError("%s is not a valid field name. " % field +
+                        "Please see the field list for a list of possible fields.")
             field_list.extend(search_params['extra_fields'].lower().split(' '))
 
         try:
