@@ -80,9 +80,7 @@ ADMIN_ONLY_FIELDS = [
     'legacy_id',
 	'category_sector',
     'category_subject',
-    'timestamp',
     'cat_level',
-    'date_updated',
     ]
 
 # these are the fields that will be given to a 'General User'
