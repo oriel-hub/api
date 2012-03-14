@@ -209,6 +209,10 @@ QUERY_MAPPING = {
             'solr_field': 'category_theme_facet',
             'object_type': 'all'
             },
+	     'theme_name':   {
+            'solr_field': 'category_theme_objects',
+            'object_type': 'all'
+            },
         'author':  {
             'solr_field': 'author',
             'object_type': 'documents'
