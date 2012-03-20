@@ -69,6 +69,22 @@ USER_LEVEL_INFO = {
 DEFAULT_SORT_FIELD = 'date_created'
 DEFAULT_SORT_ASCENDING = False
 
+# these are the fields you can use for sorting
+SORT_FIELDS = [
+        'title',
+		'title_sort',
+		'name',
+        'asset_id',
+		'object_id',
+        'category_id',
+        'publication_date',
+        'date_created',
+        'start_date',
+        'end_date',
+        'acronym',
+		'timestamp',
+        ]
+		
 # these fields will be hidden from those with #'hide_admin_fields' set to True
 ADMIN_ONLY_FIELDS = [
     'send_email_alerts',
@@ -131,21 +147,6 @@ GENERAL_FIELDS = [
     'licence_type',
 	'location_country',
 ]
-
-# these are the fields you can use for sorting
-SORT_FIELDS = [
-        'title',
-		'name',
-        'asset_id',
-		'object_id',
-        'category_id',
-        'publication_date',
-        'date_created',
-        'start_date',
-        'end_date',
-        'acronym',
-		'timestamp',
-        ]
 
 # these are fields that contain XML data
 STRUCTURED_XML_FIELDS = [
