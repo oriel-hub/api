@@ -181,7 +181,11 @@ IMAGE_BEACON_STUB_URL = 'http://api.ids.ac.uk/tracking/trackimg.cfm'
 # * the name (or names) of the field in SOLR to search across
 # * the type of object you can use the query parameter with
 QUERY_MAPPING = {
-        'country': {
+         'title':  {
+            'solr_field': 'title',
+            'object_type': 'all'
+            },
+		'country': {
             'solr_field': 'country_focus_facet',
             'object_type': 'all'
             },
@@ -209,7 +213,7 @@ QUERY_MAPPING = {
             'solr_field': 'category_theme_facet',
             'object_type': 'all'
             },
-	     'theme_name':   {
+	    'theme_name':   {
             'solr_field': 'category_theme_objects',
             'object_type': 'all'
             },
