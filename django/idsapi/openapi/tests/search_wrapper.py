@@ -1,6 +1,6 @@
 from django.utils import unittest
 from django.conf import settings
-from openapi.search_builder import SearchWrapper, InvalidFieldError
+from openapi.search_builder import SearchWrapper, InvalidFieldError, InvalidQueryError
 
 class MockSolrInterface:
     def __init__(self, site_url=None):
@@ -15,6 +15,8 @@ class MockSolrQuery:
         self.query_call_count = 0
         self.query_args = []
         self.field_list = None
+        self.sort_field = None
+        self.has_free_text_query = False
 
     def query(self, *args, **kwargs):
         self.query_call_count += 1
@@ -22,6 +24,9 @@ class MockSolrQuery:
 
     def field_limit(self, field_list):
         self.field_list = field_list
+
+    def sort_by(self, sort_field):
+        self.sort_field = sort_field
 
 class SearchWrapperTests(unittest.TestCase):
     def setUp(self):
@@ -62,3 +67,55 @@ class SearchWrapperTests(unittest.TestCase):
 
         sw.restrict_fields_returned('short', {'extra_fields': extra_field})
         self.assertTrue(extra_field in self.msi.query.field_list)
+
+class SearchWrapperAddSortTests(unittest.TestCase):
+    def setUp(self):
+        self.msi = MockSolrInterface()
+        settings.SORT_MAPPING = {'dummy': 'dummy_sort'}
+
+    def test_add_sort_method_disallows_mixed_asc_and_desc_sort(self):
+        sw = SearchWrapper('General User', 'eldis', self.msi)
+        search_params = {'sort_asc': 'title', 'sort_desc': 'title'}
+        self.assertRaises(InvalidQueryError, sw.add_sort, search_params)
+
+    def test_add_descending_sort_inverts_field(self):
+        sw = SearchWrapper('General User', 'eldis', self.msi)
+        sw.add_sort({'sort_desc': 'title'})
+        self.assertEquals(self.msi.query.sort_field, '-title')
+
+    def test_add_sort_with_no_mapping(self):
+        sw = SearchWrapper('General User', 'eldis', self.msi)
+        sw.add_sort({'sort_asc': 'title'})
+        self.assertEquals(self.msi.query.sort_field, 'title')
+
+    def test_add_sort_with_mapping(self):
+        """
+        Sort parameters should be overridable by the user via a mapping dictionary.
+        """
+        settings.SORT_MAPPING = {'title': 'title_sort'}
+        sw = SearchWrapper('General User', 'eldis', self.msi)
+        sw.add_sort({'sort_asc': 'title'})
+        self.assertEquals(self.msi.query.sort_field, 'title_sort')
+
+    def test_add_sort_default_ordering_when_no_sort_params(self):
+        """
+        If there are no sort parameters in the request AND there is no free
+        text query, the sort order should use the default setting.
+
+        Mapping of field should still take place.
+        """
+        settings.DEFAULT_SORT_FIELD = 'title'
+        settings.DEFAULT_SORT_ASCENDING = True
+        settings.SORT_MAPPING = {'title': 'title_sort'}
+        sw = SearchWrapper('General User', 'eldis', self.msi)
+        sw.add_sort(dict())
+        self.assertEquals(self.msi.query.sort_field, 'title_sort')
+
+    def test_add_sort_no_default_ordering_when_free_text_query(self):
+        settings.DEFAULT_SORT_FIELD = 'title'
+        settings.DEFAULT_SORT_ASCENDING = True
+        settings.SORT_MAPPING = {'title': 'title_sort'}
+        sw = SearchWrapper('General User', 'eldis', self.msi)
+        sw.has_free_text_query = True
+        sw.add_sort(dict())
+        self.assertIsNone(self.msi.query.sort_field)

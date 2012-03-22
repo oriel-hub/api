@@ -173,25 +173,38 @@ class SearchWrapper:
         self.si_query = self.si_query.paginate(start=start_offset, rows=num_results)
 
     def add_sort(self, search_params):
-        if 'sort_asc' in search_params and 'sort_desc' in search_params:
+        """
+            Args:
+                search_params (dict): A dict like containing the request query string.
+
+             do default sort order, but only if no free text query -
+             if there is a free text query then the sort order will be by
+             score
+        """
+        sort_asc = search_params.get('sort_asc')
+        sort_desc = search_params.get('sort_desc')
+
+        if sort_asc and sort_desc:
             raise InvalidQueryError("Cannot use both 'sort_asc' and 'sort_desc'")
         try:
-            if 'sort_asc' in search_params:
-                if search_params['sort_asc'] not in settings.SORT_FIELDS:
-                    raise InvalidQueryError("Sorry, you can't sort by %s" % search_params['sort_asc'])
-                self.si_query = self.si_query.sort_by(search_params['sort_asc'])
-            elif 'sort_desc' in search_params:
-                if search_params['sort_desc'] not in settings.SORT_FIELDS:
-                    raise InvalidQueryError("Sorry, you can't sort by %s" % search_params['sort_desc'])
-                self.si_query = self.si_query.sort_by('-' + search_params['sort_desc'])
+            # Assumes both are never True
+            sort_field = sort_asc or sort_desc
+
+            if sort_field and sort_field not in settings.SORT_FIELDS:
+                raise InvalidQueryError("Sorry, you can't sort by %s" % sort_field)
+
             elif not self.has_free_text_query:
-                # do default sort order, but only if no free text query -
-                # if there is a free text query then the sort order will be by
-                # score
-                if settings.DEFAULT_SORT_ASCENDING:
-                    self.si_query = self.si_query.sort_by(settings.DEFAULT_SORT_FIELD)
-                else:
-                    self.si_query = self.si_query.sort_by('-' + settings.DEFAULT_SORT_FIELD)
+                sort_ord = '-' if sort_desc else ''
+                if not sort_field:
+                    # assume default sort ordering
+                    sort_field = settings.DEFAULT_SORT_FIELD
+                    sort_ord = '' if settings.DEFAULT_SORT_ASCENDING else '-'
+
+                if sort_field in settings.SORT_MAPPING:
+                    sort_field = settings.SORT_MAPPING[sort_field]
+
+                self.si_query = self.si_query.sort_by(sort_ord + sort_field)
+
         except sunburnt.SolrError as e:
             raise InvalidQueryError("Can't do sort - " + str(e))
 

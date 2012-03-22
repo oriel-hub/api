@@ -301,6 +301,12 @@ FACET_MAPPING = {
         'theme':   'category_theme_objects_facet',
         }
 
+# this maps sort fields when generating SOLR queries, so that custom (eg non
+# tokenized) fields can be used.
+SORT_MAPPING = {
+        'title': 'title_sort',
+        }
+
 # the mapping of how the api refers to objects, to the object name
 # in SOLR
 OBJECT_TYPES_TO_OBJECT_NAME = {
