@@ -189,21 +189,24 @@ class SearchWrapper:
         try:
             # Assumes both are never True
             sort_field = sort_asc or sort_desc
+            sort_ord = '-' if sort_desc else ''
 
             if sort_field and sort_field not in settings.SORT_FIELDS:
                 raise InvalidQueryError("Sorry, you can't sort by %s" % sort_field)
 
-            elif not self.has_free_text_query:
-                sort_ord = '-' if sort_desc else ''
-                if not sort_field:
-                    # assume default sort ordering
+            # default sort ordering
+            if not sort_field:
+                if self.has_free_text_query:
+                    # free text queries have no default sort ordering
+                    return
+                else:
                     sort_field = settings.DEFAULT_SORT_FIELD
                     sort_ord = '' if settings.DEFAULT_SORT_ASCENDING else '-'
 
-                if sort_field in settings.SORT_MAPPING:
-                    sort_field = settings.SORT_MAPPING[sort_field]
+            if sort_field in settings.SORT_MAPPING:
+                sort_field = settings.SORT_MAPPING[sort_field]
 
-                self.si_query = self.si_query.sort_by(sort_ord + sort_field)
+            self.si_query = self.si_query.sort_by(sort_ord + sort_field)
 
         except sunburnt.SolrError as e:
             raise InvalidQueryError("Can't do sort - " + str(e))

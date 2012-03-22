@@ -112,6 +112,9 @@ class SearchWrapperAddSortTests(unittest.TestCase):
         self.assertEquals(self.msi.query.sort_field, 'title_sort')
 
     def test_add_sort_no_default_ordering_when_free_text_query(self):
+        """
+        Free text queries should have no default sort order set.
+        """
         settings.DEFAULT_SORT_FIELD = 'title'
         settings.DEFAULT_SORT_ASCENDING = True
         settings.SORT_MAPPING = {'title': 'title_sort'}
@@ -119,3 +122,15 @@ class SearchWrapperAddSortTests(unittest.TestCase):
         sw.has_free_text_query = True
         sw.add_sort(dict())
         self.assertIsNone(self.msi.query.sort_field)
+
+    def test_add_sort_allows_ordering_when_free_text_query(self):
+        """
+        Free text queries should still be sortable if a sort order is specified.
+        """
+        settings.DEFAULT_SORT_FIELD = 'title'
+        settings.DEFAULT_SORT_ASCENDING = True
+        settings.SORT_MAPPING = {'title': 'title_sort'}
+        sw = SearchWrapper('General User', 'eldis', self.msi)
+        sw.has_free_text_query = True
+        sw.add_sort({'sort_desc': 'title'})
+        self.assertEquals(self.msi.query.sort_field, '-title_sort')
