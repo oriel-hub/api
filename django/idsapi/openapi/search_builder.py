@@ -13,6 +13,8 @@ from openapi import defines
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
+from djangorestframework.renderers import BaseRenderer
+
 query_mapping = settings.QUERY_MAPPING
 
 class SearchBuilder():
@@ -66,9 +68,14 @@ class SearchBuilder():
             # if param not in our list of allowed params
             elif not param in ['num_results', 'num_results_only', 'start_offset',
                     'extra_fields', 'sort_asc', 'sort_desc']:
-                # params that start with _ are allowed - the django rest
-                # framework deals with them
-                if param[0] != '_':
+                # params that start with _ are allowed, as well as the format
+                # parameter - the django rest framework deals with them
+                # TODO: This doesn't seem the most transparent way of handling
+                # django rest framework parameters. Would it be better to
+                # delete them from the request before they are passed to our
+                # API code? 
+                if param[0] != '_' and \
+                   param != BaseRenderer._FORMAT_QUERY_PARAM:
                     raise UnknownQueryParamError(param)
 
         sw.restrict_search_by_object(object_type)
