@@ -73,11 +73,11 @@ DEFAULT_SORT_ASCENDING = True
 # DEFAULT_SORT_ASCENDING for matching object types.
 DEFAULT_SORT_OBJECT_MAPPING = {
     'documents':
-        {'field': 'date_created', 'ascending': False},
+        {'field': 'date_updated', 'ascending': False},
     'organisations':
-        {'field': 'date_created', 'ascending': False},
+        {'field': 'date_updated', 'ascending': False},
     'items':
-        {'field': 'date_created', 'ascending': False},
+        {'field': 'date_updated', 'ascending': False},
 }
 
 # these are the fields you can use for sorting
