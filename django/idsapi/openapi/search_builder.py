@@ -80,7 +80,7 @@ class SearchBuilder():
 
         sw.restrict_search_by_object(object_type)
         sw.restrict_fields_returned(output_format, search_params)
-        sw.add_sort(search_params)
+        sw.add_sort(search_params, object_type)
         if facet_type == None:
             sw.add_paginate(search_params)
         else:
@@ -93,7 +93,7 @@ class SearchBuilder():
         sw = SearchWrapper(user_level, site)
         sw.restrict_search_by_object(object_type)
         sw.restrict_fields_returned(output_format, search_params)
-        sw.add_sort(search_params)
+        sw.add_sort(search_params, object_type)
         sw.add_paginate(search_params)
         return sw
 
@@ -142,6 +142,12 @@ class SearchWrapper:
         return self.si_query.execute(), solr_query
 
     def restrict_search_by_object(self, object_type, allow_objects=False):
+        """
+            Args:
+                object_type (string): The type of object to search for.
+            Kwargs:
+                allow_objects (bool): Set for unrestricted search over objects.
+        """
         if object_type == 'assets':
             # search for any object_type that is an asset
             self.si_query = self.si_query.query(self.add_field_query('object_type',
@@ -179,10 +185,11 @@ class SearchWrapper:
             num_results = 0
         self.si_query = self.si_query.paginate(start=start_offset, rows=num_results)
 
-    def add_sort(self, search_params):
+    def add_sort(self, search_params, object_type):
         """
             Args:
                 search_params (dict): A dict like containing the request query string.
+                object_type (string): The object type of the request ('asset', 'document, etc).
 
              do default sort order, but only if no free text query -
              if there is a free text query then the sort order will be by
@@ -196,23 +203,32 @@ class SearchWrapper:
         try:
             # Assumes both are never True
             sort_field = sort_asc or sort_desc
-            sort_ord = '-' if sort_desc else ''
+            ascending = bool(sort_asc)
 
             if sort_field and sort_field not in settings.SORT_FIELDS:
                 raise InvalidQueryError("Sorry, you can't sort by %s" % sort_field)
 
-            # default sort ordering
+            # Use default sort ordering when no sort parameter set
             if not sort_field:
                 if self.has_free_text_query:
                     # free text queries have no default sort ordering
                     return
-                else:
+                # Allow per object_type defaults
+                elif object_type and object_type in defines.OBJECT_TYPES:
+                    object_default = settings.DEFAULT_SORT_OBJECT_MAPPING.get(object_type)
+                    if object_default:
+                        sort_field = object_default['field']
+                        ascending = object_default['ascending']
+
+            # Otherwise assume the catch all default
+            if not sort_field:
                     sort_field = settings.DEFAULT_SORT_FIELD
-                    sort_ord = '' if settings.DEFAULT_SORT_ASCENDING else '-'
+                    ascending = settings.DEFAULT_SORT_ASCENDING
 
             if sort_field in settings.SORT_MAPPING:
                 sort_field = settings.SORT_MAPPING[sort_field]
 
+            sort_ord = '' if ascending else '-'
             self.si_query = self.si_query.sort_by(sort_ord + sort_field)
 
         except sunburnt.SolrError as e:
