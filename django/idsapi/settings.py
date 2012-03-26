@@ -66,15 +66,17 @@ USER_LEVEL_INFO = {
         }
 
 # this is the default sort field
-DEFAULT_SORT_FIELD = 'date_created'
-DEFAULT_SORT_ASCENDING = False
+DEFAULT_SORT_FIELD = 'title'
+DEFAULT_SORT_ASCENDING = True
 
 # object type sort field mapping, overrides DEFAULT_SORT_FIELD and
 # DEFAULT_SORT_ASCENDING for matching object types.
 DEFAULT_SORT_OBJECT_MAPPING = {
-    'countries':
-        {'field': 'title', 'ascending': True},
     'documents':
+        {'field': 'date_created', 'ascending': False},
+    'organisations':
+        {'field': 'date_created', 'ascending': False},
+    'items':
         {'field': 'date_created', 'ascending': False},
 }
 
