@@ -1,6 +1,7 @@
 from django.utils import unittest
 from django.conf import settings
 from openapi.search_builder import SearchWrapper, InvalidFieldError, InvalidQueryError
+import sunburnt
 
 class MockSolrInterface:
     def __init__(self, site_url=None):
@@ -136,3 +137,59 @@ class SearchWrapperAddSortTests(unittest.TestCase):
         sw.has_free_text_query = True
         sw.add_sort({'sort_desc': 'title'}, 'assets')
         self.assertEquals(self.msi.query.sort_field, '-title_sort')
+
+
+class SearchWrapperAddFreeTextQueryTests(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        # TODO: there doesn't seem to be a easy way to just test the query
+        # building behaviour with out building a real connection.
+        cls.si = sunburnt.SolrInterface(settings.SOLR_SERVER_URLS['eldis'])
+
+    def setUp(self):
+        self.msi = MockSolrInterface()
+        self.sw = SearchWrapper('General User', 'eldis', SearchWrapperAddFreeTextQueryTests.si)
+
+    def solr_q(self):
+        return self.sw.si_query.options()['q']
+
+    def test_free_text_query_has_implicit_or(self):
+        self.sw.add_free_text_query('brazil health ozone')
+        self.assertEquals(self.solr_q(), 'brazil OR health OR ozone')
+
+    def test_free_text_query_supports_single_and_operator(self):
+        self.sw.add_free_text_query('brazil and health ozone')
+        self.assertEquals(self.solr_q(), '(brazil AND health) OR ozone')
+
+    def test_free_text_query_supports_single_and_operator_alternative(self):
+        self.sw.add_free_text_query('brazil & health ozone')
+        self.assertEquals(self.solr_q(), '(brazil AND health) OR ozone')
+
+    def test_free_text_query_supports_multiple_and_operator(self):
+        self.sw.add_free_text_query('brazil and health and ozone')
+        self.assertEquals(self.solr_q(), 'brazil AND health AND ozone')
+
+    def test_free_text_query_ignores_disconnected_and(self):
+        self.sw.add_free_text_query('brazil and health ozone and')
+        self.assertEquals(self.solr_q(), '(brazil AND health) OR ozone')
+
+    def test_free_text_query_ignores_and_at_start_of_string(self):
+        self.sw.add_free_text_query('and brazil and health ozone')
+        self.assertEquals(self.solr_q(), '(brazil AND health) OR ozone')
+
+    def test_free_text_query_ignores_multiple_ands(self):
+        self.sw.add_free_text_query('brazil and and health ozone')
+        self.assertEquals(self.solr_q(), '(brazil AND health) OR ozone')
+
+    def test_free_text_query_supports_or_operator(self):
+        self.sw.add_free_text_query('brazil or health ozone')
+        self.assertEquals(self.solr_q(), 'brazil OR health OR ozone')
+
+    def test_free_text_query_supports_or_operators_alternative(self):
+        self.sw.add_free_text_query('brazil | health | ozone')
+        self.assertEquals(self.solr_q(), 'brazil OR health OR ozone')
+
+    def test_and_has_higher_operator_precedence_than_or(self):
+        self.sw.add_free_text_query('brazil and health ozone and environment')
+        self.assertEquals(self.solr_q(), '(brazil AND health) OR (environment AND ozone)')

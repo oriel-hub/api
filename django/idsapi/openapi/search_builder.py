@@ -8,6 +8,7 @@ import re
 import datetime
 
 import sunburnt
+import operator
 
 from openapi import defines
 from django.conf import settings
@@ -236,7 +237,34 @@ class SearchWrapper:
 
     def add_free_text_query(self, search_text):
         self.has_free_text_query = True
-        self.si_query = self.si_query.query(search_text.lower())
+        words = search_text.lower().split()
+
+        def gen_2expr(oper, arg):
+            return lambda y: oper(self.si_query.Q(arg), y)
+
+        expr = []
+        ops = []
+        for word in words:
+            if word in ['and', '&']:
+                if expr and not ops:
+                    ops.append(gen_2expr(operator.and_, expr[-1]))
+                continue
+
+            if word in ['or', '|']:
+                # as we implicity ORing everything there is nothing more to do here
+                continue
+
+            if ops:
+                if callable(ops[-1]):
+                    part = ops.pop()    # function that returns the operator tree
+                    expr.pop()          # remove the argument from the expression stack
+                    expr.append(part(self.si_query.Q(word))) # push the tree to the stack
+            else:
+                expr.append(self.si_query.Q(word))
+
+        or_words = reduce(operator.or_, expr)
+
+        self.si_query = self.si_query.query(or_words)
 
     def add_facet(self, facet_type, search_params):
         if not facet_type in settings.FACET_MAPPING.keys():
