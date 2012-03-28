@@ -166,6 +166,10 @@ class SearchWrapperAddFreeTextQueryTests(unittest.TestCase):
         self.sw.add_free_text_query('brazil & health ozone')
         self.assertEquals(self.solr_q(), '(brazil AND health) OR ozone')
 
+    def test_free_text_query_supports_single_and_operator_alternative_with_no_spaces(self):
+        self.sw.add_free_text_query('brazil&health ozone')
+        self.assertEquals(self.solr_q(), '(brazil AND health) OR ozone')
+
     def test_free_text_query_supports_multiple_and_operator(self):
         self.sw.add_free_text_query('brazil and health and ozone')
         self.assertEquals(self.solr_q(), 'brazil AND health AND ozone')

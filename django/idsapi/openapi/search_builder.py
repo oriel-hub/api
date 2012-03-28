@@ -52,7 +52,7 @@ class SearchBuilder():
             if len(query) < 1:
                 raise InvalidQueryError("All query parameters must have a value, but '%s' does not" % param)
             if param == 'q':
-                sw.add_free_text_query(query)
+                sw.add_free_text_query(urllib.unquote_plus(query))
             elif param in query_mapping.keys():
                 if query_mapping[param]['object_type'] != 'all':
                     if query_mapping[param]['object_type'] != object_type:
@@ -237,7 +237,8 @@ class SearchWrapper:
 
     def add_free_text_query(self, search_text):
         self.has_free_text_query = True
-        words = search_text.lower().split()
+        # split words and operators in words, throwing away white space.
+        words = [w for w in re.split('(\s|[&|]+)', search_text.lower()) if re.match('\S', w)]
 
         def gen_2expr(oper, arg):
             return lambda y: oper(self.si_query.Q(arg), y)
