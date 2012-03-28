@@ -263,9 +263,9 @@ class SearchWrapper:
             else:
                 expr.append(self.si_query.Q(word))
 
-        or_words = reduce(operator.or_, expr)
-
-        self.si_query = self.si_query.query(or_words)
+        if expr:
+            or_words = reduce(operator.or_, expr)
+            self.si_query = self.si_query.query(or_words)
 
     def add_facet(self, facet_type, search_params):
         if not facet_type in settings.FACET_MAPPING.keys():

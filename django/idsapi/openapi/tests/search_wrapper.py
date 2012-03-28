@@ -190,6 +190,10 @@ class SearchWrapperAddFreeTextQueryTests(unittest.TestCase):
         self.sw.add_free_text_query('brazil or health ozone')
         self.assertEquals(self.solr_q(), 'brazil OR health OR ozone')
 
+    def test_free_text_query_gracefully_handles_meaningless_operators(self):
+        self.sw.add_free_text_query('|')
+        self.assertEquals(self.solr_q(), '*:*')
+
     def test_free_text_query_supports_or_operators_alternative(self):
         self.sw.add_free_text_query('brazil | health | ozone')
         self.assertEquals(self.solr_q(), 'brazil OR health OR ozone')
