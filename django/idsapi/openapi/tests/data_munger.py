@@ -10,9 +10,9 @@ class DataMungerTests(TestCase):
         facet_dict = data.convert_facet_string(test_string)
 
         self.assertEquals(facet_dict['object_id'], 'C548')
-        self.assertEquals(facet_dict['object_type'], 'theme')
+        self.assertEquals(facet_dict['object_type'], 'themes')
         self.assertEquals(facet_dict['object_name'], 'Decentralisation & Local Governance')
-        self.assertTrue(facet_dict['metadata_url'].endswith('/openapi/eldis/get/theme/C548/full/decentralisation-local-governance/'),
+        self.assertTrue(facet_dict['metadata_url'].endswith('/openapi/eldis/get/themes/C548/full/decentralisation-local-governance/'),
             "Got %s" % facet_dict['metadata_url'])
 
 

@@ -108,6 +108,7 @@ class DataMunger():
         if string:
             if string.find('|') > -1:
                 object_id, object_type, object_name = string.split('|', 2)
+                object_type = defines.object_name_to_object_type(object_type)
                 metadata_url = self._create_metadata_url(object_type, object_id, object_name)
             else:
                 object_name = string
