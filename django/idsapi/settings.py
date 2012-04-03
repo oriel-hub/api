@@ -107,6 +107,7 @@ ADMIN_ONLY_FIELDS = [
     'legacy_id',
 	'category_sector',
     'category_subject',
+	'category_subject_ids',
     ]
 
 # these are the fields that will be given to a 'General User'
@@ -304,13 +305,15 @@ DATE_PREFIX_MAPPING = {
 # this maps from the URL for faceted search (eg country_count) to the
 # facet field used
 FACET_MAPPING = {
-        'country': 'country_focus_objects_facet',
-        'keyword': 'keyword_facet',
-        'region':  'category_region_objects_facet',
-        'sector':  'category_sector_facet',
-        'subject': 'category_subject_facet',
-        'theme':   'category_theme_objects_facet',
-        }
+        'country':   'country_focus_objects_facet',
+        'keyword':   'keyword_facet',
+        'region':    'category_region_objects_facet',
+        'sector':    'category_sector_facet',
+        'subject':   'category_subject_facet',
+        'theme':     'category_theme_objects_facet',
+        'publisher': 'publisher_facet',
+		'publisher_country': 'publisher_country_facet',
+		}
 
 # this maps sort fields when generating SOLR queries, so that custom (eg non
 # tokenized) fields can be used.
