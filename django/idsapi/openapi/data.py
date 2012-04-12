@@ -59,8 +59,8 @@ class DataMunger():
     def _process_description(self, description, user_level_info, beacon_guid):
         """truncate the description for general level users and
         add an image beacon for most users"""
-        if user_level_info['general_fields_only'] and len(description) > 250:
-            description = description[:246] + '...'
+        #if user_level_info['general_fields_only'] and len(description) > 250:
+        #    description = description[:246] + '...'
         # add image beacon
         if user_level_info['image_beacon']:
             description += " <img src='" + settings.IMAGE_BEACON_STUB_URL + \
