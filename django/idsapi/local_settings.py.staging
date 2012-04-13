@@ -13,8 +13,8 @@ DATABASES = {
     }
 }
 SOLR_SERVER_URLS = {
-        'eldis': 'http://test.api.ids.ac.uk:8983/solr/eldis-test/',
-        'bridge': 'http://test.api.ids.ac.uk:8983/solr/bridge-test/',
+        'eldis': 'http://localhost:8983/solr/eldis-test/',
+        'bridge': 'http://localhost:8983/solr/bridge-test/',
         }
 		
 EMAIL_HOST = '139.184.194.19'
