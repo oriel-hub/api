@@ -12,7 +12,7 @@ DEFAULT_FROM_EMAIL = 'api@ids.ac.uk'
 # the email server at IDS
 EMAIL_HOST = '139.184.194.19'
 
-# Where to find SOLR
+# Where to find SOLR - note that these are over-written in the local settings files and are here for reference
 DEFAULT_SITE = 'eldis'
 SOLR_SERVER_URLS = {
         'eldis': 'http://beta.api.ids.ac.uk:8983/solr/eldis-test/',
@@ -216,6 +216,10 @@ QUERY_MAPPING = {
         'subject': {
             'solr_field': 'category_subject',
             'object_type': 'all'
+            },
+        'subject_id': {
+            'solr_field': 'category_subject_ids',
+            'object_type': 'documents'
             },
         'site':  {
             'solr_field': 'site',
