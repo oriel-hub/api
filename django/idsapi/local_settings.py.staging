@@ -12,5 +12,9 @@ DATABASES = {
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
-
+SOLR_SERVER_URLS = {
+        'eldis': 'http://test.api.ids.ac.uk:8983/solr/eldis-test/',
+        'bridge': 'http://test.api.ids.ac.uk:8983/solr/bridge-test/',
+        }
+		
 EMAIL_HOST = '139.184.194.19'
