@@ -125,14 +125,6 @@ class ApiSearchResponseTests(ApiTestsBase):
                     (description.find(profile.beacon_guid) > -1))
         self.assert_results_list_if_present(response, 'description', check_image_beacon_exists_and_has_correct_id)
 
-    def test_description_truncated_for_general_user(self):
-        self.setUserLevel('General User')
-        response = self.object_search(object_type='documents', output_format='full')
-        def check_description_truncated_for_general_user(description):
-            abstract_without_beacon = description.split('<img')[0]
-            return 250 >= len(abstract_without_beacon)
-        self.assert_results_list_if_present(response, 'description', check_description_truncated_for_general_user)
-
     def test_description_does_not_contain_image_beacon_for_unlimited_user(self):
         self.setUserLevel('Unlimited')
         response = self.object_search(object_type='documents', output_format='full')
