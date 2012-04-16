@@ -18,3 +18,9 @@ DATABASES = {
 INSTALLED_APPS = (
       'django_jenkins',
     )  + INSTALLED_APPS
+
+SOLR_SERVER_URLS = {
+        'eldis': 'http://test.api.ids.ac.uk:8983/solr/eldis-test/',
+        'bridge': 'http://test.api.ids.ac.uk:8983/solr/bridge-test/',
+        }
+       
