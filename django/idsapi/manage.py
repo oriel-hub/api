@@ -67,8 +67,8 @@ if update_ve:
         virtualenv.create_environment(VE_ROOT, site_packages=False)
 
     # install the pip requirements and exit
-    pip_retcode = subprocess.call(['pip', 'install',
-            '--environment=%s' % VE_ROOT,
+    pip_path = path.join(VE_ROOT, 'bin', 'pip')
+    pip_retcode = subprocess.call([pip_path, 'install',
             '--requirement=%s' % REQUIREMENTS ])
     if pip_retcode == 0:
         update_ve_timestamp()
