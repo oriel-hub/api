@@ -26,4 +26,9 @@ ADMINS = (
     ('Hamish Downer', 'hamish@aptivate.org'),
 )
 
+SOLR_SERVER_URLS = {
+        'eldis': 'http://localhost:8983/solr/eldis-test/',
+        'bridge': 'http://localhost:8983/solr/bridge-test/',
+        }
+
 # vi: ft=python
