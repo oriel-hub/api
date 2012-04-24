@@ -113,19 +113,19 @@ class DataMunger():
             # is it an XML facet_string
             if facet_string[0] == '<' and facet_string[-1] == '>':
                 result = XmlDictConfig.xml_string_to_dict(facet_string.encode('utf-8'), set_encoding="UTF-8")
-                if 'object_type' in result:
-                    result['object_type'] = defines.object_name_to_object_type(result['object_type'])
             elif facet_string.find('|') > -1:
                 object_id, object_type, object_name = facet_string.split('|', 2)
                 result['object_id'] = object_id
                 result['object_name'] = object_name
-                result['object_type'] = defines.object_name_to_object_type(object_type)
+                result['object_type'] = object_type
             else:
                 result['object_name'] = facet_string
 
             # create metadata url, but only if data exists
             if result['object_id'] and result['object_type'] and result['object_name']:
                 result['metadata_url'] = self._create_metadata_url(
-                        result['object_type'], result['object_id'], result['object_name'])
+                        defines.object_name_to_object_type(result['object_type']),
+                        result['object_id'],
+                        result['object_name'])
 
         return result

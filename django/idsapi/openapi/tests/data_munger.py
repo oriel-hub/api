@@ -10,7 +10,7 @@ class DataMungerTests(TestCase):
         facet_dict = data.convert_facet_string(test_string)
 
         self.assertEquals(facet_dict['object_id'], 'A1200')
-        self.assertEquals(facet_dict['object_type'], 'countries')
+        self.assertEquals(facet_dict['object_type'], 'Country')
         self.assertEquals(facet_dict['object_name'], 'South Africa')
         self.assertTrue(facet_dict['metadata_url'].endswith('/openapi/eldis/get/countries/A1200/full/south-africa/'),
             "Got %s" % facet_dict['metadata_url'])
@@ -21,7 +21,7 @@ class DataMungerTests(TestCase):
         facet_dict = data.convert_facet_string(test_string)
 
         self.assertEquals(facet_dict['object_id'], 'C563')
-        self.assertEquals(facet_dict['object_type'], 'themes')
+        self.assertEquals(facet_dict['object_type'], 'theme')
         self.assertEquals(facet_dict['object_name'], 'Health Challenges')
         self.assertEquals(facet_dict['level'], '1')
         self.assertTrue(facet_dict['metadata_url'].endswith('/openapi/eldis/get/themes/C563/full/health-challenges/'),
