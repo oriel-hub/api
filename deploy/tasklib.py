@@ -129,7 +129,13 @@ def _create_dir_if_not_exists(dir_path, world_writeable=False):
         _call_wrapper(['chmod', '-R', '777', dir_path])
 
 
-def _get_django_db_settings():
+def _get_django_db_settings(database='default'):
+    """
+        Args:
+            database (string): The database key to use in the 'DATABASES'
+                configuration. Override from the default to use a different
+                database.
+    """
     # import local_settings from the django dir. Here we are adding the django
     # project directory to the path. Note that env['django_dir'] may be more than
     # one directory (eg. 'django/project') which is why we use django_module
@@ -144,7 +150,7 @@ def _get_django_db_settings():
     # either as DATABASE_NAME = 'x', DATABASE_USER ...
     # or as DATABASES = { 'default': { 'NAME': 'xyz' ... } }
     try:
-        db = local_settings.DATABASES['default']
+        db = local_settings.DATABASES[database]
         db_engine = db['ENGINE']
         db_name   = db['NAME']
         if db_engine.endswith('mysql'):
@@ -207,10 +213,10 @@ def clean_ve():
     _call_wrapper(['rm', '-rf', env['ve_dir']])
 
 
-def clean_db():
+def clean_db(database='default'):
     """Delete the database for a clean start"""
     # first work out the database username and password
-    db_engine, db_name, db_user, db_pw, db_port, db_host = _get_django_db_settings()
+    db_engine, db_name, db_user, db_pw, db_port, db_host = _get_django_db_settings(database=database)
     # then see if the database exists
     if db_engine.endswith('sqlite'):
         # delete sqlite file
@@ -278,12 +284,16 @@ def link_local_settings(environment):
         os.path.join(env['django_dir'],'local_settings.py'))
 
 
-def update_db(syncdb=True, drop_test_db=True, use_migrations=False):
-    """ create the database, and do syncdb and migrations (if syncdb==True)"""
+def update_db(syncdb=True, drop_test_db=True, use_migrations=False, database='default'):
+    """ create the database, and do syncdb and migrations (if syncdb==True)
+        Args:
+            database (string): The database value passed to _get_django_db_settings.
+    """
     if not env['quiet']:
         print "### Creating and updating the databases"
     # first work out the database username and password
-    db_engine, db_name, db_user, db_pw, db_port, db_host = _get_django_db_settings()
+    db_engine, db_name, db_user, db_pw, db_port, db_host = _get_django_db_settings(database=database)
+
     # then see if the database exists
     if db_engine.endswith('mysql'):
         if not db_exists(db_user, db_pw, db_name, db_port, db_host):
@@ -292,7 +302,7 @@ def update_db(syncdb=True, drop_test_db=True, use_migrations=False):
                 (db_name, db_user, db_pw)))
 
         if not db_exists(db_user, db_pw, 'test_'+db_name, db_port, db_host):
-            create_test_db(drop_after_create=drop_test_db)
+            create_test_db(drop_after_create=drop_test_db, database=database)
 
     #print 'syncdb: %s' % type(syncdb)
     if env['project_type'] == "django" and syncdb:
@@ -342,6 +352,25 @@ def dump_db(dump_filename='db_dump.sql'):
         print 'Executing dump command: %s\nSending stdout to %s' % (' '.join(dump_cmd), dump_filename)
     _call_command(dump_cmd, stdout=dump_file)
     dump_file.close()
+
+def restore_db(dump_filename):
+    """Restore a database dump file by name"""
+    db_engine, db_name, db_user, db_pw, db_port, db_host = _get_django_db_settings()
+    if not db_engine.endswith('mysql'):
+        print 'restore_db only knows how to restore mysql so far'
+        sys.exit(1)
+    restore_cmd = ['/usr/bin/mysql', '--user='+db_user, '--password='+db_pw,
+                '--host='+db_host]
+    if db_port != None:
+        restore_cmd.append('--port='+db_port)
+    restore_cmd.append(db_name)
+    
+    dump_file = open(dump_filename, 'r')
+    if env['verbose']:
+        print 'Executing dump command: %s\nSending stdin to %s' % (' '.join(restore_cmd), dump_filename)
+    _call_command(restore_cmd, stdin=dump_file)
+    dump_file.close()
+
 
 def update_git_submodules():
     """If this is a git project then check for submodules and update"""
@@ -438,9 +467,16 @@ def quick_test(*extra_args):
 
 def _install_django_jenkins():
     """ ensure that pip has installed the django-jenkins thing """
+    if not env['quiet']:
+        print "### Installing Jenkins packages"
     pip_bin = os.path.join(env['ve_dir'], 'bin', 'pip')
-    cmd = [pip_bin, 'install', '-E', env['ve_dir'], 'django-jenkins']
-    _call_wrapper(cmd)
+    cmds = [
+        [pip_bin, 'install', 'django-jenkins'],
+        [pip_bin, 'install', 'pylint'],
+        [pip_bin, 'install', 'coverage']]
+
+    for cmd in cmds:
+        _call_wrapper(cmd)
 
 def _manage_py_jenkins():
     """ run the jenkins command """
@@ -450,6 +486,8 @@ def _manage_py_jenkins():
     if os.path.exists(coveragerc_filepath):
         args += ['--coverage-rcfile', coveragerc_filepath]
     args += project_settings.django_apps
+    if not env['quiet']:
+        print "### Running django-jenkins, with args; %s" % args
     _manage_py(args, cwd=env['project_dir'])
 
 def run_jenkins():
