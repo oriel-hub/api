@@ -104,20 +104,22 @@ class DataMunger():
                     object_id='C' + result['cat_first_parent'])
 
 
-    def convert_facet_string(self, string):
+    def convert_facet_string(self, string, facet_type):
+        result = {'object_id': '',
+                'object_type': '',
+                'object_name': '',
+                'metadata_url': ''}
         if string:
             if string.find('|') > -1:
                 object_id, object_type, object_name = string.split('|', 2)
+                if facet_type == 'theme':
+                    object_name, result['cat_level'] = object_name.split('|', 1)
+                result['object_id'] = object_id
+                result['object_name'] = object_name
                 object_type = defines.object_name_to_object_type(object_type)
-                metadata_url = self._create_metadata_url(object_type, object_id, object_name)
+                result['object_type'] = object_type
+                result['metadata_url']= self._create_metadata_url(object_type, object_id, object_name)
             else:
-                object_name = string
-                object_id, object_type, metadata_url = ('','','')
-        else:
-            object_id, object_type, object_name = ('','','')
-            metadata_url = ''
+                result['object_name'] = string
 
-        return {'object_id': object_id,
-                'object_type': object_type,
-                'object_name': object_name,
-                'metadata_url': metadata_url}
+        return result

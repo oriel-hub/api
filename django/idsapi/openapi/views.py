@@ -242,7 +242,7 @@ class FacetCountView(BaseAuthView):
         data = DataMunger(site)
         facet_dict_list = []
         for category, count in facet_counts:
-            facet_dict = data.convert_facet_string(category)
+            facet_dict = data.convert_facet_string(category, facet_type)
             facet_dict['count'] = count
             facet_dict_list.append(facet_dict)
 
