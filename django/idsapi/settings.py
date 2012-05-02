@@ -165,6 +165,8 @@ STRUCTURED_XML_FIELDS = [
         'publisher_array',
         'country_focus_array',
 		'category_region_array',
+		'children_object_array',
+		'parent_object_array',
 		]
 
 # these are the entries in the dropdown box for user registration
@@ -293,7 +295,15 @@ QUERY_MAPPING = {
             'solr_field': 'cat_level',
             'object_type': 'themes'
             },
-        }
+       'level':  {
+            'solr_field': 'cat_level',
+            'object_type': 'themes'
+            },
+		'parent_object_id':  {
+            'solr_field': 'parent_object_id',
+            'object_type': 'themes'
+            },
+		}
 
 # this maps from the date-based query parameter to the SOLR field used
 # so document_published_year would use the publication_date as the field.
