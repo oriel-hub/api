@@ -325,8 +325,8 @@ def db_exists(db_user, db_pw, db_name, db_port, db_host):
     return _call_command(db_exist_call) == 0
 
 
-def create_test_db(drop_after_create=True):
-    db_engine, db_name, db_user, db_pw, db_port, db_host = _get_django_db_settings()
+def create_test_db(drop_after_create=True, database='default'):
+    db_engine, db_name, db_user, db_pw, db_port, db_host = _get_django_db_settings(database=database)
 
     test_db_name = 'test_' + db_name
     _mysql_exec_as_root('CREATE DATABASE %s CHARACTER SET utf8' % test_db_name)
