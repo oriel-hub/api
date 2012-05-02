@@ -303,6 +303,10 @@ QUERY_MAPPING = {
             'solr_field': 'parent_object_id',
             'object_type': 'themes'
             },
+		'toplevel_object_id':  {
+            'solr_field': 'toplevel_object_id',
+            'object_type': 'themes'
+            },
 		}
 
 # this maps from the date-based query parameter to the SOLR field used
