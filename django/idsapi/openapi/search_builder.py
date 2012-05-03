@@ -1,4 +1,3 @@
-<<<<<<< .mine
 # a class to build searches
 #
 # TODO: create a mock version of this class for tests
@@ -691,4 +690,3 @@ class UnknownObjectError(BadRequestError):
     def __init__(self, error_text=''):
         BadRequestError.__init__(self)
         self.error_text = 'Unknown object type: ' + error_text
->>>>>>> .r8120
