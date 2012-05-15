@@ -229,7 +229,7 @@ QUERY_MAPPING = {
             'object_type': 'all'
             },
         'subject': {
-            'solr_field': 'category_subject',
+            'solr_field': 'category_subject_facet',
             'object_type': 'all'
             },
         'subject_id': {
