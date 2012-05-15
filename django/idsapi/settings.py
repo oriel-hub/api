@@ -340,7 +340,7 @@ FACET_MAPPING = {
         'keyword':   'keyword_facet',
         'region':    'category_region_objects_facet',
         'sector':    'category_sector_facet',
-        'subject':   'category_subject_facet',
+        'subject':   'category_subject_objects_facet',
         'theme':     'category_theme_objects_facet',
         'publisher': 'publisher_facet',
 		'publisher_country': 'publisher_country_facet',
