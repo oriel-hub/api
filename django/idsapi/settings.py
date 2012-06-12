@@ -232,6 +232,10 @@ QUERY_MAPPING = {
             'solr_field': 'category_subject_facet',
             'object_type': 'all'
             },
+	      'subject_name': {
+            'solr_field': 'category_subject_objects',
+            'object_type': 'all'
+            },
         'subject_id': {
             'solr_field': 'category_subject_ids',
             'object_type': 'documents'
