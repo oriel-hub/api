@@ -88,6 +88,7 @@ SORT_FIELDS = [
         'asset_id',
 		'object_id',
         'category_id',
+		'category_path',
         'publication_date',
         'date_created',
         'start_date',
