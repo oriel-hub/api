@@ -78,6 +78,8 @@ DEFAULT_SORT_OBJECT_MAPPING = {
         {'field': 'date_updated', 'ascending': False},
     'items':
         {'field': 'date_updated', 'ascending': False},
+    'themes':
+        {'field': 'category_path', 'ascending': False},
 }
 
 # these are the fields you can use for sorting
@@ -89,6 +91,7 @@ SORT_FIELDS = [
 		'object_id',
         'category_id',
 		'category_path',
+		'category_path_sort',
         'publication_date',
         'date_created',
         'start_date',
@@ -110,7 +113,8 @@ ADMIN_ONLY_FIELDS = [
 'redistribute_clearance',
 'send_email_alerts',
 'start_date',
-'title_sort'
+'title_sort'.
+'category_path_sort'
     ]
 
 # these are the fields that will be given to a 'General User'
@@ -355,6 +359,7 @@ FACET_MAPPING = {
 # tokenized) fields can be used.
 SORT_MAPPING = {
         'title': 'title_sort',
+		'category_path': 'category_path_sort',
         }
 
 # the mapping of how the api refers to objects, to the object name
