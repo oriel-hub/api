@@ -79,7 +79,7 @@ DEFAULT_SORT_OBJECT_MAPPING = {
     'items':
         {'field': 'date_updated', 'ascending': False},
     'themes':
-        {'field': 'category_path', 'ascending': False},
+        {'field': 'category_path_sort', 'ascending': False},
 }
 
 # these are the fields you can use for sorting
@@ -113,7 +113,7 @@ ADMIN_ONLY_FIELDS = [
 'redistribute_clearance',
 'send_email_alerts',
 'start_date',
-'title_sort'.
+'title_sort',
 'category_path_sort'
     ]
 
