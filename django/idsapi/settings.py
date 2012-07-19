@@ -79,7 +79,7 @@ DEFAULT_SORT_OBJECT_MAPPING = {
     'items':
         {'field': 'date_updated', 'ascending': False},
     'themes':
-        {'field': 'category_path_sort', 'ascending': False},
+        {'field': 'category_path_sort', 'ascending': True},
 }
 
 # these are the fields you can use for sorting
