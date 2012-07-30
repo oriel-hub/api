@@ -249,6 +249,10 @@ QUERY_MAPPING = {
             'solr_field': 'site',
             'object_type': 'all'
             },
+		 'category_path':   {
+            'solr_field': 'category_path',
+            'object_type': 'all'
+            },	
         'theme':   {
             'solr_field': 'category_theme_facet',
             'object_type': 'all'
