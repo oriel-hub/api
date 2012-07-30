@@ -237,7 +237,7 @@ QUERY_MAPPING = {
             'solr_field': 'category_subject_facet',
             'object_type': 'all'
             },
-	      'subject_name': {
+	    'subject_name': {
             'solr_field': 'category_subject_objects',
             'object_type': 'all'
             },
@@ -250,7 +250,7 @@ QUERY_MAPPING = {
             'object_type': 'all'
             },
 		 'category_path':   {
-            'solr_field': 'category_path',
+            'solr_field': 'category_path_sort',
             'object_type': 'all'
             },	
         'theme':   {
