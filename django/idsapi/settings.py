@@ -152,6 +152,13 @@ GENERAL_FIELDS = [
 'language_name',
 'level',
 'licence_type',
+'address1',
+'address2',
+'address3',
+'address4',
+'address5',
+'town',
+'postcode',
 'location_country',
 'metadata_url',
 'name',
@@ -332,6 +339,10 @@ QUERY_MAPPING = {
 		'toplevel_object_id':  {
             'solr_field': 'toplevel_object_id',
             'object_type': 'themes'
+            },
+		'country_code':  {
+            'solr_field': 'iso_two_letter_code',
+            'object_type': 'countries'
             },
 		}
 
