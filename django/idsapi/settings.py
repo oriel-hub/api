@@ -104,6 +104,7 @@ SORT_FIELDS = [
 ADMIN_ONLY_FIELDS = [
 'asset_id',
 'copyright_clearance',
+'deleted',
 'end_date',
 'item_type',
 'item_type_id',
