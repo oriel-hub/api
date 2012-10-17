@@ -329,6 +329,14 @@ QUERY_MAPPING = {
             'solr_field': 'cat_level',
             'object_type': 'themes'
             },
+		'deleted':  {
+            'solr_field': 'deleted',
+            'object_type': 'themes'
+            },
+		'archived':  {
+            'solr_field': 'archived',
+            'object_type': 'themes'
+            },	
        'level':  {
             'solr_field': 'cat_level',
             'object_type': 'themes'
