@@ -353,6 +353,10 @@ QUERY_MAPPING = {
             'solr_field': 'iso_two_letter_code',
             'object_type': 'countries'
             },
+		'url':  {
+            'solr_field': 'urls',
+            'object_type': 'documents'
+            },
 		}
 
 # this maps from the date-based query parameter to the SOLR field used
