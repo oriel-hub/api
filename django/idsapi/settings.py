@@ -33,7 +33,7 @@ EXCLUDE_ZERO_COUNT_FACETS = True
 USER_LEVEL_INFO = {
         'General User': {
             'max_call_rate':     '150/hour',
-            'max_items_per_call': 500,
+            'max_items_per_call': 2000,
             'image_beacon':       True,
             'hide_admin_fields':  True,
             'general_fields_only': True,
@@ -41,7 +41,7 @@ USER_LEVEL_INFO = {
             },
         'Offline Application User': {
             'max_call_rate':     '300/hour',
-            'max_items_per_call': 500,
+            'max_items_per_call': 2000,
             'image_beacon':       True,
             'hide_admin_fields':  True,
             'general_fields_only': False,
