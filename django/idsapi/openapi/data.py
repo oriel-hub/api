@@ -91,7 +91,6 @@ class DataMunger():
 
         # TODO: write test for condition when parent links not set
         if not all(result.has_key(field) for field in ['cat_parent', 'cat_superparent']):
-            print result
             return
 
         if result['cat_parent'] != result['cat_superparent']:
