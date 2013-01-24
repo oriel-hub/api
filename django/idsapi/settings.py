@@ -80,6 +80,8 @@ DEFAULT_SORT_OBJECT_MAPPING = {
         {'field': 'date_updated', 'ascending': False},
     'themes':
         {'field': 'category_path_sort', 'ascending': True},
+	'subjects':
+        {'field': 'category_path_sort', 'ascending': True},
 }
 
 # these are the fields you can use for sorting
@@ -187,6 +189,7 @@ GENERAL_FIELDS = [
 # these are fields that contain XML data
 STRUCTURED_XML_FIELDS = [
         'category_theme_array',
+		'category_subject_array',
         'publisher_array',
         'country_focus_array',
 		'category_region_array',
@@ -331,27 +334,27 @@ QUERY_MAPPING = {
             },
        'cat_level':  {
             'solr_field': 'cat_level',
-            'object_type': 'themes'
+            'object_type': ['themes', 'subjects']
             },
 		'deleted':  {
             'solr_field': 'deleted',
-            'object_type': 'themes'
+            'object_type': ['themes', 'subjects']
             },
 		'archived':  {
             'solr_field': 'archived',
-            'object_type': 'themes'
+            'object_type': ['themes', 'subjects']
             },	
        'level':  {
             'solr_field': 'cat_level',
-            'object_type': 'themes'
+            'object_type': ['themes', 'subjects']
             },
 		'parent_object_id':  {
             'solr_field': 'parent_object_id',
-            'object_type': 'themes'
+            'object_type': ['themes', 'subjects']
             },
 		'toplevel_object_id':  {
             'solr_field': 'toplevel_object_id',
-            'object_type': 'themes'
+            'object_type': ['themes', 'subjects']
             },
 		'country_code':  {
             'solr_field': 'iso_two_letter_code',
@@ -418,7 +421,7 @@ ASSET_TYPES = [
 ]
 
 # the object types where we actually show the heirarchy
-OBJECT_TYPES_WITH_HIERARCHY = ['themes', 'itemtypes']
+OBJECT_TYPES_WITH_HIERARCHY = ['themes', 'subjects', 'itemtypes']
 
 ######################################################################
 #
