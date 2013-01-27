@@ -193,7 +193,6 @@ STRUCTURED_XML_FIELDS = [
         'publisher_array',
         'country_focus_array',
 		'category_region_array',
-		'category_subject_array',
 		'children_object_array',
 		'parent_object_array',
 		]
