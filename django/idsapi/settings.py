@@ -337,27 +337,27 @@ QUERY_MAPPING = {
             },
        'cat_level':  {
             'solr_field': 'cat_level',
-            'object_type': ['themes', 'subjects']
+            'object_type': 'all'
             },
 		'deleted':  {
             'solr_field': 'deleted',
-            'object_type': ['themes', 'subjects']
+            'object_type': 'all'
             },
 		'archived':  {
             'solr_field': 'archived',
-            'object_type': ['themes', 'subjects']
+            'object_type': 'all'
             },	
        'level':  {
             'solr_field': 'cat_level',
-            'object_type': ['themes', 'subjects']
+            'object_type': 'all'
             },
 		'parent_object_id':  {
             'solr_field': 'parent_object_id',
-            'object_type': ['themes', 'subjects']
+            'object_type': 'all'
             },
 		'toplevel_object_id':  {
             'solr_field': 'toplevel_object_id',
-            'object_type': ['themes', 'subjects']
+            'object_type': 'all'
             },
 		'country_code':  {
             'solr_field': 'iso_two_letter_code',
