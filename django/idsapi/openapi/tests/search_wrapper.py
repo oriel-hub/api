@@ -1,7 +1,9 @@
 from django.utils import unittest
 from django.conf import settings
-from openapi.search_builder import SearchWrapper, InvalidFieldError, InvalidQueryError
 import sunburnt
+
+from openapi.search_builder import SearchWrapper, InvalidFieldError, InvalidQueryError
+
 
 class MockSolrInterface:
     def __init__(self, site_url=None):
@@ -10,6 +12,7 @@ class MockSolrInterface:
     def query(self, *args, **kwargs):
         self.query = MockSolrQuery()
         return self.query
+
 
 class MockSolrQuery:
     def __init__(self):
@@ -28,6 +31,7 @@ class MockSolrQuery:
 
     def sort_by(self, sort_field):
         self.sort_field = sort_field
+
 
 class SearchWrapperTests(unittest.TestCase):
     def setUp(self):
@@ -68,6 +72,7 @@ class SearchWrapperTests(unittest.TestCase):
 
         sw.restrict_fields_returned('short', {'extra_fields': extra_field})
         self.assertTrue(extra_field in self.msi.query.field_list)
+
 
 class SearchWrapperAddSortTests(unittest.TestCase):
     def setUp(self):
@@ -201,3 +206,75 @@ class SearchWrapperAddFreeTextQueryTests(unittest.TestCase):
     def test_and_has_higher_operator_precedence_than_or(self):
         self.sw.add_free_text_query('brazil and health ozone and environment')
         self.assertEquals(self.solr_q(), '(brazil AND health) OR (environment AND ozone)')
+
+
+class SearchWrapperAddFieldQueryTests(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        # TODO: there doesn't seem to be a easy way to just test the query
+        # building behaviour with out building a real connection.
+        cls.si = sunburnt.SolrInterface(settings.SOLR_SERVER_URLS['eldis'])
+
+    def setUp(self):
+        self.msi = MockSolrInterface()
+        self.sw = SearchWrapper('General User', 'eldis', SearchWrapperAddFieldQueryTests.si)
+
+    def test_field_query_supports_quoted_text(self):
+        q = self.sw.add_field_query('title', '"beyond their age"')
+        self.assertEquals(u'title:\\"beyond\\ their\\ age\\"', q.options()[None])
+
+    def test_field_query_supports_quoted_text_with_or(self):
+        q = self.sw.add_field_query('title', '"beyond their age"|climate')
+        self.assertEquals(u'title:\\"beyond\\ their\\ age\\" OR title:climate', q.options()[None])
+
+    def test_field_query_supports_quoted_text_with_and(self):
+        q = self.sw.add_field_query('title', '"beyond their age"&"climate change"')
+        self.assertEquals(u'title:\\"beyond\\ their\\ age\\" AND title:\\"climate\\ change\\"', q.options()[None])
+
+    def test_field_query_supports_pipe_in_quoted_text(self):
+        q = self.sw.add_field_query('title', '"beyond|their age"')
+        self.assertEquals(u'title:\\"beyond\\|their\\ age\\"', q.options()[None])
+
+    def test_field_query_supports_ampersand_in_quoted_text(self):
+        q = self.sw.add_field_query('title', '"beyond&their age"')
+        self.assertEquals(u'title:\\"beyond\\&their\\ age\\"', q.options()[None])
+
+    def test_field_query_supports_quoted_text_with_and_aswell_as_pipe_in_quotes(self):
+        q = self.sw.add_field_query('title', '"beyond their age"&"climate|change"')
+        self.assertEquals(u'title:\\"beyond\\ their\\ age\\" AND title:\\"climate\\|change\\"', q.options()[None])
+
+    def test_field_query_supports_quoted_text_with_or_aswell_as_ampersand_in_quotes(self):
+        q = self.sw.add_field_query('title', '"beyond their age"|"climate&change"')
+        self.assertEquals(u'title:\\"beyond\\ their\\ age\\" OR title:\\"climate\\&change\\"', q.options()[None])
+
+    def test_field_query_checks_quoted_text_is_closed(self):
+        self.assertRaises(InvalidQueryError, self.sw.add_field_query, 'title', '"beyond their age')
+
+    def test_split_string_around_quotes_works_not_splitting(self):
+        self.assertEqual(['simple'],
+            self.sw.split_string_around_quotes('simple', '|'))
+
+    def test_split_string_around_quotes_works_simple_split(self):
+        self.assertEqual(['simple', 'split'],
+            self.sw.split_string_around_quotes('simple|split', '|'))
+        self.assertEqual(['simple', 'split'],
+            self.sw.split_string_around_quotes('simple&split', '&'))
+
+    def test_split_string_around_quotes_does_not_split_inside_quotes(self):
+        self.assertEqual(['"simple|split"'],
+            self.sw.split_string_around_quotes('"simple|split"', '|'))
+        self.assertEqual(['"simple&split"'],
+            self.sw.split_string_around_quotes('"simple&split"', '&'))
+
+    def test_split_string_around_quotes_does_not_split_inside_quotes_but_does_outside(self):
+        self.assertEqual(['"simple|split"', 'test'],
+            self.sw.split_string_around_quotes('"simple|split"|test', '|'))
+        self.assertEqual(['"simple&split"', 'test'],
+            self.sw.split_string_around_quotes('"simple&split"&test', '&'))
+
+    def test_split_string_around_quotes_with_complicated_string(self):
+        self.assertEqual(['"complex|split&ting"', 'another', 'bit', '"or two"'],
+            self.sw.split_string_around_quotes('"complex|split&ting"|another | bit|"or two"', '|'))
+        self.assertEqual(['"complex|split&ting"', 'another', 'bit', '"or two"'],
+            self.sw.split_string_around_quotes('"complex|split&ting"& another & bit&"or two"', '&'))

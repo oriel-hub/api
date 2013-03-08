@@ -6,15 +6,14 @@ import urllib
 import urllib2
 import re
 import datetime
-
 import sunburnt
 import operator
 
-from openapi import defines
 from django.conf import settings
 from django.core.urlresolvers import reverse
-
 from djangorestframework.renderers import BaseRenderer
+
+from openapi import defines
 
 query_mapping = settings.QUERY_MAPPING
 
@@ -112,6 +111,8 @@ class SearchBuilder():
 
 
 class SearchWrapper:
+    quoted_re = re.compile(r'("[^"]*?")')
+
     def __init__(self, user_level, site, solr=None):
         """
             Args:
@@ -342,11 +343,11 @@ class SearchWrapper:
     def add_field_query(self, field_name, param_value):
         # decode spaces and '|' before using
         decoded_param_value = urllib2.unquote(param_value)
-        if not decoded_param_value[0].isalnum():
-            raise InvalidQueryError("Cannot start query value with '%s'" \
+        if not (decoded_param_value[0].isalnum() or decoded_param_value[0] == '"'):
+            raise InvalidQueryError("Cannot start query value with '%s'"
                     % decoded_param_value[0])
-        or_terms = decoded_param_value.split('|')
-        and_terms = decoded_param_value.split('&')
+        or_terms = self.split_string_around_quotes(decoded_param_value, '|')
+        and_terms = self.split_string_around_quotes(decoded_param_value, '&')
         if len(or_terms) > 1 and len(and_terms) > 1:
             raise InvalidQueryError("Cannot use both '|' and '&' within a single term")
         if len(or_terms) > 1:
@@ -363,6 +364,38 @@ class SearchWrapper:
             kwargs = {field_name: str(param_value)}
             q_final = self.solr.Q(**kwargs)
         return q_final
+
+    def split_string_around_quotes(self, string, delimiter):
+        """split string, but ignore delimiter_inside_quotes"""
+        quoted_divided_string = filter(None, self.quoted_re.split(string))
+        quoted_divided_string = filter(None, [s.strip() for s in quoted_divided_string])
+        # now we have quoted strings and other strings
+        delimiter_found = False
+        divided_string = []
+        for str_fragment in quoted_divided_string:
+            if self.is_quoted(str_fragment):
+                divided_string.append(str_fragment)
+            else:
+                divided_string.extend(filter(None,
+                        [s.strip() for s in str_fragment.split(delimiter)]))
+                if delimiter in str_fragment:
+                    delimiter_found = True
+
+        if not delimiter_found:
+            # only split on quoted strings - don't bother
+            return [string]
+        return divided_string
+
+    def is_quoted(self, string):
+        if string[0] == '"':
+            if string[-1] == '"':
+                return True
+            else:
+                raise InvalidQueryError('Unmatched quotes in query parameter')
+        if string[-1] == '"':
+            raise InvalidQueryError('Unmatched quotes in query parameter')
+        else:
+            return False
 
 
 class SolrUnavailableError(defines.IdsApiError):
