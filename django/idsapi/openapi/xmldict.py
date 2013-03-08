@@ -41,7 +41,7 @@ class XmlDictConfig(dict):
         if parent_element.items():
             self.update(dict(parent_element.items()))
         for element in parent_element:
-            if element:
+            if element is not None:
                 # treat like dict - we assume that if the first two tags
                 # in a series are different, then they are all different.
                 if len(element) == 1 or element[0].tag != element[1].tag:
@@ -60,7 +60,7 @@ class XmlDictConfig(dict):
                 self._update_or_add_to_tag(element.tag, a_dict, children_names,
                         single_item_list)
             # this assumes that if you've got an attribute in a tag,
-            # you won't be having any text. This may or may not be a 
+            # you won't be having any text. This may or may not be a
             # good idea -- time will tell. It works for the way we are
             # currently doing XML configuration files...
             elif element.items():
