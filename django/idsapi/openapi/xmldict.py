@@ -4,6 +4,7 @@ from xml.parsers.expat import ExpatError
 
 # from http://code.activestate.com/recipes/410469-xml-as-dictionary/
 
+
 class XmlListConfig(list):
     def __init__(self, a_list):
         list.__init__(self)
@@ -41,7 +42,7 @@ class XmlDictConfig(dict):
         if parent_element.items():
             self.update(dict(parent_element.items()))
         for element in parent_element:
-            if element is not None:
+            if element:
                 # treat like dict - we assume that if the first two tags
                 # in a series are different, then they are all different.
                 if len(element) == 1 or element[0].tag != element[1].tag:
@@ -79,7 +80,7 @@ class XmlDictConfig(dict):
                 current_value = self[tag]
                 current_value.append(item)
                 self.update({tag: current_value})
-            except: #the first of its kind, an empty list must be created
+            except:  # the first of its kind, an empty list must be created
                 #item is written in [], i.e. it will be a list
                 self.update({tag: [item]})
         elif single_item_list:
@@ -104,8 +105,6 @@ class XmlDictConfig(dict):
                 set_encoding (string encoding type):
                      If set, add an XML header with the given value for the encoding attr.
         """
-
-
         try:
             if set_encoding:
                 xml_header = '<?xml version="1.0" encoding="%s" ?>\n' % set_encoding
@@ -116,6 +115,6 @@ class XmlDictConfig(dict):
                 root = ElementTree.fromstring(xml_string.encode('ascii', 'xmlcharrefreplace'))
         except ExpatError as e:
             print >> sys.stderr, "Failed to parse XML\nXML string was: %s\nError was: %s" % \
-                    (xml_string, e)
+                (xml_string, e)
             return xml_string
         return XmlDictConfig(root, single_item_list)
