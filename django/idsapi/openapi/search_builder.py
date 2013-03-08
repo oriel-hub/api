@@ -18,6 +18,7 @@ from djangorestframework.renderers import BaseRenderer
 
 query_mapping = settings.QUERY_MAPPING
 
+
 class SearchBuilder():
 
     @classmethod
@@ -46,7 +47,7 @@ class SearchBuilder():
             query_list = search_params.getlist(param)
             if len(query_list) > 1:
                 raise InvalidQueryError(
-                    "Cannot repeat query parameters - there is more than one '%s'" \
+                    "Cannot repeat query parameters - there is more than one '%s'"
                     % param)
             query = query_list[0]
             if len(query) < 1:
@@ -57,8 +58,8 @@ class SearchBuilder():
                 if query_mapping[param]['object_type'] != 'all':
                     if query_mapping[param]['object_type'] != object_type:
                         raise InvalidQueryError(
-                                "Can only use query parameter '%s' with object type '%s', your search had object type '%s'" \
-                                % (param, query_mapping[param]['object_type'], object_type))
+                            "Can only use query parameter '%s' with object type '%s', your search had object type '%s'"
+                            % (param, query_mapping[param]['object_type'], object_type))
                 # we might have to search across multiple fields
                 if isinstance(query_mapping[param]['solr_field'], list):
                     sw.add_multifield_parameter_query(query_mapping[param]['solr_field'], query)
@@ -74,15 +75,14 @@ class SearchBuilder():
                 # TODO: This doesn't seem the most transparent way of handling
                 # django rest framework parameters. Would it be better to
                 # delete them from the request before they are passed to our
-                # API code? 
-                if param[0] != '_' and \
-                   param != BaseRenderer._FORMAT_QUERY_PARAM:
+                # API code?
+                if (param[0] != '_' and param != BaseRenderer._FORMAT_QUERY_PARAM):
                     raise UnknownQueryParamError(param)
 
         sw.restrict_search_by_object(object_type)
         sw.restrict_fields_returned(output_format, search_params)
         sw.add_sort(search_params, object_type)
-        if facet_type == None:
+        if facet_type is None:
             sw.add_paginate(search_params)
         else:
             sw.add_facet(facet_type, search_params)
@@ -164,14 +164,14 @@ class SearchWrapper:
 
     def add_paginate(self, search_params):
         try:
-            start_offset = int(search_params['start_offset']) if search_params.has_key('start_offset') else 0
+            start_offset = int(search_params['start_offset']) if 'start_offset' in search_params else 0
         except ValueError:
-            raise InvalidQueryError("'start_offset' must be a decimal number - you gave %s" \
+            raise InvalidQueryError("'start_offset' must be a decimal number - you gave %s"
                     % search_params['start_offset'])
         try:
-            num_results = int(search_params['num_results']) if search_params.has_key('num_results') else 10
+            num_results = int(search_params['num_results']) if 'num_results' in search_params else 10
         except ValueError:
-            raise InvalidQueryError("'num_results' must be a decimal number - you gave %s" \
+            raise InvalidQueryError("'num_results' must be a decimal number - you gave %s"
                     % search_params['num_results'])
         if start_offset < 0:
             raise InvalidQueryError("'start_offset' cannot be negative - you gave %d" % start_offset)
@@ -179,10 +179,10 @@ class SearchWrapper:
             raise InvalidQueryError("'num_results' cannot be negative - you gave %d" % num_results)
         max_results = settings.USER_LEVEL_INFO[self.user_level]['max_items_per_call']
         if max_results != 0 and num_results > max_results:
-            raise InvalidQueryError("'num_results' cannot be more than %d - you gave %d" \
+            raise InvalidQueryError("'num_results' cannot be more than %d - you gave %d"
                     % (max_results, num_results))
 
-        if search_params.has_key('num_results_only'):
+        if 'num_results_only' in search_params:
             num_results = 0
         self.si_query = self.si_query.paginate(start=start_offset, rows=num_results)
 
@@ -259,7 +259,7 @@ class SearchWrapper:
                 if callable(ops[-1]):
                     part = ops.pop()    # function that returns the operator tree
                     expr.pop()          # remove the argument from the expression stack
-                    expr.append(part(self.si_query.Q(word))) # push the tree to the stack
+                    expr.append(part(self.si_query.Q(word)))  # push the tree to the stack
             else:
                 expr.append(self.si_query.Q(word))
 
@@ -273,7 +273,7 @@ class SearchWrapper:
         facet_kwargs = {}
         if settings.EXCLUDE_ZERO_COUNT_FACETS:
             facet_kwargs['mincount'] = 1
-        if search_params.has_key('num_results'):
+        if 'num_results' in search_params:
             facet_kwargs['limit'] = int(search_params['num_results'])
 
         self.si_query = self.si_query.facet_by(settings.FACET_MAPPING[facet_type], **facet_kwargs)
@@ -286,9 +286,9 @@ class SearchWrapper:
             field_list = ['object_id', 'object_type', 'title']
         else:
             raise InvalidQueryError(
-                    "the output_format of data returned can be 'id', 'short' or 'full' - you gave '%s'" \
+                    "the output_format of data returned can be 'id', 'short' or 'full' - you gave '%s'"
                     % output_format)
-        if search_params.has_key('extra_fields'):
+        if 'extra_fields' in search_params:
             fields = search_params['extra_fields'].lower().split(' ')
             level_info = settings.USER_LEVEL_INFO[self.user_level]
             for field in fields:
@@ -306,7 +306,7 @@ class SearchWrapper:
     def add_date_query(self, param, date):
         # strip the _year/_after/_before
         match = re.match(r'(.*)(_before|_after|_year)', param)
-        if match == None:
+        if match is None:
             raise InvalidQueryError("Unknown date query '%s'." % param)
         param_prefix = match.group(1)
         solr_param = settings.DATE_PREFIX_MAPPING[param_prefix]
@@ -319,7 +319,7 @@ class SearchWrapper:
             kwargs = {solr_param + '__range': (start_of_year, end_of_year)}
             self.si_query = self.si_query.query(**kwargs)
         else:
-            if re.match(r'\d{4}-\d{2}-\d{2}', date) == None:
+            if re.match(r'\d{4}-\d{2}-\d{2}', date) is None:
                 raise InvalidQueryError("Invalid date, should be YYYY-MM-DD but is %s" % date)
             if param.endswith('_after'):
                 kwargs = {solr_param + '__gte': date}
@@ -329,7 +329,6 @@ class SearchWrapper:
                 self.si_query = self.si_query.query(**kwargs)
             else:
                 raise InvalidQueryError("Unknown date query '%s'." % param)
-
 
     def add_multifield_parameter_query(self, field_list, param_value):
         q_final = self.solr.Q()
@@ -365,31 +364,37 @@ class SearchWrapper:
             q_final = self.solr.Q(**kwargs)
         return q_final
 
+
 class SolrUnavailableError(defines.IdsApiError):
     def __init__(self, error_text=''):
         defines.IdsApiError.__init__(self, error_text)
         self.error_text = error_text
 
+
 class BadRequestError(defines.IdsApiError):
     pass
+
 
 class InvalidQueryError(BadRequestError):
     def __init__(self, error_text=''):
         BadRequestError.__init__(self)
         self.error_text = 'Invalid query: ' + error_text
 
+
 class InvalidFieldError(BadRequestError):
     def __init__(self, invalid_field, site):
         BadRequestError.__init__(self)
         field_list_url = reverse('field_list', kwargs={'site': site})
         self.error_text = 'Unknown field requested: %s ' % invalid_field + \
-                        'Please see the <a href="%s">field list</a> for a list of possible fields.' % \
-                        field_list_url
+            'Please see the <a href="%s">field list</a> for a list of possible fields.' % \
+            field_list_url
+
 
 class UnknownQueryParamError(BadRequestError):
     def __init__(self, error_text=''):
         BadRequestError.__init__(self)
         self.error_text = 'Unknown query parameter: ' + error_text
+
 
 class UnknownObjectError(BadRequestError):
     def __init__(self, error_text=''):
