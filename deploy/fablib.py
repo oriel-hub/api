@@ -35,7 +35,7 @@ def _setup_path():
     else:
         _set_dict_if_not_set(env, 'python_bin', os.path.join('/', 'usr', 'bin', 'python'))
 
-    _set_dict_if_not_set(env, 'tasks_bin', 
+    _set_dict_if_not_set(env, 'tasks_bin',
             env.python_bin + ' ' + os.path.join(env.deploy_root, 'tasks.py'))
 
 
@@ -135,7 +135,7 @@ def create_copy_for_rollback(keep):
 def delete_old_versions(keep=None):
     """Delete old rollback directories, keeping the last "keep" (default 5)"."""
     require('prev_root', provided_by=env.valid_envs)
-    prev_versions = run('ls ' + env.prev_root).split('\n')
+    prev_versions = run('ls -1' + env.prev_root).split('\n')
     if keep == None:
         if env.has_key('versions_to_keep'):
             keep = env.versions_to_keep
@@ -145,7 +145,7 @@ def delete_old_versions(keep=None):
     prev_versions_to_delete = prev_versions[:versions_to_keep]
     for version_to_delete in prev_versions_to_delete:
         with cd(env.prev_root):
-            sudo_or_run('rm -rf ' + version_to_delete)
+            sudo_or_run('rm -rf ' + version_to_delete.strip())
 
 
 def list_previous():
