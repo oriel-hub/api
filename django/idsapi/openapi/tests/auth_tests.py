@@ -57,14 +57,14 @@ class ApiAuthTests(BaseTestCase):
         self.assertEqual(403, response.status_code)
 
 class UserLimitTests(ApiTestsBase):
-    def test_200_returned_for_500_results_requested_general_user(self):
+    def test_200_returned_for_2000_results_requested_general_user(self):
         self.setUserLevel(u'General User')
-        response = self.object_search(query={'q': 'un', 'num_results': '500'})
+        response = self.object_search(query={'q': 'un', 'num_results': '2000'})
         self.assertEqual(200, response.status_code)
 
-    def test_400_returned_if_more_than_500_results_requested_general_user(self):
+    def test_400_returned_if_more_than_2000_results_requested_general_user(self):
         self.setUserLevel(u'General User')
-        response = self.object_search(query={'q': 'un', 'num_results': '501'})
+        response = self.object_search(query={'q': 'un', 'num_results': '2001'})
         self.assertEqual(400, response.status_code)
 
     def test_200_returned_for_2000_results_requested_partner_user(self):

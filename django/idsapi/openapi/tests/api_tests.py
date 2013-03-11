@@ -1,20 +1,23 @@
 # integration tests at the API level
-import json, re, datetime
+import json
+import re
+import datetime
 
 from django.conf import settings
 
 from openapi import defines
 from openapi.tests.test_base import BaseTestCase
 
+
 class ApiTestsBase(BaseTestCase):
     def setUp(self):
         BaseTestCase.setUp(self)
         self.login()
 
-    def object_search(self, site='eldis', object_type='assets', output_format='full', query=None,
+    def object_search(self, site='eldis', object_type='documents', output_format='full', query=None,
             content_type='application/json'):
         if query == None:
-            query = {'q':'un'}
+            query = {'q': 'un'}
         if output_format == 'no_slash':
             output_format = ''
         else:
@@ -23,7 +26,7 @@ class ApiTestsBase(BaseTestCase):
                 query, ACCEPT=content_type)
 
     def get_all(self, site='eldis', object_type='assets', output_format='', query=None,
-                                content_type='application/json'):
+            content_type='application/json'):
         if query == None:
             query = {}
         if output_format == 'no_slash':
@@ -71,6 +74,7 @@ class ApiTestsBase(BaseTestCase):
         response = returns_response(self)
         response_list = json.loads(response.content)
         self.assertFalse('solr_query' in response_list['metadata'])
+
 
 class ApiSearchResponseTests(ApiTestsBase):
 
@@ -120,6 +124,7 @@ class ApiSearchResponseTests(ApiTestsBase):
     def test_description_contains_image_beacon(self):
         response = self.object_search(object_type='documents', output_format='full')
         profile = self.user.get_profile()
+
         def check_image_beacon_exists_and_has_correct_id(description):
             return ((description.find(settings.IMAGE_BEACON_STUB_URL) > -1) and
                     (description.find(profile.beacon_guid) > -1))
@@ -139,6 +144,7 @@ class ApiSearchResponseTests(ApiTestsBase):
                 query={'q': 'un', 'extra_fields': 'category_theme_array'})
         self.assert_results_list_if_present(response, 'category_theme_array', lambda x: isinstance(x["theme"], list))
 
+
 class ApiSearchIntegrationTests(ApiTestsBase):
 
     def test_query_by_country(self):
@@ -146,7 +152,7 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         self.assert_results_list(response, lambda x: ' '.join(x['country_focus']).lower().find('namibia') > -1)
 
     def test_query_by_country_and_free_text(self):
-        response = self.object_search(query={'q':'un', 'country':'angola'})
+        response = self.object_search(query={'q': 'un', 'country': 'angola'})
         self.assertStatusCode(response)
 
     def test_query_by_each_query_term(self):
@@ -157,7 +163,7 @@ class ApiSearchIntegrationTests(ApiTestsBase):
                 {'sector': 'agriculture'},
                 #{'subject': 'gdn'},                # TODO: Why is this commented out?
                 {'theme': 'C531|theme|Governance'},
-                ]
+        ]
         for query_term in query_term_list:
             response = self.object_search(query=query_term)
             self.assertStatusCode(response)
@@ -306,6 +312,7 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         self.assert_metadata_solr_query_included_when_admin_fields_is_false(returns_response)
         self.assert_metadata_solr_query_not_included_when_admin_fields_is_true(returns_response)
 
+
 class ApiPaginationTests(ApiTestsBase):
 
     def test_search_response_has_metadata(self):
@@ -342,12 +349,13 @@ class ApiPaginationTests(ApiTestsBase):
         self.assertEqual(20, len(results))
 
     def test_num_results_correctly_passed_on_to_next_and_prev_links(self):
-        response = self.object_search(
+        response = self.object_search(object_type='documents',
                 query={'q': 'un', 'num_results': '12', 'start_offset': '12'})
         metadata = json.loads(response.content)['metadata']
         for link in ('prev_page', 'next_page'):
             match = re.search(r'num_results=([-0-9]+)', metadata[link])
             self.assertTrue(int(match.group(1)) == 12)
+
 
 class ApiDateQueryTests(ApiTestsBase):
 
@@ -384,7 +392,7 @@ class ApiDateQueryTests(ApiTestsBase):
             self.assertStatusCode(response)
 
     def test_200_returned_for_item_years(self):
-        for query_param in ['item_started_year', 'item_finished_year',]:
+        for query_param in ['item_started_year', 'item_finished_year']:
             response = self.object_search(query={query_param: '2008'})
             self.assertStatusCode(response)
 
@@ -395,10 +403,11 @@ class ApiDateQueryTests(ApiTestsBase):
             self.assertStatusCode(response, 400)
 
     def test_400_returned_for_document_published_year_bad_date_format(self):
-        bad_dates = ['200', '200A', '20080',]
+        bad_dates = ['200', '200A', '20080']
         for date in bad_dates:
             response = self.object_search(object_type='documents', query={'document_published_year': date})
             self.assertStatusCode(response, 400)
+
 
 class ApiSearchSortTests(ApiTestsBase):
 
@@ -431,6 +440,7 @@ class ApiSearchSortTests(ApiTestsBase):
         response = self.object_search(object_type='documents', output_format='full',
                 query={'q': 'un', 'sort_desc': 'foobar'})
         self.assertStatusCode(response, 400)
+
 
 class ApiSearchErrorTests(ApiTestsBase):
 
@@ -473,11 +483,11 @@ class ApiSearchErrorTests(ApiTestsBase):
         self.assertStatusCode(response, 405)
 
     def test_400_returned_for_repeated_country_search(self):
-        response = self.object_search(query={'country':['namibia','angola']})
+        response = self.object_search(query={'country': ['namibia','angola']})
         self.assertContains(response, 'country', status_code=400)
 
     def test_query_by_country_with_both_or_and_and(self):
-        response = self.object_search(query={'country':'angola|iran&namibia'})
+        response = self.object_search(query={'country': 'angola|iran&namibia'})
         self.assertStatusCode(response, 400)
 
     def test_400_returned_for_leading_star(self):
@@ -493,7 +503,7 @@ class ApiSearchErrorTests(ApiTestsBase):
         self.assertStatusCode(response, 400)
 
     def test_400_returned_if_document_specific_query_param_used(self):
-        response = self.object_search(query={'author': 'John'})
+        response = self.object_search(object_type='assets', query={'author': 'John'})
         self.assertStatusCode(response, 400)
 
     def test_400_returned_if_num_results_is_negative(self):
@@ -517,8 +527,9 @@ class ApiSearchErrorTests(ApiTestsBase):
             'q': 'un',
             'sort_asc': 'publication_date',
             'sort_desc': 'object_id'
-            })
+        })
         self.assertStatusCode(response, 400)
+
 
 class ApiGetAllIntegrationTests(ApiTestsBase):
 
@@ -547,17 +558,15 @@ class ApiGetAllIntegrationTests(ApiTestsBase):
                 query={'extra_fields': 'description'})
         result_list = json.loads(response.content)['results']
         for result in result_list:
-            self.assertTrue(result.has_key('description'))
+            self.assertTrue('description' in result)
 
 
 class ApiGetObjectIntegrationTests(ApiTestsBase):
 
-    def get_object(self, site='eldis', object_type='assets', object_id='A1543',
+    def get_object(self, site='eldis', object_type='documents', object_id='A8588',
             output_format='', query=None, content_type='application/json'):
-        if query == None:
+        if not query:
             query = {}
-        if object_type == 'documents':
-            object_id = 'A8588'
         if output_format == 'no_slash':
             output_format = ''
         else:
@@ -592,7 +601,7 @@ class ApiGetObjectIntegrationTests(ApiTestsBase):
         response = self.get_object(object_type='documents',
                 query={'extra_fields': 'description'})
         result = json.loads(response.content)['results']
-        self.assertTrue(result.has_key('description'))
+        self.assertTrue('description' in result)
 
     def test_404_returned_if_no_object(self):
         response = self.get_object(object_id='A1234567890')
@@ -626,6 +635,7 @@ class ApiGetObjectIntegrationTests(ApiTestsBase):
         expected_message = '"Invalid query: Can\'t limit Fields - Fields not defined in schema: [u\'not_a_valid_field\']"'
         self.assertEquals(response.content, expected_message)
 
+
 class ApiRootIntegrationTests(ApiTestsBase):
     def get_root(self):
         return self.client.get(defines.URL_ROOT, ACCEPT='application/json')
@@ -638,6 +648,7 @@ class ApiRootIntegrationTests(ApiTestsBase):
         response = self.get_root()
         response_dict = json.loads(response.content)
         self.assertTrue(response_dict['help'].startswith('http://'))
+
 
 class ApiFieldListIntegrationTests(ApiTestsBase):
     def get_field_list(self, site='eldis'):
@@ -695,9 +706,10 @@ class ApiFieldListIntegrationTests(ApiTestsBase):
         self.assertFalse('send_email_alerts' in response_list)
         self.assertFalse('asset_publication_date' in response_list)
 
+
 class ApiFacetIntegrationTests(ApiTestsBase):
 
-    def facet_search(self, site='eldis', object_type='assets', facet_type='country', query=None):
+    def facet_search(self, site='eldis', object_type='documents', facet_type='country', query=None):
         query = query or {'q': 'un'}
         return self.client.get(defines.URL_ROOT + site + '/count/' + object_type + '/' + facet_type,
                 query, ACCEPT='application/json')
@@ -730,6 +742,7 @@ class ApiFacetIntegrationTests(ApiTestsBase):
 
     def test_all_facets_have_an_integer_count(self):
         response = self.facet_search()
+
         def check_all_facets_have_an_integer_count(country_count):
             return ('object_id' in country_count and 'metadata_url' in country_count and
                     isinstance(country_count['count'], int))
@@ -763,6 +776,7 @@ class ApiFacetIntegrationTests(ApiTestsBase):
         returns_response = lambda x: x.facet_search()
         self.assert_metadata_solr_query_included_when_admin_fields_is_false(returns_response)
         self.assert_metadata_solr_query_not_included_when_admin_fields_is_true(returns_response)
+
 
 class ApiCategoryChildrenIntegrationTests(ApiTestsBase):
     def children_search(self, site='eldis', object_type='themes', object_id='C34',
