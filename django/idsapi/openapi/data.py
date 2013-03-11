@@ -1,8 +1,11 @@
 # class to assemble the data to be returned
+import sys
 import re
+
 from xml.etree.ElementTree import ParseError
 from django.conf import settings
 from django.core.urlresolvers import reverse
+
 from openapi import defines
 from openapi.xmldict import XmlDictConfig
 
@@ -33,7 +36,9 @@ class DataMunger():
                 try:
                     object_data[xml_field] = self._convert_xml_field(object_data[xml_field])
                 except ParseError as e:
-                    object_data[xml_field] = "COULD NOT PARSE XML: %s" % str(e)
+                    object_data[xml_field] = "Could not parse XML, issue reported in logs" % str(e)
+                    # and send to logs
+                    print >> sys.stderr, "COULD NOT PARSE XML: %s" % str(e)
 
         # add the parent category, if relevant
         if self.object_type in settings.OBJECT_TYPES_WITH_HIERARCHY:
