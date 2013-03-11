@@ -1,9 +1,11 @@
 # class to assemble the data to be returned
 import re
+from xml.etree.ElementTree import ParseError
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from openapi import defines
 from openapi.xmldict import XmlDictConfig
+
 
 class DataMunger():
     def __init__(self, site):
@@ -28,7 +30,10 @@ class DataMunger():
 
         for xml_field in settings.STRUCTURED_XML_FIELDS:
             if xml_field in object_data:
-                object_data[xml_field] = self._convert_xml_field(object_data[xml_field])
+                try:
+                    object_data[xml_field] = self._convert_xml_field(object_data[xml_field])
+                except ParseError as e:
+                    object_data[xml_field] = "COULD NOT PARSE XML: %s" % str(e)
 
         # add the parent category, if relevant
         if self.object_type in settings.OBJECT_TYPES_WITH_HIERARCHY:
@@ -64,7 +69,7 @@ class DataMunger():
         # add image beacon
         if user_level_info['image_beacon']:
             description += " <img src='" + settings.IMAGE_BEACON_STUB_URL + \
-                    '?beacon_guid=' + beacon_guid + "' width='1' height='1'>"
+                '?beacon_guid=' + beacon_guid + "' width='1' height='1'>"
         return description
 
     def _create_metadata_url(self, object_type=None, object_id=None, object_name=None,
@@ -74,12 +79,12 @@ class DataMunger():
             object_type = self.object_type
         if object_id == None:
             object_id = self.object_id
-        metadata_url = reverse(url_name, kwargs = {
+        metadata_url = reverse(url_name, kwargs={
             'object_type': object_type,
             'object_id': object_id,
             'output_format': 'full',
             'site': self.site,
-            }) + '/'
+        }) + '/'
         if object_name != None:
             title = re.sub('\W+', '-', object_name).lower().strip('-')
             metadata_url += title + '/'
@@ -90,7 +95,7 @@ class DataMunger():
         object_data['children_url'] = self._create_metadata_url(url_name='category_children')
 
         # TODO: write test for condition when parent links not set
-        if not all(result.has_key(field) for field in ['cat_parent', 'cat_superparent']):
+        if not all(field in result for field in ['cat_parent', 'cat_superparent']):
             return
 
         if result['cat_parent'] != result['cat_superparent']:
@@ -101,7 +106,6 @@ class DataMunger():
                 result['cat_first_parent'] != result['object_id']:
             object_data['toplevel_parent_url'] = self._create_metadata_url(
                     object_id='C' + result['cat_first_parent'])
-
 
     def convert_facet_string(self, facet_string):
         result = {'object_id': '',
