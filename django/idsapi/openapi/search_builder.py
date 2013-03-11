@@ -112,6 +112,7 @@ class SearchBuilder():
 
 class SearchWrapper:
     quoted_re = re.compile(r'("[^"]*?")')
+    amp_pipe_re = re.compile(r'(\s|[&|]+)')
 
     def __init__(self, user_level, site, solr=None):
         """
@@ -239,7 +240,7 @@ class SearchWrapper:
     def add_free_text_query(self, search_text):
         self.has_free_text_query = True
         # split words and operators in words, throwing away white space.
-        words = [w for w in re.split('(\s|[&|]+)', search_text.lower()) if re.match('\S', w)]
+        words = self.split_string_around_quotes_and_delimiters(search_text.lower())
 
         def gen_2expr(oper, arg):
             return lambda y: oper(self.si_query.Q(arg), y)
@@ -346,18 +347,19 @@ class SearchWrapper:
         if not (decoded_param_value[0].isalnum() or decoded_param_value[0] == '"'):
             raise InvalidQueryError("Cannot start query value with '%s'"
                     % decoded_param_value[0])
-        or_terms = self.split_string_around_quotes(decoded_param_value, '|')
-        and_terms = self.split_string_around_quotes(decoded_param_value, '&')
-        if len(or_terms) > 1 and len(and_terms) > 1:
+        tokens = self.split_string_around_quotes_and_delimiters(decoded_param_value)
+        ampersand_present = '&' in tokens
+        pipe_present = '|' in tokens
+        if ampersand_present and pipe_present:
             raise InvalidQueryError("Cannot use both '|' and '&' within a single term")
-        if len(or_terms) > 1:
+        if pipe_present:
             q_final = self.solr.Q()
-            for term in or_terms:
+            for term in [t for t in tokens if t != '|']:
                 kwargs = {field_name: term}
                 q_final = q_final | self.solr.Q(**kwargs)
-        elif len(and_terms) > 1:
+        elif ampersand_present:
             q_final = self.solr.Q()
-            for term in and_terms:
+            for term in [t for t in tokens if t != '&']:
                 kwargs = {field_name: term}
                 q_final = q_final & self.solr.Q(**kwargs)
         else:
@@ -365,25 +367,20 @@ class SearchWrapper:
             q_final = self.solr.Q(**kwargs)
         return q_final
 
-    def split_string_around_quotes(self, string, delimiter):
-        """split string, but ignore delimiter_inside_quotes"""
-        quoted_divided_string = filter(None, self.quoted_re.split(string))
+    def split_string_around_quotes_and_delimiters(self, string):
+        """split string into quoted sections and on & or | outside quotes"""
+        quoted_divided_string = self.quoted_re.split(string)
+        # remove empty/whitespace strings
         quoted_divided_string = filter(None, [s.strip() for s in quoted_divided_string])
         # now we have quoted strings and other strings
-        delimiter_found = False
         divided_string = []
         for str_fragment in quoted_divided_string:
             if self.is_quoted(str_fragment):
                 divided_string.append(str_fragment)
             else:
-                divided_string.extend(filter(None,
-                        [s.strip() for s in str_fragment.split(delimiter)]))
-                if delimiter in str_fragment:
-                    delimiter_found = True
-
-        if not delimiter_found:
-            # only split on quoted strings - don't bother
-            return [string]
+                words = [w.strip() for w in self.amp_pipe_re.split(str_fragment.lower())]
+                # the filter(None, array) discards empty strings
+                divided_string.extend(filter(None, words))
         return divided_string
 
     def is_quoted(self, string):

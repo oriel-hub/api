@@ -251,30 +251,34 @@ class SearchWrapperAddFieldQueryTests(unittest.TestCase):
     def test_field_query_checks_quoted_text_is_closed(self):
         self.assertRaises(InvalidQueryError, self.sw.add_field_query, 'title', '"beyond their age')
 
-    def test_split_string_around_quotes_works_not_splitting(self):
+    def test_split_string_around_quotes_and_delimiters_works_not_splitting(self):
         self.assertEqual(['simple'],
-            self.sw.split_string_around_quotes('simple', '|'))
+            self.sw.split_string_around_quotes_and_delimiters('simple'))
 
-    def test_split_string_around_quotes_works_simple_split(self):
-        self.assertEqual(['simple', 'split'],
-            self.sw.split_string_around_quotes('simple|split', '|'))
-        self.assertEqual(['simple', 'split'],
-            self.sw.split_string_around_quotes('simple&split', '&'))
+    def test_split_string_around_quotes_and_delimiters_works_simple_split(self):
+        self.assertEqual(['simple', '|', 'split'],
+            self.sw.split_string_around_quotes_and_delimiters('simple|split'))
+        self.assertEqual(['simple', '&', 'split'],
+            self.sw.split_string_around_quotes_and_delimiters('simple&split'))
+        self.assertEqual(['simple', '&', 'split', '|', '2'],
+            self.sw.split_string_around_quotes_and_delimiters('simple&split|2'))
 
-    def test_split_string_around_quotes_does_not_split_inside_quotes(self):
+    def test_split_string_around_quotes_and_delimiters_does_not_split_inside_quotes(self):
         self.assertEqual(['"simple|split"'],
-            self.sw.split_string_around_quotes('"simple|split"', '|'))
+            self.sw.split_string_around_quotes_and_delimiters('"simple|split"'))
         self.assertEqual(['"simple&split"'],
-            self.sw.split_string_around_quotes('"simple&split"', '&'))
+            self.sw.split_string_around_quotes_and_delimiters('"simple&split"'))
 
-    def test_split_string_around_quotes_does_not_split_inside_quotes_but_does_outside(self):
-        self.assertEqual(['"simple|split"', 'test'],
-            self.sw.split_string_around_quotes('"simple|split"|test', '|'))
-        self.assertEqual(['"simple&split"', 'test'],
-            self.sw.split_string_around_quotes('"simple&split"&test', '&'))
+    def test_split_string_around_quotes_and_delimiters_does_not_split_inside_quotes_but_does_outside(self):
+        self.assertEqual(['"simple|split"', '|', 'test'],
+            self.sw.split_string_around_quotes_and_delimiters('"simple|split"|test'))
+        self.assertEqual(['"simple&split"', '&', 'test'],
+            self.sw.split_string_around_quotes_and_delimiters('"simple&split"&test'))
 
-    def test_split_string_around_quotes_with_complicated_string(self):
-        self.assertEqual(['"complex|split&ting"', 'another', 'bit', '"or two"'],
-            self.sw.split_string_around_quotes('"complex|split&ting"|another | bit|"or two"', '|'))
-        self.assertEqual(['"complex|split&ting"', 'another', 'bit', '"or two"'],
-            self.sw.split_string_around_quotes('"complex|split&ting"& another & bit&"or two"', '&'))
+    def test_split_string_around_quotes_and_delimiters_with_complicated_string(self):
+        self.assertEqual(['"complex|split&ting"', '|', 'another', '|', 'bit', '|', '"or two"'],
+            self.sw.split_string_around_quotes_and_delimiters('"complex|split&ting"|another | bit|"or two"'))
+        self.assertEqual(['"complex|split&ting"', '&', 'another', '&', 'bit', '&', '"or two"'],
+            self.sw.split_string_around_quotes_and_delimiters('"complex|split&ting"& another & bit&"or two"'))
+        self.assertEqual(['"complex|split&ting"', '|', 'another', '&', 'bit', '&', '"or two"'],
+            self.sw.split_string_around_quotes_and_delimiters('"complex|split&ting"| another & bit&"or two"'))
