@@ -38,7 +38,9 @@ class DataMunger():
                 except ParseError as e:
                     object_data[xml_field] = "Could not parse XML, issue reported in logs" % str(e)
                     # and send to logs
-                    print >> sys.stderr, "COULD NOT PARSE XML: %s" % str(e)
+                    print >> sys.stderr, \
+                        "COULD NOT PARSE XML. object_id: %s, field: %s Error: %s" % \
+                        (self.object_id, xml_field, str(e))
 
         # add the parent category, if relevant
         if self.object_type in settings.OBJECT_TYPES_WITH_HIERARCHY:
