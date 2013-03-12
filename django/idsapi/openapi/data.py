@@ -36,7 +36,7 @@ class DataMunger():
                 try:
                     object_data[xml_field] = self._convert_xml_field(object_data[xml_field])
                 except ParseError as e:
-                    object_data[xml_field] = "Could not parse XML, issue reported in logs" % str(e)
+                    object_data[xml_field] = "Could not parse XML, issue reported in logs"
                     # and send to logs
                     print >> sys.stderr, \
                         "COULD NOT PARSE XML. object_id: %s, field: %s Error: %s" % \
