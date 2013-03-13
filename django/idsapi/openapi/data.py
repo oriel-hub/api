@@ -2,12 +2,16 @@
 import sys
 import re
 
-from xml.etree.ElementTree import ParseError
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from openapi import defines
 from openapi.xmldict import XmlDictConfig
+
+try:
+    from xml.etree.ElementTree import ParseError
+except ImportError:
+    from xml.parsers.expat import ExpatError as ParseError
 
 
 class DataMunger():
