@@ -228,8 +228,16 @@ IMAGE_BEACON_STUB_URL = 'http://api.ids.ac.uk/tracking/trackimg.cfm'
 # * the name (or names) of the field in SOLR to search across
 # * the type of object you can use the query parameter with
 QUERY_MAPPING = {
+         'object_id':  {
+            'solr_field': 'object_id',
+            'object_type': 'all'
+            },
          'object_type':  {
             'solr_field': 'object_type',
+            'object_type': 'all'
+            },
+         'asset_id':  {
+            'solr_field': 'asset_id',
             'object_type': 'all'
             },
 		 'title':  {
