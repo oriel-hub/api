@@ -100,6 +100,7 @@ SORT_FIELDS = [
         'end_date',
         'acronym',
 		'timestamp',
+		'score',
         ]
 		
 # these fields will be hidden from those with #'hide_admin_fields' set to True
@@ -137,6 +138,10 @@ GENERAL_FIELDS = [
 'category_theme_array',
 'category_theme_ids',
 'category_theme_path',
+'category_subject',
+'category_subject_array',
+'category_subject_ids',
+'category_subject_path',
 'children_object_array',
 'country_focus',
 'country_focus_array',
@@ -343,6 +348,10 @@ QUERY_MAPPING = {
             'solr_field': 'archived',
             'object_type': 'all'
             },	
+		'cat_autocomplete':  {
+            'solr_field': 'category_path_autocomplete',
+            'object_type': 'all'
+            },
        'level':  {
             'solr_field': 'cat_level',
             'object_type': 'all'
