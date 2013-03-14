@@ -285,7 +285,7 @@ class SearchWrapper:
             return
         # the id format needs object_type and title to construct the metadata_url
         elif output_format in [None, '', 'short', 'id']:
-            field_list = ['object_id', 'object_type', 'title']
+            field_list = ['object_id', 'object_type', 'title', 'level']
         else:
             raise InvalidQueryError(
                     "the output_format of data returned can be 'id', 'short' or 'full' - you gave '%s'"
@@ -339,9 +339,10 @@ class SearchWrapper:
         self.si_query = self.si_query.query(q_final)
 
     def add_parameter_query(self, field_name, param_value):
-        self.si_query = self.si_query.query(self.add_field_query(field_name, param_value))
+        self.si_query = self.si_query.query(self.add_field_query(field_name, param_value.replace(' ','+')))
 
     def add_field_query(self, field_name, param_value):
+
         # decode spaces and '|' before using
         decoded_param_value = urllib2.unquote(param_value)
         if not (decoded_param_value[0].isalnum() or decoded_param_value[0] == '"'):

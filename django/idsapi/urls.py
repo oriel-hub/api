@@ -21,7 +21,7 @@ urlpatterns += patterns('',
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # Uncomment the next line to enable the admin:
-    url(r'^admin/', include(admin.site.urls)),
+    #url(r'^admin/', include(admin.site.urls)),
 
     url(r'^accounts/', include('registration.urls')),
 
@@ -33,7 +33,7 @@ urlpatterns += patterns('',
 
     # the API stuff
     url(r'^openapi/', include(openapi.urls)),
-    url(r'^$', redirect_to, {'url': '/about/'}),
+    #url(r'^$', redirect_to, {'url': '/about/'}),
     #url(r'^$', redirect_to, {'url': '/openapi/'}),
 
 )
