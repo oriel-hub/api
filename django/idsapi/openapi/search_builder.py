@@ -378,7 +378,7 @@ class SearchWrapper:
             if self.is_quoted(str_fragment):
                 divided_string.append(str_fragment)
             else:
-                words = [w.strip() for w in self.amp_pipe_re.split(str_fragment.lower())]
+                words = [w.strip() for w in self.amp_pipe_re.split(str_fragment)]
                 # the filter(None, array) discards empty strings
                 divided_string.extend(filter(None, words))
         return divided_string
