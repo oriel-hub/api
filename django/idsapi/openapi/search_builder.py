@@ -285,7 +285,7 @@ class SearchWrapper:
             return
         # the id format needs object_type and title to construct the metadata_url
         elif output_format in [None, '', 'short', 'id']:
-            field_list = ['object_id', 'object_type', 'title']
+            field_list = ['object_id', 'object_type', 'title', 'level']
         else:
             raise InvalidQueryError(
                     "the output_format of data returned can be 'id', 'short' or 'full' - you gave '%s'"
