@@ -341,6 +341,18 @@ class SearchWrapper:
     def add_parameter_query(self, field_name, param_value):
         self.si_query = self.si_query.query(self.add_field_query(field_name, param_value))
 
+    def to_rawstring(self, string):
+        """
+            Here we work around aparent limitations in sunburnt's escaping. The
+            definition of SolrString always escapes whitespace, something that
+            doesn't seem needed, nor is correctly handled by the SOLR server
+            itself, so we remove whitespace from lucene_special_chars.
+        """
+        # TODO: There has got to be a better way of doing this
+        s_str = sunburnt.strings.RawString(str(string))
+        s_str.lucene_special_chars = '+-&|!(){}[]^"~*?:\t\v\\/'
+        return s_str
+
     def add_field_query(self, field_name, param_value):
         # decode spaces and '|' before using
         decoded_param_value = urllib2.unquote(param_value)
@@ -350,21 +362,24 @@ class SearchWrapper:
         tokens = self.split_string_around_quotes_and_delimiters(decoded_param_value)
         ampersand_present = '&' in tokens
         pipe_present = '|' in tokens
+
         if ampersand_present and pipe_present:
             raise InvalidQueryError("Cannot use both '|' and '&' within a single term")
+
         if pipe_present:
             q_final = self.solr.Q()
             for term in [t for t in tokens if t != '|']:
-                kwargs = {field_name: term}
+                kwargs = {field_name: self.to_rawstring(term)}
                 q_final = q_final | self.solr.Q(**kwargs)
         elif ampersand_present:
             q_final = self.solr.Q()
             for term in [t for t in tokens if t != '&']:
-                kwargs = {field_name: term}
+                kwargs = {field_name: self.to_rawstring(term)}
                 q_final = q_final & self.solr.Q(**kwargs)
         else:
-            kwargs = {field_name: str(param_value)}
+            kwargs = {field_name: self.to_rawstring(param_value)}
             q_final = self.solr.Q(**kwargs)
+
         return q_final
 
     def split_string_around_quotes_and_delimiters(self, string):

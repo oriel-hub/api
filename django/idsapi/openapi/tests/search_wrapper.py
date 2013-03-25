@@ -164,6 +164,10 @@ class SearchWrapperAddFreeTextQueryTests(unittest.TestCase):
         self.assertEquals(self.solr_q(), 'brazil OR health OR ozone')
 
     def test_free_text_query_supports_single_and_operator(self):
+        self.sw.add_free_text_query('brazil and health')
+        self.assertEquals(self.solr_q(), 'brazil AND health')
+
+    def test_free_text_query_supports_single_and_operator_with_implicit_or(self):
         self.sw.add_free_text_query('brazil and health ozone')
         self.assertEquals(self.solr_q(), '(brazil AND health) OR ozone')
 
@@ -222,31 +226,31 @@ class SearchWrapperAddFieldQueryTests(unittest.TestCase):
 
     def test_field_query_supports_quoted_text(self):
         q = self.sw.add_field_query('title', '"beyond their age"')
-        self.assertEquals(u'title:\\"beyond\\ their\\ age\\"', q.options()[None])
+        self.assertEquals(u'title:\\"beyond their age\\"', q.options()[None])
 
     def test_field_query_supports_quoted_text_with_or(self):
         q = self.sw.add_field_query('title', '"beyond their age"|climate')
-        self.assertEquals(u'title:\\"beyond\\ their\\ age\\" OR title:climate', q.options()[None])
+        self.assertEquals(u'title:\\"beyond their age\\" OR title:climate', q.options()[None])
 
     def test_field_query_supports_quoted_text_with_and(self):
         q = self.sw.add_field_query('title', '"beyond their age"&"climate change"')
-        self.assertEquals(u'title:\\"beyond\\ their\\ age\\" AND title:\\"climate\\ change\\"', q.options()[None])
+        self.assertEquals(u'title:\\"beyond their age\\" AND title:\\"climate change\\"', q.options()[None])
 
     def test_field_query_supports_pipe_in_quoted_text(self):
         q = self.sw.add_field_query('title', '"beyond|their age"')
-        self.assertEquals(u'title:\\"beyond\\|their\\ age\\"', q.options()[None])
+        self.assertEquals(u'title:\\"beyond\\|their age\\"', q.options()[None])
 
     def test_field_query_supports_ampersand_in_quoted_text(self):
         q = self.sw.add_field_query('title', '"beyond&their age"')
-        self.assertEquals(u'title:\\"beyond\\&their\\ age\\"', q.options()[None])
+        self.assertEquals(u'title:\\"beyond\\&their age\\"', q.options()[None])
 
     def test_field_query_supports_quoted_text_with_and_aswell_as_pipe_in_quotes(self):
         q = self.sw.add_field_query('title', '"beyond their age"&"climate|change"')
-        self.assertEquals(u'title:\\"beyond\\ their\\ age\\" AND title:\\"climate\\|change\\"', q.options()[None])
+        self.assertEquals(u'title:\\"beyond their age\\" AND title:\\"climate\\|change\\"', q.options()[None])
 
     def test_field_query_supports_quoted_text_with_or_aswell_as_ampersand_in_quotes(self):
         q = self.sw.add_field_query('title', '"beyond their age"|"climate&change"')
-        self.assertEquals(u'title:\\"beyond\\ their\\ age\\" OR title:\\"climate\\&change\\"', q.options()[None])
+        self.assertEquals(u'title:\\"beyond their age\\" OR title:\\"climate\\&change\\"', q.options()[None])
 
     def test_field_query_checks_quoted_text_is_closed(self):
         self.assertRaises(InvalidQueryError, self.sw.add_field_query, 'title', '"beyond their age')
