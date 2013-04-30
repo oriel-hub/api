@@ -6,7 +6,7 @@ TEMPLATE_DEBUG = DEBUG
 # whether to send solr search parameters to logs/console
 # default to False - best to override in local_settings
 # don't forget to turn it off again!
-LOG_SEARCH_PARAMS = False
+LOG_SEARCH_PARAMS = True
 
 DATABASES = {
     'default': {
@@ -23,7 +23,6 @@ EMAIL_HOST = 'localhost'
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
-    ('Hamish Downer', 'hamish@aptivate.org'),
 )
 
 SOLR_SERVER_URLS = {
