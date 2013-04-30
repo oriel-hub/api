@@ -46,6 +46,7 @@ class ApiTestsBase(BaseTestCase):
             self.assertTrue(pass_test(result), msg)
 
     def assert_results_list_if_present(self, response, required_field, pass_test, element='results', msg=None):
+        self.assertStatusCode(response)
         for result in self.assert_non_zero_result_len(response, element):
             if required_field in result:
                 self.assertTrue(pass_test(result[required_field]), msg)
@@ -184,17 +185,12 @@ class ApiSearchIntegrationTests(ApiTestsBase):
     def test_query_by_country_with_and(self):
         response = self.object_search(query={'country':'angola&namibia'})
         search_results = json.loads(response.content)['results']
-        for result in search_results:
-            self.assertTrue(' '.join(result['country_focus']).lower().find('angola') > -1)
-            self.assertTrue(' '.join(result['country_focus']).lower().find('namibia') > -1)
+        self.assert_results_list_if_present(response, 'country_focus', lambda x: 'Angola' in x and 'Namibia' in x)
 
     def test_query_by_country_with_or(self):
         response = self.object_search(query={'country':'namibia|iran'})
         search_results = json.loads(response.content)['results']
-        for result in search_results:
-            namibia_found = ' '.join(result['country_focus']).lower().find('namibia') > -1
-            iran_found = ' '.join(result['country_focus']).lower().find('iran') > -1
-            self.assertTrue(namibia_found or iran_found)
+        self.assert_results_list_if_present(response, 'country_focus', lambda x: 'Iran' in x or 'Namibia' in x)
 
     def test_blank_search_returns_same_as_short_search(self):
         response_short = self.object_search(output_format='short')
@@ -369,21 +365,22 @@ class ApiDateQueryTests(ApiTestsBase):
             self.assertTrue(document_published < query_date)
 
     def test_200_returned_for_document_published_after(self):
-        response = self.object_search(query={'document_published_after': '2008-12-31'})
-        query_date = datetime.datetime.strptime('2008-12-31', "%Y-%m-%d")
-        results = json.loads(response.content)['results']
-        for result in results:
+        def published_after_query_date(publication_date):
+            query_date = datetime.datetime.strptime('2002-6-1', "%Y-%m-%d")
             document_published = datetime.datetime.strptime(
-                    result['publication_date'][0:19], "%Y-%m-%d %H:%M:%S")
-            self.assertTrue(document_published >= query_date)
+                    publication_date[0:19], "%Y-%m-%d %H:%M:%S")
+            return document_published >= query_date
+
+        response = self.object_search(query={'document_published_after': '2002-06-01'})
+        self.assert_results_list_if_present(response, 'publication_date', published_after_query_date)
 
     def test_200_returned_for_document_published_year(self):
-        response = self.object_search(query={'document_published_year': '2008'})
-        results = json.loads(response.content)['results']
-        for result in results:
-            document_published = datetime.datetime.strptime(
-                    result['publication_date'][0:19], "%Y-%m-%d %H:%M:%S")
-            self.assertEqual(2008, document_published.year)
+        def published_in_2002(publication_date):
+            document_published = datetime.datetime.strptime(publication_date[0:19], "%Y-%m-%d %H:%M:%S")
+            return document_published.year == 2002
+
+        response = self.object_search(query={'document_published_year': '2002'})
+        self.assert_results_list_if_present(response, 'publication_date', published_in_2002)
 
     def test_200_returned_for_item_dates(self):
         for query_param in ['item_started_after', 'item_started_before', 'item_finished_after',
