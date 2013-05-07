@@ -150,6 +150,7 @@ GENERAL_FIELDS = [
 'date_created',
 'date_updated',
 'description',
+'corporate_author',
 'et_al',
 'headline',
 'iso_number',
