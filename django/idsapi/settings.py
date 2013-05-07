@@ -365,6 +365,10 @@ QUERY_MAPPING = {
             'solr_field': 'cat_level',
             'object_type': 'all'
             },
+       'cat_autocomplete':  {
+            'solr_field': 'category_path_autocomplete',
+            'object_type': 'all'
+            },
 		'parent_object_id':  {
             'solr_field': 'parent_object_id',
             'object_type': 'all'
