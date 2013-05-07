@@ -404,7 +404,7 @@ FACET_MAPPING = {
         'theme':     'category_theme_objects_facet',
         'publisher': 'publisher_facet',
 		'publisher_country': 'publisher_country_facet',
-		'publication_year': 'publication_year'
+		'publication_year': 'publication_year_facet'
 		}
 
 # this maps sort fields when generating SOLR queries, so that custom (eg non
