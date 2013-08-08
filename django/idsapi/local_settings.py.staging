@@ -18,4 +18,4 @@ SOLR_SERVER_URLS = {
         'bridge': 'http://localhost:8983/solr/bridge-test/',
         }
 		
-EMAIL_HOST = '139.184.194.19'
+EMAIL_HOST = 'mailrelay.ids.ac.uk'
