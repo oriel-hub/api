@@ -10,7 +10,7 @@ ADMINS = (
 DEFAULT_FROM_EMAIL = 'api@ids.ac.uk'
 
 # the email server at IDS
-EMAIL_HOST = 'mailrelay.ids.ac.uk'
+EMAIL_HOST = '139.184.194.164'
 
 # Where to find SOLR - note that these are over-written in the local settings files and are here for reference
 DEFAULT_SITE = 'eldis'
