@@ -464,6 +464,10 @@ PROJECT_HOME = os.path.dirname(os.path.realpath(__file__))
 
 MANAGERS = ADMINS
 
+ALLOWED_HOSTS = [
+    '.api.ids.ac.uk',
+]
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -472,6 +476,8 @@ MANAGERS = ADMINS
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
 TIME_ZONE = 'Europe/London'
+
+USE_TZ = True
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
