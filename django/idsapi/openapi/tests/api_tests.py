@@ -16,7 +16,7 @@ class ApiTestsBase(BaseTestCase):
 
     def object_search(self, site='eldis', object_type='documents', output_format='full', query=None,
             content_type='application/json'):
-        if query == None:
+        if query is None:
             query = {'q': 'un'}
         if output_format == 'no_slash':
             output_format = ''
@@ -27,7 +27,7 @@ class ApiTestsBase(BaseTestCase):
 
     def get_all(self, site='eldis', object_type='assets', output_format='', query=None,
             content_type='application/json'):
-        if query == None:
+        if query is None:
             query = {}
         if output_format == 'no_slash':
             output_format = ''
@@ -179,18 +179,18 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         #self.assertTrue(search_results['metadata']['total_results'] > 0)
 
     def test_query_by_boolean_country_and_free_text(self):
-        response = self.object_search(query={'q':'un', 'country':'angola&tanzania'})
+        response = self.object_search(query={'q': 'un', 'country': 'angola&tanzania'})
         self.assertStatusCode(response)
 
     def test_query_by_country_with_and(self):
-        response = self.object_search(query={'country':'angola&namibia'})
-        search_results = json.loads(response.content)['results']
-        self.assert_results_list_if_present(response, 'country_focus', lambda x: 'Angola' in x and 'Namibia' in x)
+        response = self.object_search(query={'country': 'angola&namibia'})
+        self.assert_results_list_if_present(
+            response, 'country_focus', lambda x: 'Angola' in x and 'Namibia' in x)
 
     def test_query_by_country_with_or(self):
-        response = self.object_search(query={'country':'namibia|iran'})
-        search_results = json.loads(response.content)['results']
-        self.assert_results_list_if_present(response, 'country_focus', lambda x: 'Iran' in x or 'Namibia' in x)
+        response = self.object_search(query={'country': 'namibia|iran'})
+        self.assert_results_list_if_present(
+            response, 'country_focus', lambda x: 'Iran' in x or 'Namibia' in x)
 
     def test_blank_search_returns_same_as_short_search(self):
         response_short = self.object_search(output_format='short')
@@ -215,9 +215,9 @@ class ApiSearchIntegrationTests(ApiTestsBase):
             self.assertEqual(url_bits[1], 'get')
             self.assertNotEqual(url_bits[2], 'assets')
             self.assertTrue(url_bits[2] in defines.OBJECT_TYPES)
-            self.assertTrue(re.match(r'^[AC]\d+$', url_bits[3]) != None)
+            self.assertTrue(re.match(r'^[AC]\d+$', url_bits[3]) is not None)
             self.assertEqual(url_bits[4], 'full')
-            self.assertTrue(re.match(r'^[-\w]+$', url_bits[5]) != None)
+            self.assertTrue(re.match(r'^[-\w]+$', url_bits[5]) is not None)
             self.assertFalse(url_bits[5].startswith('-'))
             self.assertFalse(url_bits[5].endswith('-'))
 
@@ -226,11 +226,11 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         self.assertStatusCode(response)
 
     def test_all_document_search_returns_400(self):
-        response = self.object_search(query={'all':''})
+        response = self.object_search(query={'all': ''})
         self.assertStatusCode(response, 400)
 
     def test_200_returned_if_no_results(self):
-        response = self.object_search(query={'country':'NoddyLand'})
+        response = self.object_search(query={'country': 'NoddyLand'})
         self.assertStatusCode(response)
         # this test is just to check the search actually returned zero results
         search_results = json.loads(response.content)
@@ -253,33 +253,35 @@ class ApiSearchIntegrationTests(ApiTestsBase):
             self.assertTrue(' '.join(result['author']).lower().find('john') > -1)
 
     def test_organisation_specific_query_param_acronym(self):
-        response = self.object_search(object_type='organisations', query={'acronym': 'UN*'})
+        response = self.object_search(object_type='organisations', query={'acronym': 'UNDP'})
         self.assertStatusCode(response)
         self.assertTrue(0 < json.loads(response.content)['metadata']['total_results'])
         search_results = json.loads(response.content)['results']
         for result in search_results:
             acronym_found = result['acronym'].lower().find('un') > -1
             alternative_acronym_found = False
-            if result.has_key('alternative_acronym'):
+            if 'alternative_acronym' in result:
                 alternative_acronym_found = ' '.join(result['alternative_acronym']).lower().find('un') > -1
             self.assertTrue(acronym_found or alternative_acronym_found)
 
     def test_item_specific_query_param_item_type(self):
-        response = self.object_search(object_type='items', query={'item_type': 'Other*'})
+        # need to be unlimited to see the item_type
+        self.setUserLevel('Unlimited')
+        response = self.object_search(object_type='items', query={'item_type': 'Jobs'})
         self.assertStatusCode(response)
         self.assertTrue(0 < json.loads(response.content)['metadata']['total_results'])
         search_results = json.loads(response.content)['results']
         for result in search_results:
-            self.assertTrue(result['item_type'].lower().find('other') > -1)
+            self.assertEqual('Jobs', result['item_type'])
 
     def test_num_results_only_returns_only_total_results(self):
         response = self.object_search(query={'q': 'un', 'num_results_only': None})
         self.assertStatusCode(response)
         response_dict = json.loads(response.content)
-        self.assertTrue(response_dict.has_key('metadata'))
-        self.assertFalse(response_dict.has_key('results'))
+        self.assertIn('metadata', response_dict)
+        self.assertNotIn('results', response_dict)
         self.assertEqual(1, len(response_dict['metadata'].keys()))
-        self.assertTrue(response_dict['metadata'].has_key('total_results'))
+        self.assertIn('total_results', response_dict['metadata'])
 
     def test_extra_fields_with_object_search(self):
         response = self.object_search(object_type='documents', output_format='short',
@@ -314,28 +316,29 @@ class ApiPaginationTests(ApiTestsBase):
     def test_search_response_has_metadata(self):
         response = self.object_search()
         metadata = json.loads(response.content)['metadata']
-        self.assertTrue(metadata.has_key('total_results') and metadata.has_key('start_offset'))
+        self.assertIn('total_results', metadata)
+        self.assertIn('start_offset', metadata)
 
     def test_search_response_has_next_in_metadata(self):
         response = self.object_search()
         metadata = json.loads(response.content)['metadata']
-        self.assertTrue(metadata.has_key('next_page'))
+        self.assertIn('next_page', metadata)
         self.assertTrue(metadata['next_page'].find('num_results') > -1)
         self.assertTrue(metadata['next_page'].find('start_offset') > -1)
         # also, default search should not have prev_page link
-        self.assertFalse(metadata.has_key('prev_page'))
+        self.assertNotIn('prev_page', metadata)
 
     def test_2nd_page_has_prev_in_metadata(self):
         response = self.object_search(query={'q': 'un', 'start_offset': '10'})
         metadata = json.loads(response.content)['metadata']
-        self.assertTrue(metadata.has_key('prev_page'))
+        self.assertIn('prev_page', metadata)
         self.assertTrue(metadata['prev_page'].find('num_results') > -1)
         self.assertTrue(metadata['prev_page'].find('start_offset') > -1)
 
     def test_prev_never_has_negative_start_offset(self):
         response = self.object_search(query={'q': 'un', 'start_offset': '1'})
         metadata = json.loads(response.content)['metadata']
-        self.assertTrue(metadata.has_key('prev_page'))
+        self.assertIn('prev_page', metadata)
         match = re.search(r'start_offset=([-0-9]+)', metadata['prev_page'])
         self.assertTrue(int(match.group(1)) >= 0)
 
@@ -413,9 +416,9 @@ class ApiSearchSortTests(ApiTestsBase):
                 query={'q': 'un', 'sort_asc': 'publication_date'})
         results = json.loads(response.content)['results']
         self.assertTrue(len(results) >= 5)
-        for i in range(len(results)-1):
+        for i in range(len(results) - 1):
             date1 = datetime.datetime.strptime(results[i]['publication_date'][0:19], "%Y-%m-%d %H:%M:%S")
-            date2 = datetime.datetime.strptime(results[i+1]['publication_date'][0:19], "%Y-%m-%d %H:%M:%S")
+            date2 = datetime.datetime.strptime(results[i + 1]['publication_date'][0:19], "%Y-%m-%d %H:%M:%S")
             self.assertTrue(date1 <= date2)
 
     def test_sort_descending_by_publication_date(self):
@@ -423,9 +426,9 @@ class ApiSearchSortTests(ApiTestsBase):
                 query={'q': 'un', 'sort_desc': 'publication_date'})
         results = json.loads(response.content)['results']
         self.assertTrue(len(results) >= 5)
-        for i in range(len(results)-1):
+        for i in range(len(results) - 1):
             date1 = datetime.datetime.strptime(results[i]['publication_date'][0:19], "%Y-%m-%d %H:%M:%S")
-            date2 = datetime.datetime.strptime(results[i+1]['publication_date'][0:19], "%Y-%m-%d %H:%M:%S")
+            date2 = datetime.datetime.strptime(results[i + 1]['publication_date'][0:19], "%Y-%m-%d %H:%M:%S")
             self.assertTrue(date1 >= date2)
 
     def test_400_returned_for_disallowed_sort_field(self):
@@ -480,7 +483,7 @@ class ApiSearchErrorTests(ApiTestsBase):
         self.assertStatusCode(response, 405)
 
     def test_400_returned_for_repeated_country_search(self):
-        response = self.object_search(query={'country': ['namibia','angola']})
+        response = self.object_search(query={'country': ['namibia', 'angola']})
         self.assertContains(response, 'country', status_code=400)
 
     def test_query_by_country_with_both_or_and_and(self):
@@ -560,7 +563,7 @@ class ApiGetAllIntegrationTests(ApiTestsBase):
 
 class ApiGetObjectIntegrationTests(ApiTestsBase):
 
-    def get_object(self, site='eldis', object_type='documents', object_id='A8588',
+    def get_object(self, site='eldis', object_type='documents', object_id='A66345',
             output_format='', query=None, content_type='application/json'):
         if not query:
             query = {}
@@ -568,8 +571,8 @@ class ApiGetObjectIntegrationTests(ApiTestsBase):
             output_format = ''
         else:
             output_format = '/' + output_format
-        return self.client.get(defines.URL_ROOT + site + '/get/' + object_type +
-                '/' + object_id + output_format, query, ACCEPT=content_type)
+        return self.client.get(defines.URL_ROOT + site + '/get/' + object_type
+                + '/' + object_id + output_format, query, ACCEPT=content_type)
 
     def test_get_document_by_id_returns_200(self):
         response = self.get_object(object_type='documents')
