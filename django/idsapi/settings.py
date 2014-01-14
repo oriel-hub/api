@@ -16,9 +16,9 @@ EMAIL_HOST = 'mailrelay.ids.ac.uk'
 # files and are here for reference
 DEFAULT_SITE = 'eldis'
 SOLR_SERVER_URLS = {
-        'eldis': 'http://beta.api.ids.ac.uk:8983/solr/eldis-test/',
-        'bridge': 'http://beta.api.ids.ac.uk:8983/solr/bridge-test/',
-        }
+    'eldis': 'http://test.api.ids.ac.uk:8983/solr/eldis-test/',
+    'bridge': 'http://test.api.ids.ac.uk:8983/solr/bridge-test/',
+}
 SOLR_SCHEMA_SUFFIX = 'admin/file/?file=schema.xml'
 
 SOLR_SCHEMA = SOLR_SERVER_URLS[DEFAULT_SITE] + SOLR_SCHEMA_SUFFIX
