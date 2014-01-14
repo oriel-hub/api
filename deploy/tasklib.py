@@ -364,7 +364,7 @@ def restore_db(dump_filename):
     if db_port != None:
         restore_cmd.append('--port='+db_port)
     restore_cmd.append(db_name)
-    
+
     dump_file = open(dump_filename, 'r')
     if env['verbose']:
         print 'Executing dump command: %s\nSending stdin to %s' % (' '.join(restore_cmd), dump_filename)
@@ -471,7 +471,8 @@ def _install_django_jenkins():
         print "### Installing Jenkins packages"
     pip_bin = os.path.join(env['ve_dir'], 'bin', 'pip')
     cmds = [
-        [pip_bin, 'install', 'django-jenkins'],
+        # django-jenkins after 0.14 require django>=1.4, so pin to 0.14
+        [pip_bin, 'install', 'django-jenkins==0.14'],
         [pip_bin, 'install', 'pylint'],
         [pip_bin, 'install', 'coverage']]
 
