@@ -12,7 +12,8 @@ DEFAULT_FROM_EMAIL = 'api@ids.ac.uk'
 # the email server at IDS
 EMAIL_HOST = 'mailrelay.ids.ac.uk'
 
-# Where to find SOLR - note that these are over-written in the local settings files and are here for reference
+# Where to find SOLR - note that these are over-written in the local settings
+# files and are here for reference
 DEFAULT_SITE = 'eldis'
 SOLR_SERVER_URLS = {
         'eldis': 'http://beta.api.ids.ac.uk:8983/solr/eldis-test/',
@@ -38,7 +39,7 @@ USER_LEVEL_INFO = {
             'hide_admin_fields':  True,
             'general_fields_only': True,
             'level':              1,
-            },
+        },
         'Offline Application User': {
             'max_call_rate':     '300/hour',
             'max_items_per_call': 2000,
@@ -46,7 +47,7 @@ USER_LEVEL_INFO = {
             'hide_admin_fields':  True,
             'general_fields_only': False,
             'level':              2,
-            },
+        },
         'Partner': {
             'max_call_rate':     '300/hour',
             'max_items_per_call': 2000,
@@ -54,7 +55,7 @@ USER_LEVEL_INFO = {
             'hide_admin_fields':  True,
             'general_fields_only': False,
             'level':              3,
-            },
+        },
         'Unlimited': {
             'max_call_rate':      '0/sec',
             'max_items_per_call': 0,
@@ -62,8 +63,8 @@ USER_LEVEL_INFO = {
             'hide_admin_fields':  False,
             'general_fields_only': False,
             'level':              4,
-            },
-        }
+        },
+    }
 
 # this is the default sort field
 DEFAULT_SORT_FIELD = 'title'
@@ -102,7 +103,7 @@ SORT_FIELDS = [
 		'timestamp',
 		'score',
         ]
-		
+
 # these fields will be hidden from those with #'hide_admin_fields' set to True
 ADMIN_ONLY_FIELDS = [
 'asset_id',
@@ -280,7 +281,7 @@ QUERY_MAPPING = {
 		 'category_path':   {
             'solr_field': 'category_path_sort',
             'object_type': 'all'
-            },	
+            },
         'theme':   {
             'solr_field': 'category_theme_facet',
             'object_type': 'all'
@@ -356,7 +357,7 @@ QUERY_MAPPING = {
 		'archived':  {
             'solr_field': 'archived',
             'object_type': 'all'
-            },	
+            },
 		'cat_autocomplete':  {
             'solr_field': 'category_path_autocomplete',
             'object_type': 'all'
@@ -529,7 +530,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    #'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -540,7 +541,7 @@ SECRET_KEY = private_settings.SECRET_KEY
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+    #'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -605,9 +606,9 @@ LOGGING = {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler'
         },
-        'console':{
-            'level':'ERROR',
-            'class':'logging.StreamHandler',
+        'console': {
+            'level': 'ERROR',
+            'class': 'logging.StreamHandler',
             'stream': sys.stdout
         },
     },
