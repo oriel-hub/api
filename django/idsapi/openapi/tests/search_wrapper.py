@@ -21,16 +21,24 @@ class MockSolrQuery:
         self.field_list = None
         self.sort_field = None
         self.has_free_text_query = False
+        self.extra = {}
 
     def query(self, *args, **kwargs):
         self.query_call_count += 1
         self.query_args.append([args, kwargs])
+        return self
 
     def field_limit(self, field_list):
         self.field_list = field_list
+        return self
 
     def sort_by(self, sort_field):
         self.sort_field = sort_field
+        return self
+
+    def add_extra(self, **kwargs):
+        self.extra.update(kwargs)
+        return self
 
 
 class SearchWrapperTests(unittest.TestCase):

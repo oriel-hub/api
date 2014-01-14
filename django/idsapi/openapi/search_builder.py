@@ -132,7 +132,7 @@ class SearchWrapper:
         else:
             self.solr = solr
         self.site = site
-        self.si_query = self.solr.query()
+        self.si_query = self.solr.query().add_extra(defType='edismax')
         self.user_level = user_level
         self.has_free_text_query = False
 
@@ -225,8 +225,8 @@ class SearchWrapper:
 
             # Otherwise assume the catch all default
             if not sort_field:
-                    sort_field = settings.DEFAULT_SORT_FIELD
-                    ascending = settings.DEFAULT_SORT_ASCENDING
+                sort_field = settings.DEFAULT_SORT_FIELD
+                ascending = settings.DEFAULT_SORT_ASCENDING
 
             if sort_field in settings.SORT_MAPPING:
                 sort_field = settings.SORT_MAPPING[sort_field]
