@@ -4,8 +4,11 @@ import re
 import datetime
 
 from django.conf import settings
+from django.test.testcases import TestCase
+from sunburnt import SolrInterface
 
 from openapi import defines
+from openapi.search_builder import get_solr_interface
 from openapi.tests.test_base import BaseTestCase
 
 
@@ -529,6 +532,40 @@ class ApiSearchErrorTests(ApiTestsBase):
             'sort_desc': 'object_id'
         })
         self.assertStatusCode(response, 400)
+
+
+class GetSolrInterfaceTests(TestCase):
+
+    def test_get_solr_interface_returns_same_object_normally(self):
+        si1 = get_solr_interface('eldis')
+        si2 = get_solr_interface('eldis')
+        self.assertIs(si1, si2)
+        self.assertIsInstance(si1, SolrInterface)
+
+    def test_get_solr_interface_returns_different_object_for_different_sites(self):
+        si1 = get_solr_interface('eldis')
+        si2 = get_solr_interface('bridge')
+        self.assertIsNot(si1, si2)
+        self.assertIsInstance(si1, SolrInterface)
+        self.assertIsInstance(si2, SolrInterface)
+
+    def test_get_solr_interface_returns_different_object_if_global_is_blanked(self):
+        si1 = get_solr_interface('eldis')
+        from .. import search_builder
+        del search_builder.saved_solr_interface['eldis']
+        si2 = get_solr_interface('eldis')
+        self.assertIsNot(si1, si2)
+        self.assertIsInstance(si1, SolrInterface)
+        self.assertIsInstance(si2, SolrInterface)
+
+    def test_get_solr_interface_returns_different_object_if_time_reset(self):
+        si1 = get_solr_interface('eldis')
+        from .. import search_builder
+        search_builder.solr_interface_created['eldis'] = datetime.datetime(2000, 1, 1)
+        si2 = get_solr_interface('eldis')
+        self.assertIsNot(si1, si2)
+        self.assertIsInstance(si1, SolrInterface)
+        self.assertIsInstance(si2, SolrInterface)
 
 
 class ApiGetAllIntegrationTests(ApiTestsBase):
