@@ -37,7 +37,7 @@ def get_solr_interface(site):
     if too_old:
         try:
             saved_solr_interface[site] = sunburnt.SolrInterface(
-                settings.SOLR_SERVER_URLS[site])
+                settings.SOLR_SERVER_URLS[site], format='json')
             solr_interface_created[site] = datetime.now()
         except:
             raise SolrUnavailableError('Solr is not responding (using %s )' %
