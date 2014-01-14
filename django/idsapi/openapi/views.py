@@ -118,12 +118,12 @@ class BaseSearchView(BaseAuthView):
     def format_result_list(self, request):
         # return the metadata with the output_format specified
         results = self.build_response()
-        if request.GET.has_key('num_results_only'):
-            return {'metadata': {'total_results': self.search_response.result.numFound} }
+        if 'num_results_only' in request.GET:
+            return {'metadata': {'total_results': self.search_response.result.numFound}}
 
         metadata = {
-            'total_results': self.search_response.total_results,
-            'start_offset': self.search_response.start,
+            'total_results': self.search_response.result.numFound,
+            'start_offset': self.search_response.result.start,
         }
         if self.next_page_available():
             metadata['next_page'] = self.generate_next_page_link(request)
@@ -134,8 +134,8 @@ class BaseSearchView(BaseAuthView):
         return {'metadata': metadata, 'results': results}
 
     def next_page_available(self):
-        result = self.search_response.result
-        return (result.numFound - result.start) > len(list(self.search_response))
+        last_index_on_page = self.search_response.result.start + len(list(self.search_response))
+        return self.search_response.result.numFound > last_index_on_page
 
     def prev_page_available(self):
         return self.search_response.result.start > 0
