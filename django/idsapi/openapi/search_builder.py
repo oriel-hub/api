@@ -5,7 +5,7 @@ import sys
 import urllib
 import urllib2
 import re
-import datetime
+from datetime import datetime, timedelta
 import sunburnt
 import operator
 
@@ -15,7 +15,34 @@ from djangorestframework.renderers import BaseRenderer
 
 from openapi import defines
 
+# this is a global to cache the Solr instance
+saved_solr_interface = {}
+solr_interface_created = {}
+
 query_mapping = settings.QUERY_MAPPING
+
+
+def get_solr_interface(site):
+    """cache the solr interface for an hour at a time so we don't need
+    to fetch the schema on every single query."""
+    global saved_solr_interface
+    global solr_interface_created
+    if site not in settings.SOLR_SERVER_URLS:
+        raise InvalidQueryError("Unknown site: %s" % site)
+    if site not in saved_solr_interface:
+        too_old = True
+    else:
+        age = datetime.now() - solr_interface_created[site]
+        too_old = age > timedelta(hours=1)
+    if too_old:
+        try:
+            saved_solr_interface[site] = sunburnt.SolrInterface(
+                settings.SOLR_SERVER_URLS[site])
+            solr_interface_created[site] = datetime.now()
+        except:
+            raise SolrUnavailableError('Solr is not responding (using %s )' %
+                                       settings.SOLR_SERVER_URLS[site])
+    return saved_solr_interface[site]
 
 
 class SearchBuilder():
@@ -121,16 +148,10 @@ class SearchWrapper:
                 site (string): A String representing the SOLR site to use. Eg 'eldis' or 'bridge'.
                 solr (object): an object to be the solr interface (to allow for mocking)
         """
-        if solr is None:
-            if site not in settings.SOLR_SERVER_URLS:
-                raise InvalidQueryError("Unknown site: %s" % site)
-            try:
-                self.solr = sunburnt.SolrInterface(settings.SOLR_SERVER_URLS[site])
-            except:
-                raise SolrUnavailableError('Solr is not responding (using %s )' %
-                        settings.SOLR_SERVER_URLS[site])
-        else:
+        if solr is not None:
             self.solr = solr
+        else:
+            self.solr = get_solr_interface(site)
         self.site = site
         self.si_query = self.solr.query().add_extra(defType='edismax')
         self.user_level = user_level
@@ -316,8 +337,8 @@ class SearchWrapper:
             if len(date) != 4 or not date.isdigit():
                 raise InvalidQueryError("Invalid year, should be 4 digits but is %s" % date)
             year = int(date)
-            start_of_year = datetime.datetime(year, 1, 1, 0, 0)
-            end_of_year = datetime.datetime(year, 12, 31, 23, 59)
+            start_of_year = datetime(year, 1, 1, 0, 0)
+            end_of_year = datetime(year, 12, 31, 23, 59)
             kwargs = {solr_param + '__range': (start_of_year, end_of_year)}
             self.si_query = self.si_query.query(**kwargs)
         else:
