@@ -46,6 +46,11 @@ class DataMunger():
                         "COULD NOT PARSE XML. object_id: %s, field: %s Error: %s" % \
                         (self.object_id, xml_field, str(e))
 
+        # convert date fields to expected output format
+        for date_field in settings.DATE_FIELDS:
+            if date_field in object_data:
+                object_data[date_field] = object_data[date_field].strftime('%Y-%m-%d %H:%M:%S')
+
         # add the parent category, if relevant
         if self.object_type in settings.OBJECT_TYPES_WITH_HIERARCHY:
             self._add_child_parent_links(object_data, result)
