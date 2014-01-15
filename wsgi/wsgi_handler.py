@@ -1,24 +1,21 @@
-import os, sys
+import os
+from os import path
+import sys
+import site
 
-# find the project name from project_settings
+vcs_root_dir = path.abspath(path.join(path.dirname(__file__), '..'))
 
-wsgi_dir = os.path.abspath(os.path.dirname(__file__))
+relative_django_dir = path.join('django', 'idsapi')
+relative_ve_dir = path.join(relative_django_dir, '.ve')
 
-sys.path.append(os.path.abspath(os.path.join(wsgi_dir, '..', 'deploy')))
-from project_settings import project_name
+# ensure the virtualenv for this instance is added
+python = 'python%d.%d' % (sys.version_info[0], sys.version_info[1])
+site.addsitedir(
+    path.join(vcs_root_dir, relative_ve_dir, 'lib', python, 'site-packages'))
 
-sys.path.append(os.path.abspath(os.path.join(wsgi_dir, '..', 'django')))
-sys.path.append(os.path.abspath(os.path.join(wsgi_dir, '..', 'django', project_name)))
+sys.path.append(path.join(vcs_root_dir, relative_django_dir))
 
-#print >> sys.stderr, sys.path
+os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 
-os.environ['DJANGO_SETTINGS_MODULE'] = project_name + '.settings'
-
-# this basically does:
-# os.environ['PROJECT_NAME_HOME'] = '/var/django/project_name/dev/'
-os.environ[project_name.upper() + '_HOME'] = os.path.join('/var/django', project_name, 'dev')
-
-import django.core.handlers.wsgi
-
-application = django.core.handlers.wsgi.WSGIHandler()
-
+from django.core.wsgi import get_wsgi_application
+application = get_wsgi_application()
