@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import patterns, include, url
+from django.conf.urls import patterns, include, url
 from django.views.generic.base import RedirectView
 
 import userprofile.urls
@@ -23,7 +23,7 @@ urlpatterns += patterns('',
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
 
-    url(r'^accounts/', include('registration.urls')),
+    url(r'^accounts/', include('registration.backends.default.urls')),
 
     url(r'^profiles/edit/', 'profiles.views.edit_profile',
         {'form_class': ProfileForm, 'success_url': '/profiles/view/'},

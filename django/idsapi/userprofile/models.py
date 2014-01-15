@@ -3,19 +3,15 @@ import uuid
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import signals
 from django_countries import CountryField
 
 from django.conf import settings
 
-from userprofile.signals import create_profile
 
 def validate_agreed_to_license_terms(value):
-    if value != True:
+    if value is not True:
         raise ValidationError(u'You must agree to the terms to continue')
- 
-# When model instance is saved, trigger creation of corresponding profile
-signals.post_save.connect(create_profile, sender=User)
+
 
 class UserProfile(models.Model):
     # so we can get it with user.get_profile()
@@ -57,13 +53,16 @@ class UserProfile(models.Model):
     heard_about = models.CharField("How did you hear about us?", max_length=250, blank=True)
     website_using_api = models.URLField("Website that will use the API", verify_exists=False)
     COMMERCIAL_CHOICES = (
-            (u'Commercial', u'Commercial'),
-            (u'Non-Commercial', u'Non-Commercial'),
-            )
+        (u'Commercial', u'Commercial'),
+        (u'Non-Commercial', u'Non-Commercial'),
+    )
     commercial = models.CharField("Usage", max_length=50, choices=COMMERCIAL_CHOICES)
     agree_to_licensing = models.BooleanField(
             u'I have read and agree to the Terms and Conditions',
             validators=[validate_agreed_to_license_terms])
+
+    def __unicode__(self):
+        return u'profile for user %s' % self.user.username
 
     def ensure_hidden_fields_set(self):
         if self.access_guid in [None, '']:
@@ -72,4 +71,3 @@ class UserProfile(models.Model):
             self.beacon_guid = str(uuid.uuid4())
         if self.user_level in [None, '']:
             self.user_level = u'General User'
-
