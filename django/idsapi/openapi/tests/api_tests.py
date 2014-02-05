@@ -652,6 +652,11 @@ class ApiGetObjectIntegrationTests(ApiTestsBase):
         response = self.get_object(object_type='documents', query={'country': 'angola'})
         self.assertStatusCode(response, 400)
 
+    def test_get_object_by_id_with_xml_returns_200(self):
+        response = self.get_object(object_type='objects', content_type=None,
+                                   query={'format': 'xml'})
+        self.assertStatusCode(response)
+
     def test_can_specify_content_type_in_query(self):
         response = self.get_object(query={'_accept': 'application/xml'},
                 content_type='text/html')

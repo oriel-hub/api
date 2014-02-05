@@ -48,9 +48,11 @@ def get_solr_interface(site):
 class SearchBuilder():
 
     @classmethod
-    def create_objectid_query(cls, user_level, site, object_id, object_type, search_params, output_format):
+    def create_objectid_query(cls, user_level, site, object_id, object_type,
+                              search_params, output_format):
         for key in search_params.keys():
-            if key[0] != '_' and key not in ['extra_fields']:
+            if (key[0] != '_' and key not in ['extra_fields'] and
+                    key != BaseRenderer._FORMAT_QUERY_PARAM):
                 raise InvalidQueryError("Unknown query parameter '%s'" % key)
         sw = SearchWrapper(user_level, site)
         sw.si_query = sw.solr.query(object_id=object_id)
