@@ -135,7 +135,7 @@ def create_copy_for_rollback(keep):
 def delete_old_versions(keep=None):
     """Delete old rollback directories, keeping the last "keep" (default 5)"."""
     require('prev_root', provided_by=env.valid_envs)
-    prev_versions = run('ls -1' + env.prev_root).split('\n')
+    prev_versions = run('ls -1 ' + env.prev_root).split('\n')
     if keep == None:
         if env.has_key('versions_to_keep'):
             keep = env.versions_to_keep
