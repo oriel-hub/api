@@ -260,7 +260,7 @@ class SearchWrapper:
             raise InvalidQueryError("Can't do sort - " + str(e))
 
     def add_free_text_query(self, search_text):
-        self.si_query = self.si_query.query(search_text)
+        self.si_query = self.si_query.query(search_text.lower())
         return
 
     def add_facet(self, facet_type, search_params):
