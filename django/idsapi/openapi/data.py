@@ -91,9 +91,9 @@ class DataMunger():
     def _create_metadata_url(self, object_type=None, object_id=None, object_name=None,
             url_name='object'):
         """create a URL that will give information about the object"""
-        if object_type == None:
+        if object_type is None:
             object_type = self.object_type
-        if object_id == None:
+        if object_id is None:
             object_id = self.object_id
         metadata_url = reverse(url_name, kwargs={
             'object_type': object_type,
@@ -101,7 +101,7 @@ class DataMunger():
             'output_format': 'full',
             'site': self.site,
         }) + '/'
-        if object_name != None:
+        if object_name is not None:
             title = re.sub('\W+', '-', object_name).lower().strip('-')
             metadata_url += title + '/'
         return metadata_url
@@ -121,13 +121,15 @@ class DataMunger():
         if result['cat_first_parent'] != result['cat_parent'] and \
                 result['cat_first_parent'] != result['object_id']:
             object_data['toplevel_parent_url'] = self._create_metadata_url(
-                    object_id='C' + result['cat_first_parent'])
+                object_id='C' + result['cat_first_parent'])
 
     def convert_facet_string(self, facet_string):
-        result = {'object_id': '',
-                'object_type': '',
-                'object_name': '',
-                'metadata_url': ''}
+        result = {
+            'object_id': '',
+            'object_type': '',
+            'object_name': '',
+            'metadata_url': ''
+        }
         if facet_string:
             # is it an XML facet_string
             if facet_string[0] == '<' and facet_string[-1] == '>':
@@ -143,8 +145,8 @@ class DataMunger():
             # create metadata url, but only if data exists
             if result['object_id'] and result['object_type'] and result['object_name']:
                 result['metadata_url'] = self._create_metadata_url(
-                        defines.object_name_to_object_type(result['object_type']),
-                        result['object_id'],
-                        result['object_name'])
+                    defines.object_name_to_object_type(result['object_type']),
+                    result['object_id'],
+                    result['object_name'])
 
         return result
