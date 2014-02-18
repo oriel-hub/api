@@ -172,8 +172,6 @@ class SearchWrapperAddSortTests(unittest.TestCase):
 
 
 class SearchWrapperAddFreeTextQueryTests(unittest.TestCase):
-    # 2014-02-05, HD: we just pass through most of this untouched now
-    # and let dismax sort it out
 
     @classmethod
     def setUpClass(cls):
@@ -182,63 +180,71 @@ class SearchWrapperAddFreeTextQueryTests(unittest.TestCase):
         cls.si = sunburnt.SolrInterface(settings.SOLR_SERVER_INFO['eldis']['base_url'])
 
     def setUp(self):
+        # 2014-02-05, HD: Unless we set dismax, we just pass through most of
+        # this untouched now and let dismax sort it out
+        self.orig_dismax = settings.SOLR_SERVER_INFO['eldis']['dismax']
+        settings.SOLR_SERVER_INFO['eldis']['dismax'] = False
+
         self.msi = MockSolrInterface()
         self.sw = SearchWrapper('General User', 'eldis', SearchWrapperAddFreeTextQueryTests.si)
+
+    def tearDown(self):
+        settings.SOLR_SERVER_INFO['eldis']['dismax'] = self.orig_dismax
 
     def solr_q(self):
         return self.sw.si_query.options()['q']
 
     def test_free_text_query_has_implicit_or(self):
         self.sw.add_free_text_query('brazil health ozone')
-        self.assertEquals(self.solr_q(), 'brazil\\ health\\ ozone')
+        self.assertEquals(self.solr_q(), 'brazil OR health OR ozone')
 
     def test_free_text_query_supports_single_and_operator(self):
         self.sw.add_free_text_query('brazil and health')
-        self.assertEquals(self.solr_q(), 'brazil\\ and\\ health')
+        self.assertEquals(self.solr_q(), 'brazil AND health')
 
     def test_free_text_query_supports_single_and_operator_with_implicit_or(self):
         self.sw.add_free_text_query('brazil and health ozone')
-        self.assertEquals(self.solr_q(), 'brazil\\ and\\ health\\ ozone')
+        self.assertEquals(self.solr_q(), '(brazil AND health) OR ozone')
 
     def test_free_text_query_supports_single_and_operator_alternative(self):
         self.sw.add_free_text_query('brazil & health ozone')
-        self.assertEquals(self.solr_q(), 'brazil\\ \\&\\ health\\ ozone')
+        self.assertEquals(self.solr_q(), '(brazil AND health) OR ozone')
 
     def test_free_text_query_supports_single_and_operator_alternative_with_no_spaces(self):
         self.sw.add_free_text_query('brazil&health ozone')
-        self.assertEquals(self.solr_q(), 'brazil\\&health\\ ozone')
+        self.assertEquals(self.solr_q(), '(brazil AND health) OR ozone')
 
     def test_free_text_query_supports_multiple_and_operator(self):
         self.sw.add_free_text_query('brazil and health and ozone')
-        self.assertEquals(self.solr_q(), 'brazil\\ and\\ health\\ and\\ ozone')
+        self.assertEquals(self.solr_q(), 'brazil AND health AND ozone')
 
     def test_free_text_query_ignores_disconnected_and(self):
         self.sw.add_free_text_query('brazil and health ozone and')
-        self.assertEquals(self.solr_q(), 'brazil\\ and\\ health\\ ozone\\ and')
+        self.assertEquals(self.solr_q(), '(brazil AND health) OR ozone')
 
     def test_free_text_query_ignores_and_at_start_of_string(self):
         self.sw.add_free_text_query('and brazil and health ozone')
-        self.assertEquals(self.solr_q(), 'and\\ brazil\\ and\\ health\\ ozone')
+        self.assertEquals(self.solr_q(), '(brazil AND health) OR ozone')
 
     def test_free_text_query_ignores_multiple_ands(self):
         self.sw.add_free_text_query('brazil and and health ozone')
-        self.assertEquals(self.solr_q(), 'brazil\\ and\\ and\\ health\\ ozone')
+        self.assertEquals(self.solr_q(), '(brazil AND health) OR ozone')
 
     def test_free_text_query_supports_or_operator(self):
         self.sw.add_free_text_query('brazil or health ozone')
-        self.assertEquals(self.solr_q(), 'brazil\\ or\\ health\\ ozone')
+        self.assertEquals(self.solr_q(), 'brazil OR health OR ozone')
 
     def test_free_text_query_gracefully_handles_meaningless_operators(self):
         self.sw.add_free_text_query('|')
-        self.assertEquals(self.solr_q(), '\\|')
+        self.assertEquals(self.solr_q(), '*:*')
 
     def test_free_text_query_supports_or_operators_alternative(self):
         self.sw.add_free_text_query('brazil | health | ozone')
-        self.assertEquals(self.solr_q(), 'brazil\\ \\|\\ health\\ \\|\\ ozone')
+        self.assertEquals(self.solr_q(), 'brazil OR health OR ozone')
 
     def test_and_has_higher_operator_precedence_than_or(self):
         self.sw.add_free_text_query('brazil and health ozone and environment')
-        self.assertEquals(self.solr_q(), 'brazil\\ and\\ health\\ ozone\\ and\\ environment')
+        self.assertEquals(self.solr_q(), '(brazil AND health) OR (environment AND ozone)')
 
 
 class SearchWrapperAddFieldQueryTests(unittest.TestCase):

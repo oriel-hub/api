@@ -4,6 +4,7 @@
 import sys
 import urllib
 import urllib2
+import operator
 import re
 from datetime import datetime, timedelta
 import sunburnt
@@ -154,7 +155,10 @@ class SearchWrapper:
         else:
             self.solr = get_solr_interface(site)
         self.site = site
-        self.si_query = self.solr.query().add_extra(defType='edismax')
+        if settings.SOLR_SERVER_INFO[site]['dismax']:
+            self.si_query = self.solr.query().add_extra(defType='edismax')
+        else:
+            self.si_query = self.solr.query()
         self.user_level = user_level
         self.has_free_text_query = False
 
@@ -262,8 +266,39 @@ class SearchWrapper:
             raise InvalidQueryError("Can't do sort on field %s: %s" % (sort_field, e))
 
     def add_free_text_query(self, search_text):
-        self.si_query = self.si_query.query(search_text.lower())
-        return
+        if settings.SOLR_SERVER_INFO[self.site]['dismax']:
+            self.si_query = self.si_query.query(search_text.lower())
+        else:
+            self.has_free_text_query = True
+            # split words and operators in words, throwing away white space.
+            words = self.split_string_around_quotes_and_delimiters(search_text.lower())
+
+            def gen_2expr(oper, arg):
+                return lambda y: oper(self.si_query.Q(arg), y)
+
+            expr = []
+            ops = []
+            for word in words:
+                if word in ['and', '&']:
+                    if expr and not ops:
+                        ops.append(gen_2expr(operator.and_, expr[-1]))
+                    continue
+
+                if word in ['or', '|']:
+                    # as we implicity ORing everything there is nothing more to do here
+                    continue
+
+                if ops:
+                    if callable(ops[-1]):
+                        part = ops.pop()    # function that returns the operator tree
+                        expr.pop()          # remove the argument from the expression stack
+                        expr.append(part(self.si_query.Q(word)))  # push the tree to the stack
+                else:
+                    expr.append(self.si_query.Q(word))
+
+            if expr:
+                or_words = reduce(operator.or_, expr)
+                self.si_query = self.si_query.query(or_words)
 
     def add_facet(self, facet_type, search_params):
         if not facet_type in settings.FACET_MAPPING.keys():

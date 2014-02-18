@@ -19,6 +19,7 @@ DEFAULT_SITE = 'eldis'
 SOLR_SERVER_INFO = {
     'eldis': {
         'base_url': 'http://test.api.ids.ac.uk:8983/solr/eldis-test/',
+        'dismax': True,
         'name_field': 'title',
         'sort_mapping': {
             'title': 'title_sort',
@@ -27,6 +28,7 @@ SOLR_SERVER_INFO = {
     },
     'bridge': {
         'base_url': 'http://test.api.ids.ac.uk:8983/solr/bridge-test/',
+        'dismax': True,
         'name_field': 'title',
         'sort_mapping': {
             'title': 'title_sort',
@@ -35,6 +37,7 @@ SOLR_SERVER_INFO = {
     },
     'hub': {
         'base_url': 'http://test.api.ids.ac.uk:8983/solr/oriel-searchapi-test/',
+        'dismax': True,
         'name_field': 'name',
         'sort_mapping': {
             'title': 'title_en',
