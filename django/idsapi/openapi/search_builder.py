@@ -343,7 +343,7 @@ class SearchWrapper:
             itself, so we remove whitespace from lucene_special_chars.
         """
         # TODO: There has got to be a better way of doing this
-        s_str = sunburnt.strings.RawString(str(string))
+        s_str = sunburnt.strings.RawString(unicode(string))
         s_str.lucene_special_chars = '+-&|!(){}[]^"~*?:\t\v\\/'
         return s_str
 

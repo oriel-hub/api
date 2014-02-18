@@ -234,6 +234,10 @@ class SearchWrapperAddFieldQueryTests(unittest.TestCase):
         self.msi = MockSolrInterface()
         self.sw = SearchWrapper('General User', 'eldis', SearchWrapperAddFieldQueryTests.si)
 
+    def test_field_query_supports_unicode_text(self):
+        q = self.sw.add_field_query('title', u'C\xf4tedivorie')
+        self.assertEquals(u'title:C\xf4tedivorie', q.options()[None])
+
     def test_field_query_supports_quoted_text(self):
         q = self.sw.add_field_query('title', '"beyond their age"')
         self.assertEquals(u'title:\\"beyond their age\\"', q.options()[None])
