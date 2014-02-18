@@ -475,15 +475,21 @@ ASSET_TYPES = [
 # the object types where we actually show the heirarchy
 OBJECT_TYPES_WITH_HIERARCHY = ['themes', 'subjects', 'itemtypes']
 
-# fields that will exist for all items
-GENERIC_FIELD_LIST = [
+# objects that we will get back from solr, but that we should ignore
+IGNORE_FIELDS = [
     'content',
     'id',
     'index_id',
+    'ss_search_api_language',
+    'author',
+    'title',
+]
+
+# fields that will exist for all items
+GENERIC_FIELD_LIST = [
     'item_id',
     'item_type',
     'metadata_languages',
-    'ss_search_api_language',
     'timestamp',
 ]
 

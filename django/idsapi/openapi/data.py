@@ -154,6 +154,8 @@ class DataMunger():
     def create_source_lang_dict(self, in_dict):
         out_dict = {}
         for field, value in in_dict.iteritems():
+            if field in settings.IGNORE_FIELDS:
+                continue
             prefix, source, lang = self.field_type_prefix(field)
             if source is None:
                 out_dict[prefix] = value
