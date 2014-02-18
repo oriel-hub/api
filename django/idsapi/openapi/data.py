@@ -59,7 +59,8 @@ class DataMunger():
             object_data['description'] = self._process_description(
                     object_data['description'], user_level_info, beacon_guid)
 
-        object_data['metadata_url'] = self._create_metadata_url(object_name=result['title'])
+        object_data['metadata_url'] = self._create_metadata_url(
+            object_name=result.get(settings.SOLR_SERVER_INFO[self.site]['name_field']))
         return object_data
 
     def _convert_xml_field(self, xml_field):

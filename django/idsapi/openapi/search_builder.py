@@ -26,7 +26,7 @@ def get_solr_interface(site):
     to fetch the schema on every single query."""
     global saved_solr_interface
     global solr_interface_created
-    if site not in settings.SOLR_SERVER_URLS:
+    if site not in settings.SOLR_SERVER_INFO:
         raise InvalidQueryError("Unknown site: %s" % site)
     if site not in saved_solr_interface:
         too_old = True
@@ -36,11 +36,11 @@ def get_solr_interface(site):
     if too_old:
         try:
             saved_solr_interface[site] = sunburnt.SolrInterface(
-                settings.SOLR_SERVER_URLS[site], format='json')
+                settings.SOLR_SERVER_INFO[site]['base_url'], format='json')
             solr_interface_created[site] = datetime.now()
         except:
             raise SolrUnavailableError('Solr is not responding (using %s )' %
-                                       settings.SOLR_SERVER_URLS[site])
+                                       settings.SOLR_SERVER_INFO[site]['base_url'])
     return saved_solr_interface[site]
 
 
@@ -159,7 +159,8 @@ class SearchWrapper:
         self.has_free_text_query = False
 
     def execute(self):
-        solr_query = settings.SOLR_SERVER_URLS[self.site] + 'select/?' + urllib.urlencode(self.si_query.params())
+        solr_query = settings.SOLR_SERVER_INFO[self.site]['base_url'] + \
+            'select/?' + urllib.urlencode(self.si_query.params())
         if settings.LOG_SEARCH_PARAMS:
             # this will print to console or error log as appropriate
             print >> sys.stderr, self.si_query.params()

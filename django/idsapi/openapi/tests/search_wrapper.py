@@ -160,7 +160,7 @@ class SearchWrapperAddFreeTextQueryTests(unittest.TestCase):
     def setUpClass(cls):
         # TODO: there doesn't seem to be a easy way to just test the query
         # building behaviour with out building a real connection.
-        cls.si = sunburnt.SolrInterface(settings.SOLR_SERVER_URLS['eldis'])
+        cls.si = sunburnt.SolrInterface(settings.SOLR_SERVER_INFO['eldis']['base_url'])
 
     def setUp(self):
         self.msi = MockSolrInterface()
@@ -228,7 +228,7 @@ class SearchWrapperAddFieldQueryTests(unittest.TestCase):
     def setUpClass(cls):
         # TODO: there doesn't seem to be a easy way to just test the query
         # building behaviour with out building a real connection.
-        cls.si = sunburnt.SolrInterface(settings.SOLR_SERVER_URLS['eldis'])
+        cls.si = sunburnt.SolrInterface(settings.SOLR_SERVER_INFO['eldis']['base_url'])
 
     def setUp(self):
         self.msi = MockSolrInterface()

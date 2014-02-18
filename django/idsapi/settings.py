@@ -15,13 +15,24 @@ EMAIL_HOST = 'mailrelay.ids.ac.uk'
 # Where to find SOLR - note that these are over-written in the local settings
 # files and are here for reference
 DEFAULT_SITE = 'eldis'
-SOLR_SERVER_URLS = {
-    'eldis': 'http://test.api.ids.ac.uk:8983/solr/eldis-test/',
-    'bridge': 'http://test.api.ids.ac.uk:8983/solr/bridge-test/',
-}
-SOLR_SCHEMA_SUFFIX = 'admin/file/?file=schema.xml'
 
-SOLR_SCHEMA = SOLR_SERVER_URLS[DEFAULT_SITE] + SOLR_SCHEMA_SUFFIX
+SOLR_SERVER_INFO = {
+    'eldis': {
+        'base_url': 'http://test.api.ids.ac.uk:8983/solr/eldis-test/',
+        'name_field': 'title',
+    },
+    'bridge': {
+        'base_url': 'http://test.api.ids.ac.uk:8983/solr/bridge-test/',
+        'name_field': 'title',
+    },
+    'hub': {
+        'base_url': 'http://test.api.ids.ac.uk:8983/solr/oriel-searchapi-test/',
+        'name_field': 'name',
+    },
+}
+
+SOLR_SCHEMA_SUFFIX = 'admin/file/?file=schema.xml'
+SOLR_SCHEMA = SOLR_SERVER_INFO[DEFAULT_SITE]['base_url'] + SOLR_SCHEMA_SUFFIX
 
 # whether to send solr search parameters to logs/console
 # default to False - best to override in local_settings
