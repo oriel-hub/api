@@ -10,6 +10,7 @@ from openapi.xmldict import XmlDictConfig
 
 try:
     from xml.etree.ElementTree import ParseError
+    assert ParseError  # silence pyflakes error
 except ImportError:
     from xml.parsers.expat import ExpatError as ParseError
 
