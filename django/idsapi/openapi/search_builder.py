@@ -251,8 +251,9 @@ class SearchWrapper:
                 sort_field = settings.DEFAULT_SORT_FIELD
                 ascending = settings.DEFAULT_SORT_ASCENDING
 
-            if sort_field in settings.SORT_MAPPING:
-                sort_field = settings.SORT_MAPPING[sort_field]
+            sort_mapping = settings.SOLR_SERVER_INFO[self.site]['sort_mapping']
+            if sort_field in sort_mapping:
+                sort_field = sort_mapping[sort_field]
 
             sort_ord = '' if ascending else '-'
             self.si_query = self.si_query.sort_by(sort_ord + sort_field)

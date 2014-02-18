@@ -20,14 +20,26 @@ SOLR_SERVER_INFO = {
     'eldis': {
         'base_url': 'http://test.api.ids.ac.uk:8983/solr/eldis-test/',
         'name_field': 'title',
+        'sort_mapping': {
+            'title': 'title_sort',
+            'category_path': 'category_path_sort',
+        },
     },
     'bridge': {
         'base_url': 'http://test.api.ids.ac.uk:8983/solr/bridge-test/',
         'name_field': 'title',
+        'sort_mapping': {
+            'title': 'title_sort',
+            'category_path': 'category_path_sort',
+        },
     },
     'hub': {
         'base_url': 'http://test.api.ids.ac.uk:8983/solr/oriel-searchapi-test/',
         'name_field': 'name',
+        'sort_mapping': {
+            'title': 'title_en',
+            'category_path': 'category_path_sort',
+        },
     },
 }
 

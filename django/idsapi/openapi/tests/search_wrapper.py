@@ -87,6 +87,13 @@ class SearchWrapperAddSortTests(unittest.TestCase):
         self.msi = MockSolrInterface()
         settings.SORT_MAPPING = {'dummy': 'dummy_sort'}
 
+    def set_sort_mapping(self, site, mapping):
+        self.orig_sort_mapping = settings.SOLR_SERVER_INFO[site]['sort_mapping'].copy()
+        settings.SOLR_SERVER_INFO[site]['sort_mapping'] = mapping
+
+    def unset_sort_mapping(self, site):
+        settings.SOLR_SERVER_INFO[site]['sort_mapping'] = self.orig_sort_mapping
+
     def test_add_sort_method_disallows_mixed_asc_and_desc_sort(self):
         sw = SearchWrapper('General User', 'eldis', self.msi)
         search_params = {'sort_asc': 'title', 'sort_desc': 'title'}
@@ -94,22 +101,25 @@ class SearchWrapperAddSortTests(unittest.TestCase):
 
     def test_add_descending_sort_inverts_field(self):
         sw = SearchWrapper('General User', 'eldis', self.msi)
-        sw.add_sort({'sort_desc': 'title'}, 'assets')
-        self.assertEquals(self.msi.query.sort_field, '-title')
+        sw.add_sort({'sort_desc': 'publication_date'}, 'assets')
+        self.assertEquals(self.msi.query.sort_field, '-publication_date')
 
     def test_add_sort_with_no_mapping(self):
         sw = SearchWrapper('General User', 'eldis', self.msi)
-        sw.add_sort({'sort_asc': 'title'}, 'assets')
-        self.assertEquals(self.msi.query.sort_field, 'title')
+        sw.add_sort({'sort_asc': 'publication_date'}, 'assets')
+        self.assertEquals(self.msi.query.sort_field, 'publication_date')
 
     def test_add_sort_with_mapping(self):
         """
         Sort parameters should be overridable by the user via a mapping dictionary.
         """
-        settings.SORT_MAPPING = {'title': 'title_sort'}
-        sw = SearchWrapper('General User', 'eldis', self.msi)
-        sw.add_sort({'sort_asc': 'title'}, 'assets')
-        self.assertEquals(self.msi.query.sort_field, 'title_sort')
+        self.set_sort_mapping('eldis', {'title': 'title_sort'})
+        try:
+            sw = SearchWrapper('General User', 'eldis', self.msi)
+            sw.add_sort({'sort_asc': 'title'}, 'assets')
+            self.assertEquals(self.msi.query.sort_field, 'title_sort')
+        finally:
+            self.unset_sort_mapping('eldis')
 
     def test_add_sort_default_ordering_when_no_sort_params(self):
         """
@@ -122,10 +132,13 @@ class SearchWrapperAddSortTests(unittest.TestCase):
             'countries':
                 {'field': 'title', 'ascending': True},
         }
-        settings.SORT_MAPPING = {'title': 'title_sort'}
-        sw = SearchWrapper('General User', 'eldis', self.msi)
-        sw.add_sort(dict(), 'countries')
-        self.assertEquals(self.msi.query.sort_field, 'title_sort')
+        self.set_sort_mapping('eldis', {'title': 'title_sort'})
+        try:
+            sw = SearchWrapper('General User', 'eldis', self.msi)
+            sw.add_sort(dict(), 'countries')
+            self.assertEquals(self.msi.query.sort_field, 'title_sort')
+        finally:
+            self.unset_sort_mapping('eldis')
 
     def test_add_sort_no_default_ordering_when_free_text_query(self):
         """
@@ -133,11 +146,14 @@ class SearchWrapperAddSortTests(unittest.TestCase):
         """
         settings.DEFAULT_SORT_FIELD = 'title'
         settings.DEFAULT_SORT_ASCENDING = True
-        settings.SORT_MAPPING = {'title': 'title_sort'}
-        sw = SearchWrapper('General User', 'eldis', self.msi)
-        sw.has_free_text_query = True
-        sw.add_sort(dict(), 'assets')
-        self.assertIsNone(self.msi.query.sort_field)
+        self.set_sort_mapping('eldis', {'title': 'title_sort'})
+        try:
+            sw = SearchWrapper('General User', 'eldis', self.msi)
+            sw.has_free_text_query = True
+            sw.add_sort(dict(), 'assets')
+            self.assertIsNone(self.msi.query.sort_field)
+        finally:
+            self.unset_sort_mapping('eldis')
 
     def test_add_sort_allows_ordering_when_free_text_query(self):
         """
@@ -145,11 +161,14 @@ class SearchWrapperAddSortTests(unittest.TestCase):
         """
         settings.DEFAULT_SORT_FIELD = 'title'
         settings.DEFAULT_SORT_ASCENDING = True
-        settings.SORT_MAPPING = {'title': 'title_sort'}
-        sw = SearchWrapper('General User', 'eldis', self.msi)
-        sw.has_free_text_query = True
-        sw.add_sort({'sort_desc': 'title'}, 'assets')
-        self.assertEquals(self.msi.query.sort_field, '-title_sort')
+        self.set_sort_mapping('eldis', {'title': 'title_sort'})
+        try:
+            sw = SearchWrapper('General User', 'eldis', self.msi)
+            sw.has_free_text_query = True
+            sw.add_sort({'sort_desc': 'title'}, 'assets')
+            self.assertEquals(self.msi.query.sort_field, '-title_sort')
+        finally:
+            self.unset_sort_mapping('eldis')
 
 
 class SearchWrapperAddFreeTextQueryTests(unittest.TestCase):
