@@ -258,7 +258,7 @@ class SearchWrapper:
             self.si_query = self.si_query.sort_by(sort_ord + sort_field)
 
         except sunburnt.SolrError as e:
-            raise InvalidQueryError("Can't do sort - " + str(e))
+            raise InvalidQueryError("Can't do sort on field %s: %s" % (sort_field, e))
 
     def add_free_text_query(self, search_text):
         self.si_query = self.si_query.query(search_text.lower())
