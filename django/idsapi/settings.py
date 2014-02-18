@@ -43,39 +43,39 @@ LOG_SEARCH_PARAMS = False
 EXCLUDE_ZERO_COUNT_FACETS = True
 
 USER_LEVEL_INFO = {
-        'General User': {
-            'max_call_rate':     '150/hour',
-            'max_items_per_call': 2000,
-            'image_beacon':       True,
-            'hide_admin_fields':  True,
-            'general_fields_only': True,
-            'level':              1,
-        },
-        'Offline Application User': {
-            'max_call_rate':     '300/hour',
-            'max_items_per_call': 2000,
-            'image_beacon':       True,
-            'hide_admin_fields':  True,
-            'general_fields_only': False,
-            'level':              2,
-        },
-        'Partner': {
-            'max_call_rate':     '300/hour',
-            'max_items_per_call': 2000,
-            'image_beacon':       True,
-            'hide_admin_fields':  True,
-            'general_fields_only': False,
-            'level':              3,
-        },
-        'Unlimited': {
-            'max_call_rate':      '0/sec',
-            'max_items_per_call': 0,
-            'image_beacon':       False,
-            'hide_admin_fields':  False,
-            'general_fields_only': False,
-            'level':              4,
-        },
-    }
+    'General User': {
+        'max_call_rate':     '150/hour',
+        'max_items_per_call': 2000,
+        'image_beacon':       True,
+        'hide_admin_fields':  True,
+        'general_fields_only': True,
+        'level':              1,
+    },
+    'Offline Application User': {
+        'max_call_rate':     '300/hour',
+        'max_items_per_call': 2000,
+        'image_beacon':       True,
+        'hide_admin_fields':  True,
+        'general_fields_only': False,
+        'level':              2,
+    },
+    'Partner': {
+        'max_call_rate':     '300/hour',
+        'max_items_per_call': 2000,
+        'image_beacon':       True,
+        'hide_admin_fields':  True,
+        'general_fields_only': False,
+        'level':              3,
+    },
+    'Unlimited': {
+        'max_call_rate':      '0/sec',
+        'max_items_per_call': 0,
+        'image_beacon':       False,
+        'hide_admin_fields':  False,
+        'general_fields_only': False,
+        'level':              4,
+    },
+}
 
 # this is the default sort field
 DEFAULT_SORT_FIELD = 'title'
@@ -92,28 +92,28 @@ DEFAULT_SORT_OBJECT_MAPPING = {
         {'field': 'date_updated', 'ascending': False},
     'themes':
         {'field': 'category_path_sort', 'ascending': True},
-	'subjects':
+    'subjects':
         {'field': 'category_path_sort', 'ascending': True},
 }
 
 # these are the fields you can use for sorting
 SORT_FIELDS = [
-        'title',
-		'title_sort',
-		'name',
-        'asset_id',
-		'object_id',
-        'category_id',
-		'category_path',
-		'category_path_sort',
-        'publication_date',
-        'date_created',
-        'start_date',
-        'end_date',
-        'acronym',
-		'timestamp',
-		'score',
-        ]
+    'title',
+    'title_sort',
+    'name',
+    'asset_id',
+    'object_id',
+    'category_id',
+    'category_path',
+    'category_path_sort',
+    'publication_date',
+    'date_created',
+    'start_date',
+    'end_date',
+    'acronym',
+    'timestamp',
+    'score',
+]
 
 # these fields will be hidden from those with #'hide_admin_fields' set to True
 ADMIN_ONLY_FIELDS = [
@@ -131,7 +131,7 @@ ADMIN_ONLY_FIELDS = [
 'start_date',
 'title_sort',
 'category_path_sort'
-    ]
+]
 
 # these are the fields that will be given to a 'General User'
 GENERAL_FIELDS = [
@@ -206,33 +206,33 @@ GENERAL_FIELDS = [
 
 # these are fields that contain XML data
 STRUCTURED_XML_FIELDS = [
-        'category_theme_array',
-		'category_subject_array',
-        'publisher_array',
-        'country_focus_array',
-		'category_region_array',
-		'children_object_array',
-		'parent_object_array',
-		]
+    'category_theme_array',
+    'category_subject_array',
+    'publisher_array',
+    'country_focus_array',
+    'category_region_array',
+    'children_object_array',
+    'parent_object_array',
+]
 
 # these are the entries in the dropdown box for user registration
 ORGANISATION_TYPES = [
-        u'Bilateral Aid Agency',
-        u'Multilateral Aid Agency',
-        u'International NGO or CSO',
-        u'National / Local NGO or CSO',
-        u'National / Local Government',
-        u'Political Party',
-        u'Academic',
-        u'School / college',
-        u'Library / Information Service',
-        u'Commercial / Business',
-        u'Health Centre / Hospital',
-        u'Media',
-        u'Network',
-        u'No affiliation',
-        u'Other (please specify',
-        ]
+    u'Bilateral Aid Agency',
+    u'Multilateral Aid Agency',
+    u'International NGO or CSO',
+    u'National / Local NGO or CSO',
+    u'National / Local Government',
+    u'Political Party',
+    u'Academic',
+    u'School / college',
+    u'Library / Information Service',
+    u'Commercial / Business',
+    u'Health Centre / Hospital',
+    u'Media',
+    u'Network',
+    u'No affiliation',
+    u'Other (please specify',
+]
 
 # this is the URL used for the image beacon stuff
 IMAGE_BEACON_STUB_URL = 'http://api.ids.ac.uk/tracking/trackimg.cfm'
@@ -241,163 +241,163 @@ IMAGE_BEACON_STUB_URL = 'http://api.ids.ac.uk/tracking/trackimg.cfm'
 # * the name (or names) of the field in SOLR to search across
 # * the type of object you can use the query parameter with
 QUERY_MAPPING = {
-         'object_id':  {
-            'solr_field': 'object_id',
-            'object_type': 'all'
-            },
-         'object_type':  {
-            'solr_field': 'object_type',
-            'object_type': 'all'
-            },
-         'asset_id':  {
-            'solr_field': 'asset_id',
-            'object_type': 'all'
-            },
-		 'title':  {
-            'solr_field': 'title',
-            'object_type': 'all'
-            },
-		'country': {
-            'solr_field': 'country_focus_facet',
-            'object_type': 'all'
-            },
-        'keyword': {
-            'solr_field': 'keyword',
-            'object_type': 'all'
-            },
-        'region':  {
-            'solr_field': 'category_region_facet',
-            'object_type': 'all'
-            },
-        'sector':  {
-            'solr_field': 'category_sector',
-            'object_type': 'all'
-            },
-        'subject': {
-            'solr_field': 'category_subject_facet',
-            'object_type': 'all'
-            },
-	    'subject_name': {
-            'solr_field': 'category_subject_objects',
-            'object_type': 'all'
-            },
-        'subject_id': {
-            'solr_field': 'category_subject_ids',
-            'object_type': 'documents'
-            },
-        'site':  {
-            'solr_field': 'site',
-            'object_type': 'all'
-            },
-		 'category_path':   {
-            'solr_field': 'category_path_sort',
-            'object_type': 'all'
-            },
-        'theme':   {
-            'solr_field': 'category_theme_facet',
-            'object_type': 'all'
-            },
-	    'theme_name':   {
-            'solr_field': 'category_theme_objects',
-            'object_type': 'all'
-            },
-        'author':  {
-            'solr_field': 'author',
-            'object_type': 'documents'
-            },
-        'publisher_name': {
-            'solr_field': 'publisher',
-            'object_type': 'documents'
-            },
-		'publisher': {
-            'solr_field': 'publisher_id',
-            'object_type': 'documents'
-            },
-        'copyright_clearance': {
-            'solr_field': 'copyright_clearance',
-            'object_type': 'documents',
-            },
-        'redistribute_clearance': {
-            'solr_field': 'redistribute_clearance',
-            'object_type': 'documents',
-            },
-        'licence_type': {
-            'solr_field': 'licence_type',
-            'object_type': 'all',
-            },
-        'permission_to_host_info': {
-            'solr_field': 'permission_to_host_info',
-            'object_type': 'all',
-            },
-        'related_information_links': {
-            'solr_field': 'related_information_links',
-            'object_type': 'all',
-            },
-        'language_name': {
-            'solr_field': 'language_name',
-            'object_type': 'documents',
-            },
-        'publisher_country': {
-            'solr_field': 'publisher_country',
-            'object_type': 'documents',
-            },
-        'organisation_name': {
-            'solr_field': ['name', 'alternative_name'],
-            'object_type': 'organisations'
-            },
-        'acronym': {
-            'solr_field': ['acronym', 'alternative_acronym'],
-            'object_type': 'organisations'
-            },
-        'location_country': {
-            'solr_field': 'location_country',
-            'object_type': 'organisations',
-            },
-		'item_type':  {
-            'solr_field': 'item_type',
-            'object_type': 'items'
-            },
-       'cat_level':  {
-            'solr_field': 'cat_level',
-            'object_type': 'all'
-            },
-		'deleted':  {
-            'solr_field': 'deleted',
-            'object_type': 'all'
-            },
-		'archived':  {
-            'solr_field': 'archived',
-            'object_type': 'all'
-            },
-		'cat_autocomplete':  {
-            'solr_field': 'category_path_autocomplete',
-            'object_type': 'all'
-            },
-       'level':  {
-            'solr_field': 'cat_level',
-            'object_type': 'all'
-            },
-       'cat_autocomplete':  {
-            'solr_field': 'category_path_autocomplete',
-            'object_type': 'all'
-            },
-		'parent_object_id':  {
-            'solr_field': 'parent_object_id',
-            'object_type': 'all'
-            },
-		'toplevel_object_id':  {
-            'solr_field': 'toplevel_object_id',
-            'object_type': 'all'
-            },
-		'country_code':  {
-            'solr_field': 'iso_two_letter_code',
-            'object_type': 'countries'
-            },
-		'url':  {
-            'solr_field': 'urls',
-            'object_type': 'documents'
-            },
-		}
+    'object_id':  {
+        'solr_field': 'object_id',
+        'object_type': 'all'
+    },
+    'object_type':  {
+        'solr_field': 'object_type',
+        'object_type': 'all'
+    },
+    'asset_id':  {
+        'solr_field': 'asset_id',
+        'object_type': 'all'
+    },
+    'title':  {
+        'solr_field': 'title',
+        'object_type': 'all'
+    },
+    'country': {
+        'solr_field': 'country_focus_facet',
+        'object_type': 'all'
+    },
+    'keyword': {
+        'solr_field': 'keyword',
+        'object_type': 'all'
+    },
+    'region':  {
+        'solr_field': 'category_region_facet',
+        'object_type': 'all'
+    },
+    'sector':  {
+        'solr_field': 'category_sector',
+        'object_type': 'all'
+    },
+    'subject': {
+        'solr_field': 'category_subject_facet',
+        'object_type': 'all'
+    },
+    'subject_name': {
+        'solr_field': 'category_subject_objects',
+        'object_type': 'all'
+    },
+    'subject_id': {
+        'solr_field': 'category_subject_ids',
+        'object_type': 'documents'
+    },
+    'site':  {
+        'solr_field': 'site',
+        'object_type': 'all'
+    },
+    'category_path':   {
+        'solr_field': 'category_path_sort',
+        'object_type': 'all'
+    },
+    'theme':   {
+        'solr_field': 'category_theme_facet',
+        'object_type': 'all'
+    },
+    'theme_name':   {
+        'solr_field': 'category_theme_objects',
+        'object_type': 'all'
+    },
+    'author':  {
+        'solr_field': 'author',
+        'object_type': 'documents'
+    },
+    'publisher_name': {
+        'solr_field': 'publisher',
+        'object_type': 'documents'
+    },
+    'publisher': {
+        'solr_field': 'publisher_id',
+        'object_type': 'documents'
+    },
+    'copyright_clearance': {
+        'solr_field': 'copyright_clearance',
+        'object_type': 'documents',
+    },
+    'redistribute_clearance': {
+        'solr_field': 'redistribute_clearance',
+        'object_type': 'documents',
+    },
+    'licence_type': {
+        'solr_field': 'licence_type',
+        'object_type': 'all',
+    },
+    'permission_to_host_info': {
+        'solr_field': 'permission_to_host_info',
+        'object_type': 'all',
+    },
+    'related_information_links': {
+        'solr_field': 'related_information_links',
+        'object_type': 'all',
+    },
+    'language_name': {
+        'solr_field': 'language_name',
+        'object_type': 'documents',
+    },
+    'publisher_country': {
+        'solr_field': 'publisher_country',
+        'object_type': 'documents',
+    },
+    'organisation_name': {
+        'solr_field': ['name', 'alternative_name'],
+        'object_type': 'organisations'
+    },
+    'acronym': {
+        'solr_field': ['acronym', 'alternative_acronym'],
+        'object_type': 'organisations'
+    },
+    'location_country': {
+        'solr_field': 'location_country',
+        'object_type': 'organisations',
+    },
+    'item_type':  {
+        'solr_field': 'item_type',
+        'object_type': 'items'
+    },
+    'cat_level':  {
+        'solr_field': 'cat_level',
+        'object_type': 'all'
+    },
+    'deleted':  {
+        'solr_field': 'deleted',
+        'object_type': 'all'
+    },
+    'archived':  {
+        'solr_field': 'archived',
+        'object_type': 'all'
+    },
+    'cat_autocomplete':  {
+        'solr_field': 'category_path_autocomplete',
+        'object_type': 'all'
+    },
+    'level':  {
+        'solr_field': 'cat_level',
+        'object_type': 'all'
+    },
+    'cat_autocomplete':  {
+        'solr_field': 'category_path_autocomplete',
+        'object_type': 'all'
+    },
+    'parent_object_id':  {
+        'solr_field': 'parent_object_id',
+        'object_type': 'all'
+    },
+    'toplevel_object_id':  {
+        'solr_field': 'toplevel_object_id',
+        'object_type': 'all'
+    },
+    'country_code':  {
+        'solr_field': 'iso_two_letter_code',
+        'object_type': 'countries'
+    },
+    'url':  {
+        'solr_field': 'urls',
+        'object_type': 'documents'
+    },
+}
 
 # this maps from the date-based query parameter to the SOLR field used
 # so document_published_year would use the publication_date as the field.
@@ -415,45 +415,45 @@ DATE_FIELDS = [v for k, v in DATE_PREFIX_MAPPING.items()]
 # this maps from the URL for faceted search (eg country_count) to the
 # facet field used
 FACET_MAPPING = {
-        'country':   'country_focus_objects_facet',
-        'keyword':   'keyword_facet',
-        'region':    'category_region_objects_facet',
-        'sector':    'category_sector_facet',
-        'subject':   'category_subject_objects_facet',
-        'theme':     'category_theme_objects_facet',
-        'publisher': 'publisher_facet',
-		'publisher_country': 'publisher_country_facet',
-		'publication_year': 'publication_year_facet'
-		}
+    'country':   'country_focus_objects_facet',
+    'keyword':   'keyword_facet',
+    'region':    'category_region_objects_facet',
+    'sector':    'category_sector_facet',
+    'subject':   'category_subject_objects_facet',
+    'theme':     'category_theme_objects_facet',
+    'publisher': 'publisher_facet',
+    'publisher_country': 'publisher_country_facet',
+    'publication_year': 'publication_year_facet'
+}
 
 # this maps sort fields when generating SOLR queries, so that custom (eg non
 # tokenized) fields can be used.
 SORT_MAPPING = {
-        'title': 'title_sort',
-		'category_path': 'category_path_sort',
-        }
+    'title': 'title_sort',
+    'category_path': 'category_path_sort',
+}
 
 # the mapping of how the api refers to objects, to the object name
 # in SOLR
 OBJECT_TYPES_TO_OBJECT_NAME = {
-        'assets':         None,
-        'documents':     'Document',
-        'organisations': 'Organisation',
-        'themes':        'theme',
-        'items':         'Item',
-        'subjects':      'subject',
-        'sectors':       'sector',
-        'countries':     'Country',
-        'regions':       'region',
-        'itemtypes':     'itemtype',
+    'assets':         None,
+    'documents':     'Document',
+    'organisations': 'Organisation',
+    'themes':        'theme',
+    'items':         'Item',
+    'subjects':      'subject',
+    'sectors':       'sector',
+    'countries':     'Country',
+    'regions':       'region',
+    'itemtypes':     'itemtype',
 }
 
 # the list of objects that are actually assets
 ASSET_TYPES = [
-        'documents',
-        'organisations',
-        'items',
-        'countries',
+    'documents',
+    'organisations',
+    'items',
+    'countries',
 ]
 
 # the object types where we actually show the heirarchy
