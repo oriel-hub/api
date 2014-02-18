@@ -261,6 +261,7 @@ class FacetCountView(BaseAuthView):
 class FieldListView(BaseAuthView):
     def get(self, request, site):
         self.site = site
+        # TODO: sunburnt does this better - can we reuse it?
         # fetch file from SOLR_SCHEMA
         # TODO: Is this caching useful?
         http = httplib2.Http("/tmp/.cache")

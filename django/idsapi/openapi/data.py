@@ -16,16 +16,18 @@ except ImportError:
 
 
 class DataMunger():
+
     def __init__(self, site):
         self.site = site
         self.object_id = None
         self.object_type = None
 
     def get_required_data(self, result, output_format, user_level_info, beacon_guid):
-        self.object_id = result['object_id']
-        self.object_type = defines.object_name_to_object_type(result['object_type'])
+        result = self.create_source_lang_dict(result)
+        self.object_id = result[settings.SOLR_UNIQUE_KEY]
+        self.object_type = defines.object_name_to_object_type(result['object_type']['eldis'])
         if output_format == 'id':
-            object_data = {'object_id': self.object_id}
+            object_data = {settings.SOLR_UNIQUE_KEY: self.object_id}
         elif output_format == 'full':
             # filter out fields we don't want
             object_data = dict((k, v) for k, v in result.items() if not k.endswith('_facet'))
@@ -38,30 +40,37 @@ class DataMunger():
 
         for xml_field in settings.STRUCTURED_XML_FIELDS:
             if xml_field in object_data:
-                try:
-                    object_data[xml_field] = self._convert_xml_field(object_data[xml_field])
-                except ParseError as e:
-                    object_data[xml_field] = "Could not parse XML, issue reported in logs"
-                    # and send to logs
-                    print >> sys.stderr, \
-                        "COULD NOT PARSE XML. object_id: %s, field: %s Error: %s" % \
-                        (self.object_id, xml_field, str(e))
+                # assume it is a dictionary of strings - one per source
+                # TODO: check this assumption
+                for source in object_data[xml_field]:
+                    try:
+                        object_data[xml_field][source] = \
+                            self._convert_xml_field(object_data[xml_field][source])
+                    except ParseError as e:
+                        object_data[xml_field] = "Could not parse XML, issue reported in logs"
+                        # and send to logs
+                        print >> sys.stderr, \
+                            "COULD NOT PARSE XML. object_id: %s, field: %s Error: %s" % \
+                            (self.object_id, xml_field, str(e))
 
         # convert date fields to expected output format
-        for date_field in settings.DATE_FIELDS:
-            if date_field in object_data:
-                object_data[date_field] = object_data[date_field].strftime('%Y-%m-%d %H:%M:%S')
+        #for date_field in settings.DATE_FIELDS:
+        #    if date_field in object_data:
+        #        for source in object_data[date_field]:
+        #            object_data[date_field][source] = \
+        #                object_data[date_field][source].strftime('%Y-%m-%d %H:%M:%S')
 
         # add the parent category, if relevant
         if self.object_type in settings.OBJECT_TYPES_WITH_HIERARCHY:
             self._add_child_parent_links(object_data, result)
 
         if 'description' in object_data:
-            object_data['description'] = self._process_description(
-                    object_data['description'], user_level_info, beacon_guid)
+            for source in object_data['description']:
+                for lang in object_data['description'][source]:
+                    object_data['description'][source][lang] = self._process_description(
+                        object_data['description'][source][lang], user_level_info, beacon_guid)
 
-        object_data['metadata_url'] = self._create_metadata_url(
-            object_name=result.get(settings.SOLR_SERVER_INFO[self.site]['name_field']))
+        object_data['metadata_url'] = self._create_metadata_url()
         return object_data
 
     def _convert_xml_field(self, xml_field):
@@ -70,13 +79,13 @@ class DataMunger():
         field_dict = XmlDictConfig.xml_string_to_dict(xml_field.encode('utf-8'), True, set_encoding="UTF-8")
         for _, list_value in field_dict.items():
             for item in list_value:
-                if 'object_id' in item and \
+                if settings.SOLR_UNIQUE_KEY in item and \
                         'object_name' in item and \
                         'object_type' in item:
                     item['metadata_url'] = self._create_metadata_url(
-                            defines.object_name_to_object_type(item['object_type']),
-                            item['object_id'],
-                            item['object_name'])
+                        defines.object_name_to_object_type(item['object_type']),
+                        item[settings.SOLR_UNIQUE_KEY],
+                        item['object_name'])
         return field_dict
 
     def _process_description(self, description, user_level_info, beacon_guid):
@@ -103,7 +112,7 @@ class DataMunger():
             'output_format': 'full',
             'site': self.site,
         }) + '/'
-        if object_name is not None:
+        if object_name:
             title = re.sub('\W+', '-', object_name).lower().strip('-')
             metadata_url += title + '/'
         return metadata_url
@@ -121,9 +130,43 @@ class DataMunger():
                     object_id='C' + result['cat_parent'])
 
         if result['cat_first_parent'] != result['cat_parent'] and \
-                result['cat_first_parent'] != result['object_id']:
+                result['cat_first_parent'] != result[settings.SOLR_UNIQUE_KEY]:
             object_data['toplevel_parent_url'] = self._create_metadata_url(
                 object_id='C' + result['cat_first_parent'])
+
+    def field_type_prefix(self, field_name):
+        """ take the field name, work out whether it is a generic field,
+        has a source, or has both source and language.
+
+        The return is: prefix, source, language
+        """
+        parts = field_name.split('_')
+        if (len(parts) == 1 or parts[-1] == 'id' or
+                field_name in settings.GENERIC_FIELD_LIST):
+            return field_name, None, None
+        # we assume that if the last bit after an underscore is 2 letters
+        # then it is a language code, so we have prefix_source_lang
+        elif len(parts[-1]) == 2:
+            return '_'.join(parts[:-2]), parts[-2], parts[-1]
+        else:
+            return '_'.join(parts[:-1]), parts[-1], None
+
+    def create_source_lang_dict(self, in_dict):
+        out_dict = {}
+        for field, value in in_dict.iteritems():
+            prefix, source, lang = self.field_type_prefix(field)
+            if source is None:
+                out_dict[prefix] = value
+            else:
+                if prefix not in out_dict:
+                    out_dict[prefix] = {}
+                if lang is None:
+                    out_dict[prefix][source] = value
+                else:
+                    if source not in out_dict[prefix]:
+                        out_dict[prefix][source] = {}
+                    out_dict[prefix][source][lang] = value
+        return out_dict
 
     def convert_facet_string(self, facet_string):
         result = {
@@ -138,17 +181,17 @@ class DataMunger():
                 result = XmlDictConfig.xml_string_to_dict(facet_string.encode('utf-8'), set_encoding="UTF-8")
             elif facet_string.find('|') > -1:
                 object_id, object_type, object_name = facet_string.split('|', 2)
-                result['object_id'] = object_id
+                result[settings.SOLR_UNIQUE_KEY] = object_id
                 result['object_name'] = object_name
                 result['object_type'] = object_type
             else:
                 result['object_name'] = facet_string
 
             # create metadata url, but only if data exists
-            if result['object_id'] and result['object_type'] and result['object_name']:
+            if result[settings.SOLR_UNIQUE_KEY] and result['object_type'] and result['object_name']:
                 result['metadata_url'] = self._create_metadata_url(
                     defines.object_name_to_object_type(result['object_type']),
-                    result['object_id'],
+                    result[settings.SOLR_UNIQUE_KEY],
                     result['object_name'])
 
         return result

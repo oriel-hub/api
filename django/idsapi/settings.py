@@ -93,14 +93,14 @@ USER_LEVEL_INFO = {
 }
 
 # this is the default sort field
-DEFAULT_SORT_FIELD = 'title'
+DEFAULT_SORT_FIELD = 'title_sort'
 DEFAULT_SORT_ASCENDING = True
 
 # object type sort field mapping, overrides DEFAULT_SORT_FIELD and
 # DEFAULT_SORT_ASCENDING for matching object types.
 DEFAULT_SORT_OBJECT_MAPPING = {
     'documents':
-        {'field': 'date_updated', 'ascending': False},
+        {'field': 'date_updated_eldis', 'ascending': False},
     'organisations':
         {'field': 'date_updated', 'ascending': False},
     'items':
@@ -114,6 +114,7 @@ DEFAULT_SORT_OBJECT_MAPPING = {
 # these are the fields you can use for sorting
 SORT_FIELDS = [
     'title',
+    'title_eldis_en',
     'title_sort',
     'name',
     'asset_id',
@@ -392,8 +393,8 @@ QUERY_MAPPING = {
         'solr_field': 'cat_level',
         'object_type': 'all'
     },
-    'cat_autocomplete':  {
-        'solr_field': 'category_path_autocomplete',
+    'title_autocomplete':  {
+        'solr_field': 'title_autocomplete',
         'object_type': 'all'
     },
     'parent_object_id':  {
@@ -473,6 +474,20 @@ ASSET_TYPES = [
 
 # the object types where we actually show the heirarchy
 OBJECT_TYPES_WITH_HIERARCHY = ['themes', 'subjects', 'itemtypes']
+
+# fields that will exist for all items
+GENERIC_FIELD_LIST = [
+    'content',
+    'id',
+    'index_id',
+    'item_id',
+    'item_type',
+    'metadata_languages',
+    'ss_search_api_language',
+    'timestamp',
+]
+
+SOLR_UNIQUE_KEY = 'item_id'
 
 ######################################################################
 #

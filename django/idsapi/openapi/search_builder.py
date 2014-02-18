@@ -179,6 +179,7 @@ class SearchWrapper:
             Kwargs:
                 allow_objects (bool): Set for unrestricted search over objects.
         """
+        return
         if object_type == 'assets':
             # search for any object_type that is an asset
             self.si_query = self.si_query.query(self.add_field_query('object_type',
