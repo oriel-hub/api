@@ -184,7 +184,7 @@ class DataMunger():
 
     def convert_facet_string(self, facet_string):
         result = {
-            'object_id': '',
+            settings.SOLR_UNIQUE_KEY: '',
             'object_type': '',
             'object_name': '',
             'metadata_url': ''

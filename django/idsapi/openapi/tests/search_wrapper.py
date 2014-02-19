@@ -49,20 +49,10 @@ class SearchWrapperTests(unittest.TestCase):
         sw = SearchWrapper('General User', 'eldis', self.msi)
 
         extra_field = 'contact_position'
-        self.assertTrue(extra_field not in settings.GENERAL_FIELDS)
-        self.assertTrue(extra_field not in settings.ADMIN_ONLY_FIELDS)
+        self.assertNotIn(extra_field, settings.GENERAL_FIELDS)
+        self.assertNotIn(extra_field, settings.ADMIN_ONLY_FIELDS)
 
         self.assertRaises(InvalidFieldError, sw.restrict_fields_returned, 'short', {'extra_fields': extra_field})
-
-    def test_partner_user_can_request_field_not_in_whitelist(self):
-        sw = SearchWrapper('Partner', 'eldis', self.msi)
-
-        extra_field = 'contact_position'
-        self.assertTrue(extra_field not in settings.GENERAL_FIELDS)
-        self.assertTrue(extra_field not in settings.ADMIN_ONLY_FIELDS)
-
-        sw.restrict_fields_returned('short', {'extra_fields': extra_field})
-        self.assertTrue(extra_field in self.msi.query.field_list)
 
     def test_partner_user_can_not_request_admin_only_field(self):
         sw = SearchWrapper('Partner', 'eldis', self.msi)
@@ -72,14 +62,26 @@ class SearchWrapperTests(unittest.TestCase):
 
         self.assertRaises(InvalidFieldError, sw.restrict_fields_returned, 'short', {'extra_fields': extra_field})
 
-    def test_admin_user_can_request_field_admin_only_field(self):
-        sw = SearchWrapper('Unlimited', 'eldis', self.msi)
+    # TODO: replace with data munger test
+    #def test_partner_user_can_request_field_not_in_whitelist(self):
+    #    sw = SearchWrapper('Partner', 'eldis', self.msi)
 
-        extra_field = 'legacy_id'
-        self.assertTrue(extra_field in settings.ADMIN_ONLY_FIELDS)
+    #    extra_field = 'contact_position'
+    #    self.assertNotIn(extra_field, settings.GENERAL_FIELDS)
+    #    self.assertNotIn(extra_field, settings.ADMIN_ONLY_FIELDS)
 
-        sw.restrict_fields_returned('short', {'extra_fields': extra_field})
-        self.assertTrue(extra_field in self.msi.query.field_list)
+    #    sw.restrict_fields_returned('short', {'extra_fields': extra_field})
+    #    self.assertTrue(extra_field in self.msi.query.field_list)
+
+    # TODO: replace with data munger test
+    #def test_admin_user_can_request_field_admin_only_field(self):
+    #    sw = SearchWrapper('Unlimited', 'eldis', self.msi)
+
+    #    extra_field = 'legacy_id'
+    #    self.assertTrue(extra_field in settings.ADMIN_ONLY_FIELDS)
+
+    #    sw.restrict_fields_returned('short', {'extra_fields': extra_field})
+    #    self.assertTrue(extra_field in self.msi.query.field_list)
 
 
 class SearchWrapperAddSortTests(unittest.TestCase):
