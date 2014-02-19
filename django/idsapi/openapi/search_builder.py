@@ -314,15 +314,6 @@ class SearchWrapper:
         self.si_query = self.si_query.facet_by(settings.FACET_MAPPING[facet_type], **facet_kwargs)
 
     def restrict_fields_returned(self, output_format, search_params):
-        if output_format == 'full':
-            return
-        # the id format needs object_type and title to construct the metadata_url
-        elif output_format in [None, '', 'short', 'id']:
-            field_list = ['object_id', 'object_type', 'title', 'level']
-        else:
-            raise InvalidQueryError(
-                    "the output_format of data returned can be 'id', 'short' or 'full' - you gave '%s'"
-                    % output_format)
         if 'extra_fields' in search_params:
             fields = search_params['extra_fields'].lower().split(' ')
             level_info = settings.USER_LEVEL_INFO[self.user_level]
@@ -331,12 +322,6 @@ class SearchWrapper:
                     raise InvalidFieldError(field, self.site)
                 if level_info['hide_admin_fields'] and field in settings.ADMIN_ONLY_FIELDS:
                     raise InvalidFieldError(field, self.site)
-            field_list.extend(search_params['extra_fields'].lower().split(' '))
-
-        try:
-            self.si_query = self.si_query.field_limit(field_list)
-        except sunburnt.SolrError as e:
-            raise InvalidQueryError("Can't limit Fields - " + str(e))
 
     def add_date_query(self, param, date):
         # strip the _year/_after/_before

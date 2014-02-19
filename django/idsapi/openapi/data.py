@@ -17,8 +17,9 @@ except ImportError:
 
 class DataMunger():
 
-    def __init__(self, site):
+    def __init__(self, site, search_params):
         self.site = site
+        self.search_params = search_params
         self.object_id = None
         self.object_type = None
 
@@ -28,6 +29,17 @@ class DataMunger():
         self.object_type = defines.object_name_to_object_type(result['object_type']['eldis'])
         if output_format == 'id':
             object_data = {settings.SOLR_UNIQUE_KEY: self.object_id}
+        elif output_format in [None, '', 'short']:
+            object_data = {
+                settings.SOLR_UNIQUE_KEY: self.object_id,
+                'item_type': result['item_type'],
+                'title': result['title'],
+            }
+            if 'extra_fields' in self.search_params:
+                fields = self.search_params['extra_fields'].lower().split(' ')
+                for field in fields:
+                    if field in result:
+                        object_data[field] = result[field]
         elif output_format == 'full':
             # filter out fields we don't want
             object_data = dict((k, v) for k, v in result.items() if not k.endswith('_facet'))
