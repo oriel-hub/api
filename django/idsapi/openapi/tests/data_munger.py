@@ -7,23 +7,24 @@ from ..data import DataMunger
 
 class DataMungerTests(TestCase):
 
+    def setUp(self):
+        self.data = DataMunger('eldis', {})
+
     def test_convert_facet_string(self):
         test_string = "A1200|Country|South Africa"
-        data = DataMunger("eldis")
-        facet_dict = data.convert_facet_string(test_string)
+        facet_dict = self.data.convert_facet_string(test_string)
 
-        self.assertEquals(facet_dict['object_id'], 'A1200')
+        self.assertEquals(facet_dict['item_id'], 'A1200')
         self.assertEquals(facet_dict['object_type'], 'Country')
         self.assertEquals(facet_dict['object_name'], 'South Africa')
         self.assertTrue(facet_dict['metadata_url'].endswith('/openapi/eldis/get/countries/A1200/full/south-africa/'),
             "Got %s" % facet_dict['metadata_url'])
 
     def test_convert_facet_string_with_xml_field(self):
-        test_string = "<theme><object_id>C563</object_id><object_type>theme</object_type><object_name>Health Challenges</object_name><level>1</level></theme>"
-        data = DataMunger("eldis")
-        facet_dict = data.convert_facet_string(test_string)
+        test_string = "<theme><item_id>C563</item_id><object_type>theme</object_type><object_name>Health Challenges</object_name><level>1</level></theme>"
+        facet_dict = self.data.convert_facet_string(test_string)
 
-        self.assertEquals(facet_dict['object_id'], 'C563')
+        self.assertEquals(facet_dict['item_id'], 'C563')
         self.assertEquals(facet_dict['object_type'], 'theme')
         self.assertEquals(facet_dict['object_name'], 'Health Challenges')
         self.assertEquals(facet_dict['level'], '1')
@@ -32,56 +33,49 @@ class DataMungerTests(TestCase):
 
     def test_convert_empty_facet_string_returns_dict_with_empty_values(self):
         test_string = ""
-        data = DataMunger("eldis")
-        facet_dict = data.convert_facet_string(test_string)
+        facet_dict = self.data.convert_facet_string(test_string)
 
-        self.assertEquals(facet_dict['object_id'], '')
+        self.assertEquals(facet_dict['item_id'], '')
         self.assertEquals(facet_dict['object_type'], '')
         self.assertEquals(facet_dict['object_name'], '')
         self.assertEquals(facet_dict['metadata_url'], '')
 
     def test_convert_old_style_facet_string_returns_dict_with_just_object_name(self):
         test_string = "environmental statistics"
-        data = DataMunger("eldis")
-        facet_dict = data.convert_facet_string(test_string)
+        facet_dict = self.data.convert_facet_string(test_string)
 
-        self.assertEquals(facet_dict['object_id'], '')
+        self.assertEquals(facet_dict['item_id'], '')
         self.assertEquals(facet_dict['object_type'], '')
         self.assertEquals(facet_dict['object_name'], 'environmental statistics')
         self.assertEquals(facet_dict['metadata_url'], '')
 
     def test_field_type_prefix_with_field_name_with_no_underscore(self):
-        data = DataMunger("hub")
-        prefix, source, lang = data.field_type_prefix('content')
+        prefix, source, lang = self.data.field_type_prefix('content')
         self.assertEqual('content', prefix)
         self.assertIsNone(source)
         self.assertIsNone(lang)
 
     def test_field_type_prefix_with_field_name_with_id_field(self):
-        data = DataMunger("hub")
-        prefix, source, lang = data.field_type_prefix('item_id')
+        prefix, source, lang = self.data.field_type_prefix('item_id')
         self.assertEqual('item_id', prefix)
         self.assertIsNone(source)
         self.assertIsNone(lang)
 
     def test_field_type_prefix_with_field_name_with_field_in_generic_field_list_setting(self):
-        data = DataMunger("hub")
         with override_settings(GENERIC_FIELD_LIST=['metadata_languages']):
-            prefix, source, lang = data.field_type_prefix('metadata_languages')
+            prefix, source, lang = self.data.field_type_prefix('metadata_languages')
         self.assertEqual('metadata_languages', prefix)
         self.assertIsNone(source)
         self.assertIsNone(lang)
 
     def test_field_type_prefix_with_field_name_with_source_but_no_language(self):
-        data = DataMunger("hub")
-        prefix, source, lang = data.field_type_prefix('et_al_eldis')
+        prefix, source, lang = self.data.field_type_prefix('et_al_eldis')
         self.assertEqual('et_al', prefix)
         self.assertEqual('eldis', source)
         self.assertIsNone(lang)
 
     def test_field_type_prefix_with_field_name_with_source_and_language(self):
-        data = DataMunger("hub")
-        prefix, source, lang = data.field_type_prefix('title_eldis_en')
+        prefix, source, lang = self.data.field_type_prefix('title_eldis_en')
         self.assertEqual('title', prefix)
         self.assertEqual('eldis', source)
         self.assertEqual('en', lang)
@@ -112,6 +106,5 @@ class DataMungerTests(TestCase):
             }
         }
         with override_settings(GENERIC_FIELD_LIST=['item_id']):
-            data = DataMunger("eldis")
-            actual_dict = data.create_source_lang_dict(result)
+            actual_dict = self.data.create_source_lang_dict(result)
         self.assertDictEqual(expected_dict, actual_dict)
