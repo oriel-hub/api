@@ -21,7 +21,7 @@ urlpatterns += patterns('',
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # Uncomment the next line to enable the admin:
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^apiadmin/', include(admin.site.urls)),
 
     url(r'^accounts/', include('registration.backends.default.urls')),
 
@@ -32,6 +32,6 @@ urlpatterns += patterns('',
     #url(r'^profiles/', include('profiles.urls')),
 
     # the API stuff
-    url(r'^openapi/', include(openapi.urls)),
+    url(r'^v1/', include(openapi.urls)),
     url(r'^$', RedirectView.as_view(url='/about/', permanent=False)),
 )
