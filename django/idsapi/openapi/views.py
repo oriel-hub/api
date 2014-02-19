@@ -88,6 +88,13 @@ class BaseAuthView(View):
         profile = self.user.get_profile()
         return profile.beacon_guid
 
+    def setup_vars(self, request, site, output_format):
+        self.output_format = output_format
+        self.site = site
+        self.search_params = request.GET
+        self.data_munger = DataMunger(site, self.search_params)
+        self.user_level = self.user.get_profile().user_level
+
 
 class BaseSearchView(BaseAuthView):
 
@@ -157,13 +164,6 @@ class BaseSearchView(BaseAuthView):
         if params['start_offset'] < 0:
             params['start_offset'] = 0
         return 'http://' + request.get_host() + request.path + '?' + params.urlencode()
-
-    def setup_vars(self, request, site, output_format):
-        self.output_format = output_format
-        self.site = site
-        self.search_params = request.GET
-        self.data_munger = DataMunger(site, self.search_params)
-        self.user_level = self.user.get_profile().user_level
 
 
 class ObjectView(BaseSearchView):
