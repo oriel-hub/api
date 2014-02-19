@@ -69,7 +69,7 @@ class DataMungerTests(TestCase):
         self.assertIsNone(lang)
 
     def test_field_type_prefix_with_field_name_with_source_but_no_language(self):
-        prefix, source, lang = self.data.field_type_prefix('et_al_eldis')
+        prefix, source, lang = self.data.field_type_prefix('et_al_eldis_zz')
         self.assertEqual('et_al', prefix)
         self.assertEqual('eldis', source)
         self.assertIsNone(lang)
@@ -83,8 +83,8 @@ class DataMungerTests(TestCase):
     def test_create_source_lang_dict_works(self):
         result = {
             "item_id": 1234,
-            "et_al_bridge": "some people",
-            "et_al_eldis": "similar people",
+            "et_al_bridge_zz": "some people",
+            "et_al_eldis_zz": "similar people",
             "title_bridge_en": "title goes here",
             "title_bridge_fr": "le title est ici",
             "title_eldis_en": "the title goes here",

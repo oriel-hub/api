@@ -156,12 +156,16 @@ class DataMunger():
         if (len(parts) == 1 or parts[-1] == 'id' or
                 field_name in settings.GENERIC_FIELD_LIST):
             return field_name, None, None
-        # we assume that if the last bit after an underscore is 2 letters
-        # then it is a language code, so we have prefix_source_lang
-        elif len(parts[-1]) == 2:
-            return '_'.join(parts[:-2]), parts[-2], parts[-1]
+        # we should at this point always have prefix_source_xx
+        # if xx is "zz" then language is not relevant, otherwise xx is the
+        # language code
+        prefix = '_'.join(parts[:-2])
+        source = parts[-2]
+        lang = parts[-1]
+        if lang == 'zz':
+            return prefix, source, None
         else:
-            return '_'.join(parts[:-1]), parts[-1], None
+            return prefix, source, lang
 
     def create_source_lang_dict(self, in_dict):
         out_dict = {}
