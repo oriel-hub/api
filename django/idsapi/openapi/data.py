@@ -24,9 +24,9 @@ class DataMunger():
         self.object_type = None
 
     def get_required_data(self, result, output_format, user_level_info, beacon_guid):
-        result = self.create_source_lang_dict(result)
         self.item_id = result[settings.SOLR_UNIQUE_KEY]
-        self.object_type = defines.object_name_to_object_type(result['object_type']['eldis'])
+        self.object_type = defines.object_name_to_object_type(result['item_type'])
+        result = self.create_source_lang_dict(result)
         if output_format == 'id':
             object_data = {settings.SOLR_UNIQUE_KEY: self.item_id}
         elif output_format in [None, '', 'short']:
