@@ -49,6 +49,10 @@ SOLR_SERVER_INFO = {
 SOLR_SCHEMA_SUFFIX = 'admin/file/?file=schema.xml'
 SOLR_SCHEMA = SOLR_SERVER_INFO[DEFAULT_SITE]['base_url'] + SOLR_SCHEMA_SUFFIX
 
+# we have multiple "indexes" created by drupal, the one we want to use is
+# this one:
+SOLR_INDEX_ID = 'ids_ks_item_sources_index'
+
 # whether to send solr search parameters to logs/console
 # default to False - best to override in local_settings
 # don't forget to turn it off again!

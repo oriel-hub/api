@@ -156,10 +156,9 @@ class SearchWrapper:
         else:
             self.solr = get_solr_interface(site)
         self.site = site
+        self.si_query = self.solr.query(index_id=settings.SOLR_INDEX_ID)
         if settings.SOLR_SERVER_INFO[site]['dismax']:
-            self.si_query = self.solr.query().add_extra(defType='edismax')
-        else:
-            self.si_query = self.solr.query()
+            self.si_query = self.si_query.add_extra(defType='edismax')
         self.user_level = user_level
         self.has_free_text_query = False
 
