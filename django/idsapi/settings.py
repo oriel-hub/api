@@ -417,6 +417,14 @@ QUERY_MAPPING = {
         'solr_field': 'urls',
         'object_type': 'documents'
     },
+    'source': {
+        'solr_field': 'sources',
+        'object_type': 'all',
+    },
+    'language': {
+        'solr_field': 'metadata_languages',
+        'object_type': 'all',
+    },
 }
 
 # this maps from the date-based query parameter to the SOLR field used
