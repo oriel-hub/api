@@ -17,7 +17,7 @@ class ApiTestsBase(BaseTestCase):
         BaseTestCase.setUp(self)
         self.login()
 
-    def object_search(self, site='eldis', object_type='documents', output_format='full', query=None,
+    def object_search(self, site='hub', object_type='documents', output_format='full', query=None,
             content_type='application/json'):
         if query is None:
             query = {'q': 'un'}
@@ -28,7 +28,7 @@ class ApiTestsBase(BaseTestCase):
         return self.client.get(defines.URL_ROOT + site + '/search/' + object_type + output_format,
                 query, ACCEPT=content_type)
 
-    def get_all(self, site='eldis', object_type='assets', output_format='', query=None,
+    def get_all(self, site='hub', object_type='assets', output_format='', query=None,
             content_type='application/json'):
         if query is None:
             query = {}

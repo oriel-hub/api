@@ -30,36 +30,36 @@ class RootView(View):
                 'all': {
                     'format': url_root + '{site}/get_all/{object_type}/{id|short|full}/',
                     'examples': [
-                        url_root + 'eldis/get_all/assets/short',
-                        url_root + 'bridge/get_all/documents/full',
-                        url_root + 'eldis/get_all/organisations/',
+                        url_root + 'hub/get_all/assets/short',
+                        url_root + 'hub/get_all/documents/full',
+                        url_root + 'hub/get_all/organisations/',
                     ]
                 },
                 'search': {
                     'format': url_root + '{site}/search/{object_type}/{id|short|full}/?q={query_term}&...',
                     'examples': [
-                        url_root + 'eldis/search/assets/?q=undp',
-                        url_root + 'bridge/search/documents/full?q=undp&document_published_year=2009',
-                        url_root + 'eldis/search/assets?country=angola%26south%20africa&theme=gender%7Cclimate%20change',
-                        url_root + 'eldis/search/documents/full?theme=C123|full|capacity-building-approaches',
+                        url_root + 'hub/search/assets/?q=undp',
+                        url_root + 'hub/search/documents/full?q=undp&document_published_year=2009',
+                        url_root + 'hub/search/assets?country=angola%26south%20africa&theme=gender%7Cclimate%20change',
+                        url_root + 'hub/search/documents/full?theme=C123|full|capacity-building-approaches',
                     ]
                 },
                 'object': {
                     'format': url_root + '{site}/get/{object_type}/{object_id}/{id|short|full}/friendly-name',
                     'examples': [
-                        url_root + 'eldis/get/assets/A12345/full',
-                        url_root + 'eldis/get/themes/C123/',
-                        url_root + 'eldis/get/themes/C123/full/capacity-building-approaches',
+                        url_root + 'hub/get/assets/A12345/full',
+                        url_root + 'hub/get/themes/C123/',
+                        url_root + 'hub/get/themes/C123/full/capacity-building-approaches',
                     ]
                 },
                 'field list': {
-                    'format': url_root + 'eldis/fieldlist/',
+                    'format': url_root + 'hub/fieldlist/',
                 },
                 'facet count': {
-                    'format': url_root + 'eldis/count/{object_type}/{category}/?q={query_term}&...',
+                    'format': url_root + 'hub/count/{object_type}/{category}/?q={query_term}&...',
                     'examples': [
-                        url_root + 'eldis/count/documents/theme?q=undp',
-                        url_root + 'bridge/count/assets/country?q=undp&document_published_year=2009',
+                        url_root + 'hub/count/documents/theme?q=undp',
+                        url_root + 'hub/count/assets/country?q=undp&document_published_year=2009',
                     ]
                 },
             },
