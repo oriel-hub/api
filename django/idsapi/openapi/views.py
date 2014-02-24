@@ -234,10 +234,9 @@ class FacetCountView(BaseAuthView):
             return Response(status.HTTP_500_INTERNAL_SERVER_ERROR, content=e)
         search_response, solr_query = query.execute()
         facet_counts = search_response.facet_counts.facet_fields[settings.FACET_MAPPING[facet_type]]
-        data = DataMunger(site)
         facet_dict_list = []
         for category, count in facet_counts:
-            facet_dict = data.convert_facet_string(category)
+            facet_dict = self.data_munger.convert_facet_string(category)
             facet_dict['count'] = count
             facet_dict_list.append(facet_dict)
 
