@@ -154,7 +154,8 @@ class DataMunger():
         """
         parts = field_name.split('_')
         if (len(parts) == 1 or parts[-1] == 'id' or
-                field_name in settings.GENERIC_FIELD_LIST):
+                field_name in settings.GENERIC_FIELD_LIST or
+                '_sort_hub_' in field_name or '_search_hub_' in field_name):
             return field_name, None, None
         # we should at this point always have prefix_source_xx
         # if xx is "zz" then language is not relevant, otherwise xx is the
@@ -171,8 +172,7 @@ class DataMunger():
         out_dict = {}
         for field, value in in_dict.iteritems():
             # we ignore a list of fields, plus xx_search_api_*
-            if (field in settings.IGNORE_FIELDS or field[2:].startswith('_search_api_')
-                    or '_sort_hub_' in field or '_search_hub_' in field):
+            if field in settings.IGNORE_FIELDS or field[2:].startswith('_search_api_'):
                 continue
             if field.startswith('hub_'):
                 out_dict[field] = value
