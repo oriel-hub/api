@@ -88,7 +88,7 @@ class ApiSearchResponseTests(ApiTestsBase):
 
     def test_json_id_only_search_returns_only_ids(self):
         response = self.object_search(output_format='id')
-        self.assert_results_list(response, lambda x: sorted(x.keys()) == ['metadata_url', 'object_id'])
+        self.assert_results_list(response, lambda x: sorted(x.keys()) == ['item_id', 'metadata_url'])
 
     def test_search_works_without_trailing_slash(self):
         response = self.object_search(output_format='no_slash')
@@ -96,7 +96,7 @@ class ApiSearchResponseTests(ApiTestsBase):
 
     def test_json_short_search_returns_short_fields(self):
         response = self.object_search(output_format='short')
-        self.assert_results_list(response, lambda x: sorted(x.keys()) == ['metadata_url', 'object_id', 'object_type', 'title'])
+        self.assert_results_list(response, lambda x: sorted(x.keys()) == ['item_id', 'item_type', 'metadata_url', 'title'])
 
     def test_json_full_search_returns_more_than_3_fields(self):
         response = self.object_search(output_format='full')
@@ -212,9 +212,9 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         search_results = json.loads(response.content)['results']
         for result in search_results:
             url_bits = result['metadata_url'].split(defines.URL_ROOT)[-1].strip('/').split('/')
-            # should now have something like ['eldis', 'get', 'documents', '1234', 'full', 'asdf']
+            # should now have something like ['hub', 'get', 'documents', '1234', 'full', 'asdf']
             self.assertEqual(len(url_bits), 6)
-            self.assertEqual(url_bits[0], 'eldis')
+            self.assertEqual(url_bits[0], 'hub')
             self.assertEqual(url_bits[1], 'get')
             self.assertNotEqual(url_bits[2], 'assets')
             self.assertTrue(url_bits[2] in defines.OBJECT_TYPES)
@@ -301,12 +301,12 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         self.assertEqual(response_upper_data['metadata']['total_results'],
                 response_lower_data['metadata']['total_results'])
 
-    def test_search_has_default_site_eldis(self):
+    def test_search_has_default_site_hub(self):
         response = self.object_search(object_type='documents', output_format='full',
                 query={'q': 'un', 'num_results': '500'})
         results = json.loads(response.content)['results']
         for result in results:
-            self.assertEqual('eldis', result['site'])
+            self.assertEqual('hub', result['site'])
 
     def test_metadata_solr_query_depends_on_hide_admin_field_value(self):
         returns_response = lambda x: x.object_search()
@@ -481,7 +481,7 @@ class ApiSearchErrorTests(ApiTestsBase):
     #    self.assertStatusCode(response, 406)
 
     def test_405_returned_for_post_method_not_allowed(self):
-        response = self.client.post(defines.URL_ROOT + 'eldis/search/documents',
+        response = self.client.post(defines.URL_ROOT + 'hub/search/documents',
                 {'q': 'un'}, ACCEPT='application/json')
         self.assertStatusCode(response, 405)
 
@@ -537,32 +537,32 @@ class ApiSearchErrorTests(ApiTestsBase):
 class GetSolrInterfaceTests(TestCase):
 
     def test_get_solr_interface_returns_same_object_normally(self):
-        si1 = get_solr_interface('eldis')
-        si2 = get_solr_interface('eldis')
+        si1 = get_solr_interface('hub')
+        si2 = get_solr_interface('hub')
         self.assertIs(si1, si2)
         self.assertIsInstance(si1, SolrInterface)
 
     def test_get_solr_interface_returns_different_object_for_different_sites(self):
-        si1 = get_solr_interface('eldis')
+        si1 = get_solr_interface('hub')
         si2 = get_solr_interface('bridge')
         self.assertIsNot(si1, si2)
         self.assertIsInstance(si1, SolrInterface)
         self.assertIsInstance(si2, SolrInterface)
 
     def test_get_solr_interface_returns_different_object_if_global_is_blanked(self):
-        si1 = get_solr_interface('eldis')
+        si1 = get_solr_interface('hub')
         from .. import search_builder
-        del search_builder.saved_solr_interface['eldis']
-        si2 = get_solr_interface('eldis')
+        del search_builder.saved_solr_interface['hub']
+        si2 = get_solr_interface('hub')
         self.assertIsNot(si1, si2)
         self.assertIsInstance(si1, SolrInterface)
         self.assertIsInstance(si2, SolrInterface)
 
     def test_get_solr_interface_returns_different_object_if_time_reset(self):
-        si1 = get_solr_interface('eldis')
+        si1 = get_solr_interface('hub')
         from .. import search_builder
-        search_builder.solr_interface_created['eldis'] = datetime.datetime(2000, 1, 1)
-        si2 = get_solr_interface('eldis')
+        search_builder.solr_interface_created['hub'] = datetime.datetime(2000, 1, 1)
+        si2 = get_solr_interface('hub')
         self.assertIsNot(si1, si2)
         self.assertIsInstance(si1, SolrInterface)
         self.assertIsInstance(si2, SolrInterface)
@@ -600,7 +600,7 @@ class ApiGetAllIntegrationTests(ApiTestsBase):
 
 class ApiGetObjectIntegrationTests(ApiTestsBase):
 
-    def get_object(self, site='eldis', object_type='documents', object_id='A66345',
+    def get_object(self, site='hub', object_type='documents', item_id='A66345',
             output_format='', query=None, content_type='application/json'):
         if not query:
             query = {}
@@ -609,7 +609,7 @@ class ApiGetObjectIntegrationTests(ApiTestsBase):
         else:
             output_format = '/' + output_format
         return self.client.get(defines.URL_ROOT + site + '/get/' + object_type
-                + '/' + object_id + output_format, query, ACCEPT=content_type)
+                + '/' + item_id + output_format, query, ACCEPT=content_type)
 
     def test_get_document_by_id_returns_200(self):
         response = self.get_object(object_type='documents')
@@ -623,7 +623,7 @@ class ApiGetObjectIntegrationTests(ApiTestsBase):
 # TODO: reinstate when bridge is sorted out
 #    def test_bridge_get_document_by_id_returns_200(self):
 #        response = self.get_object(site='bridge', object_type='documents',
-#                object_id='A20922')
+#                item_id='A20922')
 #       self.assertStatusCode(response)
 
     def test_get_object_by_id_returns_200(self):
@@ -641,7 +641,7 @@ class ApiGetObjectIntegrationTests(ApiTestsBase):
         self.assertTrue('description' in result)
 
     def test_404_returned_if_no_object(self):
-        response = self.get_object(object_id='A1234567890')
+        response = self.get_object(item_id='A1234567890')
         self.assertStatusCode(response, 404)
 
     def test_400_returned_if_unknown_object_type(self):
@@ -693,7 +693,7 @@ class ApiRootIntegrationTests(ApiTestsBase):
 
 
 class ApiFieldListIntegrationTests(ApiTestsBase):
-    def get_field_list(self, site='eldis'):
+    def get_field_list(self, site='hub'):
         return self.client.get(defines.URL_ROOT + site + '/fieldlist/', ACCEPT='application/json')
 
     def test_field_list_returns_200(self):
@@ -751,7 +751,7 @@ class ApiFieldListIntegrationTests(ApiTestsBase):
 
 class ApiFacetIntegrationTests(ApiTestsBase):
 
-    def facet_search(self, site='eldis', object_type='documents', facet_type='country', query=None):
+    def facet_search(self, site='hub', object_type='documents', facet_type='country', query=None):
         query = query or {'q': 'un'}
         return self.client.get(defines.URL_ROOT + site + '/count/' + object_type + '/' + facet_type,
                 query, ACCEPT='application/json')
@@ -786,7 +786,7 @@ class ApiFacetIntegrationTests(ApiTestsBase):
         response = self.facet_search()
 
         def check_all_facets_have_an_integer_count(country_count):
-            return ('object_id' in country_count and 'metadata_url' in country_count and
+            return ('item_id' in country_count and 'metadata_url' in country_count and
                     isinstance(country_count['count'], int))
         self.assert_results_list(response, check_all_facets_have_an_integer_count,
                 element='country_count')
@@ -821,15 +821,15 @@ class ApiFacetIntegrationTests(ApiTestsBase):
 
 
 class ApiCategoryChildrenIntegrationTests(ApiTestsBase):
-    def children_search(self, site='eldis', object_type='themes', object_id='C34',
+    def children_search(self, site='hub', object_type='themes', item_id='34',
             content_type='application/json'):
         return self.client.get(defines.URL_ROOT + site + '/get_children/' +
-                object_type + '/' + object_id + '/full', ACCEPT=content_type)
+                object_type + '/' + item_id + '/full', ACCEPT=content_type)
 
     def test_200_returned_for_children_search(self):
-        child_searches = {'themes': 'C34', 'itemtypes': 'C1067'}
-        for object_type, object_id in child_searches.items():
-            response = self.children_search(object_type=object_type, object_id=object_id)
+        child_searches = {'themes': '34', 'itemtypes': '1067'}
+        for object_type, item_id in child_searches.items():
+            response = self.children_search(object_type=object_type, item_id=item_id)
             self.assertStatusCode(response)
 
     def test_parents_match_for_children_search(self):
@@ -840,11 +840,11 @@ class ApiCategoryChildrenIntegrationTests(ApiTestsBase):
             self.assertEqual('34', result['cat_parent'])
 
     def test_400_returned_for_asset_child_search(self):
-        response = self.children_search(object_type='documents', object_id='A8346')
+        response = self.children_search(object_type='documents', item_id='A8346')
         self.assertStatusCode(response, 400)
 
     def test_400_returned_for_invalid_child(self):
-        response = self.children_search(object_type='regions', object_id='C1346')
+        response = self.children_search(object_type='regions', item_id='1346')
         self.assertStatusCode(response, 400)
 
     def test_all_have_children_link(self):
@@ -855,6 +855,6 @@ class ApiCategoryChildrenIntegrationTests(ApiTestsBase):
                 self.assertTrue(result['children_url'].find('children') > -1)
 
     def test_metadata_solr_query_depends_on_hide_admin_field_value(self):
-        returns_response = lambda x: x.children_search(object_type='themes', object_id='C34')
+        returns_response = lambda x: x.children_search(object_type='themes', item_id='34')
         self.assert_metadata_solr_query_included_when_admin_fields_is_false(returns_response)
         self.assert_metadata_solr_query_not_included_when_admin_fields_is_true(returns_response)
