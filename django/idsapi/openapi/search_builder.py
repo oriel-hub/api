@@ -49,14 +49,14 @@ def get_solr_interface(site):
 class SearchBuilder():
 
     @classmethod
-    def create_objectid_query(cls, user_level, site, object_id, object_type,
+    def create_objectid_query(cls, user_level, site, item_id, object_type,
                               search_params, output_format):
         for key in search_params.keys():
             if (key[0] != '_' and key not in ['extra_fields'] and
                     key != BaseRenderer._FORMAT_QUERY_PARAM):
                 raise InvalidQueryError("Unknown query parameter '%s'" % key)
         sw = SearchWrapper(user_level, site)
-        sw.si_query = sw.solr.query(object_id=object_id)
+        sw.si_query = sw.solr.query(item_id=item_id)
         sw.restrict_search_by_object(object_type, allow_objects=True)
         sw.restrict_fields_returned(output_format, search_params)
         return sw
@@ -128,13 +128,13 @@ class SearchBuilder():
         return sw
 
     @classmethod
-    def create_category_children_search(cls, user_level, site, search_params, object_type, object_id):
+    def create_category_children_search(cls, user_level, site, search_params, object_type, item_id):
         if object_type not in settings.OBJECT_TYPES_WITH_HIERARCHY:
             raise InvalidQueryError("Object type '%s' does not have children" % object_type)
 
         sw = SearchWrapper(user_level, site)
         # strip the prefix letter off
-        sw.add_parameter_query('cat_parent', object_id[1:])
+        sw.add_parameter_query('cat_parent', item_id)
         sw.restrict_search_by_object(object_type)
         sw.add_paginate(search_params)
         return sw

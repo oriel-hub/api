@@ -20,18 +20,18 @@ class DataMunger():
     def __init__(self, site, search_params):
         self.site = site
         self.search_params = search_params
-        self.object_id = None
+        self.item_id = None
         self.object_type = None
 
     def get_required_data(self, result, output_format, user_level_info, beacon_guid):
         result = self.create_source_lang_dict(result)
-        self.object_id = result[settings.SOLR_UNIQUE_KEY]
+        self.item_id = result[settings.SOLR_UNIQUE_KEY]
         self.object_type = defines.object_name_to_object_type(result['object_type']['eldis'])
         if output_format == 'id':
-            object_data = {settings.SOLR_UNIQUE_KEY: self.object_id}
+            object_data = {settings.SOLR_UNIQUE_KEY: self.item_id}
         elif output_format in [None, '', 'short']:
             object_data = {
-                settings.SOLR_UNIQUE_KEY: self.object_id,
+                settings.SOLR_UNIQUE_KEY: self.item_id,
                 'item_type': result['item_type'],
                 'title': result['title'],
             }
@@ -62,8 +62,8 @@ class DataMunger():
                         object_data[xml_field] = "Could not parse XML, issue reported in logs"
                         # and send to logs
                         print >> sys.stderr, \
-                            "COULD NOT PARSE XML. object_id: %s, field: %s Error: %s" % \
-                            (self.object_id, xml_field, str(e))
+                            "COULD NOT PARSE XML. item_id: %s, field: %s Error: %s" % \
+                            (self.item_id, xml_field, str(e))
 
         # convert date fields to expected output format
         #for date_field in settings.DATE_FIELDS:
@@ -111,16 +111,16 @@ class DataMunger():
                 '?beacon_guid=' + beacon_guid + "' width='1' height='1'>"
         return description
 
-    def _create_metadata_url(self, object_type=None, object_id=None, object_name=None,
+    def _create_metadata_url(self, object_type=None, item_id=None, object_name=None,
             url_name='object'):
         """create a URL that will give information about the object"""
         if object_type is None:
             object_type = self.object_type
-        if object_id is None:
-            object_id = self.object_id
+        if item_id is None:
+            item_id = self.item_id
         metadata_url = reverse(url_name, kwargs={
             'object_type': object_type,
-            'object_id': object_id,
+            'item_id': item_id,
             'output_format': 'full',
             'site': self.site,
         }) + '/'
@@ -139,12 +139,12 @@ class DataMunger():
 
         if result['cat_parent'] != result['cat_superparent']:
             object_data['parent_url'] = self._create_metadata_url(
-                    object_id='C' + result['cat_parent'])
+                item_id=result['cat_parent'])
 
         if result['cat_first_parent'] != result['cat_parent'] and \
                 result['cat_first_parent'] != result[settings.SOLR_UNIQUE_KEY]:
             object_data['toplevel_parent_url'] = self._create_metadata_url(
-                object_id='C' + result['cat_first_parent'])
+                item_id=result['cat_first_parent'])
 
     def field_type_prefix(self, field_name):
         """ take the field name, work out whether it is a generic field,
@@ -198,6 +198,8 @@ class DataMunger():
             if facet_string[0] == '<' and facet_string[-1] == '>':
                 result = XmlDictConfig.xml_string_to_dict(facet_string.encode('utf-8'), set_encoding="UTF-8")
             elif facet_string.find('|') > -1:
+                # TODO: is this an object_id (with prefix char) or actually
+                # item_id
                 object_id, object_type, object_name = facet_string.split('|', 2)
                 result[settings.SOLR_UNIQUE_KEY] = object_id
                 result['object_name'] = object_name
