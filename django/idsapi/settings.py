@@ -492,6 +492,7 @@ IGNORE_FIELDS = [
     'content',
     'id',
     'index_id',
+    'spell',
 ]
 
 # fields that will exist for all items
