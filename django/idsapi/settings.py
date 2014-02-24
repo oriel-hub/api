@@ -492,9 +492,6 @@ IGNORE_FIELDS = [
     'content',
     'id',
     'index_id',
-    'ss_search_api_language',
-    'author',
-    'title',
 ]
 
 # fields that will exist for all items
@@ -502,6 +499,7 @@ GENERIC_FIELD_LIST = [
     'item_id',
     'item_type',
     'metadata_languages',
+    'sources',
     'timestamp',
 ]
 
