@@ -97,7 +97,7 @@ USER_LEVEL_INFO = {
 }
 
 # this is the default sort field
-DEFAULT_SORT_FIELD = 'title_sort'
+DEFAULT_SORT_FIELD = 'title_sort_hub_en'
 DEFAULT_SORT_ASCENDING = True
 
 # object type sort field mapping, overrides DEFAULT_SORT_FIELD and
@@ -118,8 +118,7 @@ DEFAULT_SORT_OBJECT_MAPPING = {
 # these are the fields you can use for sorting
 SORT_FIELDS = [
     'title',
-    'title_eldis_en',
-    'title_sort',
+    'title_sort_hub_en',
     'name',
     'asset_id',
     'object_id',
