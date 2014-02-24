@@ -170,7 +170,12 @@ class DataMunger():
     def create_source_lang_dict(self, in_dict):
         out_dict = {}
         for field, value in in_dict.iteritems():
-            if field in settings.IGNORE_FIELDS:
+            # we ignore a list of fields, plus xx_search_api_*
+            if (field in settings.IGNORE_FIELDS or field[2:].startswith('_search_api_')
+                    or '_sort_hub_' in field or '_search_hub_' in field):
+                continue
+            if field.startswith('hub_'):
+                out_dict[field] = value
                 continue
             prefix, source, lang = self.field_type_prefix(field)
             if source is None:
