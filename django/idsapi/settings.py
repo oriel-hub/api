@@ -426,6 +426,17 @@ QUERY_MAPPING = {
     },
 }
 
+# fields to use fq queries for
+FQ_FIELDS = [
+    'item_type',
+    'country',
+    'object_type',
+    'metadata_languages',
+    'sources',
+    'keyword_search',
+    'licence_type',
+]
+
 # this maps from the date-based query parameter to the SOLR field used
 # so document_published_year would use the publication_date as the field.
 DATE_PREFIX_MAPPING = {

@@ -57,7 +57,7 @@ class SearchBuilder():
                 raise InvalidQueryError("Unknown query parameter '%s'" % key)
         sw = SearchWrapper(user_level, site)
         sw.si_query = sw.solr.query(item_id=item_id)
-        sw.restrict_search_by_object(object_type, allow_objects=True)
+        sw.restrict_search_by_item_type(object_type, allow_objects=True)
         sw.restrict_fields_returned(output_format, search_params)
         return sw
 
@@ -92,6 +92,8 @@ class SearchBuilder():
                 # we might have to search across multiple fields
                 if isinstance(query_mapping[param]['solr_field'], list):
                     sw.add_multifield_parameter_query(query_mapping[param]['solr_field'], query)
+                elif param in settings.FQ_FIELDS:
+                    sw.add_filter(query_mapping[param]['solr_field'], query)
                 else:
                     sw.add_parameter_query(query_mapping[param]['solr_field'], query)
             elif SearchBuilder._is_date_query(param):
@@ -108,7 +110,7 @@ class SearchBuilder():
                 if (param[0] != '_' and param != BaseRenderer._FORMAT_QUERY_PARAM):
                     raise UnknownQueryParamError(param)
 
-        sw.restrict_search_by_object(object_type)
+        sw.restrict_search_by_item_type(object_type)
         sw.restrict_fields_returned(output_format, search_params)
         sw.add_sort(search_params, object_type)
         if facet_type is None:
@@ -121,7 +123,7 @@ class SearchBuilder():
     @classmethod
     def create_all_search(cls, user_level, site, search_params, object_type, output_format):
         sw = SearchWrapper(user_level, site)
-        sw.restrict_search_by_object(object_type)
+        sw.restrict_search_by_item_type(object_type)
         sw.restrict_fields_returned(output_format, search_params)
         sw.add_sort(search_params, object_type)
         sw.add_paginate(search_params)
@@ -134,8 +136,8 @@ class SearchBuilder():
 
         sw = SearchWrapper(user_level, site)
         # strip the prefix letter off
-        sw.add_parameter_query('cat_parent', item_id)
-        sw.restrict_search_by_object(object_type)
+        sw.add_filter('cat_parent', item_id)
+        sw.restrict_search_by_item_type(object_type)
         sw.add_paginate(search_params)
         return sw
 
@@ -156,9 +158,10 @@ class SearchWrapper:
         else:
             self.solr = get_solr_interface(site)
         self.site = site
-        self.si_query = self.solr.query(index_id=settings.SOLR_INDEX_ID)
+        self.si_query = self.solr.query()
         if settings.SOLR_SERVER_INFO[site]['dismax']:
             self.si_query = self.si_query.add_extra(defType='edismax')
+        self.add_filter('index_id', settings.SOLR_INDEX_ID)
         self.user_level = user_level
         self.has_free_text_query = False
 
@@ -171,26 +174,24 @@ class SearchWrapper:
             print >> sys.stderr, solr_query
         return self.si_query.execute(), solr_query
 
-    def restrict_search_by_object(self, object_type, allow_objects=False):
+    def restrict_search_by_item_type(self, item_type, allow_objects=False):
         """
             Args:
-                object_type (string): The type of object to search for.
+                item_type (string): The type of item to search for.
             Kwargs:
                 allow_objects (bool): Set for unrestricted search over objects.
         """
-        return
-        if object_type == 'assets':
-            # search for any object_type that is an asset
-            self.si_query = self.si_query.query(self.add_field_query('object_type',
-                '|'.join(defines.ASSET_NAMES)))
-        elif allow_objects and object_type == 'objects':
+        if item_type == 'assets':
+            # search for any item_type that is an asset
+            self.add_filter('item_type', ' OR '.join(defines.ASSET_NAMES))
+        elif allow_objects and item_type == 'objects':
             # don't restrict search and don't raise an Error
             # required for single object search
             pass
-        elif object_type in defines.OBJECT_TYPES:
-            self.si_query = self.si_query.query(object_type=settings.OBJECT_TYPES_TO_OBJECT_NAME[object_type])
+        elif item_type in defines.OBJECT_TYPES:
+            self.add_filter('item_type', settings.OBJECT_TYPES_TO_OBJECT_NAME[item_type])
         else:
-            raise UnknownObjectError(object_type)
+            raise UnknownObjectError(item_type)
 
     def add_paginate(self, search_params):
         try:
@@ -268,8 +269,9 @@ class SearchWrapper:
 
     def add_free_text_query(self, search_text):
         if settings.SOLR_SERVER_INFO[self.site]['dismax']:
-            self.si_query = self.si_query.query(search_text.lower())
+            self.si_query = self.si_query.query(search_text)
         else:
+            # TODO: remove this - always use dismax
             self.has_free_text_query = True
             # split words and operators in words, throwing away white space.
             words = self.split_string_around_quotes_and_delimiters(search_text.lower())
@@ -348,6 +350,10 @@ class SearchWrapper:
                 self.si_query = self.si_query.query(**kwargs)
             else:
                 raise InvalidQueryError("Unknown date query '%s'." % param)
+
+    def add_filter(self, field_name, param_value):
+        kwargs = {field_name: param_value}
+        self.si_query = self.si_query.filter(**kwargs)
 
     def add_multifield_parameter_query(self, field_list, param_value):
         q_final = self.solr.Q()
