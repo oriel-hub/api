@@ -50,7 +50,7 @@ class SearchBuilder():
 
     @classmethod
     def create_itemid_query(cls, user_level, site, item_id, item_type,
-                              search_params, output_format):
+                            search_params, output_format):
         for key in search_params.keys():
             if (key[0] != '_' and key not in ['extra_fields'] and
                     key != BaseRenderer._FORMAT_QUERY_PARAM):
@@ -183,7 +183,7 @@ class SearchWrapper:
         """
         if item_type == 'assets':
             # search for any item_type that is an asset
-            self.add_filter('item_type', ' OR '.join(defines.ASSET_NAMES))
+            self.add_filter_list('item_type', defines.ASSET_NAMES)
         elif allow_objects and item_type == 'objects':
             # don't restrict search and don't raise an Error
             # required for single object search
@@ -354,6 +354,13 @@ class SearchWrapper:
     def add_filter(self, field_name, param_value):
         kwargs = {field_name: param_value}
         self.si_query = self.si_query.filter(**kwargs)
+
+    def add_filter_list(self, field_name, param_value_list):
+        q_final = self.solr.Q()
+        for value in param_value_list:
+            kwargs = {field_name: value}
+            q_final = q_final | self.solr.Q(**kwargs)
+        self.si_query = self.si_query.filter(q_final)
 
     def add_multifield_parameter_query(self, field_list, param_value):
         q_final = self.solr.Q()
