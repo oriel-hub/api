@@ -102,7 +102,7 @@ DEFAULT_SORT_ASCENDING = True
 
 # object type sort field mapping, overrides DEFAULT_SORT_FIELD and
 # DEFAULT_SORT_ASCENDING for matching object types.
-DEFAULT_SORT_OBJECT_MAPPING = {
+DEFAULT_SORT_ITEM_MAPPING = {
     'documents':
         {'field': 'date_updated_eldis', 'ascending': False},
     'organisations':
@@ -187,6 +187,8 @@ GENERAL_FIELDS = [
 'iso_number',
 'iso_three_letter_code',
 'iso_two_letter_code',
+'item_id',
+'item_type',
 'keyword',
 'language_id',
 'language_name',
@@ -202,8 +204,6 @@ GENERAL_FIELDS = [
 'location_country',
 'metadata_url',
 'name',
-'object_id',
-'object_type',
 'organisation_type',
 'organisation_url',
 'parent_object_array',
@@ -262,167 +262,167 @@ IMAGE_BEACON_STUB_URL = 'http://api.ids.ac.uk/tracking/trackimg.cfm'
 QUERY_MAPPING = {
     'object_id':  {
         'solr_field': 'object_id',
-        'object_type': 'all'
-    },
-    'object_type':  {
-        'solr_field': 'object_type',
-        'object_type': 'all'
-    },
-    'asset_id':  {
-        'solr_field': 'asset_id',
-        'object_type': 'all'
-    },
-    'title':  {
-        'solr_field': 'title',
-        'object_type': 'all'
-    },
-    'country': {
-        'solr_field': 'country_focus_facet',
-        'object_type': 'all'
-    },
-    'keyword': {
-        'solr_field': 'keyword',
-        'object_type': 'all'
-    },
-    'region':  {
-        'solr_field': 'category_region_facet',
-        'object_type': 'all'
-    },
-    'sector':  {
-        'solr_field': 'category_sector',
-        'object_type': 'all'
-    },
-    'subject': {
-        'solr_field': 'category_subject_facet',
-        'object_type': 'all'
-    },
-    'subject_name': {
-        'solr_field': 'category_subject_objects',
-        'object_type': 'all'
-    },
-    'subject_id': {
-        'solr_field': 'category_subject_ids',
-        'object_type': 'documents'
-    },
-    'site':  {
-        'solr_field': 'site',
-        'object_type': 'all'
-    },
-    'category_path':   {
-        'solr_field': 'category_path_sort',
-        'object_type': 'all'
-    },
-    'theme':   {
-        'solr_field': 'category_theme_facet',
-        'object_type': 'all'
-    },
-    'theme_name':   {
-        'solr_field': 'category_theme_objects',
-        'object_type': 'all'
-    },
-    'author':  {
-        'solr_field': 'author',
-        'object_type': 'documents'
-    },
-    'publisher_name': {
-        'solr_field': 'publisher',
-        'object_type': 'documents'
-    },
-    'publisher': {
-        'solr_field': 'publisher_id',
-        'object_type': 'documents'
-    },
-    'copyright_clearance': {
-        'solr_field': 'copyright_clearance',
-        'object_type': 'documents',
-    },
-    'redistribute_clearance': {
-        'solr_field': 'redistribute_clearance',
-        'object_type': 'documents',
-    },
-    'licence_type': {
-        'solr_field': 'licence_type',
-        'object_type': 'all',
-    },
-    'permission_to_host_info': {
-        'solr_field': 'permission_to_host_info',
-        'object_type': 'all',
-    },
-    'related_information_links': {
-        'solr_field': 'related_information_links',
-        'object_type': 'all',
-    },
-    'language_name': {
-        'solr_field': 'language_name',
-        'object_type': 'documents',
-    },
-    'publisher_country': {
-        'solr_field': 'publisher_country',
-        'object_type': 'documents',
-    },
-    'organisation_name': {
-        'solr_field': ['name', 'alternative_name'],
-        'object_type': 'organisations'
-    },
-    'acronym': {
-        'solr_field': ['acronym', 'alternative_acronym'],
-        'object_type': 'organisations'
-    },
-    'location_country': {
-        'solr_field': 'location_country',
-        'object_type': 'organisations',
+        'item_type': 'all'
     },
     'item_type':  {
         'solr_field': 'item_type',
-        'object_type': 'items'
+        'item_type': 'all'
+    },
+    'asset_id':  {
+        'solr_field': 'asset_id',
+        'item_type': 'all'
+    },
+    'title':  {
+        'solr_field': 'title',
+        'item_type': 'all'
+    },
+    'country': {
+        'solr_field': 'country_focus_facet',
+        'item_type': 'all'
+    },
+    'keyword': {
+        'solr_field': 'keyword',
+        'item_type': 'all'
+    },
+    'region':  {
+        'solr_field': 'category_region_facet',
+        'item_type': 'all'
+    },
+    'sector':  {
+        'solr_field': 'category_sector',
+        'item_type': 'all'
+    },
+    'subject': {
+        'solr_field': 'category_subject_facet',
+        'item_type': 'all'
+    },
+    'subject_name': {
+        'solr_field': 'category_subject_objects',
+        'item_type': 'all'
+    },
+    'subject_id': {
+        'solr_field': 'category_subject_ids',
+        'item_type': 'documents'
+    },
+    'site':  {
+        'solr_field': 'site',
+        'item_type': 'all'
+    },
+    'category_path':   {
+        'solr_field': 'category_path_sort',
+        'item_type': 'all'
+    },
+    'theme':   {
+        'solr_field': 'category_theme_facet',
+        'item_type': 'all'
+    },
+    'theme_name':   {
+        'solr_field': 'category_theme_objects',
+        'item_type': 'all'
+    },
+    'author':  {
+        'solr_field': 'author',
+        'item_type': 'documents'
+    },
+    'publisher_name': {
+        'solr_field': 'publisher',
+        'item_type': 'documents'
+    },
+    'publisher': {
+        'solr_field': 'publisher_id',
+        'item_type': 'documents'
+    },
+    'copyright_clearance': {
+        'solr_field': 'copyright_clearance',
+        'item_type': 'documents',
+    },
+    'redistribute_clearance': {
+        'solr_field': 'redistribute_clearance',
+        'item_type': 'documents',
+    },
+    'licence_type': {
+        'solr_field': 'licence_type',
+        'item_type': 'all',
+    },
+    'permission_to_host_info': {
+        'solr_field': 'permission_to_host_info',
+        'item_type': 'all',
+    },
+    'related_information_links': {
+        'solr_field': 'related_information_links',
+        'item_type': 'all',
+    },
+    'language_name': {
+        'solr_field': 'language_name',
+        'item_type': 'documents',
+    },
+    'publisher_country': {
+        'solr_field': 'publisher_country',
+        'item_type': 'documents',
+    },
+    'organisation_name': {
+        'solr_field': ['name', 'alternative_name'],
+        'item_type': 'organisations'
+    },
+    'acronym': {
+        'solr_field': ['acronym', 'alternative_acronym'],
+        'item_type': 'organisations'
+    },
+    'location_country': {
+        'solr_field': 'location_country',
+        'item_type': 'organisations',
+    },
+    'item_type':  {
+        'solr_field': 'item_type',
+        'item_type': 'items'
     },
     'cat_level':  {
         'solr_field': 'cat_level',
-        'object_type': 'all'
+        'item_type': 'all'
     },
     'deleted':  {
         'solr_field': 'deleted',
-        'object_type': 'all'
+        'item_type': 'all'
     },
     'archived':  {
         'solr_field': 'archived',
-        'object_type': 'all'
+        'item_type': 'all'
     },
     'cat_autocomplete':  {
         'solr_field': 'category_path_autocomplete',
-        'object_type': 'all'
+        'item_type': 'all'
     },
     'level':  {
         'solr_field': 'cat_level',
-        'object_type': 'all'
+        'item_type': 'all'
     },
     'title_autocomplete':  {
         'solr_field': 'title_autocomplete',
-        'object_type': 'all'
+        'item_type': 'all'
     },
     'parent_object_id':  {
         'solr_field': 'parent_object_id',
-        'object_type': 'all'
+        'item_type': 'all'
     },
     'toplevel_object_id':  {
         'solr_field': 'toplevel_object_id',
-        'object_type': 'all'
+        'item_type': 'all'
     },
     'country_code':  {
         'solr_field': 'iso_two_letter_code',
-        'object_type': 'countries'
+        'item_type': 'countries'
     },
     'url':  {
         'solr_field': 'urls',
-        'object_type': 'documents'
+        'item_type': 'documents'
     },
     'source': {
         'solr_field': 'sources',
-        'object_type': 'all',
+        'item_type': 'all',
     },
     'language': {
         'solr_field': 'metadata_languages',
-        'object_type': 'all',
+        'item_type': 'all',
     },
 }
 
@@ -473,7 +473,7 @@ SORT_MAPPING = {
 
 # the mapping of how the api refers to objects, to the object name
 # in SOLR
-OBJECT_TYPES_TO_OBJECT_NAME = {
+ITEM_TYPES_TO_ITEM_NAME = {
     'assets':         None,
     'documents':     'Document',
     'organisations': 'Organisation',
@@ -495,7 +495,7 @@ ASSET_TYPES = [
 ]
 
 # the object types where we actually show the heirarchy
-OBJECT_TYPES_WITH_HIERARCHY = ['themes', 'subjects', 'itemtypes']
+ITEM_TYPES_WITH_HIERARCHY = ['themes', 'subjects', 'itemtypes']
 
 # objects that we will get back from solr, but that we should ignore
 IGNORE_FIELDS = [

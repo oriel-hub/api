@@ -1,7 +1,7 @@
 from openapi.tests.test_base import BaseTestCase
 from openapi.tests.api_tests import ApiTestsBase
 
-SEARCH_URL_BASE = '/openapi/eldis/search/documents/'
+SEARCH_URL_BASE = '/v1/hub/search/documents/'
 
 class ApiAuthTests(BaseTestCase):
     def do_search(self):

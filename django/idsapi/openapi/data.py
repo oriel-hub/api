@@ -21,11 +21,11 @@ class DataMunger():
         self.site = site
         self.search_params = search_params
         self.item_id = None
-        self.object_type = None
+        self.item_type = None
 
     def get_required_data(self, result, output_format, user_level_info, beacon_guid):
         self.item_id = result[settings.SOLR_UNIQUE_KEY]
-        self.object_type = defines.object_name_to_object_type(result['item_type'])
+        self.item_type = defines.item_name_to_item_type(result['item_type'])
         result = self.create_source_lang_dict(result)
         if output_format == 'id':
             object_data = {settings.SOLR_UNIQUE_KEY: self.item_id}
@@ -73,7 +73,7 @@ class DataMunger():
         #                object_data[date_field][source].strftime('%Y-%m-%d %H:%M:%S')
 
         # add the parent category, if relevant
-        if self.object_type in settings.OBJECT_TYPES_WITH_HIERARCHY:
+        if self.item_type in settings.ITEM_TYPES_WITH_HIERARCHY:
             self._add_child_parent_links(object_data, result)
 
         if 'description' in object_data:
@@ -92,12 +92,12 @@ class DataMunger():
         for _, list_value in field_dict.items():
             for item in list_value:
                 if settings.SOLR_UNIQUE_KEY in item and \
-                        'object_name' in item and \
-                        'object_type' in item:
+                        'item_name' in item and \
+                        'item_type' in item:
                     item['metadata_url'] = self._create_metadata_url(
-                        defines.object_name_to_object_type(item['object_type']),
+                        defines.item_name_to_item_type(item['item_type']),
                         item[settings.SOLR_UNIQUE_KEY],
-                        item['object_name'])
+                        item['item_name'])
         return field_dict
 
     def _process_description(self, description, user_level_info, beacon_guid):
@@ -111,21 +111,21 @@ class DataMunger():
                 '?beacon_guid=' + beacon_guid + "' width='1' height='1'>"
         return description
 
-    def _create_metadata_url(self, object_type=None, item_id=None, object_name=None,
+    def _create_metadata_url(self, item_type=None, item_id=None, item_name=None,
             url_name='object'):
         """create a URL that will give information about the object"""
-        if object_type is None:
-            object_type = self.object_type
+        if item_type is None:
+            item_type = self.item_type
         if item_id is None:
             item_id = self.item_id
         metadata_url = reverse(url_name, kwargs={
-            'object_type': object_type,
+            'item_type': item_type,
             'item_id': item_id,
             'output_format': 'full',
             'site': self.site,
         }) + '/'
-        if object_name:
-            title = re.sub('\W+', '-', object_name).lower().strip('-')
+        if item_name:
+            title = re.sub('\W+', '-', item_name).lower().strip('-')
             metadata_url += title + '/'
         return metadata_url
 
@@ -194,8 +194,8 @@ class DataMunger():
     def convert_facet_string(self, facet_string):
         result = {
             settings.SOLR_UNIQUE_KEY: '',
-            'object_type': '',
-            'object_name': '',
+            'item_type': '',
+            'item_name': '',
             'metadata_url': ''
         }
         if facet_string:
@@ -205,18 +205,18 @@ class DataMunger():
             elif facet_string.find('|') > -1:
                 # TODO: is this an object_id (with prefix char) or actually
                 # item_id
-                object_id, object_type, object_name = facet_string.split('|', 2)
+                object_id, item_type, item_name = facet_string.split('|', 2)
                 result[settings.SOLR_UNIQUE_KEY] = object_id
-                result['object_name'] = object_name
-                result['object_type'] = object_type
+                result['item_name'] = item_name
+                result['item_type'] = item_type
             else:
-                result['object_name'] = facet_string
+                result['item_name'] = facet_string
 
             # create metadata url, but only if data exists
-            if result[settings.SOLR_UNIQUE_KEY] and result['object_type'] and result['object_name']:
+            if result[settings.SOLR_UNIQUE_KEY] and result['item_type'] and result['item_name']:
                 result['metadata_url'] = self._create_metadata_url(
-                    defines.object_name_to_object_type(result['object_type']),
+                    defines.item_name_to_item_type(result['item_type']),
                     result[settings.SOLR_UNIQUE_KEY],
-                    result['object_name'])
+                    result['item_name'])
 
         return result

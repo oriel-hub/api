@@ -15,18 +15,18 @@ class DataMungerTests(TestCase):
         facet_dict = self.data.convert_facet_string(test_string)
 
         self.assertEquals(facet_dict['item_id'], 'A1200')
-        self.assertEquals(facet_dict['object_type'], 'Country')
-        self.assertEquals(facet_dict['object_name'], 'South Africa')
+        self.assertEquals(facet_dict['item_type'], 'Country')
+        self.assertEquals(facet_dict['item_name'], 'South Africa')
         self.assertTrue(facet_dict['metadata_url'].endswith('/openapi/eldis/get/countries/A1200/full/south-africa/'),
             "Got %s" % facet_dict['metadata_url'])
 
     def test_convert_facet_string_with_xml_field(self):
-        test_string = "<theme><item_id>C563</item_id><object_type>theme</object_type><object_name>Health Challenges</object_name><level>1</level></theme>"
+        test_string = "<theme><item_id>C563</item_id><item_type>theme</item_type><item_name>Health Challenges</item_name><level>1</level></theme>"
         facet_dict = self.data.convert_facet_string(test_string)
 
         self.assertEquals(facet_dict['item_id'], 'C563')
-        self.assertEquals(facet_dict['object_type'], 'theme')
-        self.assertEquals(facet_dict['object_name'], 'Health Challenges')
+        self.assertEquals(facet_dict['item_type'], 'theme')
+        self.assertEquals(facet_dict['item_name'], 'Health Challenges')
         self.assertEquals(facet_dict['level'], '1')
         self.assertTrue(facet_dict['metadata_url'].endswith('/openapi/eldis/get/themes/C563/full/health-challenges/'),
             "Got %s" % facet_dict['metadata_url'])
@@ -36,17 +36,17 @@ class DataMungerTests(TestCase):
         facet_dict = self.data.convert_facet_string(test_string)
 
         self.assertEquals(facet_dict['item_id'], '')
-        self.assertEquals(facet_dict['object_type'], '')
-        self.assertEquals(facet_dict['object_name'], '')
+        self.assertEquals(facet_dict['item_type'], '')
+        self.assertEquals(facet_dict['item_name'], '')
         self.assertEquals(facet_dict['metadata_url'], '')
 
-    def test_convert_old_style_facet_string_returns_dict_with_just_object_name(self):
+    def test_convert_old_style_facet_string_returns_dict_with_just_item_name(self):
         test_string = "environmental statistics"
         facet_dict = self.data.convert_facet_string(test_string)
 
         self.assertEquals(facet_dict['item_id'], '')
-        self.assertEquals(facet_dict['object_type'], '')
-        self.assertEquals(facet_dict['object_name'], 'environmental statistics')
+        self.assertEquals(facet_dict['item_type'], '')
+        self.assertEquals(facet_dict['item_name'], 'environmental statistics')
         self.assertEquals(facet_dict['metadata_url'], '')
 
     def test_field_type_prefix_with_field_name_with_no_underscore(self):

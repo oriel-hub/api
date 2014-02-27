@@ -22,6 +22,7 @@ class MockSolrQuery:
         self.sort_field = None
         self.has_free_text_query = False
         self.extra = {}
+        self.filter_args = {}
 
     def query(self, *args, **kwargs):
         self.query_call_count += 1
@@ -40,13 +41,17 @@ class MockSolrQuery:
         self.extra.update(kwargs)
         return self
 
+    def filter(self, **kwargs):
+        self.filter_args.update(kwargs)
+        return self
+
 
 class SearchWrapperTests(unittest.TestCase):
     def setUp(self):
         self.msi = MockSolrInterface()
 
     def test_general_user_can_not_request_field_not_in_whitelist(self):
-        sw = SearchWrapper('General User', 'eldis', self.msi)
+        sw = SearchWrapper('General User', 'hub', self.msi)
 
         extra_field = 'contact_position'
         self.assertNotIn(extra_field, settings.GENERAL_FIELDS)
@@ -55,7 +60,7 @@ class SearchWrapperTests(unittest.TestCase):
         self.assertRaises(InvalidFieldError, sw.restrict_fields_returned, 'short', {'extra_fields': extra_field})
 
     def test_partner_user_can_not_request_admin_only_field(self):
-        sw = SearchWrapper('Partner', 'eldis', self.msi)
+        sw = SearchWrapper('Partner', 'hub', self.msi)
 
         extra_field = 'legacy_id'
         self.assertTrue(extra_field in settings.ADMIN_ONLY_FIELDS)
@@ -64,7 +69,7 @@ class SearchWrapperTests(unittest.TestCase):
 
     # TODO: replace with data munger test
     #def test_partner_user_can_request_field_not_in_whitelist(self):
-    #    sw = SearchWrapper('Partner', 'eldis', self.msi)
+    #    sw = SearchWrapper('Partner', 'hub', self.msi)
 
     #    extra_field = 'contact_position'
     #    self.assertNotIn(extra_field, settings.GENERAL_FIELDS)
@@ -75,7 +80,7 @@ class SearchWrapperTests(unittest.TestCase):
 
     # TODO: replace with data munger test
     #def test_admin_user_can_request_field_admin_only_field(self):
-    #    sw = SearchWrapper('Unlimited', 'eldis', self.msi)
+    #    sw = SearchWrapper('Unlimited', 'hub', self.msi)
 
     #    extra_field = 'legacy_id'
     #    self.assertTrue(extra_field in settings.ADMIN_ONLY_FIELDS)
@@ -97,17 +102,17 @@ class SearchWrapperAddSortTests(unittest.TestCase):
         settings.SOLR_SERVER_INFO[site]['sort_mapping'] = self.orig_sort_mapping
 
     def test_add_sort_method_disallows_mixed_asc_and_desc_sort(self):
-        sw = SearchWrapper('General User', 'eldis', self.msi)
+        sw = SearchWrapper('General User', 'hub', self.msi)
         search_params = {'sort_asc': 'title', 'sort_desc': 'title'}
         self.assertRaises(InvalidQueryError, sw.add_sort, search_params, 'assets')
 
     def test_add_descending_sort_inverts_field(self):
-        sw = SearchWrapper('General User', 'eldis', self.msi)
+        sw = SearchWrapper('General User', 'hub', self.msi)
         sw.add_sort({'sort_desc': 'publication_date'}, 'assets')
         self.assertEquals(self.msi.query.sort_field, '-publication_date')
 
     def test_add_sort_with_no_mapping(self):
-        sw = SearchWrapper('General User', 'eldis', self.msi)
+        sw = SearchWrapper('General User', 'hub', self.msi)
         sw.add_sort({'sort_asc': 'publication_date'}, 'assets')
         self.assertEquals(self.msi.query.sort_field, 'publication_date')
 
@@ -115,13 +120,13 @@ class SearchWrapperAddSortTests(unittest.TestCase):
         """
         Sort parameters should be overridable by the user via a mapping dictionary.
         """
-        self.set_sort_mapping('eldis', {'title': 'title_sort'})
+        self.set_sort_mapping('hub', {'title': 'title_sort'})
         try:
-            sw = SearchWrapper('General User', 'eldis', self.msi)
+            sw = SearchWrapper('General User', 'hub', self.msi)
             sw.add_sort({'sort_asc': 'title'}, 'assets')
             self.assertEquals(self.msi.query.sort_field, 'title_sort')
         finally:
-            self.unset_sort_mapping('eldis')
+            self.unset_sort_mapping('hub')
 
     def test_add_sort_default_ordering_when_no_sort_params(self):
         """
@@ -134,13 +139,13 @@ class SearchWrapperAddSortTests(unittest.TestCase):
             'countries':
                 {'field': 'title', 'ascending': True},
         }
-        self.set_sort_mapping('eldis', {'title': 'title_sort'})
+        self.set_sort_mapping('hub', {'title': 'title_sort'})
         try:
-            sw = SearchWrapper('General User', 'eldis', self.msi)
+            sw = SearchWrapper('General User', 'hub', self.msi)
             sw.add_sort(dict(), 'countries')
             self.assertEquals(self.msi.query.sort_field, 'title_sort')
         finally:
-            self.unset_sort_mapping('eldis')
+            self.unset_sort_mapping('hub')
 
     def test_add_sort_no_default_ordering_when_free_text_query(self):
         """
@@ -148,14 +153,14 @@ class SearchWrapperAddSortTests(unittest.TestCase):
         """
         settings.DEFAULT_SORT_FIELD = 'title'
         settings.DEFAULT_SORT_ASCENDING = True
-        self.set_sort_mapping('eldis', {'title': 'title_sort'})
+        self.set_sort_mapping('hub', {'title': 'title_sort'})
         try:
-            sw = SearchWrapper('General User', 'eldis', self.msi)
+            sw = SearchWrapper('General User', 'hub', self.msi)
             sw.has_free_text_query = True
             sw.add_sort(dict(), 'assets')
             self.assertIsNone(self.msi.query.sort_field)
         finally:
-            self.unset_sort_mapping('eldis')
+            self.unset_sort_mapping('hub')
 
     def test_add_sort_allows_ordering_when_free_text_query(self):
         """
@@ -163,14 +168,14 @@ class SearchWrapperAddSortTests(unittest.TestCase):
         """
         settings.DEFAULT_SORT_FIELD = 'title'
         settings.DEFAULT_SORT_ASCENDING = True
-        self.set_sort_mapping('eldis', {'title': 'title_sort'})
+        self.set_sort_mapping('hub', {'title': 'title_sort'})
         try:
-            sw = SearchWrapper('General User', 'eldis', self.msi)
+            sw = SearchWrapper('General User', 'hub', self.msi)
             sw.has_free_text_query = True
             sw.add_sort({'sort_desc': 'title'}, 'assets')
             self.assertEquals(self.msi.query.sort_field, '-title_sort')
         finally:
-            self.unset_sort_mapping('eldis')
+            self.unset_sort_mapping('hub')
 
 
 class SearchWrapperAddFreeTextQueryTests(unittest.TestCase):
@@ -179,19 +184,19 @@ class SearchWrapperAddFreeTextQueryTests(unittest.TestCase):
     def setUpClass(cls):
         # TODO: there doesn't seem to be a easy way to just test the query
         # building behaviour with out building a real connection.
-        cls.si = sunburnt.SolrInterface(settings.SOLR_SERVER_INFO['eldis']['base_url'])
+        cls.si = sunburnt.SolrInterface(settings.SOLR_SERVER_INFO['hub']['base_url'])
 
     def setUp(self):
         # 2014-02-05, HD: Unless we set dismax, we just pass through most of
         # this untouched now and let dismax sort it out
-        self.orig_dismax = settings.SOLR_SERVER_INFO['eldis']['dismax']
-        settings.SOLR_SERVER_INFO['eldis']['dismax'] = False
+        self.orig_dismax = settings.SOLR_SERVER_INFO['hub']['dismax']
+        settings.SOLR_SERVER_INFO['hub']['dismax'] = False
 
         self.msi = MockSolrInterface()
-        self.sw = SearchWrapper('General User', 'eldis', SearchWrapperAddFreeTextQueryTests.si)
+        self.sw = SearchWrapper('General User', 'hub', SearchWrapperAddFreeTextQueryTests.si)
 
     def tearDown(self):
-        settings.SOLR_SERVER_INFO['eldis']['dismax'] = self.orig_dismax
+        settings.SOLR_SERVER_INFO['hub']['dismax'] = self.orig_dismax
 
     def solr_q(self):
         return self.sw.si_query.options()['q']
@@ -255,11 +260,11 @@ class SearchWrapperAddFieldQueryTests(unittest.TestCase):
     def setUpClass(cls):
         # TODO: there doesn't seem to be a easy way to just test the query
         # building behaviour with out building a real connection.
-        cls.si = sunburnt.SolrInterface(settings.SOLR_SERVER_INFO['eldis']['base_url'])
+        cls.si = sunburnt.SolrInterface(settings.SOLR_SERVER_INFO['hub']['base_url'])
 
     def setUp(self):
         self.msi = MockSolrInterface()
-        self.sw = SearchWrapper('General User', 'eldis', SearchWrapperAddFieldQueryTests.si)
+        self.sw = SearchWrapper('General User', 'hub', SearchWrapperAddFieldQueryTests.si)
 
     def test_field_query_supports_unicode_text(self):
         q = self.sw.add_field_query('title', u'C\xf4tedivorie')
