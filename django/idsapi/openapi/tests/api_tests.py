@@ -174,12 +174,14 @@ class ApiSearchIntegrationTests(ApiTestsBase):
             search_results = json.loads(response.content)
             self.assertTrue(search_results['metadata']['total_results'] > 0)
 
+    """
     def test_query_using_bridge(self):
         response = self.object_search(site='bridge')
         self.assertStatusCode(response)
         # TODO: reinstate when bridge is sorted out
         #search_results = json.loads(response.content)
         #self.assertTrue(search_results['metadata']['total_results'] > 0)
+    """
 
     def test_query_by_boolean_country_and_free_text(self):
         response = self.object_search(query={'q': 'un', 'country': 'angola&tanzania'})
@@ -578,9 +580,11 @@ class ApiGetAllIntegrationTests(ApiTestsBase):
         response = self.get_all(item_type='documents', output_format='no_slash')
         self.assertStatusCode(response)
 
+    """
     def test_get_all_bridge_documents_returns_200(self):
         response = self.get_all(site="bridge", item_type='documents')
         self.assertStatusCode(response)
+    """
 
     def test_get_all_assets_returns_200(self):
         response = self.get_all()
@@ -701,10 +705,12 @@ class ApiFieldListIntegrationTests(ApiTestsBase):
         response = self.get_field_list()
         self.assertStatusCode(response)
 
+    """
     def test_bridge_field_list_returns_200(self):
         self.login()
         response = self.get_field_list(site='bridge')
         self.assertStatusCode(response)
+    """
 
     def test_bad_site_field_list_returns_400(self):
         self.login()
