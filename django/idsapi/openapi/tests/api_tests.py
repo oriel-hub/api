@@ -20,7 +20,7 @@ class ApiTestsBase(BaseTestCase):
     def object_search(self, site='hub', item_type='documents', output_format='full', query=None,
             content_type='application/json'):
         if query is None:
-            query = {'q': 'un'}
+            query = {'q': 'the'}
         if output_format == 'no_slash':
             output_format = ''
         else:
@@ -130,14 +130,14 @@ class ApiSearchResponseTests(ApiTestsBase):
         profile = self.user.get_profile()
 
         def check_image_beacon_exists_and_has_correct_id(description):
-            return ((description.find(settings.IMAGE_BEACON_STUB_URL) > -1) and
-                    (description.find(profile.beacon_guid) > -1))
+            return ((description['hub']['en'].find(settings.IMAGE_BEACON_STUB_URL) > -1) and
+                    (description['hub']['en'].find(profile.beacon_guid) > -1))
         self.assert_results_list_if_present(response, 'description', check_image_beacon_exists_and_has_correct_id)
 
     def test_description_does_not_contain_image_beacon_for_unlimited_user(self):
         self.setUserLevel('Unlimited')
         response = self.object_search(item_type='documents', output_format='full')
-        self.assert_results_list_if_present(response, 'description', lambda x: x.find(settings.IMAGE_BEACON_STUB_URL) == -1)
+        self.assert_results_list_if_present(response, 'description', lambda x: x['hub']['en'].find(settings.IMAGE_BEACON_STUB_URL) == -1)
 
     def test_full_search_converts_structured_xml_fields(self):
         response = self.object_search(item_type='documents', output_format='full')
@@ -345,13 +345,13 @@ class ApiPaginationTests(ApiTestsBase):
         self.assertTrue(int(match.group(1)) >= 0)
 
     def test_num_results_in_query_matches_results_returned(self):
-        response = self.object_search(query={'q': 'un', 'num_results': '20'})
+        response = self.object_search(query={'q': 'the', 'num_results': '20'})
         results = json.loads(response.content)['results']
         self.assertEqual(20, len(results))
 
     def test_num_results_correctly_passed_on_to_next_and_prev_links(self):
         response = self.object_search(item_type='documents',
-                query={'q': 'un', 'num_results': '12', 'start_offset': '12'})
+                query={'q': 'the', 'num_results': '12', 'start_offset': '12'})
         metadata = json.loads(response.content)['metadata']
         for link in ('prev_page', 'next_page'):
             match = re.search(r'num_results=([-0-9]+)', metadata[link])
@@ -366,26 +366,26 @@ class ApiDateQueryTests(ApiTestsBase):
         results = json.loads(response.content)['results']
         for result in results:
             document_published = datetime.datetime.strptime(
-                    result['publication_date'][0:19], "%Y-%m-%d %H:%M:%S")
+                    result['publication_date']['eldis'][0:19], "%Y-%m-%dT%H:%M:%S")
             self.assertTrue(document_published < query_date)
 
     def test_200_returned_for_document_published_after(self):
         def published_after_query_date(publication_date):
             query_date = datetime.datetime.strptime('2002-6-1', "%Y-%m-%d")
             document_published = datetime.datetime.strptime(
-                    publication_date[0:19], "%Y-%m-%d %H:%M:%S")
+                    publication_date['eldis'][0:19], "%Y-%m-%dT%H:%M:%S")
             return document_published >= query_date
 
         response = self.object_search(query={'document_published_after': '2002-06-01'})
         self.assert_results_list_if_present(response, 'publication_date', published_after_query_date)
 
     def test_200_returned_for_document_published_year(self):
-        def published_in_2002(publication_date):
-            document_published = datetime.datetime.strptime(publication_date[0:19], "%Y-%m-%d %H:%M:%S")
-            return document_published.year == 2002
+        def published_in_2006(publication_date):
+            document_published = datetime.datetime.strptime(publication_date['eldis'][0:19], "%Y-%m-%dT%H:%M:%S")
+            return document_published.year == 2006
 
-        response = self.object_search(query={'document_published_year': '2002'})
-        self.assert_results_list_if_present(response, 'publication_date', published_in_2002)
+        response = self.object_search(query={'document_published_year': '2006'})
+        self.assert_results_list_if_present(response, 'publication_date', published_in_2006)
 
     def test_200_returned_for_item_dates(self):
         for query_param in ['item_started_after', 'item_started_before', 'item_finished_after',

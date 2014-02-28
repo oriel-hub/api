@@ -443,7 +443,7 @@ DATE_PREFIX_MAPPING = {
     'metadata_published': 'date_created',
     'metadata_updated': 'date_updated',
     'timestamp': 'timestamp',
-    'document_published': 'publication_date',
+    'document_published': 'publication_date_sort_hub_zz',
     'item_started': 'start_date',
     'item_finished': 'end_date',
 }
