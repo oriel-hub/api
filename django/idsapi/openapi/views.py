@@ -174,7 +174,7 @@ class ObjectView(BaseSearchView):
         self.setup_vars(request, site, output_format)
 
         try:
-            self.query = SearchBuilder.create_objectid_query(self.user_level, site,
+            self.query = SearchBuilder.create_itemid_query(self.user_level, site,
                     item_id, item_type, self.search_params, output_format)
         except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
