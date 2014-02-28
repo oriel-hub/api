@@ -424,6 +424,10 @@ QUERY_MAPPING = {
         'solr_field': 'metadata_languages',
         'item_type': 'all',
     },
+    'publication_date': {
+        'solr_field': 'publication_date_sort_hub_zz',
+        'item_type': 'documents',
+    }
 }
 
 # fields to use fq queries for
