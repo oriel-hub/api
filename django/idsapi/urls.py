@@ -33,5 +33,5 @@ urlpatterns += patterns('',
 
     # the API stuff
     url(r'^openapi/', include(openapi.urls)),
-    url(r'^$', RedirectView.as_view(url='/about/', permanent=False)),
+    #url(r'^$', RedirectView.as_view(url='/about/', permanent=False)),
 )
