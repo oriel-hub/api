@@ -104,11 +104,11 @@ DEFAULT_SORT_ASCENDING = True
 # DEFAULT_SORT_ASCENDING for matching object types.
 DEFAULT_SORT_ITEM_MAPPING = {
     'documents':
-        {'field': 'date_updated_eldis', 'ascending': False},
+        {'field': 'date_updated_sort_hub_zz', 'ascending': False},
     'organisations':
-        {'field': 'date_updated', 'ascending': False},
+        {'field': 'date_updated_sort_hub_zz', 'ascending': False},
     'items':
-        {'field': 'date_updated', 'ascending': False},
+        {'field': 'date_updated_sort_hub_zz', 'ascending': False},
     'themes':
         {'field': 'category_path_sort', 'ascending': True},
     'subjects':
@@ -321,7 +321,7 @@ QUERY_MAPPING = {
         'item_type': 'all'
     },
     'author':  {
-        'solr_field': 'author',
+        'solr_field': 'author_search_hub_zz',
         'item_type': 'documents'
     },
     'publisher_name': {
