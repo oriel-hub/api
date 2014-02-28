@@ -269,7 +269,7 @@ class SearchWrapper:
 
     def add_free_text_query(self, search_text):
         if settings.SOLR_SERVER_INFO[self.site]['dismax']:
-            self.si_query = self.si_query.query(search_text)
+            self.si_query = self.si_query.query(search_text.lower())
         else:
             # TODO: remove this - always use dismax
             self.has_free_text_query = True
