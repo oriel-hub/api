@@ -209,22 +209,19 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         self.assertEqual(response_short, response_blank)
         self.assertEqual(response_short, response_no_slash)
 
-    def test_urls_include_friendly_ids(self):
+    def test_urls_does_not_include_friendly_ids(self):
         response = self.object_search()
         search_results = json.loads(response.content)['results']
         for result in search_results:
             url_bits = result['metadata_url'].split(defines.URL_ROOT)[-1].strip('/').split('/')
             # should now have something like ['hub', 'get', 'documents', '1234', 'full', 'asdf']
-            self.assertEqual(len(url_bits), 6)
+            self.assertEqual(len(url_bits), 5)
             self.assertEqual(url_bits[0], 'hub')
             self.assertEqual(url_bits[1], 'get')
             self.assertNotEqual(url_bits[2], 'assets')
             self.assertTrue(url_bits[2] in defines.ITEM_TYPES)
-            self.assertTrue(re.match(r'^[AC]\d+$', url_bits[3]) is not None)
+            self.assertTrue(re.match(r'^\d+$', url_bits[3]) is not None)
             self.assertEqual(url_bits[4], 'full')
-            self.assertTrue(re.match(r'^[-\w]+$', url_bits[5]) is not None)
-            self.assertFalse(url_bits[5].startswith('-'))
-            self.assertFalse(url_bits[5].endswith('-'))
 
     def test_document_search_returns_200(self):
         response = self.object_search(item_type='documents')
@@ -604,7 +601,7 @@ class ApiGetAllIntegrationTests(ApiTestsBase):
 
 class ApiGetObjectIntegrationTests(ApiTestsBase):
 
-    def get_object(self, site='hub', item_type='documents', item_id='A66345',
+    def get_object(self, site='hub', item_type='documents', item_id='3865',
             output_format='', query=None, content_type='application/json'):
         if not query:
             query = {}
@@ -673,13 +670,6 @@ class ApiGetObjectIntegrationTests(ApiTestsBase):
         # not all the results have the abstracts, so just check it doesn't
         # immediately complain
         self.assertStatusCode(response)
-
-    def test_invalid_extra_field_in_object_search_returns_api_error(self):
-        response = self.get_object(item_type='documents', output_format='short',
-                query={'extra_fields': 'not_a_valid_field'})
-        self.assertStatusCode(response, 400)
-        expected_message = '"Invalid query: Can\'t limit Fields - Fields not defined in schema: [u\'not_a_valid_field\']"'
-        self.assertEquals(response.content, expected_message)
 
 
 class ApiRootIntegrationTests(ApiTestsBase):
