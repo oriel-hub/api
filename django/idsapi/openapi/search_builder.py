@@ -10,7 +10,6 @@ from datetime import datetime, timedelta
 import sunburnt
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from djangorestframework.renderers import BaseRenderer
 
 from openapi import defines
@@ -452,10 +451,7 @@ class InvalidQueryError(BadRequestError):
 class InvalidFieldError(BadRequestError):
     def __init__(self, invalid_field, site):
         BadRequestError.__init__(self)
-        field_list_url = reverse('field_list', kwargs={'site': site})
-        self.error_text = 'Unknown field requested: %s ' % invalid_field + \
-            'Please see the <a href="%s">field list</a> for a list of possible fields.' % \
-            field_list_url
+        self.error_text = 'Unknown field requested: %s ' % invalid_field
 
 
 class UnknownQueryParamError(BadRequestError):
