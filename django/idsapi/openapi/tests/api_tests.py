@@ -176,15 +176,6 @@ class ApiSearchIntegrationTests(ApiTestsBase):
             search_results = json.loads(response.content)
             self.assertTrue(search_results['metadata']['total_results'] > 0)
 
-    """
-    def test_query_using_bridge(self):
-        response = self.object_search(site='bridge')
-        self.assertStatusCode(response)
-        # TODO: reinstate when bridge is sorted out
-        #search_results = json.loads(response.content)
-        #self.assertTrue(search_results['metadata']['total_results'] > 0)
-    """
-
     def test_query_by_boolean_country_and_free_text(self):
         response = self.object_search(query={'q': DEFAULT_SEARCH_TERM, 'country': 'angola&tanzania'})
         self.assertStatusCode(response)
@@ -537,13 +528,6 @@ class GetSolrInterfaceTests(TestCase):
         self.assertIs(si1, si2)
         self.assertIsInstance(si1, SolrInterface)
 
-    def test_get_solr_interface_returns_different_object_for_different_sites(self):
-        si1 = get_solr_interface('hub')
-        si2 = get_solr_interface('bridge')
-        self.assertIsNot(si1, si2)
-        self.assertIsInstance(si1, SolrInterface)
-        self.assertIsInstance(si2, SolrInterface)
-
     def test_get_solr_interface_returns_different_object_if_global_is_blanked(self):
         si1 = get_solr_interface('hub')
         from .. import search_builder
@@ -572,12 +556,6 @@ class ApiGetAllIntegrationTests(ApiTestsBase):
     def test_get_all_documents_returns_200_no_trailing_slash(self):
         response = self.get_all(item_type='documents', output_format='no_slash')
         self.assertStatusCode(response)
-
-    """
-    def test_get_all_bridge_documents_returns_200(self):
-        response = self.get_all(site="bridge", item_type='documents')
-        self.assertStatusCode(response)
-    """
 
     def test_get_all_assets_returns_200(self):
         response = self.get_all()
@@ -616,12 +594,6 @@ class ApiGetObjectIntegrationTests(ApiTestsBase):
         response = self.get_object(item_type='documents',
                 output_format='no_slash')
         self.assertStatusCode(response)
-
-# TODO: reinstate when bridge is sorted out
-#    def test_bridge_get_document_by_id_returns_200(self):
-#        response = self.get_object(site='bridge', item_type='documents',
-#                item_id='A20922')
-#       self.assertStatusCode(response)
 
     def test_get_object_by_id_returns_200(self):
         response = self.get_object(item_type='objects')

@@ -95,11 +95,11 @@ class SearchWrapperAddSortTests(unittest.TestCase):
         settings.SORT_MAPPING = {'dummy': 'dummy_sort'}
 
     def set_sort_mapping(self, site, mapping):
-        self.orig_sort_mapping = settings.SOLR_SERVER_INFO[site]['sort_mapping'].copy()
-        settings.SOLR_SERVER_INFO[site]['sort_mapping'] = mapping
+        self.orig_sort_mapping = settings.SORT_MAPPING.copy()
+        settings.SORT_MAPPING = mapping
 
     def unset_sort_mapping(self, site):
-        settings.SOLR_SERVER_INFO[site]['sort_mapping'] = self.orig_sort_mapping
+        settings.SORT_MAPPING = self.orig_sort_mapping
 
     def test_add_sort_method_disallows_mixed_asc_and_desc_sort(self):
         sw = SearchWrapper('General User', 'hub', self.msi)
@@ -178,89 +178,13 @@ class SearchWrapperAddSortTests(unittest.TestCase):
             self.unset_sort_mapping('hub')
 
 
-class SearchWrapperAddFreeTextQueryTests(unittest.TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        # TODO: there doesn't seem to be a easy way to just test the query
-        # building behaviour with out building a real connection.
-        cls.si = sunburnt.SolrInterface(settings.SOLR_SERVER_INFO['hub']['base_url'])
-
-    def setUp(self):
-        # 2014-02-05, HD: Unless we set dismax, we just pass through most of
-        # this untouched now and let dismax sort it out
-        self.orig_dismax = settings.SOLR_SERVER_INFO['hub']['dismax']
-        settings.SOLR_SERVER_INFO['hub']['dismax'] = False
-
-        self.msi = MockSolrInterface()
-        self.sw = SearchWrapper('General User', 'hub', SearchWrapperAddFreeTextQueryTests.si)
-
-    def tearDown(self):
-        settings.SOLR_SERVER_INFO['hub']['dismax'] = self.orig_dismax
-
-    def solr_q(self):
-        return self.sw.si_query.options()['q']
-
-    def test_free_text_query_has_implicit_or(self):
-        self.sw.add_free_text_query('brazil health ozone')
-        self.assertEquals(self.solr_q(), 'brazil OR health OR ozone')
-
-    def test_free_text_query_supports_single_and_operator(self):
-        self.sw.add_free_text_query('brazil and health')
-        self.assertEquals(self.solr_q(), 'brazil AND health')
-
-    def test_free_text_query_supports_single_and_operator_with_implicit_or(self):
-        self.sw.add_free_text_query('brazil and health ozone')
-        self.assertEquals(self.solr_q(), '(brazil AND health) OR ozone')
-
-    def test_free_text_query_supports_single_and_operator_alternative(self):
-        self.sw.add_free_text_query('brazil & health ozone')
-        self.assertEquals(self.solr_q(), '(brazil AND health) OR ozone')
-
-    def test_free_text_query_supports_single_and_operator_alternative_with_no_spaces(self):
-        self.sw.add_free_text_query('brazil&health ozone')
-        self.assertEquals(self.solr_q(), '(brazil AND health) OR ozone')
-
-    def test_free_text_query_supports_multiple_and_operator(self):
-        self.sw.add_free_text_query('brazil and health and ozone')
-        self.assertEquals(self.solr_q(), 'brazil AND health AND ozone')
-
-    def test_free_text_query_ignores_disconnected_and(self):
-        self.sw.add_free_text_query('brazil and health ozone and')
-        self.assertEquals(self.solr_q(), '(brazil AND health) OR ozone')
-
-    def test_free_text_query_ignores_and_at_start_of_string(self):
-        self.sw.add_free_text_query('and brazil and health ozone')
-        self.assertEquals(self.solr_q(), '(brazil AND health) OR ozone')
-
-    def test_free_text_query_ignores_multiple_ands(self):
-        self.sw.add_free_text_query('brazil and and health ozone')
-        self.assertEquals(self.solr_q(), '(brazil AND health) OR ozone')
-
-    def test_free_text_query_supports_or_operator(self):
-        self.sw.add_free_text_query('brazil or health ozone')
-        self.assertEquals(self.solr_q(), 'brazil OR health OR ozone')
-
-    def test_free_text_query_gracefully_handles_meaningless_operators(self):
-        self.sw.add_free_text_query('|')
-        self.assertEquals(self.solr_q(), '*:*')
-
-    def test_free_text_query_supports_or_operators_alternative(self):
-        self.sw.add_free_text_query('brazil | health | ozone')
-        self.assertEquals(self.solr_q(), 'brazil OR health OR ozone')
-
-    def test_and_has_higher_operator_precedence_than_or(self):
-        self.sw.add_free_text_query('brazil and health ozone and environment')
-        self.assertEquals(self.solr_q(), '(brazil AND health) OR (environment AND ozone)')
-
-
 class SearchWrapperAddFieldQueryTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
         # TODO: there doesn't seem to be a easy way to just test the query
         # building behaviour with out building a real connection.
-        cls.si = sunburnt.SolrInterface(settings.SOLR_SERVER_INFO['hub']['base_url'])
+        cls.si = sunburnt.SolrInterface(settings.BASE_URL)
 
     def setUp(self):
         self.msi = MockSolrInterface()

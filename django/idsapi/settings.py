@@ -17,37 +17,14 @@ EMAIL_HOST = 'mailrelay.ids.ac.uk'
 DEFAULT_SITE = 'eldis'
 
 SOLR_SERVER_INFO = {
-    'eldis': {
-        'base_url': 'http://test.api.ids.ac.uk:8983/solr/eldis-test/',
-        'dismax': True,
-        'name_field': 'title',
-        'sort_mapping': {
-            'title': 'title_sort',
-            'category_path': 'category_path_sort',
-        },
-    },
-    'bridge': {
-        'base_url': 'http://test.api.ids.ac.uk:8983/solr/bridge-test/',
-        'dismax': True,
-        'name_field': 'title',
-        'sort_mapping': {
-            'title': 'title_sort',
-            'category_path': 'category_path_sort',
-        },
-    },
     'hub': {
-        'base_url': 'http://test.api.ids.ac.uk:8983/solr/oriel-searchapi-test/',
-        'dismax': True,
         'name_field': 'name',
-        'sort_mapping': {
-            'title': 'title_en',
-            'category_path': 'category_path_sort',
-        },
     },
 }
 
+BASE_URL = 'http://test.api.ids.ac.uk:8983/solr/oriel-searchapi-test/'
 SOLR_SCHEMA_SUFFIX = 'admin/file/?file=schema.xml'
-SOLR_SCHEMA = SOLR_SERVER_INFO[DEFAULT_SITE]['base_url'] + SOLR_SCHEMA_SUFFIX
+SOLR_SCHEMA = BASE_URL + SOLR_SCHEMA_SUFFIX
 
 # we have multiple "indexes" created by drupal, the one we want to use is
 # this one:
@@ -104,11 +81,11 @@ DEFAULT_SORT_ASCENDING = True
 # DEFAULT_SORT_ASCENDING for matching object types.
 DEFAULT_SORT_ITEM_MAPPING = {
     'documents':
-        {'field': 'date_updated_sort_hub_zz', 'ascending': False},
+        {'field': 'title_sort_hub_en', 'ascending': False},
     'organisations':
-        {'field': 'date_updated_sort_hub_zz', 'ascending': False},
+        {'field': 'title_sort_hub_en', 'ascending': False},
     'items':
-        {'field': 'date_updated_sort_hub_zz', 'ascending': False},
+        {'field': 'title_sort_hub_en', 'ascending': False},
     'themes':
         {'field': 'category_path_sort', 'ascending': True},
     'subjects':
@@ -118,7 +95,6 @@ DEFAULT_SORT_ITEM_MAPPING = {
 # these are the fields you can use for sorting
 SORT_FIELDS = [
     'title',
-    'title_sort_hub_en',
     'name',
     'asset_id',
     'object_id',
@@ -471,8 +447,13 @@ FACET_MAPPING = {
 # this maps sort fields when generating SOLR queries, so that custom (eg non
 # tokenized) fields can be used.
 SORT_MAPPING = {
-    'title': 'title_sort',
     'category_path': 'category_path_sort',
+    'date_created': 'date_created_sort_hub_zz',
+    'date_updated': 'date_updated_sort_hub_zz',
+    'name': 'name_sort_hub_en',
+    'object_id': 'object_id_sort_hub_zz',
+    'publication_date': 'publication_date_sort_hub_zz',
+    'title': 'title_sort_hub_en',
 }
 
 # the mapping of how the api refers to objects, to the object name

@@ -4,7 +4,6 @@
 import sys
 import urllib
 import urllib2
-import operator
 import re
 from datetime import datetime, timedelta
 import sunburnt
@@ -26,7 +25,7 @@ def get_solr_interface(site):
     to fetch the schema on every single query."""
     global saved_solr_interface
     global solr_interface_created
-    if site not in settings.SOLR_SERVER_INFO:
+    if site != 'hub':
         raise InvalidQueryError("Unknown site: %s" % site)
     if site not in saved_solr_interface:
         too_old = True
@@ -36,12 +35,12 @@ def get_solr_interface(site):
     if too_old:
         try:
             saved_solr_interface[site] = sunburnt.SolrInterface(
-                settings.SOLR_SERVER_INFO[site]['base_url'], format='json')
+                settings.BASE_URL, format='json')
             solr_interface_created[site] = datetime.now()
         except Exception as e:
             print >>sys.stderr, e
             raise SolrUnavailableError('Solr is not responding (using %s )' %
-                                       settings.SOLR_SERVER_INFO[site]['base_url'])
+                                       settings.BASE_URL)
     return saved_solr_interface[site]
 
 
@@ -158,14 +157,13 @@ class SearchWrapper:
             self.solr = get_solr_interface(site)
         self.site = site
         self.si_query = self.solr.query()
-        if settings.SOLR_SERVER_INFO[site]['dismax']:
-            self.si_query = self.si_query.add_extra(defType='edismax')
+        self.si_query = self.si_query.add_extra(defType='edismax')
         self.add_filter('index_id', settings.SOLR_INDEX_ID)
         self.user_level = user_level
         self.has_free_text_query = False
 
     def execute(self):
-        solr_query = settings.SOLR_SERVER_INFO[self.site]['base_url'] + \
+        solr_query = settings.BASE_URL + \
             'select/?' + urllib.urlencode(self.si_query.params())
         if settings.LOG_SEARCH_PARAMS:
             # this will print to console or error log as appropriate
@@ -256,9 +254,7 @@ class SearchWrapper:
                 sort_field = settings.DEFAULT_SORT_FIELD
                 ascending = settings.DEFAULT_SORT_ASCENDING
 
-            sort_mapping = settings.SOLR_SERVER_INFO[self.site]['sort_mapping']
-            if sort_field in sort_mapping:
-                sort_field = sort_mapping[sort_field]
+            sort_field = settings.SORT_MAPPING.get(sort_field, sort_field)
 
             sort_ord = '' if ascending else '-'
             self.si_query = self.si_query.sort_by(sort_ord + sort_field)
@@ -267,40 +263,7 @@ class SearchWrapper:
             raise InvalidQueryError("Can't do sort on field %s: %s" % (sort_field, e))
 
     def add_free_text_query(self, search_text):
-        if settings.SOLR_SERVER_INFO[self.site]['dismax']:
-            self.si_query = self.si_query.query(search_text.lower())
-        else:
-            # TODO: remove this - always use dismax
-            self.has_free_text_query = True
-            # split words and operators in words, throwing away white space.
-            words = self.split_string_around_quotes_and_delimiters(search_text.lower())
-
-            def gen_2expr(oper, arg):
-                return lambda y: oper(self.si_query.Q(arg), y)
-
-            expr = []
-            ops = []
-            for word in words:
-                if word in ['and', '&']:
-                    if expr and not ops:
-                        ops.append(gen_2expr(operator.and_, expr[-1]))
-                    continue
-
-                if word in ['or', '|']:
-                    # as we implicity ORing everything there is nothing more to do here
-                    continue
-
-                if ops:
-                    if callable(ops[-1]):
-                        part = ops.pop()    # function that returns the operator tree
-                        expr.pop()          # remove the argument from the expression stack
-                        expr.append(part(self.si_query.Q(word)))  # push the tree to the stack
-                else:
-                    expr.append(self.si_query.Q(word))
-
-            if expr:
-                or_words = reduce(operator.or_, expr)
-                self.si_query = self.si_query.query(or_words)
+        self.si_query = self.si_query.query(search_text.lower())
 
     def add_facet(self, facet_type, search_params):
         if not facet_type in settings.FACET_MAPPING.keys():
