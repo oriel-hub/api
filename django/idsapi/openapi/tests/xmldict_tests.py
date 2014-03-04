@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-# integration tests at the API level
 from django.test.testcases import TestCase
 
 from openapi.xmldict import XmlDictConfig
+
 
 class XmlDictTestCase(TestCase):
 
@@ -134,3 +134,30 @@ class XmlDictTestCase(TestCase):
         xml_dict = XmlDictConfig.xml_string_to_dict(self.xml_non_ascii_text,
                 single_item_list=True)
         self.assertEqual(xml_dict['theme'][0]['category_name'], u'Stäckövérfløw')
+
+    trouble_text = """
+<languageList><language><isocode>en</isocode><title>Workshop on women and disability</title><description>The Secretary General of Argentina's National Commission Advisor on the Integration of Disabled People, Comisión Nacional Asesora para la Integración de Personas Discapacitadas (CONADIS), Prof. Silvia Bersanelli wrote on International Women's Day 2010 that disabled women are among the most marginalised groups in the world. Over half of disabled people in Argentina are women, more than one million inhabitants. These women typically suffer from double, triple or multi-dimensional discrimination. To address this situation, the national government of Argentina established the Gender and Disability Group in 2004, which coordinates CONADIS and convened this workshop. The papers submitted for this workshop encompass a variety of topics and strategies to develop more inclusive, just and equitable social relations in Argentina. For example, Dr. Norma Picaso submitted a paper on disabled women and access to health. Other papers address issues of violence, work, sexual and reproductive rights, the inclusion of disabled women in the feminist movement, etcetera.&#x0D;
+&#x0D;
+This web page - http://www.conadis.gov.ar/boletines.html - contains links to the following workshop papers: &#x0D;
+&#x0D;
+#7; Presentación. Silvia Bersanelli. Secretaria General. CONADIS. (PDF) - (DOC) / (PDF) - (DOC)&#x0D;
+#7; Acceso a la Salud. Mujeres con Discapacidad. Norma Picaso. (PDF) - (DOC)&#x0D;
+#7; Violencia y Mujeres con Discapacidad. Carlos Borro. (PDF) - (DOC)&#x0D;
+#7; Moda-Diseño -Discapacidad: el derecho a vestirse. Silvia Valori. (PDF)-(DOC)&#x0D;
+#7; Discriminación y Mujeres con Discapacidad. Mercedes Monjaime. (PDF)-(DOC)</description><language_id>1</language_id></language><language><isocode>es</isocode><title>Jornada mujer y discapacidad</title><description>The Secretary General of Argentina's National Commission Advisor on the Integration of Disabled People, Comisión Nacional Asesora para la Integración de Personas Discapacitadas (CONADIS), Prof. Silvia Bersanelli wrote on International Women's Day 2010 that disabled women are among the most marginalised groups in the world. Over half of disabled people in Argentina are women, more than one million inhabitants. These women typically suffer from double, triple or multi-dimensional discrimination. To address this situation, the national government of Argentina established the Gender and Disability Group in 2004, which coordinates CONADIS and convened this workshop. The papers submitted for this workshop encompass a variety of topics and strategies to develop more inclusive, just and equitable social relations in Argentina. For example, Dr. Norma Picaso submitted a paper on disabled women and access to health. Other papers address issues of violence, work, sexual and reproductive rights, the inclusion of disabled women in the feminist movement, etcetera.&#x0D;
+&#x0D;
+This webpage - http://www.conadis.gov.ar/boletines.html - contains links to workshop papers: &#x0D;
+#7; Presentación. Silvia Bersanelli. Secretaria General. CONADIS. (PDF) - (DOC) / (PDF) - (DOC)&#x0D;
+#7; Acceso a la Salud. Mujeres con Discapacidad. Norma Picaso. (PDF) - (DOC)&#x0D;
+#7; Violencia y Mujeres con Discapacidad. Carlos Borro. (PDF) - (DOC)&#x0D;
+#7; Moda-Diseño -Discapacidad: el derecho a vestirse. Silvia Valori. (PDF)-(DOC)&#x0D;
+#7; Discriminación y Mujeres con Discapacidad. Mercedes Monjaime. (PDF)-(DOC)</description><language_id>429</language_id></language></languageList>
+"""
+
+    def test_trouble_text(self):
+        try:
+            XmlDictConfig.xml_string_to_dict(self.trouble_text,
+                single_item_list=False)
+        except Exception as e:
+            self.fail('Failed to convert trouble_text to dictionary.  '
+                      'Exception was: %s' % e)
