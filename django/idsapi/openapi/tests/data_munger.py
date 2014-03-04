@@ -8,27 +8,27 @@ from ..data import DataMunger
 class DataMungerTests(TestCase):
 
     def setUp(self):
-        self.data = DataMunger('eldis', {})
+        self.data = DataMunger('hub', {})
 
     def test_convert_facet_string(self):
-        test_string = "A1200|Country|South Africa"
+        test_string = "1200|Country|South Africa"
         facet_dict = self.data.convert_facet_string(test_string)
 
-        self.assertEquals(facet_dict['item_id'], 'A1200')
+        self.assertEquals(facet_dict['item_id'], '1200')
         self.assertEquals(facet_dict['item_type'], 'Country')
         self.assertEquals(facet_dict['item_name'], 'South Africa')
-        self.assertTrue(facet_dict['metadata_url'].endswith('/openapi/eldis/get/countries/A1200/full/south-africa/'),
+        self.assertTrue(facet_dict['metadata_url'].endswith('/v1/hub/get/countries/1200/full/south-africa/'),
             "Got %s" % facet_dict['metadata_url'])
 
     def test_convert_facet_string_with_xml_field(self):
-        test_string = "<theme><item_id>C563</item_id><item_type>theme</item_type><item_name>Health Challenges</item_name><level>1</level></theme>"
+        test_string = "<theme><item_id>563</item_id><item_type>theme</item_type><item_name>Health Challenges</item_name><level>1</level></theme>"
         facet_dict = self.data.convert_facet_string(test_string)
 
-        self.assertEquals(facet_dict['item_id'], 'C563')
+        self.assertEquals(facet_dict['item_id'], '563')
         self.assertEquals(facet_dict['item_type'], 'theme')
         self.assertEquals(facet_dict['item_name'], 'Health Challenges')
         self.assertEquals(facet_dict['level'], '1')
-        self.assertTrue(facet_dict['metadata_url'].endswith('/openapi/eldis/get/themes/C563/full/health-challenges/'),
+        self.assertTrue(facet_dict['metadata_url'].endswith('/v1/hub/get/themes/563/full/health-challenges/'),
             "Got %s" % facet_dict['metadata_url'])
 
     def test_convert_empty_facet_string_returns_dict_with_empty_values(self):
