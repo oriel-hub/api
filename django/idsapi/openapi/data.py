@@ -208,8 +208,8 @@ class DataMunger():
             elif facet_string.find('|') > -1:
                 # TODO: is this an object_id (with prefix char) or actually
                 # item_id
-                object_id, item_type, item_name = facet_string.split('|', 2)
-                result[settings.SOLR_UNIQUE_KEY] = object_id
+                item_id, item_type, item_name = facet_string.split('|', 2)
+                result[settings.SOLR_UNIQUE_KEY] = item_id
                 result['item_name'] = item_name
                 result['item_type'] = item_type
             else:
