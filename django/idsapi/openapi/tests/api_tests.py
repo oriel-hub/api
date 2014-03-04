@@ -302,13 +302,6 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         self.assertEqual(response_upper_data['metadata']['total_results'],
                 response_lower_data['metadata']['total_results'])
 
-    def test_search_has_default_site_hub(self):
-        response = self.object_search(item_type='documents', output_format='full',
-                query={'q': DEFAULT_SEARCH_TERM, 'num_results': '500'})
-        results = json.loads(response.content)['results']
-        for result in results:
-            self.assertEqual('hub', result['site'])
-
     def test_metadata_solr_query_depends_on_hide_admin_field_value(self):
         returns_response = lambda x: x.object_search()
         self.assert_metadata_solr_query_included_when_admin_fields_is_false(returns_response)
@@ -780,7 +773,7 @@ class ApiCategoryChildrenIntegrationTests(ApiTestsBase):
             self.assertEqual('34', result['cat_parent'])
 
     def test_400_returned_for_asset_child_search(self):
-        response = self.children_search(item_type='documents', item_id='A8346')
+        response = self.children_search(item_type='documents', item_id='8346')
         self.assertStatusCode(response, 400)
 
     def test_400_returned_for_invalid_child(self):
