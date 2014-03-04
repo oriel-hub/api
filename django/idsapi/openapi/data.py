@@ -154,36 +154,39 @@ class DataMunger():
         """
         parts = field_name.split('_')
         if (len(parts) == 1 or parts[-1] == 'id' or
-                field_name in settings.GENERIC_FIELD_LIST or
-                '_sort_hub_' in field_name or '_search_hub_' in field_name):
+                field_name in settings.GENERIC_FIELD_LIST):
             return field_name, None, None
         # we should at this point always have prefix_source_xx
-        # if xx is "zz" then language is not relevant, otherwise xx is the
-        # language code
         prefix = '_'.join(parts[:-2])
         source = parts[-2]
         lang = parts[-1]
-        if lang == 'zz':
-            return prefix, source, None
-        else:
-            return prefix, source, lang
+        return prefix, source, lang
 
     def create_source_lang_dict(self, in_dict):
         out_dict = {}
-        for field, value in in_dict.iteritems():
-            # we ignore a list of fields, plus xx_search_api_*
-            if field in settings.IGNORE_FIELDS or field[2:].startswith('_search_api_'):
+        for field_name, value in in_dict.iteritems():
+            # we ignore a list of field_names, plus xx_search_api_*
+            if (field_name in settings.IGNORE_FIELDS or
+                    field_name[2:].startswith('_search_api_') or
+                    '_sort_hub_' in field_name or '_search_hub_' in field_name or
+                    '_facet_hub_' in field_name):
                 continue
-            if field.startswith('hub_'):
-                out_dict[field] = value
+            if field_name.startswith('hub_'):
+                out_dict[field_name] = value
                 continue
-            prefix, source, lang = self.field_type_prefix(field)
+            prefix, source, lang = self.field_type_prefix(field_name)
             if source is None:
                 out_dict[prefix] = value
             else:
                 if prefix not in out_dict:
                     out_dict[prefix] = {}
-                if lang is None:
+                # if lang is "zx" then the field is for computers, and may
+                # contain multiple languages (eg search, facet fields)
+                # if lang is "zz" then language is not relevant (eg date)
+                # if lang is "un" then the language is unknown
+                if lang == 'zx':
+                    continue
+                elif lang == 'zz':
                     out_dict[prefix][source] = value
                 else:
                     if source not in out_dict[prefix]:

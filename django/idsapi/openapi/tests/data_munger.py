@@ -72,7 +72,7 @@ class DataMungerTests(TestCase):
         prefix, source, lang = self.data.field_type_prefix('et_al_eldis_zz')
         self.assertEqual('et_al', prefix)
         self.assertEqual('eldis', source)
-        self.assertIsNone(lang)
+        self.assertEqual('zz', lang)
 
     def test_field_type_prefix_with_field_name_with_source_and_language(self):
         prefix, source, lang = self.data.field_type_prefix('title_eldis_en')
@@ -85,15 +85,25 @@ class DataMungerTests(TestCase):
             "item_id": 1234,
             "et_al_bridge_zz": "some people",
             "et_al_eldis_zz": "similar people",
+            "keyword_eldis_en": ["research", "tfmimport"],
+            "keyword_facet_hub_zx": ["research", "tfmimport"],
+            "keyword_search_hub_zx": ["research", "tfmimport"],
             "title_bridge_en": "title goes here",
             "title_bridge_fr": "le title est ici",
             "title_eldis_en": "the title goes here",
+            "title_search_hub_zx": ["title goes here", "le title est ici"],
+            "title_sort_hub_en": "title goes here",
         }
         expected_dict = {
             "item_id": 1234,
             "et_al": {
                 "bridge": "some people",
                 "eldis": "similar people"
+            },
+            "keyword": {
+                "eldis": {
+                    "en": ["research", "tfmimport"],
+                }
             },
             "title": {
                 "bridge": {
