@@ -1,8 +1,3 @@
-#from django.core.urlresolvers import reverse
-#from django.http import HttpResponse, HttpResponseBadRequest
-import httplib2
-from xml.dom import minidom
-
 from djangorestframework import status
 from djangorestframework.authentication import UserLoggedInAuthentication
 from djangorestframework.permissions import IsAuthenticated
@@ -51,9 +46,6 @@ class RootView(View):
                         url_root + 'hub/get/themes/C123/',
                         url_root + 'hub/get/themes/C123/full/capacity-building-approaches',
                     ]
-                },
-                'field list': {
-                    'format': url_root + 'hub/fieldlist/',
                 },
                 'facet count': {
                     'format': url_root + 'hub/count/{item_type}/{category}/?q={query_term}&...',
@@ -246,32 +238,6 @@ class FacetCountView(BaseAuthView):
 
         return {'metadata': metadata,
                 facet_type + '_count': facet_dict_list}
-
-
-class FieldListView(BaseAuthView):
-    def get(self, request, site):
-        self.site = site
-        # TODO: sunburnt does this better - can we reuse it?
-        # fetch file from SOLR_SCHEMA
-        # TODO: Is this caching useful?
-        http = httplib2.Http("/tmp/.cache")
-        if site not in settings.SOLR_SERVER_INFO:
-            return Response(status.HTTP_400_BAD_REQUEST, content="Unknown site: %s" % site)
-        schema_url = settings.SOLR_SERVER_INFO[site]['base_url'] + settings.SOLR_SCHEMA_SUFFIX
-        # TODO: Check the response code here, so that SOLR errors are gracefully handled.
-        _, content = http.request(schema_url, "GET")  # @UnusedVariable
-        doc = minidom.parseString(content)
-        field_list = [field.getAttribute('name') for field in
-                doc.getElementsByTagName('fields')[0].getElementsByTagName('field')]
-        field_list.sort()
-        if self.general_fields_only():
-            field_list = [elem for elem in field_list if elem in settings.GENERAL_FIELDS]
-        else:
-            field_list = [elem for elem in field_list if not elem.endswith('_facet')]
-            field_list = [elem for elem in field_list if not elem in ['text', 'word']]
-            if self.hide_admin_fields():
-                field_list = [elem for elem in field_list if not elem in settings.ADMIN_ONLY_FIELDS]
-        return field_list
 
 
 class CategoryChildrenView(BaseSearchView):

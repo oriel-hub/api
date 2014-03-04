@@ -1,13 +1,11 @@
 from django.conf.urls.defaults import patterns, url
 
-from openapi.views import AllObjectView, ObjectSearchView, ObjectView, FieldListView, \
-    RootView, FacetCountView, CategoryChildrenView, The404View
+from openapi.views import (AllObjectView, ObjectSearchView, ObjectView,
+    RootView, FacetCountView, CategoryChildrenView, The404View)
 
 urlpatterns = patterns('idsapi.openapi.views',
 
     url(r'^$', RootView.as_view(), name='root'),
-
-    url(r'^(?P<site>\w+)/fieldlist/?$', FieldListView.as_view(), name='field_list'),
 
     # eg:
     # /eldis/search/documents?q=undp&author=lopez

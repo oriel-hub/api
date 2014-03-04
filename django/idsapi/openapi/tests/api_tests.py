@@ -689,65 +689,6 @@ class ApiRootIntegrationTests(ApiTestsBase):
         self.assertTrue(response_dict['help'].startswith('http://'))
 
 
-class ApiFieldListIntegrationTests(ApiTestsBase):
-    def get_field_list(self, site='hub'):
-        return self.client.get(defines.URL_ROOT + site + '/fieldlist/', ACCEPT='application/json')
-
-    def test_field_list_returns_200(self):
-        self.login()
-        response = self.get_field_list()
-        self.assertStatusCode(response)
-
-    """
-    def test_bridge_field_list_returns_200(self):
-        self.login()
-        response = self.get_field_list(site='bridge')
-        self.assertStatusCode(response)
-    """
-
-    def test_bad_site_field_list_returns_400(self):
-        self.login()
-        response = self.get_field_list(site='no_such_site')
-        self.assertStatusCode(response, 400)
-
-    def test_field_list_has_admin_items_for_unlimited_user(self):
-        # first check our assumptions
-        self.assertTrue('send_email_alerts' in settings.ADMIN_ONLY_FIELDS)
-        self.setUserLevel('Unlimited')
-        # now run the test
-        self.login()
-        response = self.get_field_list()
-        response_list = json.loads(response.content)
-        self.assertTrue(len(response_list) > 1)
-        self.assertTrue('send_email_alerts' in response_list)
-
-    def test_field_list_has_no_admin_items_for_partner_user(self):
-        # first check our assumptions
-        self.assertTrue('send_email_alerts' in settings.ADMIN_ONLY_FIELDS)
-        self.assertFalse('asset_publication_date' in settings.GENERAL_FIELDS)
-        # now run the test
-        self.setUserLevel('Partner')
-        self.login()
-        response = self.get_field_list()
-        response_list = json.loads(response.content)
-        self.assertTrue(len(response_list) > 1)
-        self.assertFalse('send_email_alerts' in response_list)
-        self.assertTrue('asset_publication_date' in response_list)
-
-    def test_field_list_has_no_admin_items_for_general_user(self):
-        # first check our assumptions
-        self.assertTrue('send_email_alerts' in settings.ADMIN_ONLY_FIELDS)
-        self.assertFalse('asset_publication_date' in settings.GENERAL_FIELDS)
-        # now run the test
-        self.setUserLevel('General User')
-        self.login()
-        response = self.get_field_list()
-        response_list = json.loads(response.content)
-        self.assertTrue(len(response_list) > 1)
-        self.assertFalse('send_email_alerts' in response_list)
-        self.assertFalse('asset_publication_date' in response_list)
-
-
 class ApiFacetIntegrationTests(ApiTestsBase):
 
     def facet_search(self, site='hub', item_type='documents', facet_type='country', query=None):
