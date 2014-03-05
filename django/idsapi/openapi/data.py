@@ -162,14 +162,41 @@ class DataMunger():
         lang = parts[-1]
         return prefix, source, lang
 
+    def include_field(self, field_name):
+        if (field_name in settings.IGNORE_FIELDS or
+                field_name[2:].startswith('_search_api_') or
+                '_sort_hub_' in field_name or '_search_hub_' in field_name or
+                '_facet_hub_' in field_name):
+            return False
+        else:
+            return True
+
+    def include_source(self, source):
+        """ check for source_only or source_exclude """
+        if 'source_only' in self.search_params and source != self.search_params['source_only']:
+            return False
+        if 'source_exclude' in self.search_params and source == self.search_params['source_exclude']:
+            return False
+        return True
+
+    def include_lang(self, lang):
+        """ check for lang_only or lang_exclude """
+        if lang == 'zx':
+            return False
+        if lang == 'zz':
+            return True
+        # TODO: what about 'un' ??
+        if 'lang_only' in self.search_params and lang != self.search_params['lang_only']:
+            return False
+        if 'lang_exclude' in self.search_params and lang == self.search_params['lang_exclude']:
+            return False
+        return True
+
     def create_source_lang_dict(self, in_dict):
         out_dict = {}
         for field_name, value in in_dict.iteritems():
             # we ignore a list of field_names, plus xx_search_api_*
-            if (field_name in settings.IGNORE_FIELDS or
-                    field_name[2:].startswith('_search_api_') or
-                    '_sort_hub_' in field_name or '_search_hub_' in field_name or
-                    '_facet_hub_' in field_name):
+            if not self.include_field(field_name):
                 continue
             if field_name.startswith('hub_'):
                 out_dict[field_name] = value
@@ -184,7 +211,9 @@ class DataMunger():
                 # contain multiple languages (eg search, facet fields)
                 # if lang is "zz" then language is not relevant (eg date)
                 # if lang is "un" then the language is unknown
-                if lang == 'zx':
+                if not self.include_source(source):
+                    continue
+                elif not self.include_lang(lang):
                     continue
                 elif lang == 'zz':
                     out_dict[prefix][source] = value
