@@ -22,8 +22,6 @@ class DataMunger():
         self.search_params = search_params
         self.object_id = None
         self.object_type = None
-        self.lang_fields = set()
-        self.source_fields = set()
 
     def get_required_data(self, result, output_format, user_level_info, beacon_guid):
         self.object_id = result[settings.SOLR_OBJECT_ID]
@@ -192,20 +190,20 @@ class DataMunger():
             return False
         return True
 
-    def prefer_source(self, search_params, out_dict):
+    def prefer_source(self, search_params, out_dict, source_fields):
         source_pref = search_params.get('source_pref', None)
         if source_pref is None:
             return
-        for field in self.source_fields:
+        for field in source_fields:
             # if our preferred source exists, drop all other sources
             if source_pref in out_dict[field]:
                 out_dict[field] = {source_pref: out_dict[field][source_pref]}
 
-    def prefer_lang(self, search_params, out_dict):
+    def prefer_lang(self, search_params, out_dict, lang_fields):
         lang_pref = search_params.get('lang_pref', None)
         if lang_pref is None:
             return
-        for field in self.lang_fields:
+        for field in lang_fields:
             for source in out_dict[field]:
                 # if our preferred language exists, drop all other languages
                 if lang_pref in out_dict[field][source]:
@@ -213,6 +211,8 @@ class DataMunger():
 
     def create_source_lang_dict(self, in_dict):
         out_dict = {}
+        lang_fields = set()
+        source_fields = set()
         for field_name, value in in_dict.iteritems():
             # we ignore a list of field_names, plus xx_search_api_*
             if not self.include_field(field_name):
@@ -236,13 +236,15 @@ class DataMunger():
                     continue
                 elif lang == 'zz':
                     out_dict[prefix][source] = value
-                    self.source_fields.add(prefix)
+                    source_fields.add(prefix)
                 else:
                     if source not in out_dict[prefix]:
                         out_dict[prefix][source] = {}
                     out_dict[prefix][source][lang] = value
-                    self.lang_fields.add(prefix)
-                    self.source_fields.add(prefix)
+                    lang_fields.add(prefix)
+                    source_fields.add(prefix)
+        self.prefer_lang(self.search_params, out_dict, lang_fields)
+        self.prefer_source(self.search_params, out_dict, source_fields)
         return out_dict
 
     def convert_facet_string(self, facet_string):

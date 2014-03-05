@@ -39,11 +39,11 @@ class DataMungerTests(TestCase):
                              '/v1/hub/get/countries/1200/full/south-africa/')
 
     def test_convert_facet_string_with_xml_field(self):
-        test_string = "<theme><object_id>563</object_id><object_type>theme</object_type><object_name>Health Challenges</object_name><level>1</level></theme>"
+        test_string = "<theme><object_id>563</object_id><object_type>Theme</object_type><object_name>Health Challenges</object_name><level>1</level></theme>"
         facet_dict = self.data.convert_facet_string(test_string)
 
         self.assertEquals(facet_dict['object_id'], '563')
-        self.assertEquals(facet_dict['object_type'], 'theme')
+        self.assertEquals(facet_dict['object_type'], 'Theme')
         self.assertEquals(facet_dict['object_name'], 'Health Challenges')
         self.assertEquals(facet_dict['level'], '1')
         self.assert_endswith(facet_dict['metadata_url'],
@@ -138,17 +138,17 @@ class DataMungerTests(TestCase):
         self.assertTrue(self.data.include_lang('zz'))
 
     def test_prefer_lang_does_not_modify_out_dict_if_lang_pref_not_set(self):
-        self.data.lang_fields = set(self.PREFER_TEST_DICT.keys())
+        lang_fields = set(self.PREFER_TEST_DICT.keys())
         search_params = {}
         out_dict = copy.deepcopy(self.PREFER_TEST_DICT)
-        self.data.prefer_lang(search_params, out_dict)
+        self.data.prefer_lang(search_params, out_dict, lang_fields)
         self.assertDictEqual(out_dict, self.PREFER_TEST_DICT)
 
     def test_prefer_lang_does_modify_out_dict_if_lang_pref_set(self):
-        self.data.lang_fields = set(self.PREFER_TEST_DICT.keys())
+        lang_fields = set(self.PREFER_TEST_DICT.keys())
         search_params = {'lang_pref': 'en'}
         out_dict = copy.deepcopy(self.PREFER_TEST_DICT)
-        self.data.prefer_lang(search_params, out_dict)
+        self.data.prefer_lang(search_params, out_dict, lang_fields)
         expected_dict = {
             "title": {
                 "bridge": {
@@ -162,17 +162,17 @@ class DataMungerTests(TestCase):
         self.assertDictEqual(out_dict, expected_dict)
 
     def test_prefer_source_does_not_modify_out_dict_if_source_pref_not_set(self):
-        self.data.source_fields = set(self.PREFER_TEST_DICT.keys())
+        source_fields = set(self.PREFER_TEST_DICT.keys())
         search_params = {}
         out_dict = copy.deepcopy(self.PREFER_TEST_DICT)
-        self.data.prefer_source(search_params, out_dict)
+        self.data.prefer_source(search_params, out_dict, source_fields)
         self.assertDictEqual(out_dict, self.PREFER_TEST_DICT)
 
     def test_prefer_source_does_modify_out_dict_if_source_pref_set(self):
-        self.data.source_fields = set(self.PREFER_TEST_DICT.keys())
+        source_fields = set(self.PREFER_TEST_DICT.keys())
         search_params = {'source_pref': 'bridge'}
         out_dict = copy.deepcopy(self.PREFER_TEST_DICT)
-        self.data.prefer_source(search_params, out_dict)
+        self.data.prefer_source(search_params, out_dict, source_fields)
         expected_dict = {
             "title": {
                 "bridge": {
