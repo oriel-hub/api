@@ -470,13 +470,13 @@ OBJECT_TYPES_TO_OBJECT_NAME = {
     'assets':         None,
     'documents':     'Document',
     'organisations': 'Organisation',
-    'themes':        'theme',
+    'themes':        'Theme',
     'items':         'Item',
-    'subjects':      'subject',
-    'sectors':       'sector',
+    'subjects':      'Subject',
+    'sectors':       'Sector',
     'countries':     'Country',
-    'regions':       'region',
-    'itemtypes':     'itemtype',
+    'regions':       'Region',
+    'itemtypes':     'Itemtype',
 }
 
 # the list of objects that are actually assets
