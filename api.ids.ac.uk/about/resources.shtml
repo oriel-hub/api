@@ -1,8 +1,7 @@
-
 <!--#include VIRTUAL="/includes/header.html"-->
 <h1>Useful Development API Resources</h1>
 <h4>IDS Knowledge Services Resources</h4>
-<p>We will shortly be adding some useful resources for using the IDS Knowledge Services API, such as a PHP library and CF wrappers for the API.</p>
+<p>We will shortly be adding some useful resources for using the IDS Knowledge Services API, such as a PHP library and ColdFusion wrappers for the API.</p>
 <p>In the mean time, please look at the <a href="http://api.ids.ac.uk/docs/">API documentation</a> or <a href="mailto:api@ids.ac.uk">email us</a> for further information about the API</p>
 
 <div class="callout boxed">
@@ -12,7 +11,9 @@
 	<tr>
 		<td><a href="http://www.joomla.org/"><img src="http://api.ids.ac.uk/site_media/images/JoomlaLogo.jpg" /></a></td>
 		<td style="vertical-align:top;"><a href="http://southasia.oneworld.net/">OneWorld South Asia</a> have developed a IDS Knowledge Services plug in for the popular <a href="http://www.joomla.org/">Joomla</a> CMS</td>
-		<td style="vertical-align:top;"><a href="http://api.ids.ac.uk/site_media/apps/eldisapi-1.5.zip">Plug in for Joomla 1.5</a><br /><a href="http://api.ids.ac.uk/site_media/apps/eldisapi-1.6.zip">Plug in for Joomla 1.6 and 1.7</a></td>
+		<td style="vertical-align:top;"><a href="http://api.ids.ac.uk/about/downloads/joomla/eldisapi-1.5.zip">
+			Plug in for Joomla 1.5</a><br />
+			<a href="http://api.ids.ac.uk/about/downloads/joomla/eldisapi-1.6.zip">Plug in for Joomla 1.6</a></td>
 	</tr>
 </table>
 
