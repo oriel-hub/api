@@ -258,7 +258,11 @@ QUERY_MAPPING = {
         'object_type': 'all'
     },
     'keyword': {
-        'solr_field': 'keyword',
+        'solr_field': 'keyword_search_hub_zx',
+        'object_type': 'all'
+    },
+    'country_code': {
+        'solr_field': 'country_code_search_hub_zz',
         'object_type': 'all'
     },
     'region':  {
@@ -385,10 +389,6 @@ QUERY_MAPPING = {
         'solr_field': 'toplevel_object_id',
         'object_type': 'all'
     },
-    'country_code':  {
-        'solr_field': 'iso_two_letter_code',
-        'object_type': 'countries'
-    },
     'url':  {
         'solr_field': 'urls',
         'object_type': 'documents'
@@ -415,13 +415,22 @@ QUERY_MAPPING = {
         'object_type': 'all',
         'exclude': True,
     },
+    'publication_date': {
+        'solr_field': 'publication_date_sort_hub_zz',
+        'object_type': 'documents',
+    },
+    'item_type':  {
+        'solr_field': 'item_type',
+        'object_type': 'all'
+    }
 }
 
 # fields to use fq queries for
 FQ_FIELDS = [
     'object_type',
-    'object_type_hub_zz',
+    'author',
     'country',
+    'country_code',
     'item_type',
     'metadata_languages',
     'sources',
@@ -445,8 +454,9 @@ DATE_FIELDS = [v for k, v in DATE_PREFIX_MAPPING.items()]
 # this maps from the URL for faceted search (eg country_count) to the
 # facet field used
 FACET_MAPPING = {
-    'country':   'country_focus_objects_facet',
-    'keyword':   'keyword_facet',
+    'country':   'country_focus_facet_hub_zx',
+    'country_code':   'country_code_facet_hub_zz',
+    'keyword':   'keyword_facet_hub_zx',
     'region':    'category_region_objects_facet',
     'sector':    'category_sector_facet',
     'subject':   'category_subject_objects_facet',
