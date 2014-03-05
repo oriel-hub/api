@@ -1,4 +1,6 @@
 # tests for the data munger
+import copy
+
 from django.test.testcases import TestCase
 from django.test.utils import override_settings
 
@@ -7,46 +9,62 @@ from ..data import DataMunger
 
 class DataMungerTests(TestCase):
 
+    PREFER_TEST_DICT = {
+        "title": {
+            "bridge": {
+                "en": "title goes here",
+                "fr": "le title est ici"
+            },
+            "eldis": {
+                "en": "the title goes here"
+            }
+        }
+    }
+
     def setUp(self):
         self.data = DataMunger('hub', {})
+
+    def assert_endswith(self, full_string, expected_end):
+        self.assertTrue(full_string.endswith(expected_end),
+                        'Got: %s\nExpected end: %s' % (full_string, expected_end))
 
     def test_convert_facet_string(self):
         test_string = "1200|Country|South Africa"
         facet_dict = self.data.convert_facet_string(test_string)
 
-        self.assertEquals(facet_dict['item_id'], '1200')
-        self.assertEquals(facet_dict['item_type'], 'Country')
-        self.assertEquals(facet_dict['item_name'], 'South Africa')
-        self.assertTrue(facet_dict['metadata_url'].endswith('/v1/hub/get/countries/1200/full/south-africa/'),
-            "Got %s" % facet_dict['metadata_url'])
+        self.assertEquals(facet_dict['object_id'], '1200')
+        self.assertEquals(facet_dict['object_type'], 'Country')
+        self.assertEquals(facet_dict['object_name'], 'South Africa')
+        self.assert_endswith(facet_dict['metadata_url'],
+                             '/v1/hub/get/countries/1200/full/south-africa/')
 
     def test_convert_facet_string_with_xml_field(self):
-        test_string = "<theme><item_id>563</item_id><item_type>theme</item_type><item_name>Health Challenges</item_name><level>1</level></theme>"
+        test_string = "<theme><object_id>563</object_id><object_type>theme</object_type><object_name>Health Challenges</object_name><level>1</level></theme>"
         facet_dict = self.data.convert_facet_string(test_string)
 
-        self.assertEquals(facet_dict['item_id'], '563')
-        self.assertEquals(facet_dict['item_type'], 'theme')
-        self.assertEquals(facet_dict['item_name'], 'Health Challenges')
+        self.assertEquals(facet_dict['object_id'], '563')
+        self.assertEquals(facet_dict['object_type'], 'theme')
+        self.assertEquals(facet_dict['object_name'], 'Health Challenges')
         self.assertEquals(facet_dict['level'], '1')
-        self.assertTrue(facet_dict['metadata_url'].endswith('/v1/hub/get/themes/563/full/health-challenges/'),
-            "Got %s" % facet_dict['metadata_url'])
+        self.assert_endswith(facet_dict['metadata_url'],
+                             '/v1/hub/get/themes/563/full/health-challenges/')
 
     def test_convert_empty_facet_string_returns_dict_with_empty_values(self):
         test_string = ""
         facet_dict = self.data.convert_facet_string(test_string)
 
-        self.assertEquals(facet_dict['item_id'], '')
-        self.assertEquals(facet_dict['item_type'], '')
-        self.assertEquals(facet_dict['item_name'], '')
+        self.assertEquals(facet_dict['object_id'], '')
+        self.assertEquals(facet_dict['object_type'], '')
+        self.assertEquals(facet_dict['object_name'], '')
         self.assertEquals(facet_dict['metadata_url'], '')
 
-    def test_convert_old_style_facet_string_returns_dict_with_just_item_name(self):
+    def test_convert_old_style_facet_string_returns_dict_with_just_object_name(self):
         test_string = "environmental statistics"
         facet_dict = self.data.convert_facet_string(test_string)
 
-        self.assertEquals(facet_dict['item_id'], '')
-        self.assertEquals(facet_dict['item_type'], '')
-        self.assertEquals(facet_dict['item_name'], 'environmental statistics')
+        self.assertEquals(facet_dict['object_id'], '')
+        self.assertEquals(facet_dict['object_type'], '')
+        self.assertEquals(facet_dict['object_name'], 'environmental statistics')
         self.assertEquals(facet_dict['metadata_url'], '')
 
     def test_field_type_prefix_with_field_name_with_no_underscore(self):
@@ -56,8 +74,8 @@ class DataMungerTests(TestCase):
         self.assertIsNone(lang)
 
     def test_field_type_prefix_with_field_name_with_id_field(self):
-        prefix, source, lang = self.data.field_type_prefix('item_id')
-        self.assertEqual('item_id', prefix)
+        prefix, source, lang = self.data.field_type_prefix('object_id')
+        self.assertEqual('object_id', prefix)
         self.assertIsNone(source)
         self.assertIsNone(lang)
 
@@ -80,9 +98,107 @@ class DataMungerTests(TestCase):
         self.assertEqual('eldis', source)
         self.assertEqual('en', lang)
 
+    def test_include_field_ignores_search_api_fields(self):
+        # there are all actual fields from the data
+        self.assertFalse(self.data.include_field('sm_search_api_source_hub_zz'))
+        self.assertFalse(self.data.include_field('dm_search_api_date_updated_hub_zz'))
+        self.assertFalse(self.data.include_field('ss_search_api_language'))
+        self.assertFalse(self.data.include_field('ss_search_api_type_hub_un'))
+
+    def test_include_field_does_not_ignore_search_api_fields_with_more_than_2_letter_prefix(self):
+        self.assertTrue(self.data.include_field('another_search_api_source_hub_zz'))
+
+    def test_include_field_ignores_hub_search_sort_and_facet_fields(self):
+        self.assertFalse(self.data.include_field('title_sort_hub_en'))
+        self.assertFalse(self.data.include_field('title_search_hub_zx'))
+        self.assertFalse(self.data.include_field('country_focus_facet_hub_zz'))
+
+    def test_include_field_does_not_ignore_other_fields(self):
+        self.assertTrue(self.data.include_field('title_hub_en'))
+        self.assertTrue(self.data.include_field('object_id_eldis_zz'))
+
+    def test_include_lang_includes_lang_if_lang_only_not_set(self):
+        self.data.search_params = {}
+        self.assertTrue(self.data.include_lang('en'))
+
+    def test_include_lang_includes_lang_if_lang_only_is_same(self):
+        self.data.search_params = {'lang_only': 'en'}
+        self.assertTrue(self.data.include_lang('en'))
+
+    def test_include_lang_excludes_lang_if_lang_only_is_different(self):
+        self.data.search_params = {'lang_only': 'es'}
+        self.assertFalse(self.data.include_lang('en'))
+
+    def test_include_lang_excludes_lang_if_lang_is_zx(self):
+        self.data.search_params = {}
+        self.assertFalse(self.data.include_lang('zx'))
+
+    def test_include_lang_includes_lang_if_lang_is_zz(self):
+        self.data.search_params = {}
+        self.assertTrue(self.data.include_lang('zz'))
+
+    def test_prefer_lang_does_not_modify_out_dict_if_lang_pref_not_set(self):
+        self.data.lang_fields = set(self.PREFER_TEST_DICT.keys())
+        search_params = {}
+        out_dict = copy.deepcopy(self.PREFER_TEST_DICT)
+        self.data.prefer_lang(search_params, out_dict)
+        self.assertDictEqual(out_dict, self.PREFER_TEST_DICT)
+
+    def test_prefer_lang_does_modify_out_dict_if_lang_pref_set(self):
+        self.data.lang_fields = set(self.PREFER_TEST_DICT.keys())
+        search_params = {'lang_pref': 'en'}
+        out_dict = copy.deepcopy(self.PREFER_TEST_DICT)
+        self.data.prefer_lang(search_params, out_dict)
+        expected_dict = {
+            "title": {
+                "bridge": {
+                    "en": "title goes here",
+                },
+                "eldis": {
+                    "en": "the title goes here"
+                }
+            }
+        }
+        self.assertDictEqual(out_dict, expected_dict)
+
+    def test_prefer_source_does_not_modify_out_dict_if_source_pref_not_set(self):
+        self.data.source_fields = set(self.PREFER_TEST_DICT.keys())
+        search_params = {}
+        out_dict = copy.deepcopy(self.PREFER_TEST_DICT)
+        self.data.prefer_source(search_params, out_dict)
+        self.assertDictEqual(out_dict, self.PREFER_TEST_DICT)
+
+    def test_prefer_source_does_modify_out_dict_if_source_pref_set(self):
+        self.data.source_fields = set(self.PREFER_TEST_DICT.keys())
+        search_params = {'source_pref': 'bridge'}
+        out_dict = copy.deepcopy(self.PREFER_TEST_DICT)
+        self.data.prefer_source(search_params, out_dict)
+        expected_dict = {
+            "title": {
+                "bridge": {
+                    "en": "title goes here",
+                    "fr": "le title est ici"
+                },
+            }
+        }
+        self.assertDictEqual(out_dict, expected_dict)
+
+    def test_include_source_includes_source_if_source_only_not_set(self):
+        self.data.search_params = {}
+        self.assertTrue(self.data.include_source('eldis'))
+
+    def test_include_source_includes_source_if_source_only_is_same(self):
+        self.data.search_params = {'source_only': 'eldis'}
+        self.assertTrue(self.data.include_source('eldis'))
+
+    def test_include_source_excludes_source_if_source_only_is_different(self):
+        self.data.search_params = {'source_only': 'ella'}
+        self.assertFalse(self.data.include_source('eldis'))
+
     def test_create_source_lang_dict_works(self):
         result = {
-            "item_id": 1234,
+            "object_id_hub_zz": 1234,
+            "object_id_eldis_zz": 'A2345',
             "et_al_bridge_zz": "some people",
             "et_al_eldis_zz": "similar people",
             "keyword_eldis_en": ["research", "tfmimport"],
@@ -95,7 +211,10 @@ class DataMungerTests(TestCase):
             "title_sort_hub_en": "title goes here",
         }
         expected_dict = {
-            "item_id": 1234,
+            "object_id": {
+                'hub': 1234,
+                'eldis': 'A2345',
+            },
             "et_al": {
                 "bridge": "some people",
                 "eldis": "similar people"
@@ -115,6 +234,6 @@ class DataMungerTests(TestCase):
                 }
             }
         }
-        with override_settings(GENERIC_FIELD_LIST=['item_id']):
+        with override_settings(GENERIC_FIELD_LIST=['object_id']):
             actual_dict = self.data.create_source_lang_dict(result)
         self.assertDictEqual(expected_dict, actual_dict)

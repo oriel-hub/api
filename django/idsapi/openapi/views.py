@@ -23,7 +23,7 @@ class RootView(View):
             'help': 'http://' + hostname + '/docs/',
             'some_api_calls': {
                 'all': {
-                    'format': url_root + '{site}/get_all/{item_type}/{id|short|full}/',
+                    'format': url_root + '{site}/get_all/{object_type}/{id|short|full}/',
                     'examples': [
                         url_root + 'hub/get_all/assets/short',
                         url_root + 'hub/get_all/documents/full',
@@ -31,7 +31,7 @@ class RootView(View):
                     ]
                 },
                 'search': {
-                    'format': url_root + '{site}/search/{item_type}/{id|short|full}/?q={query_term}&...',
+                    'format': url_root + '{site}/search/{object_type}/{id|short|full}/?q={query_term}&...',
                     'examples': [
                         url_root + 'hub/search/assets/?q=undp',
                         url_root + 'hub/search/documents/full?q=undp&document_published_year=2009',
@@ -40,7 +40,7 @@ class RootView(View):
                     ]
                 },
                 'object': {
-                    'format': url_root + '{site}/get/{item_type}/{item_id}/{id|short|full}/friendly-name',
+                    'format': url_root + '{site}/get/{object_type}/{object_id}/{id|short|full}/friendly-name',
                     'examples': [
                         url_root + 'hub/get/assets/A12345/full',
                         url_root + 'hub/get/themes/C123/',
@@ -48,7 +48,7 @@ class RootView(View):
                     ]
                 },
                 'facet count': {
-                    'format': url_root + 'hub/count/{item_type}/{category}/?q={query_term}&...',
+                    'format': url_root + 'hub/count/{object_type}/{category}/?q={query_term}&...',
                     'examples': [
                         url_root + 'hub/count/documents/theme?q=undp',
                         url_root + 'hub/count/assets/country?q=undp&document_published_year=2009',
@@ -162,12 +162,12 @@ class ObjectView(BaseSearchView):
     def __init__(self):
         BaseSearchView.__init__(self, True)
 
-    def get(self, request, site, item_id, output_format, item_type=None):
+    def get(self, request, site, object_id, output_format, object_type=None):
         self.setup_vars(request, site, output_format)
 
         try:
             self.query = SearchBuilder.create_itemid_query(self.user_level, site,
-                    item_id, item_type, self.search_params, output_format)
+                    object_id, object_type, self.search_params, output_format)
         except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
         except SolrUnavailableError as e:
@@ -178,18 +178,18 @@ class ObjectView(BaseSearchView):
             return {'results': self.build_response()[0]}
         except NoObjectFoundError:
             return Response(status.HTTP_404_NOT_FOUND,
-                    content='No %s found with item_id %s' % (item_type, item_id))
+                    content='No %s found with object_id %s' % (object_type, object_id))
 
 
 class ObjectSearchView(BaseSearchView):
-    def get(self, request, site, output_format, item_type=None):
+    def get(self, request, site, output_format, object_type=None):
         self.setup_vars(request, site, output_format)
         if len(self.search_params.keys()) == 0:
             return Response(status.HTTP_400_BAD_REQUEST,
                     content='object search must have some query string, eg /objects/search/short?q=undp')
         try:
             self.query = SearchBuilder.create_search(self.user_level, site,
-                    self.search_params, item_type, output_format)
+                    self.search_params, object_type, output_format)
         except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
         except SolrUnavailableError as e:
@@ -200,11 +200,11 @@ class ObjectSearchView(BaseSearchView):
 
 
 class AllObjectView(BaseSearchView):
-    def get(self, request, site, output_format, item_type=None):
+    def get(self, request, site, output_format, object_type=None):
         self.setup_vars(request, site, output_format)
         try:
             self.query = SearchBuilder.create_all_search(self.user_level, site,
-                    self.search_params, item_type, output_format)
+                    self.search_params, object_type, output_format)
         except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
         except SolrUnavailableError as e:
@@ -215,11 +215,11 @@ class AllObjectView(BaseSearchView):
 
 
 class FacetCountView(BaseAuthView):
-    def get(self, request, site, item_type, facet_type):
+    def get(self, request, site, object_type, facet_type):
         self.setup_vars(request, site, 'id')
         try:
             query = SearchBuilder.create_search(self.user_level, site,
-                    self.search_params, item_type, 'id', facet_type)
+                    self.search_params, object_type, 'id', facet_type)
         except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
         except SolrUnavailableError as e:
@@ -241,12 +241,12 @@ class FacetCountView(BaseAuthView):
 
 
 class CategoryChildrenView(BaseSearchView):
-    def get(self, request, site, item_type, item_id, output_format):
+    def get(self, request, site, object_type, object_id, output_format):
         self.setup_vars(request, site, output_format)
 
         try:
             self.query = SearchBuilder.create_category_children_search(self.user_level,
-                    site, self.search_params, item_type, item_id)
+                    site, self.search_params, object_type, object_id)
         except BadRequestError as e:
             return Response(status.HTTP_400_BAD_REQUEST, content=e)
         except SolrUnavailableError as e:

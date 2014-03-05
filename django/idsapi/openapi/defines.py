@@ -4,19 +4,19 @@ from django.conf import settings
 
 URL_ROOT = '/v1/'
 
-ITEM_TYPES = settings.ITEM_TYPES_TO_ITEM_NAME.keys()
-ITEM_NAMES = settings.ITEM_TYPES_TO_ITEM_NAME.values()
+OBJECT_TYPES = settings.OBJECT_TYPES_TO_OBJECT_NAME.keys()
+OBJECT_NAMES = settings.OBJECT_TYPES_TO_OBJECT_NAME.values()
 
-ASSET_TYPES_TO_ITEM_NAME = dict((k, v) for k, v in settings.ITEM_TYPES_TO_ITEM_NAME.items()
+ASSET_TYPES_TO_OBJECT_NAME = dict((k, v) for k, v in settings.OBJECT_TYPES_TO_OBJECT_NAME.items()
                                 if k in settings.ASSET_TYPES)
 
-ASSET_NAMES = ASSET_TYPES_TO_ITEM_NAME.values()
+ASSET_NAMES = ASSET_TYPES_TO_OBJECT_NAME.values()
 
 
-def item_name_to_item_type(item_name):
-    for item_type in settings.ITEM_TYPES_TO_ITEM_NAME:
-        if settings.ITEM_TYPES_TO_ITEM_NAME[item_type] == item_name:
-            return item_type
+def object_name_to_object_type(object_name):
+    for object_type in settings.OBJECT_TYPES_TO_OBJECT_NAME:
+        if settings.OBJECT_TYPES_TO_OBJECT_NAME[object_type] == object_name:
+            return object_type
 
 
 class IdsApiError(exceptions.StandardError):

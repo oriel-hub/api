@@ -47,15 +47,15 @@ def get_solr_interface(site):
 class SearchBuilder():
 
     @classmethod
-    def create_itemid_query(cls, user_level, site, item_id, item_type,
+    def create_itemid_query(cls, user_level, site, object_id, object_type,
                             search_params, output_format):
         for key in search_params.keys():
             if (key[0] != '_' and key not in ['extra_fields'] and
                     key != BaseRenderer._FORMAT_QUERY_PARAM):
                 raise InvalidQueryError("Unknown query parameter '%s'" % key)
         sw = SearchWrapper(user_level, site)
-        sw.si_query = sw.solr.query(item_id=item_id)
-        sw.restrict_search_by_item_type(item_type, allow_objects=True)
+        sw.si_query = sw.solr.query(object_id=object_id)
+        sw.restrict_search_by_object_type(object_type, allow_objects=True)
         sw.restrict_fields_returned(output_format, search_params)
         return sw
 
@@ -67,7 +67,7 @@ class SearchBuilder():
         return False
 
     @classmethod
-    def create_search(cls, user_level, site, search_params, item_type, output_format, facet_type=None):
+    def create_search(cls, user_level, site, search_params, object_type, output_format, facet_type=None):
         sw = SearchWrapper(user_level, site)
 
         for param in search_params:
@@ -82,11 +82,11 @@ class SearchBuilder():
             if param == 'q':
                 sw.add_free_text_query(urllib.unquote_plus(query))
             elif param in query_mapping.keys():
-                if query_mapping[param]['item_type'] != 'all':
-                    if query_mapping[param]['item_type'] != item_type:
+                if query_mapping[param]['object_type'] != 'all':
+                    if query_mapping[param]['object_type'] != object_type:
                         raise InvalidQueryError(
                             "Can only use query parameter '%s' with item type '%s', your search had item type '%s'"
-                            % (param, query_mapping[param]['item_type'], item_type))
+                            % (param, query_mapping[param]['object_type'], object_type))
                 # we might have to search across multiple fields
                 if isinstance(query_mapping[param]['solr_field'], list):
                     sw.add_multifield_parameter_query(query_mapping[param]['solr_field'], query)
@@ -98,7 +98,7 @@ class SearchBuilder():
                 sw.add_date_query(param, query)
             # if param not in our list of allowed params
             elif not param in ['num_results', 'num_results_only', 'start_offset',
-                    'extra_fields', 'sort_asc', 'sort_desc']:
+                    'extra_fields', 'sort_asc', 'sort_desc', 'lang_pref', 'source_pref']:
                 # params that start with _ are allowed, as well as the format
                 # parameter - the django rest framework deals with them
                 # TODO: This doesn't seem the most transparent way of handling
@@ -108,9 +108,9 @@ class SearchBuilder():
                 if (param[0] != '_' and param != BaseRenderer._FORMAT_QUERY_PARAM):
                     raise UnknownQueryParamError(param)
 
-        sw.restrict_search_by_item_type(item_type)
+        sw.restrict_search_by_object_type(object_type)
         sw.restrict_fields_returned(output_format, search_params)
-        sw.add_sort(search_params, item_type)
+        sw.add_sort(search_params, object_type)
         if facet_type is None:
             sw.add_paginate(search_params)
         else:
@@ -119,23 +119,23 @@ class SearchBuilder():
         return sw
 
     @classmethod
-    def create_all_search(cls, user_level, site, search_params, item_type, output_format):
+    def create_all_search(cls, user_level, site, search_params, object_type, output_format):
         sw = SearchWrapper(user_level, site)
-        sw.restrict_search_by_item_type(item_type)
+        sw.restrict_search_by_object_type(object_type)
         sw.restrict_fields_returned(output_format, search_params)
-        sw.add_sort(search_params, item_type)
+        sw.add_sort(search_params, object_type)
         sw.add_paginate(search_params)
         return sw
 
     @classmethod
-    def create_category_children_search(cls, user_level, site, search_params, item_type, item_id):
-        if item_type not in settings.ITEM_TYPES_WITH_HIERARCHY:
-            raise InvalidQueryError("Item type '%s' does not have children" % item_type)
+    def create_category_children_search(cls, user_level, site, search_params, object_type, object_id):
+        if object_type not in settings.OBJECT_TYPES_WITH_HIERARCHY:
+            raise InvalidQueryError("Item type '%s' does not have children" % object_type)
 
         sw = SearchWrapper(user_level, site)
         # strip the prefix letter off
-        sw.add_filter('cat_parent', item_id)
-        sw.restrict_search_by_item_type(item_type)
+        sw.add_filter('cat_parent', object_id)
+        sw.restrict_search_by_object_type(object_type)
         sw.add_paginate(search_params)
         return sw
 
@@ -171,24 +171,24 @@ class SearchWrapper:
             print >> sys.stderr, solr_query
         return self.si_query.execute(), solr_query
 
-    def restrict_search_by_item_type(self, item_type, allow_objects=False):
+    def restrict_search_by_object_type(self, object_type, allow_objects=False):
         """
             Args:
-                item_type (string): The type of item to search for.
+                object_type (string): The type of item to search for.
             Kwargs:
                 allow_objects (bool): Set for unrestricted search over objects.
         """
-        if item_type == 'assets':
-            # search for any item_type that is an asset
-            self.add_filter_list('item_type', defines.ASSET_NAMES)
-        elif allow_objects and item_type == 'objects':
+        if object_type == 'assets':
+            # search for any object_type that is an asset
+            self.add_filter_list(settings.SOLR_OBJECT_TYPE, defines.ASSET_NAMES)
+        elif allow_objects and object_type == 'objects':
             # don't restrict search and don't raise an Error
             # required for single object search
             pass
-        elif item_type in defines.ITEM_TYPES:
-            self.add_filter('item_type', settings.ITEM_TYPES_TO_ITEM_NAME[item_type])
+        elif object_type in defines.OBJECT_TYPES:
+            self.add_filter(settings.SOLR_OBJECT_TYPE, settings.OBJECT_TYPES_TO_OBJECT_NAME[object_type])
         else:
-            raise UnknownObjectError(item_type)
+            raise UnknownObjectError(object_type)
 
     def add_paginate(self, search_params):
         try:
@@ -214,11 +214,11 @@ class SearchWrapper:
             num_results = 0
         self.si_query = self.si_query.paginate(start=start_offset, rows=num_results)
 
-    def add_sort(self, search_params, item_type):
+    def add_sort(self, search_params, object_type):
         """
             Args:
                 search_params (dict): A dict like containing the request query string.
-                item_type (string): The object type of the request ('asset', 'document, etc).
+                object_type (string): The object type of the request ('asset', 'document, etc).
 
              do default sort order, but only if no free text query -
              if there is a free text query then the sort order will be by
@@ -242,12 +242,12 @@ class SearchWrapper:
                 if self.has_free_text_query:
                     # free text queries have no default sort ordering
                     return
-                # Allow per item_type defaults
-                elif item_type and item_type in defines.ITEM_TYPES:
-                    item_default = settings.DEFAULT_SORT_ITEM_MAPPING.get(item_type)
-                    if item_default:
-                        sort_field = item_default['field']
-                        ascending = item_default['ascending']
+                # Allow per object_type defaults
+                elif object_type and object_type in defines.OBJECT_TYPES:
+                    object_default = settings.DEFAULT_SORT_OBJECT_MAPPING.get(object_type)
+                    if object_default:
+                        sort_field = object_default['field']
+                        ascending = object_default['ascending']
 
             # Otherwise assume the catch all default
             if not sort_field:
