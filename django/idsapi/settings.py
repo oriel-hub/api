@@ -405,20 +405,6 @@ QUERY_MAPPING = {
         'solr_field': 'metadata_languages',
         'object_type': 'all',
     },
-    'source_exclude': {
-        'solr_field': 'sources',
-        'object_type': 'all',
-        'exclude': True,
-    },
-    'lang_exclude': {
-        'solr_field': 'metadata_languages',
-        'object_type': 'all',
-        'exclude': True,
-    },
-    'publication_date': {
-        'solr_field': 'publication_date_sort_hub_zz',
-        'object_type': 'documents',
-    },
     'item_type':  {
         'solr_field': 'item_type',
         'object_type': 'all'
