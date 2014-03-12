@@ -112,7 +112,10 @@ class XmlDictConfig(dict):
                 root = ElementTree.fromstring(xml_string)
             else:
                 #TODO: Is this a useful feature?
-                root = ElementTree.fromstring(xml_string.encode('ascii', 'xmlcharrefreplace'))
+                try:
+                    root = ElementTree.fromstring(xml_string)
+                except UnicodeEncodeError:
+                    root = ElementTree.fromstring(xml_string.encode('ascii', 'xmlcharrefreplace'))
         except ExpatError as e:
             print >> sys.stderr, "Failed to parse XML\nXML string was: %s\nError was: %s" % \
                 (xml_string, e)
