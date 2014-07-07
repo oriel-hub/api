@@ -22,8 +22,9 @@ class SearchBuilder():
 
     @classmethod
     def create_objectid_query(cls, user_level, site, object_id, object_type, search_params, output_format):
-        for key in search_params.keys():
-            if key[0] != '_' and key not in ['extra_fields']:
+        for param in search_params:
+            if (param[0] != '_' and param != BaseRenderer._FORMAT_QUERY_PARAM and
+                    param not in ['extra_fields']):
                 raise InvalidQueryError("Unknown query parameter '%s'" % key)
         sw = SearchWrapper(user_level, site)
         sw.si_query = sw.solr.query(object_id=object_id)
