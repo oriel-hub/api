@@ -18,8 +18,8 @@ DEFAULT_SITE = 'eldis'
 SOLR_SERVER_URLS = {
     # These are examples, the real values are defined in local_settings.py
     # so that we can have different values on different servers
-    'eldis': 'http://test.api.ids.ac.uk:8983/solr/eldis-test/',
-    'bridge': 'http://test.api.ids.ac.uk:8983/solr/bridge-test/',
+    'eldis': 'http://beta.api.ids.ac.uk:8983/solr/eldis-test/',
+    'bridge': 'http://beta.api.ids.ac.uk:8983/solr/bridge-test/',
 }
 SOLR_SCHEMA_SUFFIX = 'admin/file/?file=schema.xml'
 
@@ -127,6 +127,7 @@ ADMIN_ONLY_FIELDS = [
 # these are the fields that will be given to a 'General User'
 GENERAL_FIELDS = [
 'acronym',
+'asset_id',
 'alternative_acronym',
 'alternative_name',
 'archived',
@@ -153,6 +154,7 @@ GENERAL_FIELDS = [
 'date_created',
 'date_updated',
 'description',
+'document_type',
 'corporate_author',
 'et_al',
 'headline',
@@ -162,6 +164,7 @@ GENERAL_FIELDS = [
 'keyword',
 'language_id',
 'language_name',
+'language_array',
 'level',
 'licence_type',
 'address1',
@@ -173,6 +176,7 @@ GENERAL_FIELDS = [
 'postcode',
 'location_country',
 'metadata_url',
+'metadata_languages',
 'name',
 'object_id',
 'object_type',
@@ -204,6 +208,7 @@ STRUCTURED_XML_FIELDS = [
 		'category_region_array',
 		'children_object_array',
 		'parent_object_array',
+		'language_array'
 		]
 
 # these are the entries in the dropdown box for user registration
@@ -244,11 +249,11 @@ QUERY_MAPPING = {
             'solr_field': 'asset_id',
             'object_type': 'all'
             },
-		 'title':  {
+       'title':  {
             'solr_field': 'title',
             'object_type': 'all'
             },
-		'country': {
+      'country': {
             'solr_field': 'country_focus_facet',
             'object_type': 'all'
             },
@@ -328,6 +333,10 @@ QUERY_MAPPING = {
             'solr_field': 'language_name',
             'object_type': 'documents',
             },
+       'language': {
+            'solr_field': 'metadata_languages',
+            'object_type': 'documents',
+            },
         'publisher_country': {
             'solr_field': 'publisher_country',
             'object_type': 'documents',
@@ -340,55 +349,59 @@ QUERY_MAPPING = {
             'solr_field': ['acronym', 'alternative_acronym'],
             'object_type': 'organisations'
             },
-        'location_country': {
+    'location_country': {
             'solr_field': 'location_country',
             'object_type': 'organisations',
             },
-		'item_type':  {
+    'item_type':  {
             'solr_field': 'item_type',
             'object_type': 'items'
             },
-       'cat_level':  {
+    'cat_level':  {
             'solr_field': 'cat_level',
             'object_type': 'all'
             },
-		'deleted':  {
+    'deleted':  {
             'solr_field': 'deleted',
             'object_type': 'all'
             },
-		'archived':  {
+    'archived':  {
             'solr_field': 'archived',
             'object_type': 'all'
             },
-		'cat_autocomplete':  {
-            'solr_field': 'category_path_autocomplete',
-            'object_type': 'all'
-            },
-       'level':  {
+    'level':  {
             'solr_field': 'cat_level',
             'object_type': 'all'
             },
-       'cat_autocomplete':  {
+    'cat_autocomplete':  {
             'solr_field': 'category_path_autocomplete',
             'object_type': 'all'
             },
-		'parent_object_id':  {
+	'title_autocomplete':  {
+            'solr_field': 'title_autocomplete',
+            'object_type': 'all'
+            },
+    'parent_object_id':  {
             'solr_field': 'parent_object_id',
             'object_type': 'all'
             },
-		'toplevel_object_id':  {
+    'toplevel_object_id':  {
             'solr_field': 'toplevel_object_id',
             'object_type': 'all'
             },
-		'country_code':  {
+    'country_code':  {
             'solr_field': 'iso_two_letter_code',
             'object_type': 'countries'
             },
-		'url':  {
+    'url':  {
             'solr_field': 'urls',
             'object_type': 'documents'
             },
-		}
+    'document_type':  {
+            'solr_field': 'document_type',
+            'object_type': 'documents'
+            },
+}
 
 # this maps from the date-based query parameter to the SOLR field used
 # so document_published_year would use the publication_date as the field.
@@ -413,9 +426,11 @@ FACET_MAPPING = {
         'subject':   'category_subject_objects_facet',
         'theme':     'category_theme_objects_facet',
         'publisher': 'publisher_facet',
-		'publisher_country': 'publisher_country_facet',
-		'publication_year': 'publication_year_facet'
-		}
+        'publisher_country': 'publisher_country_facet',
+        'publication_year': 'publication_year_facet',
+        'language': 'metadata_languages',
+        'document_type': 'document_type_facet',
+}
 
 # this maps sort fields when generating SOLR queries, so that custom (eg non
 # tokenized) fields can be used.
