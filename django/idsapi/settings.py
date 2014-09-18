@@ -16,6 +16,8 @@ EMAIL_HOST = 'mailrelay.ids.ac.uk'
 # files and are here for reference
 DEFAULT_SITE = 'eldis'
 SOLR_SERVER_URLS = {
+    # These are examples, the real values are defined in local_settings.py
+    # so that we can have different values on different servers
     'eldis': 'http://test.api.ids.ac.uk:8983/solr/eldis-test/',
     'bridge': 'http://test.api.ids.ac.uk:8983/solr/bridge-test/',
 }
