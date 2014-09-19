@@ -22,7 +22,7 @@ urlpatterns = patterns('idsapi.openapi.views',
     # eg:
     # /eldis/get/assets/C1234/full
     # /eldis/get/countries/A1100/full
-    url(r'^(?P<site>\w+)/get/(?P<object_type>\w+)/(?P<object_id>[ACJ]\d+)(?:/(?P<output_format>\w*)(/\S*)?)?$',
+    url(r'^(?P<site>\w+)/get/(?P<object_type>\w+)/(?P<object_id>[A-Z]\d+)(?:/(?P<output_format>\w*)(/\S*)?)?$',
         ObjectView.as_view(), name='object'),
 
     # eg:
