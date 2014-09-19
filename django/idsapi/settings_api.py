@@ -18,8 +18,8 @@ EMAIL_HOST = 'mailrelay.ids.ac.uk'
 
 # Where to find SOLR - note that these are over-written in the local settings
 # files and are here for reference
-if SERVER_ENV == "staging_new":
-    BASE_URL = 'http://test.api.ids.ac.uk:8983/solr/oriel-searchapi-test/'
+if SERVER_ENV in ["staging_new", "localdev"]:
+    BASE_URL = 'http://localhost:8983/solr/oriel-searchapi-test/'
     # else production_new ...
 
 SOLR_SCHEMA_SUFFIX = 'admin/file/?file=schema.xml'
