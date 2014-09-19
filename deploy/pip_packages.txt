@@ -1,7 +1,7 @@
 # core django
-Django==1.4.11
+Django==1.4.15
 mysql-python==1.2.3
-pytz==2013.9
+pytz
 
 # solr
 -e git+https://github.com/aptivate/sunburnt.git@30cbee7eb4d4e4c5c7a33c2c080871dc6ee632b7#egg=sunburnt
