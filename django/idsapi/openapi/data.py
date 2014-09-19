@@ -31,7 +31,7 @@ class DataMunger():
             if user_level_info['general_fields_only']:
                 object_data = dict((k, v) for k, v in object_data.items() if k in settings.GENERAL_FIELDS)
             elif user_level_info['hide_admin_fields']:
-                object_data = dict((k, v) for k, v in object_data.items() if not k in settings.ADMIN_ONLY_FIELDS)
+                object_data = dict((k, v) for k, v in object_data.items() if k not in settings.ADMIN_ONLY_FIELDS)
         else:
             object_data = result
 
@@ -80,7 +80,7 @@ class DataMunger():
     def _process_description(self, description, user_level_info, beacon_guid):
         """truncate the description for general level users and
         add an image beacon for most users"""
-        #if user_level_info['general_fields_only'] and len(description) > 250:
+        # if user_level_info['general_fields_only'] and len(description) > 250:
         #    description = description[:246] + '...'
         # add image beacon
         if user_level_info['image_beacon']:
@@ -123,7 +123,7 @@ class DataMunger():
             object_data['toplevel_parent_url'] = self._create_metadata_url(
                 object_id='C' + result['cat_first_parent'])
 
-    def convert_facet_string(self, facet_string):
+    def convert_facet_string(self, facet_string, facet_type):
         result = {
             'object_id': '',
             'object_type': '',
@@ -132,9 +132,9 @@ class DataMunger():
         }
         if facet_string:
             # is it an XML facet_string
-            if facet_string[0] == '<' and facet_string[-1] == '>':
+            if settings.FACET_TYPES[facet_type] == "xml_string":
                 result = XmlDictConfig.xml_string_to_dict(facet_string.encode('utf-8'), set_encoding="UTF-8")
-            elif facet_string.find('|') > -1:
+            elif settings.FACET_TYPES[facet_type] == "id_name_type":
                 object_id, object_type, object_name = facet_string.split('|', 2)
                 result['object_id'] = object_id
                 result['object_name'] = object_name

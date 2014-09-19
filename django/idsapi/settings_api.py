@@ -442,6 +442,21 @@ FACET_MAPPING = {
     'document_type': 'document_type_facet',
 }
 
+# values are 'plain_string', 'id_name_type' or 'xml_string'
+FACET_TYPES = {
+    'country':   'xml_string',
+    'keyword':   'plain_string',
+    'region':    'id_name_type',
+    'sector':    'plain_string',
+    'subject':   'xml_string',
+    'theme':     'xml_string',
+    'publisher': 'plain_string',
+    'publisher_country': 'plain_string',
+    'publication_year': 'plain_string',
+    'language': 'plain_string',
+    'document_type': 'plain_string',
+}
+
 # this maps sort fields when generating SOLR queries, so that custom (eg non
 # tokenized) fields can be used.
 SORT_MAPPING = {
