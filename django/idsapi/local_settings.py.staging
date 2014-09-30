@@ -13,8 +13,7 @@ DATABASES = {
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
-SOLR_SERVER_URLS = {
-        'eldis': 'http://localhost:8983/solr/eldis-test/',
-        'bridge': 'http://localhost:8983/solr/bridge-test/',
-        }
-		
+
+SERVER_ENV = "staging"
+
+# vi: ft=python

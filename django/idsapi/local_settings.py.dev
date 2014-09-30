@@ -10,7 +10,7 @@ LOG_SEARCH_PARAMS = True
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.db.backends.mysql',  # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'idsapi',                      # Or path to database file if using sqlite3.
         'USER': 'idsapi',                      # Not used with sqlite3.
         'PASSWORD': private_settings.DB_PASSWORD,                  # Not used with sqlite3.
@@ -25,9 +25,6 @@ ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
 
-SOLR_SERVER_URLS = {
-        'eldis': 'http://localhost:8983/solr/eldis-test/',
-        'bridge': 'http://localhost:8983/solr/bridge-test/',
-        }
+SERVER_ENV = "localdev"
 
 # vi: ft=python
