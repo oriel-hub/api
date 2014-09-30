@@ -19,7 +19,10 @@ EMAIL_HOST = 'mailrelay.ids.ac.uk'
 # Where to find SOLR - note that these are over-written in the local settings
 # files and are here for reference
 if SERVER_ENV in ["staging_new", "localdev"]:
-    BASE_URL = 'http://localhost:8983/solr/oriel-searchapi-test/'
+    # Index for current version of test hub
+    # BASE_URL = 'http://localhost:8983/solr/oriel-searchapi-test/'
+    # Index for older version of test hub for testing
+    BASE_URL = 'http://localhost:8983/solr/oriel-dev/'
     # else production_new ...
 
 SOLR_SCHEMA_SUFFIX = 'admin/file/?file=schema.xml'
@@ -73,18 +76,18 @@ USER_LEVEL_INFO = {
 }
 
 # this is the default sort field
-DEFAULT_SORT_FIELD = 'title_sort_hub_en'
+DEFAULT_SORT_FIELD = 'title_sort_hub_zx'
 DEFAULT_SORT_ASCENDING = True
 
 # object type sort field mapping, overrides DEFAULT_SORT_FIELD and
 # DEFAULT_SORT_ASCENDING for matching object types.
 DEFAULT_SORT_OBJECT_MAPPING = {
     'documents':
-        {'field': 'title_sort_hub_en', 'ascending': False},
+        {'field': 'title_sort_hub_zx', 'ascending': False},
     'organisations':
-        {'field': 'title_sort_hub_en', 'ascending': False},
+        {'field': 'title_sort_hub_zx', 'ascending': False},
     'items':
-        {'field': 'title_sort_hub_en', 'ascending': False},
+        {'field': 'title_sort_hub_zx', 'ascending': False},
     'themes':
         {'field': 'category_path_sort', 'ascending': True},
     'subjects':
@@ -156,6 +159,8 @@ GENERAL_FIELDS = [
     'country_name',
     'date_created',
     'date_updated',
+    'document_medium',
+    'document_type',
     'description',
     'corporate_author',
     'et_al',
@@ -179,6 +184,7 @@ GENERAL_FIELDS = [
     'postcode',
     'location_country',
     'metadata_url',
+    'metadata_languages',
     'name',
     'organisation_type',
     'organisation_url',
@@ -202,12 +208,15 @@ GENERAL_FIELDS = [
 # these are fields that contain XML data
 STRUCTURED_XML_FIELDS = [
     'category_theme_array',
+    # 'category_theme_objects',
     'category_subject_array',
+    'category_subject_objects_hub_zx',
     'publisher_array',
-    'country_focus_array',
+    # 'country_focus_array',
     'category_region_array',
-    'children_object_array',
+    # 'children_object_array',
     'parent_object_array',
+    'country_focus_array_hub_zx',
 ]
 
 # these are the entries in the dropdown box for user registration
@@ -244,6 +253,10 @@ QUERY_MAPPING = {
         'solr_field': 'object_type_hub_zz',
         'object_type': 'all'
     },
+    'item_type':  {
+        'solr_field': 'item_type_hub_zz',
+        'object_type': 'all'
+    },
     'asset_id':  {
         'solr_field': 'asset_id_eldis_zz',
         'object_type': 'all'
@@ -260,8 +273,12 @@ QUERY_MAPPING = {
         'solr_field': 'title_search_hub_zx',
         'object_type': 'all'
     },
+    # 'country': {
+        # 'solr_field': 'country_focus_search_hub_zx',
+        # 'object_type': 'all'
+    # },
     'country': {
-        'solr_field': 'country_focus_search_hub_zx',
+        'solr_field': 'hubcountry_search_hub_en',
         'object_type': 'all'
     },
     'keyword': {
@@ -300,8 +317,12 @@ QUERY_MAPPING = {
         'solr_field': 'category_path_eldis_zz',
         'object_type': 'all'
     },
+    # 'theme':   {
+        # 'solr_field': 'category_theme_facet_hub_zx',
+        # 'object_type': 'all'
+    # },
     'theme':   {
-        'solr_field': 'category_theme_facet',
+        'solr_field': 'hubtheme_search_hub_zx',
         'object_type': 'all'
     },
     'theme_name':   {
@@ -408,7 +429,15 @@ QUERY_MAPPING = {
         'solr_field': 'sources',
         'object_type': 'all',
     },
+    'source': {
+        'solr_field': 'sources',
+        'object_type': 'all',
+    },
     'lang_only': {
+        'solr_field': 'metadata_languages',
+        'object_type': 'all',
+    },
+    'lang': {
         'solr_field': 'metadata_languages',
         'object_type': 'all',
     },
@@ -420,13 +449,14 @@ QUERY_MAPPING = {
 
 # fields to use fq queries for
 FQ_FIELDS = [
+    'item_type',
     'object_type',
     'author',
     'country',
     'country_code',
     'item_type',
     'metadata_languages',
-    'sources',
+    'source_only',
     'keyword_search',
     'licence_type',
 ]
@@ -447,16 +477,21 @@ DATE_FIELDS = [v for k, v in DATE_PREFIX_MAPPING.items()]
 # this maps from the URL for faceted search (eg country_count) to the
 # facet field used
 FACET_MAPPING = {
-    'country':   'country_focus_facet_hub_zx',
+    'item_type':   'item_type_facet_hub_zx',
+    'country':   'hubcountry_search_hub_en',
+    # 'country':   'country_focus_facet_hub_zx',
     'country_code':   'country_code_facet_hub_zz',
     'keyword':   'keyword_facet_hub_zx',
     'region':    'category_region_objects_facet',
     'sector':    'category_sector_facet',
-    'subject':   'category_subject_objects_facet',
-    'theme':     'category_theme_objects_facet',
+    # 'subject':   'category_subject_objects_facet',
+    'subject':   'hubsubject_objects_facet',
+    # 'theme':     'category_theme_objects_facet',
+    'theme':     'hubtheme_facet_hub_zx',
     'publisher': 'publisher_facet',
     'publisher_country': 'publisher_country_facet',
-    'publication_year': 'publication_year_facet'
+    'publication_year': 'publication_year_facet',
+    'source': 'sources',
 }
 
 # this maps sort fields when generating SOLR queries, so that custom (eg non
@@ -465,10 +500,10 @@ SORT_MAPPING = {
     'category_path': 'category_path_sort',
     'date_created': 'date_created_sort_hub_zz',
     'date_updated': 'date_updated_sort_hub_zz',
-    'name': 'name_sort_hub_en',
+    'name': 'name_sort_hub_zx',
     'object_id': 'object_id_sort_hub_zz',
     'publication_date': 'publication_date_sort_hub_zz',
-    'title': 'title_sort_hub_en',
+    'title': 'title_sort_hub_zx',
 }
 
 # the mapping of how the api refers to objects, to the object name
@@ -519,4 +554,4 @@ GENERIC_FIELD_LIST = [
 #SOLR_OBJECT_ID = 'object_id_hub_zz'
 #SOLR_OBJECT_ID = 'object_id_sort_hub_zz'
 SOLR_OBJECT_ID = 'item_id'
-SOLR_OBJECT_TYPE = 'object_type_hub_zz'
+SOLR_OBJECT_TYPE = 'item_type'
