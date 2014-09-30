@@ -97,7 +97,7 @@ class SearchBuilder():
             elif SearchBuilder._is_date_query(param):
                 sw.add_date_query(param, query)
             # if param not in our list of allowed params
-            elif not param in ['num_results', 'num_results_only', 'start_offset',
+            elif param not in ['num_results', 'num_results_only', 'start_offset',
                     'extra_fields', 'sort_asc', 'sort_desc', 'lang_pref', 'source_pref']:
                 # params that start with _ are allowed, as well as the format
                 # parameter - the django rest framework deals with them
@@ -266,7 +266,7 @@ class SearchWrapper:
         self.si_query = self.si_query.query(search_text.lower())
 
     def add_facet(self, facet_type, search_params):
-        if not facet_type in settings.FACET_MAPPING.keys():
+        if facet_type not in settings.FACET_MAPPING.keys():
             raise InvalidQueryError("Unknown count type: '%s_count'" % facet_type)
         facet_kwargs = {}
         if settings.EXCLUDE_ZERO_COUNT_FACETS:
@@ -319,8 +319,7 @@ class SearchWrapper:
                 raise InvalidQueryError("Unknown date query '%s'." % param)
 
     def add_filter(self, field_name, param_value):
-        kwargs = {field_name: param_value}
-        self.si_query = self.si_query.filter(**kwargs)
+        self.si_query = self.si_query.filter(self.add_field_query(field_name, param_value))
 
     def add_filter_list(self, field_name, param_value_list):
         q_final = self.solr.Q()
