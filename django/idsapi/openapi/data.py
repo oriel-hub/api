@@ -32,7 +32,9 @@ class DataMunger():
         elif output_format in [None, '', 'short']:
             object_data = {
                 'object_id': result.get('object_id', result['item_id']),
+                'item_id': result.get('item_id', result['item_id']),
                 'object_type': result.get('object_type', result['item_type']),
+                'item_type': result.get('item_type', result['item_type']),
                 'title': result.get('title', result.get('name')),
             }
             if 'extra_fields' in self.search_params:

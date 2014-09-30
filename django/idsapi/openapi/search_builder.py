@@ -54,7 +54,7 @@ class SearchBuilder():
                     key != BaseRenderer._FORMAT_QUERY_PARAM):
                 raise InvalidQueryError("Unknown query parameter '%s'" % key)
         sw = SearchWrapper(user_level, site)
-        sw.si_query = sw.solr.query(object_id=object_id)
+        sw.si_query = sw.solr.query(item_id=object_id)
         sw.restrict_search_by_object_type(object_type, allow_objects=True)
         sw.restrict_fields_returned(output_format, search_params)
         return sw

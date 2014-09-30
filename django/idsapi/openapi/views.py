@@ -178,7 +178,7 @@ class ObjectView(BaseSearchView):
             return {'results': self.build_response()[0]}
         except NoObjectFoundError:
             return Response(status.HTTP_404_NOT_FOUND,
-                    content='No %s found with object_id %s' % (object_type, object_id))
+                    content='No %s found with item_id %s' % (object_type, object_id))
 
 
 class ObjectSearchView(BaseSearchView):
