@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load ssi from future %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 	<head>
@@ -42,18 +43,9 @@
 		</div><!--ends header-->
 
 
-
 		<div id="nav-wrapper">
-			<div id="nav">
-				<ul>
-					<li><a href="/about">About</a></li>
-					<li><a href="/profiles/view">Get API key</a></li>
-					<li><a href="/about/terms.shtml">Terms and Conditions</a></li>
-					<li><a href="/docs/">Documentation</a></li>
-					<li><a href="/about/resources.shtml">Useful resources</a></li>
-					<li><a href="/openapi/">API</a></li>
-				</ul>
-			</div><!--ends nav-->
+			<!-- nav shared across sites -->
+			{% ssi '/var/www/includes/nav.shtml' %}
 
 			<div id="action-nav">
 				{% block header %}
