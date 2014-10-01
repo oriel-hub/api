@@ -4,16 +4,28 @@
  
 {% block content %}
 <h1>{% trans "Your profile" %}</h1>
- 
-<p>Your username is <em>{{user}}</em> and actual name is "{{first_name}} {{last_name}}".<br />
-Your user level is "{{profile.user_level}}".<br />
-Your email address is {{email}}</p>
 
-<p>Your access GUID is <strong>{{profile.access_guid}}</strong>.</p>
+<h2>Basic Profile Details</h2>
+ 
+<p>Your username is <em>{{user}}</em> and actual name is "{{first_name}} {{last_name}}".</p>
+<p>Your user level is "{{profile.user_level}}".</p>
+<p>Your email address is {{email}}</p>
+
+<h2>Access GUID</h2>
+
+<p>Your access GUID is <strong>{{profile.access_guid}}</strong></p>
 <p>To use your access GUID as a token,
 so that your scripts can access the API,
-please read the <a href="/docs/functions/#authenticate">authorisation documentation</a>.
+please read the <a href="/docs/functions/#authenticate">authorisation documentation</a>
+for the full description.  But here are a couple of examples.
 </p>
+<p>Using <strong>curl</strong>:</p>
+<pre>curl -X GET -H "Accept: application/json" -H "Token-Guid: {{profile.access_guid}}" http://{{domain_name}}{{url_root}}hub/search/documents/short?q=undp</pre>
+
+<p>Embedding in a URL:</p>
+<p><a href="http://{{domain_name}}{{url_root}}hub/search/documents/short?q=undp&_token_guid={{profile.access_guid}}">http://{{domain_name}}{{url_root}}hub/search/documents/short?q=undp&_token_guid={{profile.access_guid}}</a></p>
+
+<h2>Other Profile Details</h2>
 
 <table>
 	<tr>

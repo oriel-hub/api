@@ -1,5 +1,5 @@
 {% load urlize_quoted_links %}{% load add_query_param %}<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -13,28 +13,28 @@
      <link rel="stylesheet" type="text/css" href='{{ADMIN_MEDIA_PREFIX}}css/base.css'/>
      <link rel="stylesheet" type="text/css" href='{{ADMIN_MEDIA_PREFIX}}css/forms.css'/>
      <link href="/site_media/footer.css" rel="stylesheet" type="text/css" media="screen" />
-    <title>IDS Web API - {{ name }}</title>
+    <title>Open Knowledge Hub API - {{ name }}</title>
   </head>
   <body>
   <div id="container">
-  
+
 	<div id="header">
 		<div id="branding">
-		  <h1 id="site-name"><a href="/">IDS Web API</a></h1>
+		  <h1 id="site-name"><a href="/">Open Knowledge Hub Web API</a></h1>
 		</div>
 		<div id="user-tools">
     {% if user.is_active %}
-      Welcome, <a href="/profiles/view/">{{ user.first_name }} {{ user.last_name }}</a> | 
+      Welcome, <a href="/profiles/view/">{{ user.first_name }} {{ user.last_name }}</a> |
       <a href="/docs/">API Documentation</a> |
       <a href='{{ logout_url }}'>Log out</a>
     {% else %}
-      Anonymous | 
+      Anonymous |
       <a href="/docs/">API Documentation</a> |
       <a href='{{ login_url }}'>Log in</a>
     {% endif %}
 		</div>
 	</div>
-	
+
 	<div class="breadcrumbs">
 	{% for breadcrumb_name, breadcrumb_url in breadcrumblist %}
     <a href="{{breadcrumb_url}}">{{breadcrumb_name}}</a> {% if not forloop.last %}&rsaquo;{% endif %}
@@ -99,7 +99,7 @@
 				</fieldset>
 				</form>
 		{% endif %}
-		
+
 		{% if 'PUT' in view.allowed_methods %}
 				<form action="{{ request.get_full_path }}" method="post" {% if put_form.is_multipart %}enctype="multipart/form-data"{% endif %}>
 				<fieldset class='module aligned'>
@@ -112,23 +112,23 @@
 					    {{ field.label_tag }}
 					    {{ field }}
 					    <span class='help'>{{ field.help_text }}</span>
-					    {{ field.errors }}			    
+					    {{ field.errors }}
 					</div>
 					{% endfor %}
-					<div class='submit-row' style='margin: 0; border: 0'>			
+					<div class='submit-row' style='margin: 0; border: 0'>
 					  <input type="submit" value="PUT" class="default" />
 					</div>
 				</fieldset>
 				</form>
 		{% endif %}
-		
+
 		{% if 'DELETE' in view.allowed_methods %}
 				<form action="{{ request.get_full_path }}" method="post">
-				<fieldset class='module aligned'>			
+				<fieldset class='module aligned'>
 					<h2>DELETE {{ name }}</h2>
 				    {% csrf_token %}
 					<input type="hidden" name="{{ METHOD_PARAM }}" value="DELETE" />
-					<div class='submit-row' style='margin: 0; border: 0'>			
+					<div class='submit-row' style='margin: 0; border: 0'>
 					  <input type="submit" value="DELETE" class="default" />
 					</div>
 				</fieldset>
