@@ -88,7 +88,17 @@ class DataMunger():
     def _convert_xml_field(self, xml_field):
         """convert an XML string into a list of dictionaries and add
         metadata URLs"""
-        field_dict = XmlDictConfig.xml_string_to_dict(xml_field.encode('utf-8'), True, set_encoding="UTF-8")
+        if isinstance(xml_field, list):
+            newfield = []
+            for field in xml_field:
+                newfield.append(self._convert_single_xml_field(field, False))
+        else:
+            newfield = self._convert_single_xml_field(xml_field, True)
+        return newfield
+
+    def _convert_single_xml_field(self, xml_field, single_item_list):
+        field_dict = XmlDictConfig.xml_string_to_dict(
+            xml_field.encode('utf-8'), single_item_list, set_encoding="UTF-8")
         for _, list_value in field_dict.items():
             for item in list_value:
                 if 'object_id' in item and \

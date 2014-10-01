@@ -211,6 +211,7 @@ STRUCTURED_XML_FIELDS = [
     'category_theme_array',
     # 'category_theme_objects',
     'category_subject_array',
+    'category_subject_objects',
     'category_subject_objects_hub_zx',
     'publisher_array',
     # 'country_focus_array',

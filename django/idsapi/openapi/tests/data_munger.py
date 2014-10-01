@@ -49,6 +49,22 @@ class DataMungerTests(TestCase):
         self.assert_endswith(facet_dict['metadata_url'],
                              '/v1/hub/get/themes/563/full/health-challenges/')
 
+    def test_convert_xml_string_with_single_string_produces_dict_and_metadata_url(self):
+        test_string = "<languageList><Language><title>10 big ideas</title><isocode>en</isocode><description><p>This report argues that blah</p></description><language_id>1</language_id></Language></languageList>"
+        theme_data = self.data._convert_xml_field(test_string)
+        self.assertEquals(theme_data['Language'][0]['title'], '10 big ideas')
+        self.assertEquals(theme_data['Language'][0]['language_id'], '1')
+        self.assertEquals(theme_data['Language'][0]['isocode'], 'en')
+
+    def test_convert_xml_string_with_list_of_strings(self):
+        test_list = [
+            "<list-item><subject><object_id>C1842</object_id><object_type>subject</object_type><object_name>Funder</object_name><level>1</level></subject></list-item>",
+            "<list-item><subject><object_id>C1901</object_id><object_type>subject</object_type><object_name>Source</object_name><level>1</level></subject></list-item>",
+        ]
+        theme_data = self.data._convert_xml_field(test_list)
+        self.assertEquals(theme_data[0]['subject']['object_id'], 'C1842')
+        self.assertEquals(theme_data[1]['subject']['object_name'], 'Source')
+
     def test_convert_empty_facet_string_returns_dict_with_empty_values(self):
         test_string = ""
         facet_dict = self.data.convert_facet_string(test_string)
