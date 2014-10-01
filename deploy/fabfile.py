@@ -97,6 +97,15 @@ def production():
     _local_setup()
 
 
+def production_new():
+    """ use production environment on remote host"""
+    env.project_dir = env.project + '_new'
+    env.environment = 'production_new'
+    env.user = 'root'
+    env.hosts = ['api.ids.ac.uk']
+    _local_setup()
+
+
 def update_docs():
     """ update the documentation """
     require('tasks_bin', provided_by=env.valid_envs)

@@ -18,12 +18,13 @@ EMAIL_HOST = 'mailrelay.ids.ac.uk'
 
 # Where to find SOLR - note that these are over-written in the local settings
 # files and are here for reference
-if SERVER_ENV in ["staging_new", "localdev"]:
+if SERVER_ENV in ["production_new"]:
+    BASE_URL = 'http://localhost:8983/solr/oriel-live/'
+elif SERVER_ENV in ["staging_new", "localdev"]:
     # Index for current version of test hub
     # BASE_URL = 'http://localhost:8983/solr/oriel-searchapi-test/'
     # Index for older version of test hub for testing
     BASE_URL = 'http://localhost:8983/solr/oriel-dev/'
-    # else production_new ...
 
 SOLR_SCHEMA_SUFFIX = 'admin/file/?file=schema.xml'
 SOLR_SCHEMA = BASE_URL + SOLR_SCHEMA_SUFFIX
@@ -551,7 +552,7 @@ GENERIC_FIELD_LIST = [
 ]
 
 # TODO: reinstate this one when created
-#SOLR_OBJECT_ID = 'object_id_hub_zz'
-#SOLR_OBJECT_ID = 'object_id_sort_hub_zz'
+# SOLR_OBJECT_ID = 'object_id_hub_zz'
+# SOLR_OBJECT_ID = 'object_id_sort_hub_zz'
 SOLR_OBJECT_ID = 'item_id'
 SOLR_OBJECT_TYPE = 'item_type'
