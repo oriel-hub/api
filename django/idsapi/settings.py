@@ -118,6 +118,9 @@ TEMPLATE_DIRS = (
     os.path.join(PROJECT_HOME, 'templates'),
 )
 
+# required for the ssi tag, used to include a standard menu
+ALLOWED_INCLUDE_ROOTS = ('/var/www/includes/',)
+
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
