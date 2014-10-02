@@ -1,3 +1,19 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Account Activation" %}{% endblock %}
+
+{% block content %}
+
+{% if account %}
+
 <p>Your account is now activated. You just need to <a href="/profiles/edit/">create your
 profile</a> and then you can get your API key and start using the Open Knowledge Hub API.
 </p>
+
+{% else %}
+
+<p>{% trans "Account activation failed" %}</p>
+
+{% endif %}
+
+{% endblock %}
