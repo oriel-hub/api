@@ -16,6 +16,7 @@ PROJECT_HOME = os.path.dirname(os.path.realpath(__file__))
 
 ALLOWED_HOSTS = [
     '.api.ids.ac.uk',
+    '.api.okhub.org',
 ]
 
 # Local time zone for this installation. Choices can be found here:
