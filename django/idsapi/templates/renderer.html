@@ -1,4 +1,4 @@
-{% load urlize_quoted_links %}{% load add_query_param %}<?xml version="1.0" encoding="UTF-8"?>
+{% load ssi from future %}{% load urlize_quoted_links %}{% load add_query_param %}<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -10,12 +10,15 @@
        .errorlist li {display: inline !important; background: white !important; color: black !important; border: 0 !important;}
      </style>
      <link rel="icon" type="image/vnd.microsoft.icon" href="/site_media/favicon.ico" />
+     <link href="/static/globalnav.css" rel="stylesheet" type="text/css" media="screen" />
      <link rel="stylesheet" type="text/css" href='{{ADMIN_MEDIA_PREFIX}}css/base.css'/>
      <link rel="stylesheet" type="text/css" href='{{ADMIN_MEDIA_PREFIX}}css/forms.css'/>
      <link href="/site_media/footer.css" rel="stylesheet" type="text/css" media="screen" />
     <title>Open Knowledge Hub API - {{ name }}</title>
   </head>
   <body>
+<!-- nav shared across sites -->
+{% ssi '/var/www/includes/nav.shtml' %}
   <div id="container">
 
 	<div id="header">
