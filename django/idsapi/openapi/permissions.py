@@ -3,6 +3,7 @@ from djangorestframework.response import ErrorResponse
 from djangorestframework import status
 
 from django.conf import settings
+from django.contrib.sites.models import Site
 
 class PerUserThrottlingRatePerGroup(PerUserThrottling):
 
@@ -13,6 +14,7 @@ class PerUserThrottlingRatePerGroup(PerUserThrottling):
         Return `None` or raise an :exc:`.ErrorResponse`.
         """
         profile = user.get_profile()
+        domain = Site.objects.all()[0].domain
         try:
             rate = settings.USER_LEVEL_INFO[profile.user_level]['max_call_rate']
         except KeyError:
@@ -20,7 +22,7 @@ class PerUserThrottlingRatePerGroup(PerUserThrottling):
             raise ErrorResponse(
                 status.HTTP_403_FORBIDDEN,
                 {'detail': 'You must complete registration before using the API. ' +
-                           'Please visit http://api.ids.ac.uk/profiles/edit/ and complete your registration.'})
+                           'Please visit http://%s/profiles/edit/ and complete your registration.' % domain})
         num, period = rate.split('/')
         self.num_requests = int(num)
         if self.num_requests == 0:
