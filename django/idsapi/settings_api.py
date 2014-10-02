@@ -11,7 +11,7 @@ ADMINS = (
 MANAGERS = ADMINS
 
 # Default email address
-DEFAULT_FROM_EMAIL = 'api@ids.ac.uk'
+DEFAULT_FROM_EMAIL = 'api@okhub.org'
 
 # the email server at IDS
 EMAIL_HOST = 'mailrelay.ids.ac.uk'
