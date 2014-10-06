@@ -48,7 +48,7 @@ class DataMunger():
                 if user_level_info['general_fields_only']:
                     object_data = dict((k, v) for k, v in object_data.items() if k in settings.GENERAL_FIELDS)
                 elif user_level_info['hide_admin_fields']:
-                    object_data = dict((k, v) for k, v in object_data.items() if not k in settings.ADMIN_ONLY_FIELDS)
+                    object_data = dict((k, v) for k, v in object_data.items() if k not in settings.ADMIN_ONLY_FIELDS)
 
         for xml_field in settings.STRUCTURED_XML_FIELDS:
             if xml_field in object_data:
@@ -66,7 +66,7 @@ class DataMunger():
                             (self.object_id, xml_field, str(e))
 
         # convert date fields to expected output format
-        #for date_field in settings.DATE_FIELDS:
+        # for date_field in settings.DATE_FIELDS:
         #    if date_field in object_data:
         #        for source in object_data[date_field]:
         #            object_data[date_field][source] = \
@@ -113,7 +113,7 @@ class DataMunger():
     def _process_description(self, description, user_level_info, beacon_guid):
         """truncate the description for general level users and
         add an image beacon for most users"""
-        #if user_level_info['general_fields_only'] and len(description) > 250:
+        # if user_level_info['general_fields_only'] and len(description) > 250:
         #    description = description[:246] + '...'
         # add image beacon
         if user_level_info['image_beacon']:
@@ -173,10 +173,13 @@ class DataMunger():
         return prefix, source, lang
 
     def include_field(self, field_name):
-        if (field_name in settings.IGNORE_FIELDS or
-                field_name[2:].startswith('_search_api_') or
-                '_sort_hub_' in field_name or '_search_hub_' in field_name or
-                '_facet_hub_' in field_name):
+        if (
+            field_name in settings.IGNORE_FIELDS or
+            field_name[2:].startswith('_search_api_') or
+            '_sort_hub_' in field_name or
+            '_search_hub_' in field_name or
+            '_facet_hub_' in field_name
+        ):
             return False
         else:
             return True
@@ -228,9 +231,6 @@ class DataMunger():
         for field_name, value in in_dict.iteritems():
             # we ignore a list of field_names, plus xx_search_api_*
             if not self.include_field(field_name):
-                continue
-            if field_name.startswith('hub_'):
-                out_dict[field_name] = value
                 continue
             prefix, source, lang = self.field_type_prefix(field_name)
             if source is None:

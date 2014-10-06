@@ -545,13 +545,17 @@ IGNORE_FIELDS = [
 ]
 
 # fields that will exist for all items
-GENERIC_FIELD_LIST = [
+GENERIC_FIELD_LIST_BASE = [
     'item_id',
     'item_type',
     'metadata_languages',
     'sources',
     'timestamp',
 ]
+# for each item, add an additional item with hub_ as prefix
+from itertools import chain
+GENERIC_FIELD_LIST = list(chain.from_iterable(
+    (name, 'hub_' + name) for name in GENERIC_FIELD_LIST_BASE))
 
 # TODO: reinstate this one when created
 # SOLR_OBJECT_ID = 'object_id_hub_zz'
