@@ -100,8 +100,7 @@ DEFAULT_SORT_OBJECT_MAPPING = {
 SORT_FIELDS = [
     'title',
     'name',
-    'asset_id',
-    'object_id',
+    'item_id',
     'category_id',
     'category_path',
     'category_path_sort',
@@ -122,7 +121,6 @@ ADMIN_ONLY_FIELDS = [
     'end_date',
     'item_id',
     'item_type',
-    'item_type_id',
     'legacy_id',
     'notification_email',
     'permission_to_host_info',
@@ -167,6 +165,8 @@ GENERAL_FIELDS = [
     'corporate_author',
     'et_al',
     'headline',
+    'hub_theme',
+    'hub_country',
     'iso_number',
     'iso_three_letter_code',
     'iso_two_letter_code',
@@ -210,16 +210,18 @@ GENERAL_FIELDS = [
 # these are fields that contain XML data
 STRUCTURED_XML_FIELDS = [
     'category_theme_array',
-    # 'category_theme_objects',
+    'category_theme_objects',
     'category_subject_array',
     'category_subject_objects',
     'category_subject_objects_hub_zx',
     'publisher_array',
-    # 'country_focus_array',
+    'country_focus_array',
+    'country_focus_objects',
     'category_region_array',
-    # 'children_object_array',
+    'children_object_array',
     'parent_object_array',
     'country_focus_array_hub_zx',
+    'language_array',
 ]
 
 # these are the entries in the dropdown box for user registration
@@ -248,18 +250,6 @@ IMAGE_BEACON_STUB_URL = 'http://api.ids.ac.uk/tracking/trackimg.cfm'
 # * the name (or names) of the field in SOLR to search across
 # * the type of object you can use the query parameter with
 QUERY_MAPPING = {
-    'object_id':  {
-        'solr_field': 'object_id_hub_zz',
-        'object_type': 'all'
-    },
-    'object_type':  {
-        'solr_field': 'object_type_hub_zz',
-        'object_type': 'all'
-    },
-    'item_type':  {
-        'solr_field': 'item_type_hub_zz',
-        'object_type': 'all'
-    },
     'asset_id':  {
         'solr_field': 'asset_id_eldis_zz',
         'object_type': 'all'
@@ -272,6 +262,24 @@ QUERY_MAPPING = {
         'solr_field': 'hub_timestamp',
         'object_type': 'all'
     },
+    'item_id':  {
+        'solr_field': 'item_id',
+        'object_type': 'all'
+    },
+    'item_type':  {
+        'solr_field': 'item_type',
+        'object_type': 'all'
+    },
+    'object_id':  {
+        'solr_field': 'object_id_hub_zz',
+        'object_type': 'all'
+    },
+    'object_type':  {
+        'solr_field': 'object_type_hub_zz',
+        'object_type': 'all'
+    },
+
+
     'title':  {
         'solr_field': 'title_search_hub_zx',
         'object_type': 'all'
@@ -281,11 +289,7 @@ QUERY_MAPPING = {
         # 'object_type': 'all'
     # },
     'country': {
-        'solr_field': 'hubcountry_search_hub_en',
-        'object_type': 'all'
-    },
-    'keyword': {
-        'solr_field': 'keyword_search_hub_zx',
+        'solr_field': 'hub_country_search_hub_zx',
         'object_type': 'all'
     },
     'country_code': {
@@ -293,7 +297,7 @@ QUERY_MAPPING = {
         'object_type': 'all'
     },
     'region':  {
-        'solr_field': 'category_region_facet',
+        'solr_field': 'hub_region_search_hub_zx',
         'object_type': 'all'
     },
     'sector':  {
@@ -301,7 +305,7 @@ QUERY_MAPPING = {
         'object_type': 'all'
     },
     'subject': {
-        'solr_field': 'category_subject_facet',
+        'solr_field': 'hub_subject_search_hub_zx',
         'object_type': 'all'
     },
     'subject_name': {
@@ -311,6 +315,10 @@ QUERY_MAPPING = {
     'subject_id': {
         'solr_field': 'category_subject_ids',
         'object_type': 'documents'
+    },
+    'keyword': {
+        'solr_field': 'keyword_search_hub_zx',
+        'object_type': 'all'
     },
     'site':  {
         'solr_field': 'site',
@@ -325,7 +333,7 @@ QUERY_MAPPING = {
         # 'object_type': 'all'
     # },
     'theme':   {
-        'solr_field': 'hubtheme_search_hub_zx',
+        'solr_field': 'hub_theme_search_hub_zx',
         'object_type': 'all'
     },
     'theme_name':   {
@@ -384,10 +392,6 @@ QUERY_MAPPING = {
         'solr_field': 'location_country',
         'object_type': 'organisations',
     },
-    'item_type':  {
-        'solr_field': 'object_type',
-        'object_type': 'items'
-    },
     'cat_level':  {
         'solr_field': 'cat_level',
         'object_type': 'all'
@@ -428,6 +432,10 @@ QUERY_MAPPING = {
         'solr_field': 'publication_date_sort_hub_zz',
         'object_type': 'documents',
     },
+    'publication_year': {
+        'solr_field': 'publication_year_sort_hub_zz',
+        'object_type': 'documents',
+    },
     'source_only': {
         'solr_field': 'sources',
         'object_type': 'all',
@@ -444,16 +452,14 @@ QUERY_MAPPING = {
         'solr_field': 'metadata_languages',
         'object_type': 'all',
     },
-    'item_type':  {
-        'solr_field': 'item_type',
-        'object_type': 'all'
+    'document_type':  {
+        'solr_field': 'hub_document_type_search_hub_zx',
+        'object_type': 'documents'
     }
 }
 
 # fields to use fq queries for
 FQ_FIELDS = [
-    'item_type',
-    'object_type',
     'author',
     'country',
     'country_code',
@@ -469,7 +475,7 @@ FQ_FIELDS = [
 DATE_PREFIX_MAPPING = {
     'metadata_published': 'date_created',
     'metadata_updated': 'date_updated',
-    'timestamp': 'timestamp',
+    'timestamp': 'hub_timestamp',
     'document_published': 'publication_date_sort_hub_zz',
     'item_started': 'start_date',
     'item_finished': 'end_date',
@@ -480,33 +486,41 @@ DATE_FIELDS = [v for k, v in DATE_PREFIX_MAPPING.items()]
 # this maps from the URL for faceted search (eg country_count) to the
 # facet field used
 FACET_MAPPING = {
-    'item_type':   'item_type_facet_hub_zx',
-    'country':   'hubcountry_search_hub_en',
-    # 'country':   'country_focus_facet_hub_zx',
-    'country_code':   'country_code_facet_hub_zz',
-    'keyword':   'keyword_facet_hub_zx',
-    'region':    'category_region_objects_facet',
-    'sector':    'category_sector_facet',
-    # 'subject':   'category_subject_objects_facet',
-    'subject':   'hubsubject_objects_facet',
-    # 'theme':     'category_theme_objects_facet',
-    'theme':     'hubtheme_facet_hub_zx',
-    'publisher': 'publisher_facet',
-    'publisher_country': 'publisher_country_facet',
-    'publication_year': 'publication_year_facet',
-    'source': 'sources',
+    'source':            'sources',
+    'item_type':         'hub_item_type_facet_hub_zx',
+    'country':           'hub_country_facet_hub_zx',
+    'region':            'hub_region_facet_hub_zx',
+    'subject':           'hub_subject_facet_hub_zx',
+    'theme':             'hub_theme_facet_hub_zx',
+    'document_type':     'hub_document_type_facet_hub_zx',
+
+    'publisher':         'publisher_facet_hub_zx',
+    'publisher_country': 'publisher_country_facet_hub_zx',
+    'publication_year':  'publication_year_facet_hub_zx',
+
+    'author':            'author_facet_hub_zx',
+    'keyword':           'keyword_facet_hub_zx',
+    'country_code':      'country_code_facet_hub_zz',
+
+    'sector':            'category_sector_facet',
+    # 'country':          'country_focus_facet_hub_zx',
+    # 'region':           'category_region_objects_facet',
+    # 'subject':         'category_subject_objects_facet',
+    # 'theme':           'category_theme_objects_facet',
 }
 
 # this maps sort fields when generating SOLR queries, so that custom (eg non
 # tokenized) fields can be used.
 SORT_MAPPING = {
+    'item_id': 'hub_item_id_sort_hub_zz',
     'category_path': 'category_path_sort',
     'date_created': 'date_created_sort_hub_zz',
     'date_updated': 'date_updated_sort_hub_zz',
     'name': 'name_sort_hub_zx',
-    'object_id': 'object_id_sort_hub_zz',
     'publication_date': 'publication_date_sort_hub_zz',
     'title': 'title_sort_hub_zx',
+    'object_id': 'object_id_sort_hub_zz',
+
 }
 
 # the mapping of how the api refers to objects, to the object name
@@ -522,6 +536,7 @@ OBJECT_TYPES_TO_OBJECT_NAME = {
     'countries':     'Country',
     'regions':       'Region',
     'itemtypes':     'Itemtype',
+    'documenttypes': 'Documenttype',
 }
 
 # the list of objects that are actually assets
