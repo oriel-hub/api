@@ -10,40 +10,46 @@
 	<meta http-equiv="Content-Language" content="en-uk" />
 	<link rel="shortcut icon" type="image/vnd.microsoft.icon" href="/site_media/favicon.ico" />
 	<link rel="icon" type="image/vnd.microsoft.icon" href="/site_media/favicon.ico" />
-	<link href="/site_media/styles.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="http://www.okhub.org/static/globalnav.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="http://www.okhub.org/static/typography.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="/site_media/styles2.css" rel="stylesheet" type="text/css" media="screen" />
 
 
 	</head>
 	
 <body>
-	
+
+<?php include '/var/www/includes/nav.shtml'; ?>
+
+
 <div id="main-wrapper">
 	
 	<div id="header-wrapper">
 		<div id="header">
 		
 			<div id="logo">
-			   <a href="/"><img src="/site_media/images/logo.png" alt="IDS - Global Knowledge for Global Change" /></a>
+			   <h1><a href="/">API</a></h1>
 			</div>
-		</div><!--ends header-->
-		
+		</div>
+	<!--ends header-->
+	</div>		
 			
+
 	
 <div id="nav-wrapper">	
     <div id="nav">
 		<ul>
-			<li><a href="/about">About</a></li>
-			<li><a href="/profiles/view">Get API key</a></li>
+			<!--<li><a href="/about">About</a></li>-->
+			<li><a href="/profiles/view">Register/Login</a></li>
 			<li><a href="/about/terms.shtml">Terms and Conditions</a></li>
-			<li><a href="/docs/">Documentation</a></li>
-			<li><a href="/about/resources.shtml">Useful resources</a></li>
+			<li><a href="http://developer.okhub.org">Documentation and resources</a></li>
 		</ul>		
 	</div><!--ends nav-->
 
 <div id="action-nav">
 		  
 				<ul>
-		  		  <li><a href="/profiles/view/">Your Account</a></li>
+		  		  <li><a class="btn" href="/profiles/view/">Your Account</a></li>
 				</ul>
 			
 </div><!--ends action-nav -->	
