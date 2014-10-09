@@ -1,7 +1,5 @@
 Thank you for registering for a key for the Open Knowledge Hub API.
 
-Your username is: {{ user.username }}
-
 To activate your account, please click on this link or copy and paste it into your browser within {{expiration_days}} days.
 After {{expiration_days}} days this link will not work and you will have to register again.
 
