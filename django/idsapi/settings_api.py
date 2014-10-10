@@ -468,6 +468,7 @@ FQ_FIELDS = [
     'source_only',
     'keyword_search',
     'licence_type',
+    #'theme',
 ]
 
 # this maps from the date-based query parameter to the SOLR field used
@@ -493,6 +494,7 @@ FACET_MAPPING = {
     'subject':           'hub_subject_facet_hub_zx',
     'theme':             'hub_theme_facet_hub_zx',
     'document_type':     'hub_document_type_facet_hub_zx',
+    'language':          'metadata_languages',
 
     'publisher':         'publisher_facet_hub_zx',
     'publisher_country': 'publisher_country_facet_hub_zx',
