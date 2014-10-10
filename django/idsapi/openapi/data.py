@@ -79,8 +79,12 @@ class DataMunger():
         if 'description' in object_data:
             for source in object_data['description']:
                 for lang in object_data['description'][source]:
-                    object_data['description'][source][lang] = self._process_description(
-                        object_data['description'][source][lang], user_level_info, beacon_guid)
+                    if isinstance(object_data['description'][source][lang], list):
+                        object_data['description'][source][lang][0] = self._process_description(
+                            object_data['description'][source][lang][0], user_level_info, beacon_guid)
+                    else:
+                        object_data['description'][source][lang] = self._process_description(
+                            object_data['description'][source][lang], user_level_info, beacon_guid)
 
         object_data['metadata_url'] = self._create_metadata_url()
         return object_data
