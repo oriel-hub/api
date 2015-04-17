@@ -168,6 +168,8 @@ GENERAL_FIELDS = [
     'headline',
     'hub_theme',
     'hub_country',
+    'hub_region',
+    'hub_subject',
     'iso_number',
     'iso_three_letter_code',
     'iso_two_letter_code',
@@ -281,8 +283,6 @@ QUERY_MAPPING = {
         'solr_field': 'object_type_hub_zz',
         'object_type': 'all'
     },
-
-
     'title':  {
         'solr_field': 'title_search_hub_zx',
         'object_type': 'all'
@@ -497,7 +497,7 @@ FACET_MAPPING = {
     'subject':           'hub_subject_facet_hub_zx',
     'theme':             'hub_theme_facet_hub_zx',
     'document_type':     'hub_document_type_facet_hub_zx',
-    'language': 	    'metadata_languages_hub_zz',
+    'language':          'metadata_languages_hub_zz',
 
     'publisher':         'publisher_facet_hub_zx',
     'publisher_country': 'publisher_country_facet_hub_zx',
@@ -508,6 +508,7 @@ FACET_MAPPING = {
     'country_code':      'country_code_facet_hub_zz',
 
     'sector':            'category_sector_facet',
+
     # 'country':          'country_focus_facet_hub_zx',
     # 'region':           'category_region_objects_facet',
     # 'subject':         'category_subject_objects_facet',
