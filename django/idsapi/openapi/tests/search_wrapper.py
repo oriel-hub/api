@@ -192,7 +192,6 @@ class SearchWrapperAddFieldQueryTests(unittest.TestCase):
         cls.si = sunburnt.SolrInterface(settings.BASE_URL)
 
     def setUp(self):
-        self.msi = MockSolrInterface()
         self.sw = SearchWrapper('General User', 'hub', SearchWrapperAddFieldQueryTests.si)
 
     def test_field_query_supports_unicode_text(self):
@@ -230,6 +229,23 @@ class SearchWrapperAddFieldQueryTests(unittest.TestCase):
     def test_field_query_checks_quoted_text_is_closed(self):
         self.assertRaises(InvalidQueryError, self.sw.add_field_query, 'title', '"beyond their age')
 
+    def test_field_query_supports_not_query(self):
+        q = self.sw.add_field_query('country', '!Angola')
+        self.assertEquals(u'NOT country:Angola', q.options()[None])
+
+    def test_field_query_supports_not_with_quoted_text(self):
+        q = self.sw.add_field_query('title', '!"beyond their age"')
+        self.assertEquals(u'NOT title:"beyond their age"', q.options()[None])
+
+    def test_field_query_supports_quoted_text_with_or_not(self):
+        q = self.sw.add_field_query('title', '"beyond their age"|!climate')
+        # the (*:* AND ...) is added by sunburnt, so live with it
+        self.assertEquals(u'title:"beyond their age" OR (*:* AND NOT title:climate)', q.options()[None])
+
+    def test_field_query_supports_quoted_text_with_and_not(self):
+        q = self.sw.add_field_query('title', '"beyond their age"&!"climate change"')
+        self.assertEquals(u'title:"beyond their age" AND NOT title:"climate change"', q.options()[None])
+
     def test_split_string_around_quotes_and_delimiters_works_not_splitting(self):
         self.assertEqual(['simple'],
             self.sw.split_string_around_quotes_and_delimiters('simple'))
@@ -261,6 +277,39 @@ class SearchWrapperAddFieldQueryTests(unittest.TestCase):
             self.sw.split_string_around_quotes_and_delimiters('"complex|split&ting"& another & bit&"or two"'))
         self.assertEqual(['"complex|split&ting"', '|', 'another', '&', 'bit', '&', '"or two"'],
             self.sw.split_string_around_quotes_and_delimiters('"complex|split&ting"| another & bit&"or two"'))
+
+    def test_split_string_around_quotes_and_delimiters_works_not_splitting_with_bang(self):
+        self.assertEqual(['!simple'],
+            self.sw.split_string_around_quotes_and_delimiters('!simple'))
+
+    def test_split_string_around_quotes_and_delimiters_works_simple_split_with_bang(self):
+        self.assertEqual(['!simple', '|', 'split'],
+            self.sw.split_string_around_quotes_and_delimiters('!simple|split'))
+        self.assertEqual(['simple', '&', '!split'],
+            self.sw.split_string_around_quotes_and_delimiters('simple&!split'))
+        self.assertEqual(['simple', '&', '!split', '|', '2'],
+            self.sw.split_string_around_quotes_and_delimiters('simple&!split|2'))
+
+    # TODO: bang before quotation marks
+    def test_split_string_around_quotes_and_delimiters_does_not_split_inside_quotes_with_bang(self):
+        self.assertEqual(['!"simple|split"'],
+            self.sw.split_string_around_quotes_and_delimiters('!"simple|split"'))
+        self.assertEqual(['!"simple&split"'],
+            self.sw.split_string_around_quotes_and_delimiters('!"simple&split"'))
+
+    def test_split_string_around_quotes_and_delimiters_does_not_split_inside_quotes_but_does_outside_with_bang(self):
+        self.assertEqual(['!"simple|split"', '|', 'test'],
+            self.sw.split_string_around_quotes_and_delimiters('!"simple|split"|test'))
+        self.assertEqual(['"simple&split"', '&', '!test'],
+            self.sw.split_string_around_quotes_and_delimiters('"simple&split"&!test'))
+
+    def test_split_string_around_quotes_and_delimiters_with_complicated_string_with_bang(self):
+        self.assertEqual(['!"complex|split&ting"', '|', 'another', '|', 'bit', '|', '"or two"'],
+            self.sw.split_string_around_quotes_and_delimiters('!"complex|split&ting"|another | bit|"or two"'))
+        self.assertEqual(['"complex|split&ting"', '&', '!another', '&', 'bit', '&', '"or two"'],
+            self.sw.split_string_around_quotes_and_delimiters('"complex|split&ting"& !another & bit&"or two"'))
+        self.assertEqual(['"complex|split&ting"', '|', 'another', '&', 'bit', '&', '!"or two"'],
+            self.sw.split_string_around_quotes_and_delimiters('"complex|split&ting"| another & bit&!"or two"'))
 
 
 class FacetArgsTests(unittest.TestCase):
