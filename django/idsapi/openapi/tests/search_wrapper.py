@@ -68,7 +68,7 @@ class SearchWrapperTests(unittest.TestCase):
         self.assertRaises(InvalidFieldError, sw.restrict_fields_returned, 'short', {'extra_fields': extra_field})
 
     # TODO: replace with data munger test
-    #def test_partner_user_can_request_field_not_in_whitelist(self):
+    # def test_partner_user_can_request_field_not_in_whitelist(self):
     #    sw = SearchWrapper('Partner', 'hub', self.msi)
 
     #    extra_field = 'contact_position'
@@ -79,7 +79,7 @@ class SearchWrapperTests(unittest.TestCase):
     #    self.assertTrue(extra_field in self.msi.query.field_list)
 
     # TODO: replace with data munger test
-    #def test_admin_user_can_request_field_admin_only_field(self):
+    # def test_admin_user_can_request_field_admin_only_field(self):
     #    sw = SearchWrapper('Unlimited', 'hub', self.msi)
 
     #    extra_field = 'legacy_id'
@@ -196,31 +196,31 @@ class SearchWrapperAddFieldQueryTests(unittest.TestCase):
 
     def test_field_query_supports_quoted_text(self):
         q = self.sw.add_field_query('title', '"beyond their age"')
-        self.assertEquals(u'title:\\"beyond their age\\"', q.options()[None])
+        self.assertEquals(u'title:"beyond their age"', q.options()[None])
 
     def test_field_query_supports_quoted_text_with_or(self):
         q = self.sw.add_field_query('title', '"beyond their age"|climate')
-        self.assertEquals(u'title:\\"beyond their age\\" OR title:climate', q.options()[None])
+        self.assertEquals(u'title:"beyond their age" OR title:climate', q.options()[None])
 
     def test_field_query_supports_quoted_text_with_and(self):
         q = self.sw.add_field_query('title', '"beyond their age"&"climate change"')
-        self.assertEquals(u'title:\\"beyond their age\\" AND title:\\"climate change\\"', q.options()[None])
+        self.assertEquals(u'title:"beyond their age" AND title:"climate change"', q.options()[None])
 
     def test_field_query_supports_pipe_in_quoted_text(self):
         q = self.sw.add_field_query('title', '"beyond|their age"')
-        self.assertEquals(u'title:\\"beyond\\|their age\\"', q.options()[None])
+        self.assertEquals(u'title:"beyond\\|their age"', q.options()[None])
 
     def test_field_query_supports_ampersand_in_quoted_text(self):
         q = self.sw.add_field_query('title', '"beyond&their age"')
-        self.assertEquals(u'title:\\"beyond\\&their age\\"', q.options()[None])
+        self.assertEquals(u'title:"beyond\\&their age"', q.options()[None])
 
     def test_field_query_supports_quoted_text_with_and_aswell_as_pipe_in_quotes(self):
         q = self.sw.add_field_query('title', '"beyond their age"&"climate|change"')
-        self.assertEquals(u'title:\\"beyond their age\\" AND title:\\"climate\\|change\\"', q.options()[None])
+        self.assertEquals(u'title:"beyond their age" AND title:"climate\\|change"', q.options()[None])
 
     def test_field_query_supports_quoted_text_with_or_aswell_as_ampersand_in_quotes(self):
         q = self.sw.add_field_query('title', '"beyond their age"|"climate&change"')
-        self.assertEquals(u'title:\\"beyond their age\\" OR title:\\"climate\\&change\\"', q.options()[None])
+        self.assertEquals(u'title:"beyond their age" OR title:"climate\\&change"', q.options()[None])
 
     def test_field_query_checks_quoted_text_is_closed(self):
         self.assertRaises(InvalidQueryError, self.sw.add_field_query, 'title', '"beyond their age')
