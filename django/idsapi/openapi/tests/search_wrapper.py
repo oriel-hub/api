@@ -229,6 +229,23 @@ class SearchWrapperAddFieldQueryTests(unittest.TestCase):
     def test_field_query_checks_quoted_text_is_closed(self):
         self.assertRaises(InvalidQueryError, self.sw.add_field_query, 'title', '"beyond their age')
 
+    def test_field_query_supports_not_query(self):
+        q = self.sw.add_field_query('country', '!Angola')
+        self.assertEquals(u'NOT country:Angola', q.options()[None])
+
+    def test_field_query_supports_not_with_quoted_text(self):
+        q = self.sw.add_field_query('title', '!"beyond their age"')
+        self.assertEquals(u'NOT title:"beyond their age"', q.options()[None])
+
+    def test_field_query_supports_quoted_text_with_or_not(self):
+        q = self.sw.add_field_query('title', '"beyond their age"|!climate')
+        # the (*:* AND ...) is added by sunburnt, so live with it
+        self.assertEquals(u'title:"beyond their age" OR (*:* AND NOT title:climate)', q.options()[None])
+
+    def test_field_query_supports_quoted_text_with_and_not(self):
+        q = self.sw.add_field_query('title', '"beyond their age"&!"climate change"')
+        self.assertEquals(u'title:"beyond their age" AND NOT title:"climate change"', q.options()[None])
+
     def test_split_string_around_quotes_and_delimiters_works_not_splitting(self):
         self.assertEqual(['simple'],
             self.sw.split_string_around_quotes_and_delimiters('simple'))

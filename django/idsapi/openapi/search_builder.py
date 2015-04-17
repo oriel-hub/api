@@ -343,7 +343,10 @@ class SearchWrapper:
     def add_field_query(self, field_name, param_value):
         # decode spaces and '|' before using
         decoded_param_value = urllib2.unquote(param_value)
-        if not (decoded_param_value[0].isalnum() or decoded_param_value[0] == '"'):
+        if not (
+                decoded_param_value[0].isalnum() or
+                decoded_param_value[0] == '!' or
+                decoded_param_value[0] == '"'):
             raise InvalidQueryError("Cannot start query value with '%s'"
                     % decoded_param_value[0])
         tokens = self.split_string_around_quotes_and_delimiters(decoded_param_value)
@@ -356,18 +359,23 @@ class SearchWrapper:
         if pipe_present:
             q_final = self.solr.Q()
             for term in [t for t in tokens if t != '|']:
-                kwargs = {field_name: term}
-                q_final = q_final | self.solr.Q(**kwargs)
+                q_final = q_final | self.get_Q(field_name, term)
         elif ampersand_present:
             q_final = self.solr.Q()
             for term in [t for t in tokens if t != '&']:
-                kwargs = {field_name: term}
-                q_final = q_final & self.solr.Q(**kwargs)
+                q_final = q_final & self.get_Q(field_name, term)
         else:
-            kwargs = {field_name: param_value}
-            q_final = self.solr.Q(**kwargs)
+            q_final = self.get_Q(field_name, param_value)
 
         return q_final
+
+    def get_Q(self, field_name, value):
+        if value.startswith('!'):
+            kwargs = {field_name: value[1:]}
+            return ~self.solr.Q(**kwargs)
+        else:
+            kwargs = {field_name: value}
+            return self.solr.Q(**kwargs)
 
     # TODO: split these 2 methods into another class, along with associated
     # regex - self.quoted_re and self.amp_pipe_re
