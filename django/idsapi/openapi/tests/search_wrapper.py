@@ -2,7 +2,12 @@ from django.utils import unittest
 from django.conf import settings
 import sunburnt
 
-from openapi.search_builder import SearchWrapper, InvalidFieldError, InvalidQueryError
+from openapi.search_builder import (
+    SearchWrapper,
+    FacetArgs,
+    InvalidFieldError,
+    InvalidQueryError
+)
 
 
 class MockSolrInterface:
@@ -256,3 +261,84 @@ class SearchWrapperAddFieldQueryTests(unittest.TestCase):
             self.sw.split_string_around_quotes_and_delimiters('"complex|split&ting"& another & bit&"or two"'))
         self.assertEqual(['"complex|split&ting"', '|', 'another', '&', 'bit', '&', '"or two"'],
             self.sw.split_string_around_quotes_and_delimiters('"complex|split&ting"| another & bit&"or two"'))
+
+
+class FacetArgsTests(unittest.TestCase):
+    FACET_MAPPING = {
+        't1': 'type1',
+        't2': 'type2',
+    }
+
+    def test_init_doesnt_raise_error_if_facet_type_is_in_mapping(self):
+        try:
+            FacetArgs({}, 't1', self.FACET_MAPPING, exclude_zero_count=False)
+        except InvalidQueryError:
+            self.fail('Unexpected InvalidQueryError raised in FacetArgs.__init__()')
+
+    def test_init_raises_error_if_facet_type_is_not_in_mapping(self):
+        self.assertRaises(
+            InvalidQueryError,
+            FacetArgs,
+            search_params={},
+            facet_type='t3',
+            facet_mapping=self.FACET_MAPPING,
+            exclude_zero_count=False
+        )
+
+    def test_args_returns_mapped_facet(self):
+        fa = FacetArgs({}, 't1', self.FACET_MAPPING, exclude_zero_count=False)
+        self.assertSequenceEqual(['type1'], fa.args())
+        fa = FacetArgs({}, 't2', self.FACET_MAPPING, exclude_zero_count=False)
+        self.assertSequenceEqual(['type2'], fa.args())
+
+    def test_kwargs_does_not_set_mincount_if_not_exclude_zero_count(self):
+        fa = FacetArgs({}, 't1', self.FACET_MAPPING, exclude_zero_count=False)
+        kwargs = fa.kwargs()
+        self.assertNotIn('mincount', kwargs)
+
+    def test_kwargs_has_mincount_if_exclude_zero_count(self):
+        fa = FacetArgs({}, 't1', self.FACET_MAPPING, exclude_zero_count=True)
+        kwargs = fa.kwargs()
+        self.assertTrue(kwargs['mincount'])
+
+    def test_kwargs_does_not_set_limit_if_num_results_not_in_search_params(self):
+        search_params = {}
+        fa = FacetArgs(search_params, 't1', self.FACET_MAPPING, False)
+        kwargs = fa.kwargs()
+        self.assertNotIn('limit', kwargs)
+
+    def test_kwargs_has_limit_if_num_results_in_search_params(self):
+        search_params = {'num_results': 7}
+        fa = FacetArgs(search_params, 't1', self.FACET_MAPPING, False)
+        kwargs = fa.kwargs()
+        self.assertEqual(7, kwargs['limit'])
+
+    def test_kwargs_ensures_limit_is_int(self):
+        search_params = {'num_results': '7'}
+        fa = FacetArgs(search_params, 't1', self.FACET_MAPPING, False)
+        kwargs = fa.kwargs()
+        self.assertEqual(7, kwargs['limit'])
+
+    def test_kwargs_does_not_set_sort_if_count_sort_not_in_search_params(self):
+        search_params = {}
+        fa = FacetArgs(search_params, 't1', self.FACET_MAPPING, False)
+        kwargs = fa.kwargs()
+        self.assertNotIn('sort', kwargs)
+
+    def test_kwargs_has_sort_if_count_sort_in_search_params(self):
+        search_params = {'count_sort': 'count_desc'}
+        fa = FacetArgs(search_params, 't1', self.FACET_MAPPING, False)
+        kwargs = fa.kwargs()
+        self.assertEqual('count', kwargs['sort'])
+        search_params = {'count_sort': 'name_asc'}
+        fa = FacetArgs(search_params, 't1', self.FACET_MAPPING, False)
+        kwargs = fa.kwargs()
+        self.assertEqual('index', kwargs['sort'])
+
+    def test_kwargs_raises_error_if_count_sort_value_unknown(self):
+        search_params = {'count_sort': 'bubble'}
+        fa = FacetArgs(search_params, 't1', self.FACET_MAPPING, False)
+        self.assertRaises(
+            InvalidQueryError,
+            fa.kwargs,
+        )

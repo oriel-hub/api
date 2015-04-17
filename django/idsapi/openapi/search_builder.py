@@ -97,8 +97,11 @@ class SearchBuilder():
             elif SearchBuilder._is_date_query(param):
                 sw.add_date_query(param, query)
             # if param not in our list of allowed params
-            elif param not in ['num_results', 'num_results_only', 'start_offset',
-                    'extra_fields', 'sort_asc', 'sort_desc', 'lang_pref', 'source_pref']:
+            elif param not in [
+                'num_results', 'num_results_only', 'start_offset',
+                'extra_fields', 'sort_asc', 'sort_desc', 'lang_pref',
+                'source_pref', 'count_sort'
+            ]:
                 # params that start with _ are allowed, as well as the format
                 # parameter - the django rest framework deals with them
                 # TODO: This doesn't seem the most transparent way of handling
@@ -266,21 +269,21 @@ class SearchWrapper:
         self.si_query = self.si_query.query(search_text.lower())
 
     def add_facet(self, facet_type, search_params):
-        if facet_type not in settings.FACET_MAPPING.keys():
-            raise InvalidQueryError("Unknown count type: '%s_count'" % facet_type)
-        facet_kwargs = {}
-        if settings.EXCLUDE_ZERO_COUNT_FACETS:
-            facet_kwargs['mincount'] = 1
-        if 'num_results' in search_params:
-            facet_kwargs['limit'] = int(search_params['num_results'])
-
-        self.si_query = self.si_query.facet_by(settings.FACET_MAPPING[facet_type], **facet_kwargs)
+        fa = FacetArgs(
+            search_params,
+            facet_type,
+            settings.FACET_MAPPING,
+            settings.EXCLUDE_ZERO_COUNT_FACETS
+        )
+        self.si_query = self.si_query.facet_by(*fa.args(), **fa.kwargs())
 
     def restrict_fields_returned(self, output_format, search_params):
         if output_format not in [None, '', 'id', 'short', 'full']:
             raise InvalidQueryError(
-                    "the output_format of data returned can be 'id', 'short' or 'full' - you gave '%s'"
-                    % output_format)
+                "the output_format of data returned can be 'id', 'short' or "
+                "'full' - you gave '%s'"
+                % output_format
+            )
 
         if 'extra_fields' in search_params:
             fields = search_params['extra_fields'].lower().split(' ')
@@ -392,6 +395,56 @@ class SearchWrapper:
             raise InvalidQueryError('Unmatched quotes in query parameter')
         else:
             return False
+
+
+class FacetArgs(object):
+    # what query parameter sets the sort
+    SORT_QUERY_PARAM = 'count_sort'
+    # the mapping from query parameter value to sort index
+    SORT_MAPPING = {
+        'count_desc': 'count',
+        'name_asc': 'index',
+    }
+
+    def __init__(self, search_params, facet_type, facet_mapping, exclude_zero_count):
+        if facet_type not in facet_mapping.keys():
+            raise InvalidQueryError("Unknown count type: '%s_count'" % facet_type)
+        self.mapped_facet = facet_mapping[facet_type]
+        self.exclude_zero_count = exclude_zero_count
+        self.search_params = search_params
+
+    def args(self):
+        return [self.mapped_facet]
+
+    def kwargs(self):
+        kwargs = {}
+        self._set_mincount(kwargs)
+        self._set_limit(kwargs)
+        self._set_sort(kwargs)
+        return kwargs
+
+    def _set_mincount(self, kwargs):
+        if self.exclude_zero_count:
+            kwargs['mincount'] = 1
+
+    def _set_limit(self, kwargs):
+        if 'num_results' in self.search_params:
+            kwargs['limit'] = int(self.search_params['num_results'])
+
+    def _set_sort(self, kwargs):
+        if 'count_sort' in self.search_params:
+            sort_value = self.search_params['count_sort']
+            if sort_value in self.SORT_MAPPING:
+                kwargs['sort'] = self.SORT_MAPPING[sort_value]
+            else:
+                raise InvalidQueryError(
+                    "count queries count_sort parameter can only have the "
+                    "values %s - you gave '%s'" %
+                    (
+                        ', '.join(self.SORT_MAPPING.values()),
+                        sort_value
+                    )
+                )
 
 
 class SolrUnavailableError(defines.IdsApiError):
