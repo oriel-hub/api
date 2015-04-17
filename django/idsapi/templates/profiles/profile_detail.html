@@ -16,8 +16,8 @@
 <p>Your access GUID is <strong>{{profile.access_guid}}</strong></p>
 <p>To use your access GUID as a token,
 so that your scripts can access the API,
-please read the <a href="/docs/functions/#authenticate">authorisation documentation</a>
-for the full description.  But here are a couple of examples.
+please read the <a href="http://developer.okhub.org/hub-api-documentation/authentication/">authorisation documentation</a>
+for the full description, but here are a couple of examples.
 </p>
 <p>Using <strong>curl</strong>:</p>
 <pre>curl -X GET -H "Accept: application/json" -H "Token-Guid: {{profile.access_guid}}" http://{{domain_name}}{{url_root}}hub/search/documents/short?q=undp</pre>
