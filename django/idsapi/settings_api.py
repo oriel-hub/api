@@ -445,11 +445,11 @@ QUERY_MAPPING = {
         'object_type': 'all',
     },
     'lang_only': {
-        'solr_field': 'metadata_languages',
+        'solr_field': 'metadata_languages_hub_zz',
         'object_type': 'all',
     },
     'lang': {
-        'solr_field': 'metadata_languages',
+        'solr_field': 'metadata_languages_hub_zz',
         'object_type': 'all',
     },
     'document_type':  {
@@ -494,7 +494,7 @@ FACET_MAPPING = {
     'subject':           'hub_subject_facet_hub_zx',
     'theme':             'hub_theme_facet_hub_zx',
     'document_type':     'hub_document_type_facet_hub_zx',
-    'language':          'metadata_languages',
+    'language': 	    'metadata_languages_hub_zz',
 
     'publisher':         'publisher_facet_hub_zx',
     'publisher_country': 'publisher_country_facet_hub_zx',
