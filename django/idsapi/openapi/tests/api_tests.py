@@ -81,6 +81,12 @@ class ApiTestsBase(BaseTestCase):
         response_list = json.loads(response.content)
         self.assertFalse('solr_query' in response_list['metadata'])
 
+    def extract_text_from_description(self, description):
+        return description[description.keys()[0]]['en'][0]
+
+    def extract_object_list_from_sources_dict(self, sources_dict):
+        return sources_dict[sources_dict.keys()[0]]['theme']
+
 
 class ApiSearchResponseTests(ApiTestsBase):
 
@@ -90,7 +96,7 @@ class ApiSearchResponseTests(ApiTestsBase):
 
     def test_json_id_only_search_returns_only_ids(self):
         response = self.object_search(output_format='id')
-        self.assert_results_list(response, lambda x: sorted(x.keys()) == ['object_id', 'metadata_url'])
+        self.assert_results_list(response, lambda x: sorted(x.keys()) == ['metadata_url', 'object_id'])
 
     def test_search_works_without_trailing_slash(self):
         response = self.object_search(output_format='no_slash')
@@ -98,7 +104,9 @@ class ApiSearchResponseTests(ApiTestsBase):
 
     def test_json_short_search_returns_short_fields(self):
         response = self.object_search(output_format='short')
-        self.assert_results_list(response, lambda x: sorted(x.keys()) == ['object_id', 'object_type', 'metadata_url', 'title'])
+        self.assert_results_list(
+            response,
+            lambda x: sorted(x.keys()) == ['item_id', 'item_type', 'metadata_url', 'object_id', 'object_type', 'title'])
 
     def test_json_full_search_returns_more_than_3_fields(self):
         response = self.object_search(output_format='full')
@@ -124,7 +132,7 @@ class ApiSearchResponseTests(ApiTestsBase):
         response = self.object_search(output_format='short',
                 query={'q': 'Agricultural', 'num_results': '500'})
         self.assert_results_list(response,
-                lambda x: x['object_type'] in defines.ASSET_NAMES,
+                lambda x: x['item_type'] in defines.ASSET_NAMES,
                 msg="Search should have only asset objects")
 
     def test_description_contains_image_beacon(self):
@@ -132,23 +140,36 @@ class ApiSearchResponseTests(ApiTestsBase):
         profile = self.user.get_profile()
 
         def check_image_beacon_exists_and_has_correct_id(description):
-            return ((description['hub']['en'].find(settings.IMAGE_BEACON_STUB_URL) > -1) and
-                    (description['hub']['en'].find(profile.beacon_guid) > -1))
+            text = self.extract_text_from_description(description)
+            return ((text.find(settings.IMAGE_BEACON_STUB_URL) > -1) and
+                    (text.find(profile.beacon_guid) > -1))
         self.assert_results_list_if_present(response, 'description', check_image_beacon_exists_and_has_correct_id)
 
     def test_description_does_not_contain_image_beacon_for_unlimited_user(self):
         self.setUserLevel('Unlimited')
         response = self.object_search(object_type='documents', output_format='full')
-        self.assert_results_list_if_present(response, 'description', lambda x: x['hub']['en'].find(settings.IMAGE_BEACON_STUB_URL) == -1)
+
+        def check_image_beacon_not_present(description):
+            text = self.extract_text_from_description(description)
+            return text.find(settings.IMAGE_BEACON_STUB_URL) == -1
+        self.assert_results_list_if_present(response, 'description', check_image_beacon_not_present)
 
     def test_full_search_converts_structured_xml_fields(self):
         response = self.object_search(object_type='documents', output_format='full')
-        self.assert_results_list_if_present(response, 'category_theme_array', lambda x: isinstance(x["theme"], list))
+
+        def check_theme_is_converted(theme_dict):
+            theme = self.extract_object_list_from_sources_dict(theme_dict)
+            return isinstance(theme, list)
+        self.assert_results_list_if_present(response, 'category_theme_array', check_theme_is_converted)
 
     def test_short_search_converts_structured_xml_fields(self):
         response = self.object_search(object_type='documents', output_format='short',
                 query={'q': DEFAULT_SEARCH_TERM, 'extra_fields': 'category_theme_array'})
-        self.assert_results_list_if_present(response, 'category_theme_array', lambda x: isinstance(x["theme"], list))
+
+        def check_theme_is_converted(theme_dict):
+            theme = self.extract_object_list_from_sources_dict(theme_dict)
+            return isinstance(theme, list)
+        self.assert_results_list_if_present(response, 'category_theme_array', check_theme_is_converted)
 
 
 class ApiSearchIntegrationTests(ApiTestsBase):
@@ -575,7 +596,7 @@ class ApiGetAllIntegrationTests(ApiTestsBase):
 
 class ApiGetObjectIntegrationTests(ApiTestsBase):
 
-    def get_object(self, site='hub', object_type='documents', object_id='3865',
+    def get_object(self, site='hub', object_type='documents', object_id='13675',
             output_format='', query=None, content_type='application/json'):
         if not query:
             query = {}
