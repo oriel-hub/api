@@ -46,101 +46,109 @@ def get_solr_interface(site):
 
 class SearchBuilder():
 
-    @classmethod
-    def create_itemid_query(cls, user_level, site, object_id, object_type,
-                            search_params, output_format):
-        for param in search_params:
-            if (param[0] != '_' and param not in ['extra_fields'] and
-                    param != BaseRenderer._FORMAT_QUERY_PARAM):
-                raise InvalidQueryError("Unknown query parameter '%s'" % param)
-        sw = SearchWrapper(user_level, site)
-        sw.si_query = sw.solr.query(item_id=object_id)
-        sw.restrict_search_by_object_type(object_type, allow_objects=True)
-        sw.restrict_fields_returned(output_format, search_params)
-        return sw
+    def __init__(self, user_level, site):
+        self.sw = SearchWrapper(user_level, site)
 
-    @classmethod
-    def _is_date_query(cls, param):
+    def _assert_only_one_query_in_query_list(self, query_list, param):
+        if len(query_list) > 1:
+            raise InvalidQueryError(
+                "Cannot repeat query parameters - there is more than one '%s'"
+                % param)
+
+    def _assert_query_param_has_value(self, query, param):
+        if len(query) < 1:
+            raise InvalidQueryError(
+                "All query parameters must have a value, but '%s' does not"
+                % param)
+
+    def _assert_query_param_can_be_user_with_object_type(self, param, object_type):
+        if query_mapping[param]['object_type'] != 'all':
+            if query_mapping[param]['object_type'] != object_type:
+                raise InvalidQueryError(
+                    "Can only use query parameter '%s' with item type '%s', "
+                    "your search had item type '%s'"
+                    %
+                    (param, query_mapping[param]['object_type'], object_type))
+
+    def _assert_valid_query_param(self, param, allowed_param_list):
+        if (
+            param[0] != '_' and
+            param not in allowed_param_list and
+            param != BaseRenderer._FORMAT_QUERY_PARAM
+        ):
+            raise UnknownQueryParamError(param)
+
+    def _is_date_query(self, param):
         for date_prefix in settings.DATE_PREFIX_MAPPING.keys():
             if param.startswith(date_prefix):
                 return True
         return False
 
-    @classmethod
-    def create_search(cls, user_level, site, search_params, object_type, output_format, facet_type=None):
-        sw = SearchWrapper(user_level, site)
+    def _add_query_via_query_mapping(self, param, object_type, query):
+        self._assert_query_param_can_be_user_with_object_type(param, object_type)
+        # we might have to search across multiple fields
+        if isinstance(query_mapping[param]['solr_field'], list):
+            self.sw.add_multifield_parameter_query(query_mapping[param]['solr_field'], query)
+        elif param in settings.FQ_FIELDS:
+            self.sw.add_filter(query_mapping[param]['solr_field'], query)
+        else:
+            self.sw.add_parameter_query(query_mapping[param]['solr_field'], query)
 
+    def create_itemid_query(self, object_id, search_params, object_type, output_format):
+        for param in search_params:
+            self._assert_valid_query_param(param, ['extra_fields'])
+        self.sw.si_query = self.sw.solr.query(item_id=object_id)
+        self.sw.restrict_search_by_object_type(object_type, allow_objects=True)
+        self.sw.restrict_fields_returned(output_format, search_params)
+        return self.sw
+
+    def create_search(self, search_params, object_type, output_format, facet_type=None):
+        allowed_param_list = [
+            'num_results', 'num_results_only', 'start_offset',
+            'extra_fields', 'sort_asc', 'sort_desc', 'lang_pref',
+            'source_pref', 'count_sort'
+        ]
         for param in search_params:
             query_list = search_params.getlist(param)
-            if len(query_list) > 1:
-                raise InvalidQueryError(
-                    "Cannot repeat query parameters - there is more than one '%s'"
-                    % param)
+            self._assert_only_one_query_in_query_list(query_list, param)
             query = query_list[0]
-            if len(query) < 1:
-                raise InvalidQueryError("All query parameters must have a value, but '%s' does not" % param)
+            self._assert_query_param_has_value(query, param)
             if param == 'q':
-                sw.add_free_text_query(urllib.unquote_plus(query))
+                self.sw.add_free_text_query(urllib.unquote_plus(query))
             elif param in query_mapping.keys():
-                if query_mapping[param]['object_type'] != 'all':
-                    if query_mapping[param]['object_type'] != object_type:
-                        raise InvalidQueryError(
-                            "Can only use query parameter '%s' with item type '%s', your search had item type '%s'"
-                            % (param, query_mapping[param]['object_type'], object_type))
-                # we might have to search across multiple fields
-                if isinstance(query_mapping[param]['solr_field'], list):
-                    sw.add_multifield_parameter_query(query_mapping[param]['solr_field'], query)
-                elif param in settings.FQ_FIELDS:
-                    sw.add_filter(query_mapping[param]['solr_field'], query)
-                else:
-                    sw.add_parameter_query(query_mapping[param]['solr_field'], query)
-            elif SearchBuilder._is_date_query(param):
-                sw.add_date_query(param, query)
-            # if param not in our list of allowed params
-            elif param not in [
-                'num_results', 'num_results_only', 'start_offset',
-                'extra_fields', 'sort_asc', 'sort_desc', 'lang_pref',
-                'source_pref', 'count_sort'
-            ]:
-                # params that start with _ are allowed, as well as the format
-                # parameter - the django rest framework deals with them
-                # TODO: This doesn't seem the most transparent way of handling
-                # django rest framework parameters. Would it be better to
-                # delete them from the request before they are passed to our
-                # API code?
-                if (param[0] != '_' and param != BaseRenderer._FORMAT_QUERY_PARAM):
-                    raise UnknownQueryParamError(param)
+                self._add_query_via_query_mapping(param, object_type, query)
+            elif self._is_date_query(param):
+                self.sw.add_date_query(param, query)
+            else:
+                # if param not in our list of allowed params
+                self._assert_valid_query_param(param, allowed_param_list)
 
-        sw.restrict_search_by_object_type(object_type)
-        sw.restrict_fields_returned(output_format, search_params)
-        sw.add_sort(search_params, object_type)
+        self.sw.restrict_search_by_object_type(object_type)
+        self.sw.restrict_fields_returned(output_format, search_params)
+        self.sw.add_sort(search_params, object_type)
         if facet_type is None:
-            sw.add_paginate(search_params)
+            self.sw.add_paginate(search_params)
         else:
-            sw.add_facet(facet_type, search_params)
-            sw.add_paginate({'num_results': 0})
-        return sw
+            self.sw.add_facet(facet_type, search_params)
+            self.sw.add_paginate({'num_results': 0})
+        return self.sw
 
-    @classmethod
-    def create_all_search(cls, user_level, site, search_params, object_type, output_format):
-        sw = SearchWrapper(user_level, site)
-        sw.restrict_search_by_object_type(object_type)
-        sw.restrict_fields_returned(output_format, search_params)
-        sw.add_sort(search_params, object_type)
-        sw.add_paginate(search_params)
-        return sw
+    def create_all_search(self, search_params, object_type, output_format):
+        self.sw.restrict_search_by_object_type(object_type)
+        self.sw.restrict_fields_returned(output_format, search_params)
+        self.sw.add_sort(search_params, object_type)
+        self.sw.add_paginate(search_params)
+        return self.sw
 
-    @classmethod
-    def create_category_children_search(cls, user_level, site, search_params, object_type, object_id):
+    def create_category_children_search(self, search_params, object_type, object_id):
         if object_type not in settings.OBJECT_TYPES_WITH_HIERARCHY:
             raise InvalidQueryError("Item type '%s' does not have children" % object_type)
 
-        sw = SearchWrapper(user_level, site)
         # strip the prefix letter off
-        sw.add_filter('cat_parent', object_id)
-        sw.restrict_search_by_object_type(object_type)
-        sw.add_paginate(search_params)
-        return sw
+        self.sw.add_filter('cat_parent', object_id)
+        self.sw.restrict_search_by_object_type(object_type)
+        self.sw.add_paginate(search_params)
+        return self.sw
 
 
 class SearchWrapper:
@@ -217,6 +225,28 @@ class SearchWrapper:
             num_results = 0
         self.si_query = self.si_query.paginate(start=start_offset, rows=num_results)
 
+    def _extract_sort_field_ascending(self, search_params):
+        sort_asc = search_params.get('sort_asc')
+        sort_desc = search_params.get('sort_desc')
+        if sort_asc and sort_desc:
+            raise InvalidQueryError("Cannot use both 'sort_asc' and 'sort_desc'")
+        ascending = bool(sort_asc)
+
+        sort_field = sort_asc or sort_desc
+        if sort_field and sort_field not in settings.SORT_FIELDS:
+            raise InvalidQueryError("Sorry, you can't sort by %s" % sort_field)
+
+        return sort_field, ascending
+
+    def _get_default_sort_order(self, object_type):
+        sort_field = ascending = None
+        if object_type and object_type in defines.OBJECT_TYPES:
+            object_default = settings.DEFAULT_SORT_OBJECT_MAPPING.get(object_type)
+            if object_default:
+                sort_field = object_default['field']
+                ascending = object_default['ascending']
+        return sort_field, ascending
+
     def add_sort(self, search_params, object_type):
         """
             Args:
@@ -227,41 +257,26 @@ class SearchWrapper:
              if there is a free text query then the sort order will be by
              score
         """
-        sort_asc = search_params.get('sort_asc')
-        sort_desc = search_params.get('sort_desc')
+        sort_field, ascending = self._extract_sort_field_ascending(search_params)
 
-        if sort_asc and sort_desc:
-            raise InvalidQueryError("Cannot use both 'sort_asc' and 'sort_desc'")
+        # free text queries have no default sort ordering
+        if not sort_field and self.has_free_text_query:
+            return
+
+        # Use default sort ordering when no sort parameter set
+        if not sort_field:
+            sort_field, ascending = self._get_default_sort_order(object_type)
+
+        # Otherwise assume the catch all default
+        if not sort_field:
+            sort_field = settings.DEFAULT_SORT_FIELD
+            ascending = settings.DEFAULT_SORT_ASCENDING
+
+        sort_field = settings.SORT_MAPPING.get(sort_field, sort_field)
+        sort_ord = '' if ascending else '-'
+
         try:
-            # Assumes both are never True
-            sort_field = sort_asc or sort_desc
-            ascending = bool(sort_asc)
-
-            if sort_field and sort_field not in settings.SORT_FIELDS:
-                raise InvalidQueryError("Sorry, you can't sort by %s" % sort_field)
-
-            # Use default sort ordering when no sort parameter set
-            if not sort_field:
-                if self.has_free_text_query:
-                    # free text queries have no default sort ordering
-                    return
-                # Allow per object_type defaults
-                elif object_type and object_type in defines.OBJECT_TYPES:
-                    object_default = settings.DEFAULT_SORT_OBJECT_MAPPING.get(object_type)
-                    if object_default:
-                        sort_field = object_default['field']
-                        ascending = object_default['ascending']
-
-            # Otherwise assume the catch all default
-            if not sort_field:
-                sort_field = settings.DEFAULT_SORT_FIELD
-                ascending = settings.DEFAULT_SORT_ASCENDING
-
-            sort_field = settings.SORT_MAPPING.get(sort_field, sort_field)
-
-            sort_ord = '' if ascending else '-'
             self.si_query = self.si_query.sort_by(sort_ord + sort_field)
-
         except sunburnt.SolrError as e:
             raise InvalidQueryError("Can't do sort on field %s: %s" % (sort_field, e))
 
@@ -278,7 +293,7 @@ class SearchWrapper:
         self.si_query = self.si_query.facet_by(*fa.args(), **fa.kwargs())
 
     def restrict_fields_returned(self, output_format, search_params):
-        if output_format not in [None, '', 'id', 'short', 'full']:
+        if output_format not in [None, '', 'id', 'short', 'hub', 'full']:
             raise InvalidQueryError(
                 "the output_format of data returned can be 'id', 'short' or "
                 "'full' - you gave '%s'"
