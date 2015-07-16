@@ -188,7 +188,7 @@ class ApiSearchIntegrationTests(ApiTestsBase):
                 {'keyword': 'agriculture'},
                 {'region': 'C21|region|Africa'},
                 {'sector': 'agriculture'},
-                #{'subject': 'gdn'},                # TODO: Why is this commented out?
+                # {'subject': 'gdn'},                # TODO: Why is this commented out?
                 {'theme': 'C531|theme|Governance'},
         ]
         for query_term in query_term_list:
@@ -367,20 +367,25 @@ class ApiPaginationTests(ApiTestsBase):
 
 class ApiDateQueryTests(ApiTestsBase):
 
+    def get_date_string_from_pub_date(self, pub_date):
+        return pub_date[pub_date.keys()[0]]
+
+    def get_datetime_from_pub_date(self, pub_date):
+        pub_date = self.get_date_string_from_pub_date(pub_date)
+        return datetime.datetime.strptime(pub_date[0][0:19], "%Y-%m-%dT%H:%M:%S")
+
     def test_200_returned_for_document_published_before(self):
         response = self.object_search(query={'document_published_before': '2008-12-31'})
         query_date = datetime.datetime.strptime('2008-12-31', "%Y-%m-%d")
         results = json.loads(response.content)['results']
         for result in results:
-            document_published = datetime.datetime.strptime(
-                    result['publication_date']['eldis'][0:19], "%Y-%m-%dT%H:%M:%S")
+            document_published = self.get_datetime_from_pub_date(result['publication_date'])
             self.assertTrue(document_published < query_date)
 
     def test_200_returned_for_document_published_after(self):
         def published_after_query_date(publication_date):
             query_date = datetime.datetime.strptime('2002-6-1', "%Y-%m-%d")
-            document_published = datetime.datetime.strptime(
-                    publication_date['eldis'][0:19], "%Y-%m-%dT%H:%M:%S")
+            document_published = self.get_datetime_from_pub_date(publication_date)
             return document_published >= query_date
 
         response = self.object_search(query={'document_published_after': '2002-06-01'})
@@ -388,7 +393,7 @@ class ApiDateQueryTests(ApiTestsBase):
 
     def test_200_returned_for_document_published_year(self):
         def published_in_2006(publication_date):
-            document_published = datetime.datetime.strptime(publication_date['eldis'][0:19], "%Y-%m-%dT%H:%M:%S")
+            document_published = self.get_datetime_from_pub_date(publication_date)
             return document_published.year == 2006
 
         response = self.object_search(query={'document_published_year': '2006'})
@@ -426,8 +431,10 @@ class ApiSearchSortTests(ApiTestsBase):
         results = json.loads(response.content)['results']
         self.assertTrue(len(results) >= 5)
         for i in range(len(results) - 1):
-            date1 = datetime.datetime.strptime(results[i]['publication_date'][0:19], "%Y-%m-%d %H:%M:%S")
-            date2 = datetime.datetime.strptime(results[i + 1]['publication_date'][0:19], "%Y-%m-%d %H:%M:%S")
+            date1 = datetime.datetime.strptime(
+                results[i]['publication_date'][0][0:19], "%Y-%m-%d %H:%M:%S")
+            date2 = datetime.datetime.strptime(
+                results[i + 1]['publication_date'][0][0:19], "%Y-%m-%d %H:%M:%S")
             self.assertTrue(date1 <= date2)
 
     def test_sort_descending_by_publication_date(self):
@@ -482,7 +489,7 @@ class ApiSearchErrorTests(ApiTestsBase):
         self.assertStatusCode(response, 404)
 
     # TODO: fails - framework bug? think about this ...
-    #def test_406_returned_if_unknown_return_format(self):
+    # def test_406_returned_if_unknown_return_format(self):
     #    response = self.object_search(content_type='application/foobar')
     #    self.assertStatusCode(response, 406)
 
