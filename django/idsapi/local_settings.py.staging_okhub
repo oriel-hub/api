@@ -14,6 +14,6 @@ DATABASES = {
     }
 }
 
-SERVER_ENV = "staging_new"
+SERVER_ENV = "staging_okhub"
 
 # vi: ft=python

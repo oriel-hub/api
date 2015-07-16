@@ -28,8 +28,8 @@ env.test_cmd = ' manage.py test -v0 ' + ' '.join(project_settings.django_apps)
 env.use_virtualenv = True
 
 # valid environments - used for require statements in fablib
-env.valid_non_prod_envs = ('dev_server', 'staging_test', 'staging_new', 'staging')
-env.valid_envs = ('dev_server', 'staging_test', 'staging_new', 'staging', 'production')
+env.valid_non_prod_envs = ('dev_server', 'staging_test', 'staging_okhub', 'staging')
+env.valid_envs = ('dev_server', 'staging_test', 'staging_okhub', 'staging', 'production', 'production_okhub')
 
 # does this use apache - mostly for staging_test
 env.use_apache = True
@@ -43,8 +43,8 @@ def _local_setup():
     # override settings here
     # if you have an ssh key and particular user you need to use
     # then uncomment the next 2 lines
-    #env.user = "root"
-    #env.key_filename = ["/home/shared/keypair.rsa"]
+    # env.user = "root"
+    # env.key_filename = ["/home/shared/keypair.rsa"]
 
 
 #
@@ -67,7 +67,7 @@ def staging_test():
     env.project_dir = env.project + '_test'
     env.environment = 'staging_test'
     env.use_apache = False
-    #env.hosts = ['fen-vz-' + project_settings.project_name + '-stage']
+    # env.hosts = ['fen-vz-' + project_settings.project_name + '-stage']
     env.hosts = ['fen-vz-' + project_settings.project_name]
     _local_setup()
 
@@ -80,10 +80,10 @@ def staging():
     _local_setup()
 
 
-def staging_new():
+def staging_okhub():
     """ use staging environment on remote host to demo to client"""
-    env.project_dir = env.project + '_new'
-    env.environment = 'staging_new'
+    env.project_dir = env.project + '_okhub'
+    env.environment = 'staging_okhub'
     env.user = 'root'
     env.hosts = ['test.api.ids.ac.uk']
     _local_setup()
@@ -97,10 +97,10 @@ def production():
     _local_setup()
 
 
-def production_new():
+def production_okhub():
     """ use production environment on remote host"""
-    env.project_dir = env.project + '_new'
-    env.environment = 'production_new'
+    env.project_dir = env.project + '_okhub'
+    env.environment = 'production_okhub'
     env.user = 'root'
     env.hosts = ['api.ids.ac.uk']
     _local_setup()
