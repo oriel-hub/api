@@ -31,7 +31,8 @@ SOLR_SCHEMA_SUFFIX = 'admin/file/?file=schema.xml'
 SOLR_SCHEMA = BASE_URL + SOLR_SCHEMA_SUFFIX
 
 # we have multiple "indexes" created by drupal, the one we want to use is
-# this one:
+# this one: *** Not actually used ***
+# SOLR_INDEX_ID = '(ids_ks_item_sources_index OR ok_hub_meta_solr_index_live)'
 SOLR_INDEX_ID = 'ids_ks_item_sources_index'
 
 # whether to send solr search parameters to logs/console
@@ -87,6 +88,8 @@ DEFAULT_SORT_OBJECT_MAPPING = {
     'documents':
         {'field': 'title_sort_hub_zx', 'ascending': False},
     'organisations':
+        {'field': 'title_sort_hub_zx', 'ascending': False},
+    'sources':
         {'field': 'title_sort_hub_zx', 'ascending': False},
     'items':
         {'field': 'title_sort_hub_zx', 'ascending': False},
@@ -154,6 +157,7 @@ GENERAL_FIELDS = [
     'category_subject_ids',
     'category_subject_path',
     'children_object_array',
+    'code',
     'country_focus',
     'country_focus_array',
     'country_focus_ids',
@@ -227,6 +231,7 @@ STRUCTURED_XML_FIELDS = [
     'parent_object_array',
     'country_focus_array_hub_zx',
     'language_array',
+#    'hub_metadata_languages',
 ]
 
 # these are the entries in the dropdown box for user registration
@@ -268,11 +273,11 @@ QUERY_MAPPING = {
         'object_type': 'all'
     },
     'item_id':  {
-        'solr_field': 'item_id',
+        'solr_field': 'hub_item_id',
         'object_type': 'all'
     },
     'item_type':  {
-        'solr_field': 'item_type',
+        'solr_field': 'hub_item_type',
         'object_type': 'all'
     },
     'object_id':  {
@@ -282,6 +287,10 @@ QUERY_MAPPING = {
     'object_type':  {
         'solr_field': 'object_type_hub_zz',
         'object_type': 'all'
+    },
+    'code': {
+        'solr_field': 'code_okhub_zz',
+        'object_type': 'sources'
     },
     'title':  {
         'solr_field': 'title_search_hub_zx',
@@ -337,6 +346,10 @@ QUERY_MAPPING = {
     # },
     'theme':   {
         'solr_field': 'hub_theme_search_hub_zx',
+        'object_type': 'all'
+    },
+    'theme_id':   {
+        'solr_field': 'hub_theme_item_id_facet_hub_zz',
         'object_type': 'all'
     },
     'theme_name':   {
@@ -477,8 +490,8 @@ FQ_FIELDS = [
 # this maps from the date-based query parameter to the SOLR field used
 # so document_published_year would use the publication_date as the field.
 DATE_PREFIX_MAPPING = {
-    'metadata_published': 'date_created',
-    'metadata_updated': 'date_updated',
+    'metadata_published': 'date_created_hub_zz',
+    'metadata_updated': 'date_updated_hub_zz',
     'timestamp': 'hub_timestamp',
     'document_published': 'publication_date_sort_hub_zz',
     'item_started': 'start_date',
@@ -535,6 +548,7 @@ OBJECT_TYPES_TO_OBJECT_NAME = {
     'assets':         None,
     'documents':     'Document',
     'organisations': 'Organisation',
+    'sources': 	'Source',
     'themes':        'Theme',
     'items':         'Item',
     'subjects':      'Subject',
@@ -551,6 +565,7 @@ ASSET_TYPES = [
     'organisations',
     'items',
     'countries',
+    'sources',
 ]
 
 
@@ -563,6 +578,8 @@ IGNORE_FIELDS = [
     'id',
     'index_id',
     'spell',
+#    'item_id',
+#    'item_type',
 ]
 
 # fields that will exist for all items
