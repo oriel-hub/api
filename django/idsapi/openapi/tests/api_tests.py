@@ -606,10 +606,10 @@ class ApiGetAllIntegrationTests(ApiTestsBase):
 
     def test_extra_fields_with_all_assets(self):
         response = self.get_all(object_type='documents',
-                query={'extra_fields': 'description'})
+                query={'extra_fields': 'author'})
         result_list = json.loads(response.content)['results']
         for result in result_list:
-            self.assertTrue('description' in result)
+            self.assertTrue('author' in result)
 
 
 class ApiGetObjectIntegrationTests(ApiTestsBase):
