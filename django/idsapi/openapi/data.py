@@ -63,23 +63,6 @@ class DataMunger():
             object_data = self._keep_not_matching_fields(object_data, settings.ADMIN_ONLY_FIELDS)
         return object_data
 
-    def _convert_xml_field_list(self, object_data):
-        for xml_field in settings.STRUCTURED_XML_FIELDS:
-            if xml_field in object_data:
-                # assume it is a dictionary of strings - one per source
-                # TODO: check this assumption
-                for source in object_data[xml_field]:
-                    try:
-                        object_data[xml_field][source] = \
-                            self._convert_xml_field(object_data[xml_field][source])
-                    except ParseError as e:
-                        object_data[xml_field] = "Could not parse XML, issue reported in logs"
-                        # and send to logs
-                        # TODO: logging properly - and test
-                        print >> sys.stderr, \
-                            "COULD NOT PARSE XML. object_id: %s, field: %s Error: %s" % \
-                            (self.object_id, xml_field, str(e))
-
     def _convert_date_fields(self, object_data):
         # convert date fields to expected output format
         for date_field in settings.DATE_FIELDS:
@@ -132,6 +115,15 @@ class DataMunger():
         object_data['metadata_url'] = self._create_metadata_url()
         return object_data
 
+    def _convert_xml_field_list(self, object_data):
+        for xml_field in settings.STRUCTURED_XML_FIELDS:
+            if xml_field in object_data:
+                # assume it is a dictionary of strings - one per source
+                # TODO: check this assumption
+                for source in object_data[xml_field]:
+                    object_data[xml_field][source] = \
+                        self._convert_xml_field(object_data[xml_field][source])
+
     def _convert_xml_field(self, xml_field):
         """convert an XML string into a list of dictionaries and add
         metadata URLs"""
@@ -145,9 +137,21 @@ class DataMunger():
 
     def _convert_single_xml_field(self, xml_field, single_item_list):
         xml_field = xml_field.replace(' & ', '&amp;')
-        field_dict = XmlDictConfig.xml_string_to_dict(
-            xml_field.encode('utf-8'), single_item_list, set_encoding="UTF-8")
-        for _, list_value in field_dict.items():
+        try:
+            field_dict = XmlDictConfig.xml_string_to_dict(
+                xml_field.encode('utf-8'), single_item_list, set_encoding="UTF-8")
+        except ParseError as e:
+            # send to logs
+            # TODO: logging properly - and test
+            print >> sys.stderr, \
+                "COULD NOT PARSE XML. object_id: %s, field: %s Error: %s" % \
+                (self.object_id, xml_field, str(e))
+            return "Could not parse XML, issue reported in logs"
+        self._add_metadata_url_to_xml_fields(field_dict)
+        return field_dict
+
+    def _add_metadata_url_to_xml_fields(self, field_dict):
+        for list_value in field_dict.values():
             for item in list_value:
                 if 'object_id' in item and \
                         'object_name' in item and \
@@ -156,7 +160,6 @@ class DataMunger():
                         defines.object_name_to_object_type(item['object_type']),
                         item['object_id'],
                         item['object_name'])
-        return field_dict
 
     def _process_description(self, description, user_level_info, beacon_guid):
         """truncate the description for general level users and
