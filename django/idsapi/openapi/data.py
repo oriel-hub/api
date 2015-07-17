@@ -154,12 +154,12 @@ class DataMunger():
 
         if result['cat_parent'] != result['cat_superparent']:
             object_data['parent_url'] = self._create_metadata_url(
-                object_id=result['cat_parent'])
+                object_id=result['cat_parent'].values()[0][0])
 
         if result['cat_first_parent'] != result['cat_parent'] and \
                 result['cat_first_parent'] != result[settings.SOLR_OBJECT_ID]:
             object_data['toplevel_parent_url'] = self._create_metadata_url(
-                object_id=result['cat_first_parent'])
+                object_id=result['cat_first_parent'].values()[0][0])
 
     def field_type_prefix(self, field_name):
         """ take the field name, work out whether it is a generic field,

@@ -87,6 +87,10 @@ class ApiTestsBase(BaseTestCase):
     def extract_object_list_from_sources_dict(self, sources_dict):
         return sources_dict.values()[0]['theme']
 
+    def get_datetime_from_pub_date(self, pub_date):
+        pub_date_inner = pub_date.values()[0]
+        return datetime.datetime.strptime(pub_date_inner[0][0:19], "%Y-%m-%dT%H:%M:%S")
+
 
 class ApiSearchResponseTests(ApiTestsBase):
 
@@ -383,10 +387,6 @@ class ApiPaginationTests(ApiTestsBase):
 
 class ApiDateQueryTests(ApiTestsBase):
 
-    def get_datetime_from_pub_date(self, pub_date):
-        pub_date_inner = pub_date.values()[0]
-        return datetime.datetime.strptime(pub_date_inner[0][0:19], "%Y-%m-%dT%H:%M:%S")
-
     def test_200_returned_for_document_published_before(self):
         response = self.object_search(query={'document_published_before': '2008-12-31'})
         query_date = datetime.datetime.strptime('2008-12-31', "%Y-%m-%d")
@@ -444,10 +444,8 @@ class ApiSearchSortTests(ApiTestsBase):
         results = json.loads(response.content)['results']
         self.assertTrue(len(results) >= 5)
         for i in range(len(results) - 1):
-            date1 = datetime.datetime.strptime(
-                results[i]['publication_date'][0][0:19], "%Y-%m-%d %H:%M:%S")
-            date2 = datetime.datetime.strptime(
-                results[i + 1]['publication_date'][0][0:19], "%Y-%m-%d %H:%M:%S")
+            date1 = self.get_datetime_from_pub_date(results[i]['publication_date'])
+            date2 = self.get_datetime_from_pub_date(results[i + 1]['publication_date'])
             self.assertTrue(date1 <= date2)
 
     def test_sort_descending_by_publication_date(self):
@@ -456,8 +454,8 @@ class ApiSearchSortTests(ApiTestsBase):
         results = json.loads(response.content)['results']
         self.assertTrue(len(results) >= 5)
         for i in range(len(results) - 1):
-            date1 = datetime.datetime.strptime(results[i]['publication_date'][0:19], "%Y-%m-%d %H:%M:%S")
-            date2 = datetime.datetime.strptime(results[i + 1]['publication_date'][0:19], "%Y-%m-%d %H:%M:%S")
+            date1 = self.get_datetime_from_pub_date(results[i]['publication_date'])
+            date2 = self.get_datetime_from_pub_date(results[i + 1]['publication_date'])
             self.assertTrue(date1 >= date2)
 
     def test_400_returned_for_disallowed_sort_field(self):
@@ -767,7 +765,7 @@ class ApiFacetIntegrationTests(ApiTestsBase):
 
 
 class ApiCategoryChildrenIntegrationTests(ApiTestsBase):
-    def children_search(self, site='hub', object_type='themes', object_id='34',
+    def children_search(self, site='hub', object_type='themes', object_id='9021',
             content_type='application/json'):
         return self.client.get(defines.URL_ROOT + site + '/get_children/' +
                 object_type + '/' + object_id + '/full', ACCEPT=content_type)
@@ -777,13 +775,6 @@ class ApiCategoryChildrenIntegrationTests(ApiTestsBase):
         for object_type, object_id in child_searches.items():
             response = self.children_search(object_type=object_type, object_id=object_id)
             self.assertStatusCode(response)
-
-    def test_parents_match_for_children_search(self):
-        response = self.children_search()
-        search_results = json.loads(response.content)
-        self.assertTrue(0 < int(search_results['metadata']['total_results']))
-        for result in search_results['results']:
-            self.assertEqual('34', result['cat_parent'])
 
     def test_400_returned_for_asset_child_search(self):
         response = self.children_search(object_type='documents', object_id='8346')
@@ -798,7 +789,7 @@ class ApiCategoryChildrenIntegrationTests(ApiTestsBase):
             response = self.get_all(object_type=object_type, output_format='full')
             search_results = json.loads(response.content)
             for result in search_results['results']:
-                self.assertTrue(result['children_url'].find('children') > -1)
+                self.assertTrue('children' in result['children_url'])
 
     def test_metadata_solr_query_depends_on_hide_admin_field_value(self):
         returns_response = lambda x: x.children_search(object_type='themes', object_id='34')
