@@ -732,31 +732,23 @@ class ApiFacetIntegrationTests(ApiTestsBase):
         def check_all_facets_have_an_integer_count(country_count):
             return ('object_id' in country_count and 'metadata_url' in country_count and
                     isinstance(country_count['count'], int))
-        self.assert_results_list(response, check_all_facets_have_an_integer_count,
-                element='country_count')
+        self.assert_results_list(
+            response, check_all_facets_have_an_integer_count, element='country_count')
 
     def test_facets_with_zero_count_excluded_by_setting(self):
-        old_setting = settings.EXCLUDE_ZERO_COUNT_FACETS
-        try:
-            settings.EXCLUDE_ZERO_COUNT_FACETS = True
+        with self.settings(EXCLUDE_ZERO_COUNT_FACETS=True):
             response = self.facet_search()
-            self.assert_results_list(response, lambda x: x['count'] > 0,
-                    element='country_count')
-        finally:
-            settings.EXCLUDE_ZERO_COUNT_FACETS = old_setting
+            self.assert_results_list(
+                response, lambda x: x['count'] > 0, element='country_count')
 
     def test_facets_with_zero_count_included_by_setting(self):
-        old_setting = settings.EXCLUDE_ZERO_COUNT_FACETS
-        try:
-            settings.EXCLUDE_ZERO_COUNT_FACETS = False
-            response = self.facet_search()
+        with self.settings(EXCLUDE_ZERO_COUNT_FACETS=False):
+            response = self.facet_search(object_type='organisations')
             zero_found = False
             for result in self.assert_non_zero_result_len(response, element='country_count'):
                 if result['count'] == 0:
                     zero_found = True
             self.assertTrue(zero_found, "Did not find any results with a zero count")
-        finally:
-            settings.EXCLUDE_ZERO_COUNT_FACETS = old_setting
 
     def test_metadata_solr_query_depends_on_hide_admin_field_value(self):
         returns_response = lambda x: x.facet_search()
