@@ -101,6 +101,7 @@ class DataMunger():
         return newfield
 
     def _convert_single_xml_field(self, xml_field, single_item_list):
+        xml_field = xml_field.replace(' & ', '&amp;')
         field_dict = XmlDictConfig.xml_string_to_dict(
             xml_field.encode('utf-8'), single_item_list, set_encoding="UTF-8")
         for _, list_value in field_dict.items():
