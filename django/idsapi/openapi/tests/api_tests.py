@@ -82,10 +82,10 @@ class ApiTestsBase(BaseTestCase):
         self.assertFalse('solr_query' in response_list['metadata'])
 
     def extract_text_from_description(self, description):
-        return description[description.keys()[0]]['en'][0]
+        return description.values()[0]['en'][0]
 
     def extract_object_list_from_sources_dict(self, sources_dict):
-        return sources_dict[sources_dict.keys()[0]]['theme']
+        return sources_dict.values()[0]['theme']
 
 
 class ApiSearchResponseTests(ApiTestsBase):
@@ -174,9 +174,16 @@ class ApiSearchResponseTests(ApiTestsBase):
 
 class ApiSearchIntegrationTests(ApiTestsBase):
 
+    def get_country_test(self, country):
+        def in_country_focus(country_focus):
+            country_list = country_focus['hub_country'].values()[0].values()[0]
+            country_names = [country.lower() for country in country_list]
+            return country.lower() in country_names
+        return in_country_focus
+
     def test_query_by_country(self):
-        response = self.object_search(query={'country': 'Namibia|NA'})
-        self.assert_results_list(response, lambda x: ' '.join(x['country_focus']).lower().find('namibia') > -1)
+        response = self.object_search(query={'country': 'namibia'})
+        self.assert_results_list(response, self.get_country_test('namibia'))
 
     def test_query_by_country_and_free_text(self):
         response = self.object_search(query={'q': DEFAULT_SEARCH_TERM, 'country': 'angola'})
@@ -204,12 +211,18 @@ class ApiSearchIntegrationTests(ApiTestsBase):
     def test_query_by_country_with_and(self):
         response = self.object_search(query={'country': 'angola&namibia'})
         self.assert_results_list_if_present(
-            response, 'country_focus', lambda x: 'Angola' in x and 'Namibia' in x)
+            response,
+            'country_focus',
+            lambda x: self.get_country_test('angola') and self.get_country_test('namibia')
+        )
 
     def test_query_by_country_with_or(self):
         response = self.object_search(query={'country': 'namibia|iran'})
         self.assert_results_list_if_present(
-            response, 'country_focus', lambda x: 'Iran' in x or 'Namibia' in x)
+            response,
+            'country_focus',
+            lambda x: self.get_country_test('angola') or self.get_country_test('namibia')
+        )
 
     def test_blank_search_returns_same_as_short_search(self):
         response_short = self.object_search(output_format='short')
@@ -266,7 +279,7 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         self.assertStatusCode(response)
         search_results = json.loads(response.content)['results']
         for result in search_results:
-            self.assertTrue(' '.join(result['author']).lower().find('john') > -1)
+            self.assertTrue('john' in ' '.join(result['author']).lower())
 
     def test_organisation_specific_query_param_acronym(self):
         response = self.object_search(object_type='organisations', query={'acronym': 'UNDP'})
@@ -367,12 +380,9 @@ class ApiPaginationTests(ApiTestsBase):
 
 class ApiDateQueryTests(ApiTestsBase):
 
-    def get_date_string_from_pub_date(self, pub_date):
-        return pub_date[pub_date.keys()[0]]
-
     def get_datetime_from_pub_date(self, pub_date):
-        pub_date = self.get_date_string_from_pub_date(pub_date)
-        return datetime.datetime.strptime(pub_date[0][0:19], "%Y-%m-%dT%H:%M:%S")
+        pub_date_inner = pub_date.values()[0]
+        return datetime.datetime.strptime(pub_date_inner[0][0:19], "%Y-%m-%dT%H:%M:%S")
 
     def test_200_returned_for_document_published_before(self):
         response = self.object_search(query={'document_published_before': '2008-12-31'})

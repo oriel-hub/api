@@ -2,6 +2,7 @@
 from django.contrib.auth.models import User
 from django.test.testcases import TestCase
 
+
 class BaseTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.create(username='user1', email='user1@example.org')
@@ -23,4 +24,3 @@ class BaseTestCase(TestCase):
 
     def login(self):
         self.client.login(username='user1', password='password')
-
