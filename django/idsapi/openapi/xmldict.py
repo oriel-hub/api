@@ -1,6 +1,8 @@
-import sys
+import logging
 from xml.etree import ElementTree
 from xml.parsers.expat import ExpatError
+
+logger = logging.getLogger(__name__)
 
 # from http://code.activestate.com/recipes/410469-xml-as-dictionary/
 
@@ -118,7 +120,10 @@ class XmlDictConfig(dict):
                     root = ElementTree.fromstring(
                         xml_string.encode('ascii', 'xmlcharrefreplace'))
         except ExpatError as e:
-            print >> sys.stderr, "Failed to parse XML\nXML string was: %s\nError was: %s" % \
-                (xml_string, e)
+            logger.error(
+                "Failed to parse XML\nXML string was: %s\nError was: %s" %
+                (xml_string, e),
+                exc_info=e
+            )
             return xml_string
         return XmlDictConfig(root, single_item_list)

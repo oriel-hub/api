@@ -1,5 +1,5 @@
 # class to assemble the data to be returned
-import sys
+import logging
 import re
 
 from django.conf import settings
@@ -14,6 +14,8 @@ try:
     assert ParseError  # silence pyflakes error
 except ImportError:
     from xml.parsers.expat import ExpatError as ParseError
+
+logger = logging.getLogger(__name__)
 
 
 class DataMunger():
@@ -142,10 +144,11 @@ class DataMunger():
                 xml_field.encode('utf-8'), single_item_list, set_encoding="UTF-8")
         except ParseError as e:
             # send to logs
-            # TODO: logging properly - and test
-            print >> sys.stderr, \
-                "COULD NOT PARSE XML. object_id: %s, field: %s Error: %s" % \
-                (self.object_id, xml_field, str(e))
+            logger.error(
+                "COULD NOT PARSE XML. object_id: %s, field: %s Error: %s" %
+                (self.object_id, xml_field, str(e)),
+                exc_info=e
+            )
             return "Could not parse XML, issue reported in logs"
         self._add_metadata_url_to_xml_fields(field_dict)
         return field_dict

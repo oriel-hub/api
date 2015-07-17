@@ -1,7 +1,7 @@
 # a class to build searches
 #
 # TODO: create a mock version of this class for tests
-import sys
+import logging
 import urllib
 import urllib2
 import re
@@ -18,6 +18,8 @@ saved_solr_interface = {}
 solr_interface_created = {}
 
 query_mapping = settings.QUERY_MAPPING
+
+logger = logging.getLogger(__name__)
 
 
 def get_solr_interface(site):
@@ -38,9 +40,9 @@ def get_solr_interface(site):
                 settings.BASE_URL, format='json')
             solr_interface_created[site] = datetime.now()
         except Exception as e:
-            print >>sys.stderr, e
-            raise SolrUnavailableError('Solr is not responding (using %s )' %
-                                       settings.BASE_URL)
+            msg = 'Solr is not responding (using %s )' % settings.BASE_URL
+            logger.error(msg + str(e), exc_info=e)
+            raise SolrUnavailableError(msg)
     return saved_solr_interface[site]
 
 
@@ -177,8 +179,8 @@ class SearchWrapper:
             'select/?' + urllib.urlencode(self.si_query.params())
         if settings.LOG_SEARCH_PARAMS:
             # this will print to console or error log as appropriate
-            print >> sys.stderr, self.si_query.params()
-            print >> sys.stderr, solr_query
+            logger.info("search params: " + self.si_query.params())
+            logger.info("solr query: " + solr_query)
         return self.si_query.execute(), solr_query
 
     def restrict_search_by_object_type(self, object_type, allow_objects=False):
