@@ -20,7 +20,8 @@ urlpatterns = patterns('idsapi.openapi.views',
     # eg:
     # /eldis/get/assets/1234/full
     # /eldis/get/countries/1100/full
-    url(r'^(?P<site>\w+)/get/(?P<object_type>\w+)/(?P<object_id>[AC]?\d+)(?:/(?P<output_format>\w*)(/\S*)?)?$',
+    # A for Assets, C for Categories, S for Sources, L for languages (not done yet)
+    url(r'^(?P<site>\w+)/get/(?P<object_type>\w+)/(?P<object_id>[ACLS]?\d+)(?:/(?P<output_format>\w*)(/\S*)?)?$',
         ObjectView.as_view(), name='object'),
 
     # eg:

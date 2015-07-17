@@ -557,6 +557,7 @@ OBJECT_TYPES_TO_OBJECT_NAME = {
     'regions':       'Region',
     'itemtypes':     'Itemtype',
     'documenttypes': 'Documenttype',
+    'languages': 'Language',
 }
 
 # the list of objects that are actually assets
