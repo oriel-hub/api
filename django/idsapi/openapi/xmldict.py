@@ -67,7 +67,7 @@ class XmlDictConfig(dict):
             elif element.items():
                 self._update_or_add_to_tag(element.tag, dict(element.items()), children_names,
                         single_item_list)
-                #self.update({element.tag: dict(element.items())})
+                # self.update({element.tag: dict(element.items())})
             # finally, if there are no child tags and no attributes, extract
             # the text
             else:
@@ -81,10 +81,10 @@ class XmlDictConfig(dict):
                 current_value.append(item)
                 self.update({tag: current_value})
             except:  # the first of its kind, an empty list must be created
-                #item is written in [], i.e. it will be a list
+                # item is written in [], i.e. it will be a list
                 self.update({tag: [item]})
         elif single_item_list:
-            #item is written in [], i.e. it will be a list
+            # item is written in [], i.e. it will be a list
             self.update({tag: [item]})
         else:
             self.update({tag: item})
@@ -111,11 +111,12 @@ class XmlDictConfig(dict):
                 xml_string = xml_header + xml_string
                 root = ElementTree.fromstring(xml_string)
             else:
-                #TODO: Is this a useful feature?
+                # TODO: Is this a useful feature?
                 try:
                     root = ElementTree.fromstring(xml_string)
                 except UnicodeEncodeError:
-                    root = ElementTree.fromstring(xml_string.encode('ascii', 'xmlcharrefreplace'))
+                    root = ElementTree.fromstring(
+                        xml_string.encode('ascii', 'xmlcharrefreplace'))
         except ExpatError as e:
             print >> sys.stderr, "Failed to parse XML\nXML string was: %s\nError was: %s" % \
                 (xml_string, e)
