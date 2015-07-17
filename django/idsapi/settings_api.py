@@ -123,8 +123,8 @@ ADMIN_ONLY_FIELDS = [
     'copyright_clearance',
     'deleted',
     'end_date',
-    #'item_id',
-    #'item_type',
+    # 'item_id',
+    # 'item_type',
     'legacy_id',
     'notification_email',
     'permission_to_host_info',
@@ -231,7 +231,7 @@ STRUCTURED_XML_FIELDS = [
     'parent_object_array',
     'country_focus_array_hub_zx',
     'language_array',
-#    'hub_metadata_languages',
+    # 'hub_metadata_languages',
 ]
 
 # these are the entries in the dropdown box for user registration
@@ -297,8 +297,8 @@ QUERY_MAPPING = {
         'object_type': 'all'
     },
     # 'country': {
-        # 'solr_field': 'country_focus_search_hub_zx',
-        # 'object_type': 'all'
+    #     'solr_field': 'country_focus_search_hub_zx',
+    #     'object_type': 'all'
     # },
     'country': {
         'solr_field': 'hub_country_search_hub_zx',
@@ -341,8 +341,8 @@ QUERY_MAPPING = {
         'object_type': 'all'
     },
     # 'theme':   {
-        # 'solr_field': 'category_theme_facet_hub_zx',
-        # 'object_type': 'all'
+    #     'solr_field': 'category_theme_facet_hub_zx',
+    #     'object_type': 'all'
     # },
     'theme':   {
         'solr_field': 'hub_theme_search_hub_zx',
@@ -484,7 +484,7 @@ FQ_FIELDS = [
     'source_only',
     'keyword_search',
     'licence_type',
-    #'theme',
+    # 'theme',
 ]
 
 # this maps from the date-based query parameter to the SOLR field used
@@ -579,8 +579,8 @@ IGNORE_FIELDS = [
     'id',
     'index_id',
     'spell',
-#    'item_id',
-#    'item_type',
+    # 'item_id',
+    # 'item_type',
 ]
 
 # fields that will exist for all items
