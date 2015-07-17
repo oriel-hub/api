@@ -117,6 +117,24 @@ SORT_FIELDS = [
     'score',
 ]
 
+# a sub set of fields from the hub
+HUB_FIELDS = [
+    'title',
+    'name',
+    'item_id',
+    'category_id',
+    'category_path',
+    'category_path_sort',
+    'publication_date',
+    'date_updated',
+    'date_created',
+    'start_date',
+    'end_date',
+    'acronym',
+    'timestamp',
+    'score',
+]
+
 # these fields will be hidden from those with #'hide_admin_fields' set to True
 ADMIN_ONLY_FIELDS = [
     'asset_id',

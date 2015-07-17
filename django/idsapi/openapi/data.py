@@ -6,6 +6,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from openapi import defines
+from openapi.search_builder import InvalidOutputFormat
 from openapi.xmldict import XmlDictConfig
 
 try:
@@ -23,33 +24,46 @@ class DataMunger():
         self.object_id = None
         self.object_type = None
 
-    def get_required_data(self, result, output_format, user_level_info, beacon_guid):
-        self.object_id = result[settings.SOLR_OBJECT_ID]
-        self.object_type = defines.object_name_to_object_type(result[settings.SOLR_OBJECT_TYPE])
-        result = self.create_source_lang_dict(result)
-        if output_format == 'id':
-            object_data = {'object_id': result.get('object_id', result['item_id'])}
-        elif output_format in [None, '', 'short']:
-            object_data = {
-                'object_id': result.get('object_id', result['item_id']),
-                'item_id': result.get('item_id', result['item_id']),
-                'object_type': result.get('object_type', result['item_type']),
-                'item_type': result.get('item_type', result['item_type']),
-                'title': result.get('title', result.get('name')),
-            }
-            if 'extra_fields' in self.search_params:
-                fields = self.search_params['extra_fields'].lower().split(' ')
-                for field in fields:
-                    if field in result:
-                        object_data[field] = result[field]
-        else:
-            object_data = result
-            if output_format == 'full':
-                if user_level_info['general_fields_only']:
-                    object_data = dict((k, v) for k, v in object_data.items() if k in settings.GENERAL_FIELDS)
-                elif user_level_info['hide_admin_fields']:
-                    object_data = dict((k, v) for k, v in object_data.items() if k not in settings.ADMIN_ONLY_FIELDS)
+    def _keep_matching_fields(in_dict, field_list):
+        return dict((k, v) for k, v in in_dict.items() if k in field_list)
 
+    def _keep_not_matching_fields(in_dict, field_list):
+        return dict((k, v) for k, v in in_dict.items() if k not in field_list)
+
+    def _extra_fields(self):
+        return self.search_params.get('extra_fields', '').lower().split(' ')
+
+    def _filter_id_fields(self, result):
+        return {'object_id': result.get('object_id', result['item_id'])}
+
+    def _filter_short_fields(self, result):
+        object_data = {
+            'object_id': result.get('object_id', result['item_id']),
+            'item_id': result['item_id'],
+            'object_type': result.get('object_type', result['item_type']),
+            'item_type': result['item_type'],
+            'title': result.get('title', result.get('name')),
+        }
+        for field in self._extra_fields():
+            if field in result:
+                object_data[field] = result[field]
+        return object_data
+
+    def _filter_hub_fields(self, result):
+        object_data = self._keep_matching_fields(result, settings.HUB_FIELDS)
+        return object_data
+
+    def _filter_full_fields(self, result):
+        return result
+
+    def _filter_fields_for_user(self, object_data, user_level_info):
+        if user_level_info['general_fields_only']:
+            object_data = self._keep_matching_fields(object_data, settings.GENERAL_FIELDS)
+        elif user_level_info['hide_admin_fields']:
+            object_data = self._keep_not_matching_fields(object_data, settings.ADMIN_ONLY_FIELDS)
+        return object_data
+
+    def _convert_xml_field_list(self, object_data):
         for xml_field in settings.STRUCTURED_XML_FIELDS:
             if xml_field in object_data:
                 # assume it is a dictionary of strings - one per source
@@ -61,30 +75,59 @@ class DataMunger():
                     except ParseError as e:
                         object_data[xml_field] = "Could not parse XML, issue reported in logs"
                         # and send to logs
+                        # TODO: logging properly - and test
                         print >> sys.stderr, \
                             "COULD NOT PARSE XML. object_id: %s, field: %s Error: %s" % \
                             (self.object_id, xml_field, str(e))
 
+    def _convert_date_fields(self, object_data):
         # convert date fields to expected output format
-        # for date_field in settings.DATE_FIELDS:
-        #    if date_field in object_data:
-        #        for source in object_data[date_field]:
-        #            object_data[date_field][source] = \
-        #                object_data[date_field][source].strftime('%Y-%m-%d %H:%M:%S')
+        for date_field in settings.DATE_FIELDS:
+            if date_field in object_data:
+                for source in object_data[date_field]:
+                    object_data[date_field][source] = \
+                        object_data[date_field][source].strftime('%Y-%m-%d %H:%M:%S')
+
+    def _convert_descriptions(self, description, user_level_info, beacon_guid):
+        for source in description:
+            for lang in description[source]:
+                if isinstance(description[source][lang], list):
+                    description[source][lang][0] = self._process_description(
+                        description[source][lang][0], user_level_info, beacon_guid)
+                else:
+                    description[source][lang] = self._process_description(
+                        description[source][lang], user_level_info, beacon_guid)
+
+    def get_required_data(self, result, output_format, user_level_info, beacon_guid):
+        self.object_id = result[settings.SOLR_OBJECT_ID]
+        self.object_type = defines.object_name_to_object_type(result[settings.SOLR_OBJECT_TYPE])
+        result = self.create_source_lang_dict(result)
+        try:
+            filter_fn = {
+                'id': self._filter_id_fields,
+                'short': self._filter_short_fields,
+                '': self._filter_short_fields,
+                None: self._filter_short_fields,
+                'hub': self._filter_hub_fields,
+                'full': self._filter_full_fields,
+            }[output_format]
+        except KeyError:
+            raise InvalidOutputFormat(output_format)
+        object_data = filter_fn(result)
+        object_data = self._filter_fields_for_user(object_data, user_level_info)
+
+        self._convert_xml_field_list(object_data)
+
+        # convert date fields to expected output format
+        # self._convert_date_fields(object_data)
 
         # add the parent category, if relevant
         if self.object_type in settings.OBJECT_TYPES_WITH_HIERARCHY:
             self._add_child_parent_links(object_data, result)
 
         if 'description' in object_data:
-            for source in object_data['description']:
-                for lang in object_data['description'][source]:
-                    if isinstance(object_data['description'][source][lang], list):
-                        object_data['description'][source][lang][0] = self._process_description(
-                            object_data['description'][source][lang][0], user_level_info, beacon_guid)
-                    else:
-                        object_data['description'][source][lang] = self._process_description(
-                            object_data['description'][source][lang], user_level_info, beacon_guid)
+            self._convert_descriptions(
+                object_data['description'], user_level_info, beacon_guid)
 
         object_data['metadata_url'] = self._create_metadata_url()
         return object_data
@@ -127,7 +170,7 @@ class DataMunger():
         return description
 
     def _create_metadata_url(self, object_type=None, object_id=None, object_name=None,
-            url_name='object'):
+                             url_name='object'):
         """create a URL that will give information about the object"""
         if object_type is None:
             object_type = self.object_type

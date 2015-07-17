@@ -293,11 +293,7 @@ class SearchWrapper:
 
     def restrict_fields_returned(self, output_format, search_params):
         if output_format not in [None, '', 'id', 'short', 'hub', 'full']:
-            raise InvalidQueryError(
-                "the output_format of data returned can be 'id', 'short' or "
-                "'full' - you gave '%s'"
-                % output_format
-            )
+            raise InvalidOutputFormat(output_format)
 
         if 'extra_fields' in search_params:
             fields = search_params['extra_fields'].lower().split(' ')
@@ -485,6 +481,13 @@ class InvalidQueryError(BadRequestError):
     def __init__(self, error_text=''):
         BadRequestError.__init__(self)
         self.error_text = 'Invalid query: ' + error_text
+
+
+class InvalidOutputFormat(BadRequestError):
+    def __init__(self, output_format):
+        BadRequestError.__init__(self)
+        self.error_text = "The output_format of data returned can be 'id', " \
+            "'short', 'hub' or 'full' - you gave '%s'" % output_format
 
 
 class InvalidFieldError(BadRequestError):
