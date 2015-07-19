@@ -1,3 +1,4 @@
+from django.test import SimpleTestCase
 from django.utils import unittest
 from django.conf import settings
 import sunburnt
@@ -108,44 +109,33 @@ class SearchWrapperTests(unittest.TestCase):
     #    self.assertTrue(extra_field in self.msi.query.field_list)
 
 
-class SearchWrapperAddSortTests(unittest.TestCase):
+class SearchWrapperAddSortTests(SimpleTestCase):
     def setUp(self):
         self.msi = MockSolrInterface()
-        settings.SORT_MAPPING = {'dummy': 'dummy_sort'}
-
-    def set_sort_mapping(self, site, mapping):
-        self.orig_sort_mapping = settings.SORT_MAPPING.copy()
-        settings.SORT_MAPPING = mapping
-
-    def unset_sort_mapping(self, site):
-        settings.SORT_MAPPING = self.orig_sort_mapping
 
     def test_add_sort_method_disallows_mixed_asc_and_desc_sort(self):
         sw = SearchWrapper('General User', 'hub', self.msi)
-        search_params = {'sort_asc': 'title', 'sort_desc': 'title'}
+        search_params = SearchParams({'sort_asc': 'title', 'sort_desc': 'title'})
         self.assertRaises(InvalidQueryError, sw.add_sort, search_params, 'assets')
 
     def test_add_descending_sort_inverts_field(self):
         sw = SearchWrapper('General User', 'hub', self.msi)
-        sw.add_sort({'sort_desc': 'publication_date'}, 'assets')
+        sw.add_sort(SearchParams({'sort_desc': 'publication_date'}), 'assets')
         self.assertEquals(self.msi.query.sort_field, '-publication_date')
 
     def test_add_sort_with_no_mapping(self):
         sw = SearchWrapper('General User', 'hub', self.msi)
-        sw.add_sort({'sort_asc': 'publication_date'}, 'assets')
+        sw.add_sort(SearchParams({'sort_asc': 'publication_date'}), 'assets')
         self.assertEquals(self.msi.query.sort_field, 'publication_date')
 
     def test_add_sort_with_mapping(self):
         """
         Sort parameters should be overridable by the user via a mapping dictionary.
         """
-        self.set_sort_mapping('hub', {'title': 'title_sort'})
-        try:
+        with self.settings(SORT_MAPPING={'title': 'title_sort'}):
             sw = SearchWrapper('General User', 'hub', self.msi)
-            sw.add_sort({'sort_asc': 'title'}, 'assets')
+            sw.add_sort(SearchParams({'sort_asc': 'title'}), 'assets')
             self.assertEquals(self.msi.query.sort_field, 'title_sort')
-        finally:
-            self.unset_sort_mapping('hub')
 
     def test_add_sort_default_ordering_when_no_sort_params(self):
         """
@@ -158,43 +148,44 @@ class SearchWrapperAddSortTests(unittest.TestCase):
             'countries':
                 {'field': 'title', 'ascending': True},
         }
-        self.set_sort_mapping('hub', {'title': 'title_sort'})
-        try:
+        with self.settings(
+            SORT_MAPPING={'title': 'title_sort'},
+            DEFAULT_SORT_OBJECT_MAPPING={
+                'countries':
+                    {'field': 'title', 'ascending': True},
+            }
+        ):
             sw = SearchWrapper('General User', 'hub', self.msi)
-            sw.add_sort(dict(), 'countries')
+            sw.add_sort(SearchParams(dict()), 'countries')
             self.assertEquals(self.msi.query.sort_field, 'title_sort')
-        finally:
-            self.unset_sort_mapping('hub')
 
     def test_add_sort_no_default_ordering_when_free_text_query(self):
         """
         Free text queries should have no default sort order set.
         """
-        settings.DEFAULT_SORT_FIELD = 'title'
-        settings.DEFAULT_SORT_ASCENDING = True
-        self.set_sort_mapping('hub', {'title': 'title_sort'})
-        try:
+        with self.settings(
+            SORT_MAPPING={'title': 'title_sort'},
+            DEFAULT_SORT_FIELD='title',
+            DEFAULT_SORT_ASCENDING=True
+        ):
             sw = SearchWrapper('General User', 'hub', self.msi)
             sw.has_free_text_query = True
-            sw.add_sort(dict(), 'assets')
+            sw.add_sort(SearchParams(dict()), 'assets')
             self.assertIsNone(self.msi.query.sort_field)
-        finally:
-            self.unset_sort_mapping('hub')
 
     def test_add_sort_allows_ordering_when_free_text_query(self):
         """
         Free text queries should still be sortable if a sort order is specified.
         """
-        settings.DEFAULT_SORT_FIELD = 'title'
-        settings.DEFAULT_SORT_ASCENDING = True
-        self.set_sort_mapping('hub', {'title': 'title_sort'})
-        try:
+        with self.settings(
+            SORT_MAPPING={'title': 'title_sort'},
+            DEFAULT_SORT_FIELD='title',
+            DEFAULT_SORT_ASCENDING=True
+        ):
             sw = SearchWrapper('General User', 'hub', self.msi)
             sw.has_free_text_query = True
-            sw.add_sort({'sort_desc': 'title'}, 'assets')
+            sw.add_sort(SearchParams({'sort_desc': 'title'}), 'assets')
             self.assertEquals(self.msi.query.sort_field, '-title_sort')
-        finally:
-            self.unset_sort_mapping('hub')
 
 
 class SearchWrapperAddFieldQueryTests(unittest.TestCase):

@@ -186,19 +186,6 @@ class SearchWrapper:
                     % (max_results, num_results))
         self.si_query = self.si_query.paginate(start=start_offset, rows=num_results)
 
-    def _extract_sort_field_ascending(self, search_params):
-        sort_asc = search_params.get('sort_asc')
-        sort_desc = search_params.get('sort_desc')
-        if sort_asc and sort_desc:
-            raise InvalidQueryError("Cannot use both 'sort_asc' and 'sort_desc'")
-        ascending = bool(sort_asc)
-
-        sort_field = sort_asc or sort_desc
-        if sort_field and sort_field not in settings.SORT_FIELDS:
-            raise InvalidQueryError("Sorry, you can't sort by %s" % sort_field)
-
-        return sort_field, ascending
-
     def _get_default_sort_order(self, object_type):
         sort_field = ascending = None
         if object_type and object_type in defines.OBJECT_TYPES:
@@ -218,7 +205,7 @@ class SearchWrapper:
              if there is a free text query then the sort order will be by
              score
         """
-        sort_field, ascending = self._extract_sort_field_ascending(search_params)
+        sort_field, ascending = search_params.sort_field_ascending()
 
         # free text queries have no default sort ordering
         if not sort_field and self.has_free_text_query:
@@ -527,6 +514,22 @@ class SearchParams(object):
             if num_results < 0 and not for_facet:
                 raise InvalidQueryError("'num_results' cannot be negative - you gave %d" % num_results)
         return num_results
+
+    def sort_field_ascending(self):
+        sort_asc = self.params.get('sort_asc')
+        sort_desc = self.params.get('sort_desc')
+        if sort_asc and sort_desc:
+            raise InvalidQueryError("Cannot use both 'sort_asc' and 'sort_desc'")
+        ascending = bool(sort_asc)
+
+        sort_field = sort_asc or sort_desc
+        if sort_field and sort_field not in settings.SORT_FIELDS:
+            raise InvalidQueryError("Sorry, you can't sort by %s" % sort_field)
+
+        return sort_field, ascending
+
+    def extra_fields(self):
+        return self.params.get('extra_fields', '').lower().split(' ')
 
 
 class SolrUnavailableError(defines.IdsApiError):
