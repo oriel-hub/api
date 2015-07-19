@@ -58,6 +58,20 @@ class DataMunger():
     def _filter_full_fields(self, result):
         return result
 
+    def _get_object_data_from_result(self, output_format, result):
+        try:
+            filter_fn = {
+                'id': self._filter_id_fields,
+                'short': self._filter_short_fields,
+                '': self._filter_short_fields,
+                None: self._filter_short_fields,
+                'hub': self._filter_hub_fields,
+                'full': self._filter_full_fields,
+            }[output_format]
+        except KeyError:
+            raise InvalidOutputFormat(output_format)
+        return filter_fn(result)
+
     def _filter_fields_for_user(self, object_data, user_level_info):
         if user_level_info['general_fields_only']:
             object_data = self._keep_matching_fields(object_data, settings.GENERAL_FIELDS)
@@ -86,19 +100,8 @@ class DataMunger():
     def get_required_data(self, result, output_format, user_level_info, beacon_guid):
         self.object_id = result[settings.SOLR_OBJECT_ID]
         self.object_type = defines.object_name_to_object_type(result[settings.SOLR_OBJECT_TYPE])
-        result = self.create_source_lang_dict(result)
-        try:
-            filter_fn = {
-                'id': self._filter_id_fields,
-                'short': self._filter_short_fields,
-                '': self._filter_short_fields,
-                None: self._filter_short_fields,
-                'hub': self._filter_hub_fields,
-                'full': self._filter_full_fields,
-            }[output_format]
-        except KeyError:
-            raise InvalidOutputFormat(output_format)
-        object_data = filter_fn(result)
+        result = SourceLangParser(self.search_params).create_source_lang_dict(result)
+        object_data = self._get_object_data_from_result(output_format, result)
         object_data = self._filter_fields_for_user(object_data, user_level_info)
 
         self._convert_xml_field_list(object_data)
@@ -210,109 +213,6 @@ class DataMunger():
             object_data['toplevel_parent_url'] = self._create_metadata_url(
                 object_id=result['cat_first_parent'].values()[0][0])
 
-    def field_type_prefix(self, field_name):
-        """ take the field name, work out whether it is a generic field,
-        has a source, or has both source and language.
-
-        The return is: prefix, source, language
-        """
-        parts = field_name.split('_')
-        if (len(parts) == 1 or parts[-1] == 'id' or
-                field_name in settings.GENERIC_FIELD_LIST):
-            return field_name, None, None
-        # we should at this point always have prefix_source_xx
-        prefix = '_'.join(parts[:-2])
-        source = parts[-2]
-        lang = parts[-1]
-        return prefix, source, lang
-
-    def include_field(self, field_name):
-        if (
-            field_name in settings.IGNORE_FIELDS or
-            field_name[2:].startswith('_search_api_') or
-            '_sort_hub_' in field_name or
-            '_search_hub_' in field_name or
-            '_facet_hub_' in field_name
-        ):
-            return False
-        else:
-            return True
-
-    def include_source(self, source):
-        """ check for source_only or source_exclude """
-        if 'source_only' in self.search_params and source != self.search_params['source_only']:
-            return False
-        if 'source_exclude' in self.search_params and source == self.search_params['source_exclude']:
-            return False
-        return True
-
-    def include_lang(self, lang):
-        """ check for lang_only or lang_exclude """
-        if lang == 'zx':
-            return False
-        if lang == 'zz':
-            return True
-        # TODO: what about 'un' ??
-        if 'lang_only' in self.search_params and lang != self.search_params['lang_only']:
-            return False
-        if 'lang_exclude' in self.search_params and lang == self.search_params['lang_exclude']:
-            return False
-        return True
-
-    def prefer_source(self, search_params, out_dict, source_fields):
-        source_pref = search_params.get('source_pref', None)
-        if source_pref is None:
-            return
-        for field in source_fields:
-            # if our preferred source exists, drop all other sources
-            if source_pref in out_dict[field]:
-                out_dict[field] = {source_pref: out_dict[field][source_pref]}
-
-    def prefer_lang(self, search_params, out_dict, lang_fields):
-        lang_pref = search_params.get('lang_pref', None)
-        if lang_pref is None:
-            return
-        for field in lang_fields:
-            for source in out_dict[field]:
-                # if our preferred language exists, drop all other languages
-                if lang_pref in out_dict[field][source]:
-                    out_dict[field][source] = {lang_pref: out_dict[field][source][lang_pref]}
-
-    def create_source_lang_dict(self, in_dict):
-        out_dict = {}
-        lang_fields = set()
-        source_fields = set()
-        for field_name, value in in_dict.iteritems():
-            # we ignore a list of field_names, plus xx_search_api_*
-            if not self.include_field(field_name):
-                continue
-            prefix, source, lang = self.field_type_prefix(field_name)
-            if source is None:
-                out_dict[prefix] = value
-            else:
-                if prefix not in out_dict:
-                    out_dict[prefix] = {}
-                # if lang is "zx" then the field is for computers, and may
-                # contain multiple languages (eg search, facet fields)
-                # if lang is "zz" then language is not relevant (eg date)
-                # if lang is "un" then the language is unknown
-                if not self.include_source(source):
-                    continue
-                elif not self.include_lang(lang):
-                    continue
-                elif lang == 'zz':
-                    out_dict[prefix][source] = value
-                    source_fields.add(prefix)
-                else:
-                    if source not in out_dict[prefix]:
-                        out_dict[prefix][source] = {}
-                    out_dict[prefix][source][lang] = value
-                    lang_fields.add(prefix)
-                    source_fields.add(prefix)
-        self.prefer_lang(self.search_params, out_dict, lang_fields)
-        self.prefer_source(self.search_params, out_dict, source_fields)
-        return out_dict
-
     def convert_facet_string(self, facet_string):
         result = {
             'object_id': '',
@@ -342,3 +242,128 @@ class DataMunger():
                     result['object_name'])
 
         return result
+
+
+class SourceLangParser(object):
+
+    def __init__(self, search_params):
+        self.search_params = search_params
+
+    def create_source_lang_dict(self, in_dict):
+        self.out_dict = {}
+        self.lang_fields = set()
+        self.source_fields = set()
+        for field_name, value in in_dict.iteritems():
+            self.process_field(field_name, value)
+        self.prefer_lang()
+        self.prefer_source()
+        return self.out_dict
+
+    def process_field(self, field_name, value):
+        # we ignore a list of field_names, plus xx_search_api_*
+        if self.exclude_field(field_name):
+            return
+        prefix, source, lang = self.field_type_prefix(field_name)
+        if source is None:
+            self.out_dict[prefix] = value
+        else:
+            if prefix not in self.out_dict:
+                self.out_dict[prefix] = {}
+            # if lang is "zx" then the field is for computers, and may
+            # contain multiple languages (eg search, facet fields)
+            # if lang is "zz" then language is not relevant (eg date)
+            # if lang is "un" then the language is unknown
+            if self.exclude_source(source):
+                return
+            elif self.exclude_lang(lang):
+                return
+            elif lang == 'zz':
+                self.out_dict[prefix][source] = value
+                self.source_fields.add(prefix)
+            else:
+                if source not in self.out_dict[prefix]:
+                    self.out_dict[prefix][source] = {}
+                self.out_dict[prefix][source][lang] = value
+                self.lang_fields.add(prefix)
+                self.source_fields.add(prefix)
+
+    def field_type_prefix(self, field_name):
+        """ take the field name, work out whether it is a generic field,
+        has a source, or has both source and language.
+
+        The return is: prefix, source, language
+        """
+        parts = field_name.split('_')
+        if (len(parts) == 1 or parts[-1] == 'id' or
+                field_name in settings.GENERIC_FIELD_LIST):
+            return field_name, None, None
+        # we should at this point always have prefix_source_xx
+        prefix = '_'.join(parts[:-2])
+        source = parts[-2]
+        lang = parts[-1]
+        return prefix, source, lang
+
+    def exclude_field(self, field_name):
+        return (
+            field_name in settings.IGNORE_FIELDS or
+            field_name[2:].startswith('_search_api_') or
+            '_sort_hub_' in field_name or
+            '_search_hub_' in field_name or
+            '_facet_hub_' in field_name
+        )
+
+    def exclude_source(self, source):
+        """ check for source_only or source_exclude """
+        return (
+            (
+                'source_only' in self.search_params and
+                source != self.search_params['source_only']
+            )
+            or
+            (
+                'source_exclude' in self.search_params and
+                source == self.search_params['source_exclude']
+            )
+        )
+
+    def exclude_lang(self, lang):
+        """ check for lang_only or lang_exclude """
+        if lang == 'zz':
+            return False
+        # TODO: what about 'un' ??
+        return (
+            lang == 'zx'
+            or
+            (
+                'lang_only' in self.search_params and
+                lang != self.search_params['lang_only']
+            )
+            or
+            (
+                'lang_exclude' in self.search_params and
+                lang == self.search_params['lang_exclude']
+            )
+        )
+
+    def prefer_source(self):
+        source_pref = self.search_params.get('source_pref', None)
+        if source_pref is None:
+            return
+        for field in self.source_fields:
+            # if our preferred source exists, drop all other sources
+            if source_pref in self.out_dict[field]:
+                self.out_dict[field] = {
+                    source_pref: self.out_dict[field][source_pref]
+                }
+
+    def prefer_lang(self):
+        lang_pref = self.search_params.get('lang_pref', None)
+        if lang_pref is None:
+            return
+        for field in self.lang_fields:
+            for source in self.out_dict[field]:
+                # if our preferred language exists, drop all other languages
+                if lang_pref in self.out_dict[field][source]:
+                    self.out_dict[field][source] = {
+                        lang_pref: self.out_dict[field][source][lang_pref]
+                    }

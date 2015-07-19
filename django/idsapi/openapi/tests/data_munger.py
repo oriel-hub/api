@@ -4,22 +4,22 @@ import copy
 from django.test.testcases import TestCase
 from django.test.utils import override_settings
 
-from ..data import DataMunger
+from ..data import DataMunger, SourceLangParser
+
+PREFER_TEST_DICT = {
+    "title": {
+        "bridge": {
+            "en": "title goes here",
+            "fr": "le title est ici"
+        },
+        "eldis": {
+            "en": "the title goes here"
+        }
+    }
+}
 
 
 class DataMungerTests(TestCase):
-
-    PREFER_TEST_DICT = {
-        "title": {
-            "bridge": {
-                "en": "title goes here",
-                "fr": "le title est ici"
-            },
-            "eldis": {
-                "en": "the title goes here"
-            }
-        }
-    }
 
     def setUp(self):
         self.data = DataMunger('hub', {})
@@ -83,133 +83,11 @@ class DataMungerTests(TestCase):
         self.assertEquals(facet_dict['object_name'], 'environmental statistics')
         self.assertEquals(facet_dict['metadata_url'], '')
 
-    def test_field_type_prefix_with_field_name_with_no_underscore(self):
-        prefix, source, lang = self.data.field_type_prefix('content')
-        self.assertEqual('content', prefix)
-        self.assertIsNone(source)
-        self.assertIsNone(lang)
 
-    def test_field_type_prefix_with_field_name_with_id_field(self):
-        prefix, source, lang = self.data.field_type_prefix('object_id')
-        self.assertEqual('object_id', prefix)
-        self.assertIsNone(source)
-        self.assertIsNone(lang)
+class SourceLangParserTests(TestCase):
 
-    def test_field_type_prefix_with_field_name_with_field_in_generic_field_list_setting(self):
-        with override_settings(GENERIC_FIELD_LIST=['metadata_languages']):
-            prefix, source, lang = self.data.field_type_prefix('metadata_languages')
-        self.assertEqual('metadata_languages', prefix)
-        self.assertIsNone(source)
-        self.assertIsNone(lang)
-
-    def test_field_type_prefix_with_field_name_with_source_but_no_language(self):
-        prefix, source, lang = self.data.field_type_prefix('et_al_eldis_zz')
-        self.assertEqual('et_al', prefix)
-        self.assertEqual('eldis', source)
-        self.assertEqual('zz', lang)
-
-    def test_field_type_prefix_with_field_name_with_source_and_language(self):
-        prefix, source, lang = self.data.field_type_prefix('title_eldis_en')
-        self.assertEqual('title', prefix)
-        self.assertEqual('eldis', source)
-        self.assertEqual('en', lang)
-
-    def test_include_field_ignores_search_api_fields(self):
-        # there are all actual fields from the data
-        self.assertFalse(self.data.include_field('sm_search_api_source_hub_zz'))
-        self.assertFalse(self.data.include_field('dm_search_api_date_updated_hub_zz'))
-        self.assertFalse(self.data.include_field('ss_search_api_language'))
-        self.assertFalse(self.data.include_field('ss_search_api_type_hub_un'))
-
-    def test_include_field_does_not_ignore_search_api_fields_with_more_than_2_letter_prefix(self):
-        self.assertTrue(self.data.include_field('another_search_api_source_hub_zz'))
-
-    def test_include_field_ignores_hub_search_sort_and_facet_fields(self):
-        self.assertFalse(self.data.include_field('title_sort_hub_en'))
-        self.assertFalse(self.data.include_field('title_search_hub_zx'))
-        self.assertFalse(self.data.include_field('country_focus_facet_hub_zz'))
-
-    def test_include_field_does_not_ignore_other_fields(self):
-        self.assertTrue(self.data.include_field('title_hub_en'))
-        self.assertTrue(self.data.include_field('object_id_eldis_zz'))
-
-    def test_include_lang_includes_lang_if_lang_only_not_set(self):
-        self.data.search_params = {}
-        self.assertTrue(self.data.include_lang('en'))
-
-    def test_include_lang_includes_lang_if_lang_only_is_same(self):
-        self.data.search_params = {'lang_only': 'en'}
-        self.assertTrue(self.data.include_lang('en'))
-
-    def test_include_lang_excludes_lang_if_lang_only_is_different(self):
-        self.data.search_params = {'lang_only': 'es'}
-        self.assertFalse(self.data.include_lang('en'))
-
-    def test_include_lang_excludes_lang_if_lang_is_zx(self):
-        self.data.search_params = {}
-        self.assertFalse(self.data.include_lang('zx'))
-
-    def test_include_lang_includes_lang_if_lang_is_zz(self):
-        self.data.search_params = {}
-        self.assertTrue(self.data.include_lang('zz'))
-
-    def test_prefer_lang_does_not_modify_out_dict_if_lang_pref_not_set(self):
-        lang_fields = set(self.PREFER_TEST_DICT.keys())
-        search_params = {}
-        out_dict = copy.deepcopy(self.PREFER_TEST_DICT)
-        self.data.prefer_lang(search_params, out_dict, lang_fields)
-        self.assertDictEqual(out_dict, self.PREFER_TEST_DICT)
-
-    def test_prefer_lang_does_modify_out_dict_if_lang_pref_set(self):
-        lang_fields = set(self.PREFER_TEST_DICT.keys())
-        search_params = {'lang_pref': 'en'}
-        out_dict = copy.deepcopy(self.PREFER_TEST_DICT)
-        self.data.prefer_lang(search_params, out_dict, lang_fields)
-        expected_dict = {
-            "title": {
-                "bridge": {
-                    "en": "title goes here",
-                },
-                "eldis": {
-                    "en": "the title goes here"
-                }
-            }
-        }
-        self.assertDictEqual(out_dict, expected_dict)
-
-    def test_prefer_source_does_not_modify_out_dict_if_source_pref_not_set(self):
-        source_fields = set(self.PREFER_TEST_DICT.keys())
-        search_params = {}
-        out_dict = copy.deepcopy(self.PREFER_TEST_DICT)
-        self.data.prefer_source(search_params, out_dict, source_fields)
-        self.assertDictEqual(out_dict, self.PREFER_TEST_DICT)
-
-    def test_prefer_source_does_modify_out_dict_if_source_pref_set(self):
-        source_fields = set(self.PREFER_TEST_DICT.keys())
-        search_params = {'source_pref': 'bridge'}
-        out_dict = copy.deepcopy(self.PREFER_TEST_DICT)
-        self.data.prefer_source(search_params, out_dict, source_fields)
-        expected_dict = {
-            "title": {
-                "bridge": {
-                    "en": "title goes here",
-                    "fr": "le title est ici"
-                },
-            }
-        }
-        self.assertDictEqual(out_dict, expected_dict)
-
-    def test_include_source_includes_source_if_source_only_not_set(self):
-        self.data.search_params = {}
-        self.assertTrue(self.data.include_source('eldis'))
-
-    def test_include_source_includes_source_if_source_only_is_same(self):
-        self.data.search_params = {'source_only': 'eldis'}
-        self.assertTrue(self.data.include_source('eldis'))
-
-    def test_include_source_excludes_source_if_source_only_is_different(self):
-        self.data.search_params = {'source_only': 'ella'}
-        self.assertFalse(self.data.include_source('eldis'))
+    def setUp(self):
+        self.slp = SourceLangParser({})
 
     def test_create_source_lang_dict_works(self):
         result = {
@@ -251,5 +129,133 @@ class DataMungerTests(TestCase):
             }
         }
         with override_settings(GENERIC_FIELD_LIST=['object_id']):
-            actual_dict = self.data.create_source_lang_dict(result)
+            actual_dict = self.slp.create_source_lang_dict(result)
         self.assertDictEqual(expected_dict, actual_dict)
+
+    def test_field_type_prefix_with_field_name_with_no_underscore(self):
+        prefix, source, lang = self.slp.field_type_prefix('content')
+        self.assertEqual('content', prefix)
+        self.assertIsNone(source)
+        self.assertIsNone(lang)
+
+    def test_field_type_prefix_with_field_name_with_id_field(self):
+        prefix, source, lang = self.slp.field_type_prefix('object_id')
+        self.assertEqual('object_id', prefix)
+        self.assertIsNone(source)
+        self.assertIsNone(lang)
+
+    def test_field_type_prefix_with_field_name_with_field_in_generic_field_list_setting(self):
+        with override_settings(GENERIC_FIELD_LIST=['metadata_languages']):
+            prefix, source, lang = self.slp.field_type_prefix('metadata_languages')
+        self.assertEqual('metadata_languages', prefix)
+        self.assertIsNone(source)
+        self.assertIsNone(lang)
+
+    def test_field_type_prefix_with_field_name_with_source_but_no_language(self):
+        prefix, source, lang = self.slp.field_type_prefix('et_al_eldis_zz')
+        self.assertEqual('et_al', prefix)
+        self.assertEqual('eldis', source)
+        self.assertEqual('zz', lang)
+
+    def test_field_type_prefix_with_field_name_with_source_and_language(self):
+        prefix, source, lang = self.slp.field_type_prefix('title_eldis_en')
+        self.assertEqual('title', prefix)
+        self.assertEqual('eldis', source)
+        self.assertEqual('en', lang)
+
+    def test_exclude_field_ignores_search_api_fields(self):
+        # there are all actual fields from the data
+        self.assertTrue(self.slp.exclude_field('sm_search_api_source_hub_zz'))
+        self.assertTrue(self.slp.exclude_field('dm_search_api_date_updated_hub_zz'))
+        self.assertTrue(self.slp.exclude_field('ss_search_api_language'))
+        self.assertTrue(self.slp.exclude_field('ss_search_api_type_hub_un'))
+
+    def test_exclude_field_does_not_ignore_search_api_fields_with_more_than_2_letter_prefix(self):
+        self.assertFalse(self.slp.exclude_field('another_search_api_source_hub_zz'))
+
+    def test_exclude_field_ignores_hub_search_sort_and_facet_fields(self):
+        self.assertTrue(self.slp.exclude_field('title_sort_hub_en'))
+        self.assertTrue(self.slp.exclude_field('title_search_hub_zx'))
+        self.assertTrue(self.slp.exclude_field('country_focus_facet_hub_zz'))
+
+    def test_exclude_field_does_not_ignore_other_fields(self):
+        self.assertFalse(self.slp.exclude_field('title_hub_en'))
+        self.assertFalse(self.slp.exclude_field('object_id_eldis_zz'))
+
+    def test_exclude_lang_includes_lang_if_lang_only_not_set(self):
+        self.slp.search_params = {}
+        self.assertFalse(self.slp.exclude_lang('en'))
+
+    def test_exclude_lang_includes_lang_if_lang_only_is_same(self):
+        self.slp.search_params = {'lang_only': 'en'}
+        self.assertFalse(self.slp.exclude_lang('en'))
+
+    def test_exclude_lang_excludes_lang_if_lang_only_is_different(self):
+        self.slp.search_params = {'lang_only': 'es'}
+        self.assertTrue(self.slp.exclude_lang('en'))
+
+    def test_exclude_lang_excludes_lang_if_lang_is_zx(self):
+        self.slp.search_params = {}
+        self.assertTrue(self.slp.exclude_lang('zx'))
+
+    def test_exclude_lang_includes_lang_if_lang_is_zz(self):
+        self.slp.search_params = {}
+        self.assertFalse(self.slp.exclude_lang('zz'))
+
+    def test_prefer_lang_does_not_modify_out_dict_if_lang_pref_not_set(self):
+        self.slp.lang_fields = set(PREFER_TEST_DICT.keys())
+        self.slp.search_params = {}
+        self.slp.out_dict = copy.deepcopy(PREFER_TEST_DICT)
+        self.slp.prefer_lang()
+        self.assertDictEqual(self.slp.out_dict, PREFER_TEST_DICT)
+
+    def test_prefer_lang_does_modify_out_dict_if_lang_pref_set(self):
+        self.slp.lang_fields = set(PREFER_TEST_DICT.keys())
+        self.slp.search_params = {'lang_pref': 'en'}
+        self.slp.out_dict = copy.deepcopy(PREFER_TEST_DICT)
+        self.slp.prefer_lang()
+        expected_dict = {
+            "title": {
+                "bridge": {
+                    "en": "title goes here",
+                },
+                "eldis": {
+                    "en": "the title goes here"
+                }
+            }
+        }
+        self.assertDictEqual(self.slp.out_dict, expected_dict)
+
+    def test_prefer_source_does_not_modify_out_dict_if_source_pref_not_set(self):
+        self.slp.source_fields = set(PREFER_TEST_DICT.keys())
+        self.slp.search_params = {}
+        self.slp.out_dict = copy.deepcopy(PREFER_TEST_DICT)
+        self.slp.prefer_source()
+        self.assertDictEqual(self.slp.out_dict, PREFER_TEST_DICT)
+
+    def test_prefer_source_does_modify_out_dict_if_source_pref_set(self):
+        self.slp.source_fields = set(PREFER_TEST_DICT.keys())
+        self.slp.search_params = {'source_pref': 'bridge'}
+        self.slp.out_dict = copy.deepcopy(PREFER_TEST_DICT)
+        self.slp.prefer_source()
+        expected_dict = {
+            "title": {
+                "bridge": {
+                    "en": "title goes here",
+                    "fr": "le title est ici"
+                },
+            }
+        }
+        self.assertDictEqual(self.slp.out_dict, expected_dict)
+
+    def test_exclude_source_includes_source_if_source_only_not_set(self):
+        self.slp.search_params = {}
+        self.assertFalse(self.slp.exclude_source('eldis'))
+
+    def test_exclude_source_includes_source_if_source_only_is_same(self):
+        self.slp.search_params = {'source_only': 'eldis'}
+        self.assertFalse(self.slp.exclude_source('eldis'))
+
+    def test_exclude_source_excludes_source_if_source_only_is_different(self):
+        self.slp.search_params = {'source_only': 'ella'}
+        self.assertTrue(self.slp.exclude_source('eldis'))
