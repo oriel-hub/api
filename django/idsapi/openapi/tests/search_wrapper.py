@@ -337,13 +337,17 @@ class SearchParamsTests(unittest.TestCase):
         sp = SearchParams({})
         self.assertFalse(sp._invalid_param('_hidden', []))
 
+    def test_invalid_param_returns_false_if_param_is_format_query_param(self):
+        sp = SearchParams({})
+        self.assertFalse(sp._invalid_param(BaseRenderer._FORMAT_QUERY_PARAM, []))
+
     def test_invalid_param_returns_false_if_param_is_in_allowed_param_list(self):
         sp = SearchParams({})
         self.assertFalse(sp._invalid_param('an_extra_field', ['an_extra_field']))
 
-    def test_invalid_param_returns_false_if_param_is_format_query_param(self):
+    def test_invalid_param_returns_true_if_param_is_not_in_allowed_param_list(self):
         sp = SearchParams({})
-        self.assertFalse(sp._invalid_param(BaseRenderer._FORMAT_QUERY_PARAM, []))
+        self.assertTrue(sp._invalid_param('an_extra_field', []))
 
     def test_invalid_query_raised_if_start_offset_is_negative(self):
         sp = SearchParams({'start_offset': '-1'})

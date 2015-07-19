@@ -454,6 +454,20 @@ class SearchParams(object):
             param != BaseRenderer._FORMAT_QUERY_PARAM
         )
 
+    def assert_valid_query_param(self, param, allowed_param_list):
+        if self._invalid_param(param, allowed_param_list):
+            raise UnknownQueryParamError(param)
+
+    def _get_all_invalid_params(self, allowed_param_list):
+        return [
+            p for p in self.params if self._invalid_param(p, allowed_param_list)
+        ]
+
+    def assert_all_params_valid(self, allowed_param_list):
+        invalid_params = self._get_all_invalid_params(allowed_param_list)
+        if invalid_params:
+            raise UnknownQueryParamError(', '.join(invalid_params))
+
     def _assert_only_one_query_in_query_list(self, query_list, param):
         if len(query_list) > 1:
             raise InvalidQueryError(
@@ -466,24 +480,16 @@ class SearchParams(object):
                 "All query parameters must have a value, but '%s' does not"
                 % param)
 
+    def get_query_for_param(self, param):
+        query_list = self.params.getlist(param)
+        self._assert_only_one_query_in_query_list(query_list, param)
+        query = query_list[0]
+        self._assert_query_param_has_value(query, param)
+        return param, query
+
     def query_items(self):
         for param in self.params:
-            query_list = self.params.getlist(param)
-            self._assert_only_one_query_in_query_list(query_list, param)
-            query = query_list[0]
-            self._assert_query_param_has_value(query, param)
-            yield param, query
-
-    def assert_valid_query_param(self, param, allowed_param_list):
-        if self._invalid_param(param, allowed_param_list):
-            raise UnknownQueryParamError(param)
-
-    def assert_all_params_valid(self, allowed_param_list):
-        invalid_params = [
-            p for p in self.params if self._invalid_param(p, allowed_param_list)
-        ]
-        if invalid_params:
-            raise UnknownQueryParamError(', '.join(invalid_params))
+            yield self.get_query_for_param(param)
 
     def has_query(self):
         # TODO: later on could filter out non-query params - num_results etc
