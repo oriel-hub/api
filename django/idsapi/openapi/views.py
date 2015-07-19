@@ -9,7 +9,9 @@ from django.conf import settings
 from sunburnt import SolrError
 
 from openapi.data import DataMunger
-from openapi.search_builder import SearchBuilder, BadRequestError, SolrUnavailableError
+from openapi.search_builder import (
+    SearchBuilder, SearchParams, BadRequestError, SolrUnavailableError
+)
 from openapi.defines import URL_ROOT, IdsApiError
 from openapi.guid_authentication import GuidAuthentication
 from openapi.permissions import PerUserThrottlingRatePerGroup
@@ -83,7 +85,7 @@ class BaseAuthView(View):
     def setup_vars(self, request, site, output_format):
         self.output_format = output_format
         self.site = site
-        self.search_params = request.GET
+        self.search_params = SearchParams(request.GET)
         self.data_munger = DataMunger(site, self.search_params)
         self.user_level = self.user.get_profile().user_level
         # note this can throw an exception, so need to catch it
@@ -186,7 +188,7 @@ class ObjectSearchView(BaseSearchView):
     def get(self, request, site, output_format, object_type=None):
         try:
             self.setup_vars(request, site, output_format)
-            if len(self.search_params.keys()) == 0:
+            if not self.search_params.has_query():
                 return Response(
                     status.HTTP_400_BAD_REQUEST,
                     content='object search must have some query string, eg /objects/search/short?q=undp')

@@ -20,6 +20,7 @@ solr_interface_created = {}
 query_mapping = settings.QUERY_MAPPING
 
 logger = logging.getLogger(__name__)
+logger.setLevel(getattr(settings, 'LOG_LEVEL', logging.DEBUG))
 
 
 def get_solr_interface(site):
@@ -51,18 +52,6 @@ class SearchBuilder():
     def __init__(self, user_level, site, solr=None):
         self.sw = SearchWrapper(user_level, site, solr)
 
-    def _assert_only_one_query_in_query_list(self, query_list, param):
-        if len(query_list) > 1:
-            raise InvalidQueryError(
-                "Cannot repeat query parameters - there is more than one '%s'"
-                % param)
-
-    def _assert_query_param_has_value(self, query, param):
-        if len(query) < 1:
-            raise InvalidQueryError(
-                "All query parameters must have a value, but '%s' does not"
-                % param)
-
     def _assert_query_param_can_be_user_with_object_type(self, param, object_type):
         if query_mapping[param]['object_type'] != 'all':
             if query_mapping[param]['object_type'] != object_type:
@@ -71,14 +60,6 @@ class SearchBuilder():
                     "your search had item type '%s'"
                     %
                     (param, query_mapping[param]['object_type'], object_type))
-
-    def _assert_valid_query_param(self, param, allowed_param_list):
-        if (
-            param[0] != '_' and
-            param not in allowed_param_list and
-            param != BaseRenderer._FORMAT_QUERY_PARAM
-        ):
-            raise UnknownQueryParamError(param)
 
     def _is_date_query(self, param):
         for date_prefix in settings.DATE_PREFIX_MAPPING.keys():
@@ -97,8 +78,7 @@ class SearchBuilder():
             self.sw.add_parameter_query(query_mapping[param]['solr_field'], query)
 
     def create_itemid_query(self, object_id, search_params, object_type, output_format):
-        for param in search_params:
-            self._assert_valid_query_param(param, ['extra_fields'])
+        search_params.assert_all_params_valid(['extra_fields'])
         self.sw.si_query = self.sw.solr.query(item_id=object_id)
         self.sw.restrict_search_by_object_type(object_type, allow_objects=True)
         self.sw.restrict_fields_returned(output_format, search_params)
@@ -110,20 +90,15 @@ class SearchBuilder():
             'extra_fields', 'sort_asc', 'sort_desc', 'lang_pref',
             'source_pref', 'count_sort'
         ]
-        for param in search_params:
-            query_list = search_params.getlist(param)
-            self._assert_only_one_query_in_query_list(query_list, param)
-            query = query_list[0]
-            self._assert_query_param_has_value(query, param)
-            if param == 'q':
-                self.sw.add_free_text_query(urllib.unquote_plus(query))
-            elif param in query_mapping.keys():
-                self._add_query_via_query_mapping(param, object_type, query)
-            elif self._is_date_query(param):
-                self.sw.add_date_query(param, query)
+        for query, query_value in search_params.query_items():
+            if query == 'q':
+                self.sw.add_free_text_query(urllib.unquote_plus(query_value))
+            elif query in query_mapping:
+                self._add_query_via_query_mapping(query, object_type, query_value)
+            elif self._is_date_query(query):
+                self.sw.add_date_query(query, query_value)
             else:
-                # if param not in our list of allowed params
-                self._assert_valid_query_param(param, allowed_param_list)
+                search_params.assert_valid_query_param(query, allowed_param_list)
 
         self.sw.restrict_search_by_object_type(object_type)
         self.sw.restrict_fields_returned(output_format, search_params)
@@ -132,7 +107,7 @@ class SearchBuilder():
             self.sw.add_paginate(search_params)
         else:
             self.sw.add_facet(facet_type, search_params)
-            self.sw.add_paginate({'num_results': 0})
+            self.sw.add_paginate(SearchParams({'num_results': 0}))
         return self.sw
 
     def create_all_search(self, search_params, object_type, output_format):
@@ -202,32 +177,9 @@ class SearchWrapper:
         else:
             raise UnknownObjectError(object_type)
 
-    def get_start_offset(self, search_params):
-        try:
-            start_offset = int(search_params.get('start_offset', 0))
-        except ValueError:
-            raise InvalidQueryError("'start_offset' must be a decimal number - you gave %s"
-                    % search_params['start_offset'])
-        if start_offset < 0:
-            raise InvalidQueryError("'start_offset' cannot be negative - you gave %d" % start_offset)
-        return start_offset
-
-    def get_num_results(self, search_params):
-        if 'num_results_only' in search_params:
-            num_results = 0
-        else:
-            try:
-                num_results = int(search_params.get('num_results', 10))
-            except ValueError:
-                raise InvalidQueryError("'num_results' must be a decimal number - you gave %s"
-                        % search_params['num_results'])
-            if num_results < 0:
-                raise InvalidQueryError("'num_results' cannot be negative - you gave %d" % num_results)
-        return num_results
-
     def add_paginate(self, search_params):
-        start_offset = self.get_start_offset()
-        num_results = self.get_num_results()
+        start_offset = search_params.start_offset()
+        num_results = search_params.num_results()
         max_results = settings.USER_LEVEL_INFO[self.user_level]['max_items_per_call']
         if max_results != 0 and num_results > max_results:
             raise InvalidQueryError("'num_results' cannot be more than %d - you gave %d"
@@ -459,7 +411,7 @@ class FacetArgs(object):
 
     def _set_limit(self, kwargs):
         if 'num_results' in self.search_params:
-            kwargs['limit'] = int(self.search_params['num_results'])
+            kwargs['limit'] = self.search_params.num_results(for_facet=True)
 
     def _set_sort(self, kwargs):
         if 'count_sort' in self.search_params:
@@ -475,6 +427,106 @@ class FacetArgs(object):
                         sort_value
                     )
                 )
+
+
+class SearchParams(object):
+    PARAMS_DONE = (
+        'start_offset',
+        'num_results',
+    )
+
+    def __init__(self, get_params):
+        # this is expected to be a QueryDict
+        self.params = get_params
+
+    def __getitem__(self, key):
+        # TODO: once mostly done, start logging calls to this, then delete it
+        if key in self.PARAMS_DONE:
+            raise Exception('SearchParams: Use the method for %s rather than dict access' % key)
+        return self.params[key]
+
+    def get(self, key, default=None):
+        return self.params.get(key, default)
+
+    def __iter__(self):
+        for key in self.params:
+            yield key
+
+    def __contains__(self, key):
+        return key in self.params
+
+    def items(self):
+        for key, value in self.params:
+            yield key, value
+
+    def _invalid_param(self, param, allowed_param_list):
+        return (
+            param[0] != '_' and
+            param not in allowed_param_list and
+            param != BaseRenderer._FORMAT_QUERY_PARAM
+        )
+
+    def _assert_only_one_query_in_query_list(self, query_list, param):
+        if len(query_list) > 1:
+            raise InvalidQueryError(
+                "Cannot repeat query parameters - there is more than one '%s'"
+                % param)
+
+    def _assert_query_param_has_value(self, query, param):
+        if len(query) < 1:
+            raise InvalidQueryError(
+                "All query parameters must have a value, but '%s' does not"
+                % param)
+
+    def query_items(self):
+        for param in self.params:
+            query_list = self.params.getlist(param)
+            self._assert_only_one_query_in_query_list(query_list, param)
+            query = query_list[0]
+            self._assert_query_param_has_value(query, param)
+            yield param, query
+
+    def assert_valid_query_param(self, param, allowed_param_list):
+        if self._invalid_param(param, allowed_param_list):
+            raise UnknownQueryParamError(param)
+
+    def assert_all_params_valid(self, allowed_param_list):
+        invalid_params = [
+            p for p in self.params if self._invalid_param(p, allowed_param_list)
+        ]
+        if invalid_params:
+            raise UnknownQueryParamError(', '.join(invalid_params))
+
+    def has_query(self):
+        # TODO: later on could filter out non-query params - num_results etc
+        return bool(self.params)
+
+    def start_offset(self):
+        try:
+            start_offset = int(self.params.get('start_offset', 0))
+        except ValueError:
+            raise InvalidQueryError(
+                "'start_offset' must be a decimal number - you gave %s"
+                % self.params['start_offset'])
+        if start_offset < 0:
+            raise InvalidQueryError(
+                "'start_offset' cannot be negative - you gave %d" % start_offset)
+        return start_offset
+
+    def num_results(self, for_facet=False):
+        if 'num_results_only' in self.params:
+            num_results = 0
+        else:
+            try:
+                num_results = int(self.params.get('num_results', 10))
+            except ValueError:
+                raise InvalidQueryError(
+                    "'num_results' must be a decimal number - you gave %s"
+                    % self.params['num_results'])
+            # num_results for facets are allowed to be -1
+            if num_results < 0 and not for_facet:
+                raise InvalidQueryError("'num_results' cannot be negative - you gave %d" % num_results)
+        return num_results
 
 
 class SolrUnavailableError(defines.IdsApiError):

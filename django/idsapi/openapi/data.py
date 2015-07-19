@@ -16,6 +16,7 @@ except ImportError:
     from xml.parsers.expat import ExpatError as ParseError
 
 logger = logging.getLogger(__name__)
+logger.setLevel(getattr(settings, 'LOG_LEVEL', logging.DEBUG))
 
 
 class DataMunger():
@@ -26,10 +27,10 @@ class DataMunger():
         self.object_id = None
         self.object_type = None
 
-    def _keep_matching_fields(in_dict, field_list):
+    def _keep_matching_fields(self, in_dict, field_list):
         return dict((k, v) for k, v in in_dict.items() if k in field_list)
 
-    def _keep_not_matching_fields(in_dict, field_list):
+    def _keep_not_matching_fields(self, in_dict, field_list):
         return dict((k, v) for k, v in in_dict.items() if k not in field_list)
 
     def _extra_fields(self):
@@ -278,6 +279,14 @@ class SourceLangParser(object):
             elif self.exclude_lang(lang):
                 return
             elif lang == 'zz':
+                if isinstance(self.out_dict[prefix], basestring):
+                    logger.error(
+                        "Unexpected source version after non-source version "
+                        "already added. field name: %s prefix: %s source: %s "
+                        "non-source version: %s source version: %s" %
+                        (field_name, prefix, source, self.out_dict[prefix], value)
+                    )
+                    return
                 self.out_dict[prefix][source] = value
                 self.source_fields.add(prefix)
             else:

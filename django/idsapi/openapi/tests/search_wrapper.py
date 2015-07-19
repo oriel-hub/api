@@ -5,10 +5,14 @@ import sunburnt
 from openapi.search_builder import (
     SearchBuilder,
     SearchWrapper,
+    SearchParams,
     FacetArgs,
     InvalidFieldError,
-    InvalidQueryError
+    InvalidQueryError,
+    UnknownQueryParamError
 )
+
+DEFAULT_SEARCH_TERM = 'water'
 
 
 class MockSolrInterface:
@@ -322,6 +326,33 @@ class SearchWrapperAddFieldQueryTests(unittest.TestCase):
             self.sw.split_string_around_quotes_and_delimiters('"complex|split&ting"| another & bit&!"or two"'))
 
 
+class SearchParamsTests(unittest.TestCase):
+
+    def test_has_query_true_if_any_search_params_present(self):
+        sp = SearchParams({'q': DEFAULT_SEARCH_TERM})
+        self.assertTrue(sp.has_query())
+
+    def test_has_query_false_if_no_search_params_present(self):
+        sp = SearchParams({})
+        self.assertFalse(sp.has_query())
+
+    def test_invalid_query_raised_if_start_offset_is_negative(self):
+        sp = SearchParams({'start_offset': '-1'})
+        self.assertRaises(InvalidQueryError, sp.start_offset)
+
+    def test_invalid_query_raised_if_start_offset_is_non_numeric(self):
+        sp = SearchParams({'start_offset': 'not_a_number'})
+        self.assertRaises(InvalidQueryError, sp.start_offset)
+
+    def test_invalid_query_raised_if_num_results_is_non_numeric(self):
+        sp = SearchParams({'num_results': 'not_a_number'})
+        self.assertRaises(InvalidQueryError, sp.num_results)
+
+    def test_invalid_param_returns_true_if_bad_param_present(self):
+        sp = SearchParams({'q': DEFAULT_SEARCH_TERM, 'bad_param': 'value'})
+        self.assertTrue(sp._invalid_param('bad_param', []))
+
+
 class FacetArgsTests(unittest.TestCase):
     FACET_MAPPING = {
         't1': 'type1',
@@ -338,64 +369,64 @@ class FacetArgsTests(unittest.TestCase):
         self.assertRaises(
             InvalidQueryError,
             FacetArgs,
-            search_params={},
+            search_params=SearchParams({}),
             facet_type='t3',
             facet_mapping=self.FACET_MAPPING,
             exclude_zero_count=False
         )
 
     def test_args_returns_mapped_facet(self):
-        fa = FacetArgs({}, 't1', self.FACET_MAPPING, exclude_zero_count=False)
+        fa = FacetArgs(SearchParams({}), 't1', self.FACET_MAPPING, exclude_zero_count=False)
         self.assertSequenceEqual(['type1'], fa.args())
-        fa = FacetArgs({}, 't2', self.FACET_MAPPING, exclude_zero_count=False)
+        fa = FacetArgs(SearchParams({}), 't2', self.FACET_MAPPING, exclude_zero_count=False)
         self.assertSequenceEqual(['type2'], fa.args())
 
     def test_kwargs_does_not_set_mincount_if_not_exclude_zero_count(self):
-        fa = FacetArgs({}, 't1', self.FACET_MAPPING, exclude_zero_count=False)
+        fa = FacetArgs(SearchParams({}), 't1', self.FACET_MAPPING, exclude_zero_count=False)
         kwargs = fa.kwargs()
         self.assertNotIn('mincount', kwargs)
 
     def test_kwargs_has_mincount_if_exclude_zero_count(self):
-        fa = FacetArgs({}, 't1', self.FACET_MAPPING, exclude_zero_count=True)
+        fa = FacetArgs(SearchParams({}), 't1', self.FACET_MAPPING, exclude_zero_count=True)
         kwargs = fa.kwargs()
         self.assertTrue(kwargs['mincount'])
 
     def test_kwargs_does_not_set_limit_if_num_results_not_in_search_params(self):
-        search_params = {}
+        search_params = SearchParams({})
         fa = FacetArgs(search_params, 't1', self.FACET_MAPPING, False)
         kwargs = fa.kwargs()
         self.assertNotIn('limit', kwargs)
 
     def test_kwargs_has_limit_if_num_results_in_search_params(self):
-        search_params = {'num_results': 7}
+        search_params = SearchParams({'num_results': 7})
         fa = FacetArgs(search_params, 't1', self.FACET_MAPPING, False)
         kwargs = fa.kwargs()
         self.assertEqual(7, kwargs['limit'])
 
     def test_kwargs_ensures_limit_is_int(self):
-        search_params = {'num_results': '7'}
+        search_params = SearchParams({'num_results': '7'})
         fa = FacetArgs(search_params, 't1', self.FACET_MAPPING, False)
         kwargs = fa.kwargs()
         self.assertEqual(7, kwargs['limit'])
 
     def test_kwargs_does_not_set_sort_if_count_sort_not_in_search_params(self):
-        search_params = {}
+        search_params = SearchParams({})
         fa = FacetArgs(search_params, 't1', self.FACET_MAPPING, False)
         kwargs = fa.kwargs()
         self.assertNotIn('sort', kwargs)
 
     def test_kwargs_has_sort_if_count_sort_in_search_params(self):
-        search_params = {'count_sort': 'count_desc'}
+        search_params = SearchParams({'count_sort': 'count_desc'})
         fa = FacetArgs(search_params, 't1', self.FACET_MAPPING, False)
         kwargs = fa.kwargs()
         self.assertEqual('count', kwargs['sort'])
-        search_params = {'count_sort': 'name_asc'}
+        search_params = SearchParams({'count_sort': 'name_asc'})
         fa = FacetArgs(search_params, 't1', self.FACET_MAPPING, False)
         kwargs = fa.kwargs()
         self.assertEqual('index', kwargs['sort'])
 
     def test_kwargs_raises_error_if_count_sort_value_unknown(self):
-        search_params = {'count_sort': 'bubble'}
+        search_params = SearchParams({'count_sort': 'bubble'})
         fa = FacetArgs(search_params, 't1', self.FACET_MAPPING, False)
         self.assertRaises(
             InvalidQueryError,

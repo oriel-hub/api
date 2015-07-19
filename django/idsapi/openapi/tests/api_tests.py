@@ -352,8 +352,8 @@ class ApiPaginationTests(ApiTestsBase):
         response = self.object_search()
         metadata = json.loads(response.content)['metadata']
         self.assertIn('next_page', metadata)
-        self.assertTrue(metadata['next_page'].find('num_results') > -1)
-        self.assertTrue(metadata['next_page'].find('start_offset') > -1)
+        self.assertIn('num_results', metadata['next_page'])
+        self.assertIn('start_offset', metadata['next_page'])
         # also, default search should not have prev_page link
         self.assertNotIn('prev_page', metadata)
 
@@ -361,8 +361,8 @@ class ApiPaginationTests(ApiTestsBase):
         response = self.object_search(query={'q': DEFAULT_SEARCH_TERM, 'start_offset': '10'})
         metadata = json.loads(response.content)['metadata']
         self.assertIn('prev_page', metadata)
-        self.assertTrue(metadata['prev_page'].find('num_results') > -1)
-        self.assertTrue(metadata['prev_page'].find('start_offset') > -1)
+        self.assertIn('num_results', metadata['prev_page'])
+        self.assertIn('start_offset', metadata['prev_page'])
 
     def test_prev_never_has_negative_start_offset(self):
         response = self.object_search(query={'q': DEFAULT_SEARCH_TERM, 'start_offset': '1'})

@@ -3,6 +3,7 @@ from xml.etree import ElementTree
 from xml.parsers.expat import ExpatError
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.WARNING)
 
 # from http://code.activestate.com/recipes/410469-xml-as-dictionary/
 
