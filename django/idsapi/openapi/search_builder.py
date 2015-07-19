@@ -202,28 +202,36 @@ class SearchWrapper:
         else:
             raise UnknownObjectError(object_type)
 
-    def add_paginate(self, search_params):
+    def get_start_offset(self, search_params):
         try:
-            start_offset = int(search_params['start_offset']) if 'start_offset' in search_params else 0
+            start_offset = int(search_params.get('start_offset', 0))
         except ValueError:
             raise InvalidQueryError("'start_offset' must be a decimal number - you gave %s"
                     % search_params['start_offset'])
-        try:
-            num_results = int(search_params['num_results']) if 'num_results' in search_params else 10
-        except ValueError:
-            raise InvalidQueryError("'num_results' must be a decimal number - you gave %s"
-                    % search_params['num_results'])
         if start_offset < 0:
             raise InvalidQueryError("'start_offset' cannot be negative - you gave %d" % start_offset)
-        if num_results < 0:
-            raise InvalidQueryError("'num_results' cannot be negative - you gave %d" % num_results)
+        return start_offset
+
+    def get_num_results(self, search_params):
+        if 'num_results_only' in search_params:
+            num_results = 0
+        else:
+            try:
+                num_results = int(search_params.get('num_results', 10))
+            except ValueError:
+                raise InvalidQueryError("'num_results' must be a decimal number - you gave %s"
+                        % search_params['num_results'])
+            if num_results < 0:
+                raise InvalidQueryError("'num_results' cannot be negative - you gave %d" % num_results)
+        return num_results
+
+    def add_paginate(self, search_params):
+        start_offset = self.get_start_offset()
+        num_results = self.get_num_results()
         max_results = settings.USER_LEVEL_INFO[self.user_level]['max_items_per_call']
         if max_results != 0 and num_results > max_results:
             raise InvalidQueryError("'num_results' cannot be more than %d - you gave %d"
                     % (max_results, num_results))
-
-        if 'num_results_only' in search_params:
-            num_results = 0
         self.si_query = self.si_query.paginate(start=start_offset, rows=num_results)
 
     def _extract_sort_field_ascending(self, search_params):
