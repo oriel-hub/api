@@ -114,19 +114,22 @@ class SearchWrapperAddSortTests(SimpleTestCase):
         self.msi = MockSolrInterface()
 
     def test_add_sort_method_disallows_mixed_asc_and_desc_sort(self):
-        sw = SearchWrapper('General User', 'hub', self.msi)
-        search_params = SearchParams({'sort_asc': 'title', 'sort_desc': 'title'})
-        self.assertRaises(InvalidQueryError, sw.add_sort, search_params, 'assets')
+        with self.settings(SORT_MAPPING={'title': 'title_sort'}):
+            sw = SearchWrapper('General User', 'hub', self.msi)
+            search_params = SearchParams({'sort_asc': 'title', 'sort_desc': 'title'})
+            self.assertRaises(InvalidQueryError, sw.add_sort, search_params, 'assets')
 
     def test_add_descending_sort_inverts_field(self):
-        sw = SearchWrapper('General User', 'hub', self.msi)
-        sw.add_sort(SearchParams({'sort_desc': 'publication_date'}), 'assets')
-        self.assertEquals(self.msi.query.sort_field, '-publication_date')
+        with self.settings(SORT_MAPPING={'title': 'title_sort'}):
+            sw = SearchWrapper('General User', 'hub', self.msi)
+            sw.add_sort(SearchParams({'sort_desc': 'publication_date'}), 'assets')
+            self.assertEquals(self.msi.query.sort_field, '-publication_date')
 
     def test_add_sort_with_no_mapping(self):
-        sw = SearchWrapper('General User', 'hub', self.msi)
-        sw.add_sort(SearchParams({'sort_asc': 'publication_date'}), 'assets')
-        self.assertEquals(self.msi.query.sort_field, 'publication_date')
+        with self.settings(SORT_MAPPING={'title': 'title_sort'}):
+            sw = SearchWrapper('General User', 'hub', self.msi)
+            sw.add_sort(SearchParams({'sort_asc': 'publication_date'}), 'assets')
+            self.assertEquals(self.msi.query.sort_field, 'publication_date')
 
     def test_add_sort_with_mapping(self):
         """
@@ -144,10 +147,6 @@ class SearchWrapperAddSortTests(SimpleTestCase):
 
         Sort field mapping should still take place.
         """
-        settings.DEFAULT_SORT_OBJECT_MAPPING = {
-            'countries':
-                {'field': 'title', 'ascending': True},
-        }
         with self.settings(
             SORT_MAPPING={'title': 'title_sort'},
             DEFAULT_SORT_OBJECT_MAPPING={
