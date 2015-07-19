@@ -3,6 +3,7 @@ from django.conf import settings
 import sunburnt
 
 from openapi.search_builder import (
+    SearchBuilder,
     SearchWrapper,
     FacetArgs,
     InvalidFieldError,
@@ -49,6 +50,15 @@ class MockSolrQuery:
     def filter(self, **kwargs):
         self.filter_args.update(kwargs)
         return self
+
+
+class SearchBuilderTests(unittest.TestCase):
+    def setup(self):
+        self.msi = MockSolrInterface()
+        self.sb = self.get_search_builder(solr=self.msi)
+
+    def get_search_builder(self, user_level='General User', site='hub', solr=None):
+        return SearchBuilder(user_level, site, solr)
 
 
 class SearchWrapperTests(unittest.TestCase):

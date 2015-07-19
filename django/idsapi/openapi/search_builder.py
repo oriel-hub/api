@@ -48,8 +48,8 @@ def get_solr_interface(site):
 
 class SearchBuilder():
 
-    def __init__(self, user_level, site):
-        self.sw = SearchWrapper(user_level, site)
+    def __init__(self, user_level, site, solr=None):
+        self.sw = SearchWrapper(user_level, site, solr)
 
     def _assert_only_one_query_in_query_list(self, query_list, param):
         if len(query_list) > 1:
