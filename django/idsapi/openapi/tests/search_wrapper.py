@@ -1,6 +1,7 @@
 from django.test import SimpleTestCase
 from django.utils import unittest
 from django.conf import settings
+from djangorestframework.renderers import BaseRenderer
 import sunburnt
 
 from openapi.search_builder import (
@@ -10,7 +11,7 @@ from openapi.search_builder import (
     FacetArgs,
     InvalidFieldError,
     InvalidQueryError,
-    UnknownQueryParamError
+    # UnknownQueryParamError
 )
 
 DEFAULT_SEARCH_TERM = 'water'
@@ -77,7 +78,10 @@ class SearchWrapperTests(unittest.TestCase):
         self.assertNotIn(extra_field, settings.GENERAL_FIELDS)
         self.assertNotIn(extra_field, settings.ADMIN_ONLY_FIELDS)
 
-        self.assertRaises(InvalidFieldError, sw.restrict_fields_returned, 'short', {'extra_fields': extra_field})
+        self.assertRaises(
+            InvalidFieldError,
+            sw.restrict_fields_returned,
+            'short', SearchParams({'extra_fields': extra_field}))
 
     def test_partner_user_can_not_request_admin_only_field(self):
         sw = SearchWrapper('Partner', 'hub', self.msi)
@@ -85,7 +89,10 @@ class SearchWrapperTests(unittest.TestCase):
         extra_field = 'legacy_id'
         self.assertTrue(extra_field in settings.ADMIN_ONLY_FIELDS)
 
-        self.assertRaises(InvalidFieldError, sw.restrict_fields_returned, 'short', {'extra_fields': extra_field})
+        self.assertRaises(
+            InvalidFieldError,
+            sw.restrict_fields_returned,
+            'short', SearchParams({'extra_fields': extra_field}))
 
     # TODO: replace with data munger test
     # def test_partner_user_can_request_field_not_in_whitelist(self):
@@ -95,7 +102,7 @@ class SearchWrapperTests(unittest.TestCase):
     #    self.assertNotIn(extra_field, settings.GENERAL_FIELDS)
     #    self.assertNotIn(extra_field, settings.ADMIN_ONLY_FIELDS)
 
-    #    sw.restrict_fields_returned('short', {'extra_fields': extra_field})
+    #    sw.restrict_fields_returned('short', SearchParams({'extra_fields': extra_field}))
     #    self.assertTrue(extra_field in self.msi.query.field_list)
 
     # TODO: replace with data munger test
@@ -105,7 +112,7 @@ class SearchWrapperTests(unittest.TestCase):
     #    extra_field = 'legacy_id'
     #    self.assertTrue(extra_field in settings.ADMIN_ONLY_FIELDS)
 
-    #    sw.restrict_fields_returned('short', {'extra_fields': extra_field})
+    #    sw.restrict_fields_returned('short', SearchParams({'extra_fields': extra_field}))
     #    self.assertTrue(extra_field in self.msi.query.field_list)
 
 
@@ -325,6 +332,18 @@ class SearchParamsTests(unittest.TestCase):
     def test_has_query_false_if_no_search_params_present(self):
         sp = SearchParams({})
         self.assertFalse(sp.has_query())
+
+    def test_invalid_param_returns_false_if_param_starts_with_underscore(self):
+        sp = SearchParams({})
+        self.assertFalse(sp._invalid_param('_hidden', []))
+
+    def test_invalid_param_returns_false_if_param_is_in_allowed_param_list(self):
+        sp = SearchParams({})
+        self.assertFalse(sp._invalid_param('an_extra_field', ['an_extra_field']))
+
+    def test_invalid_param_returns_false_if_param_is_format_query_param(self):
+        sp = SearchParams({})
+        self.assertFalse(sp._invalid_param(BaseRenderer._FORMAT_QUERY_PARAM, []))
 
     def test_invalid_query_raised_if_start_offset_is_negative(self):
         sp = SearchParams({'start_offset': '-1'})

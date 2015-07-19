@@ -244,14 +244,12 @@ class SearchWrapper:
         if output_format not in [None, '', 'id', 'short', 'hub', 'full']:
             raise InvalidOutputFormat(output_format)
 
-        if 'extra_fields' in search_params:
-            fields = search_params['extra_fields'].lower().split(' ')
-            level_info = settings.USER_LEVEL_INFO[self.user_level]
-            for field in fields:
-                if level_info['general_fields_only'] and field not in settings.GENERAL_FIELDS:
-                    raise InvalidFieldError(field, self.site)
-                if level_info['hide_admin_fields'] and field in settings.ADMIN_ONLY_FIELDS:
-                    raise InvalidFieldError(field, self.site)
+        level_info = settings.USER_LEVEL_INFO[self.user_level]
+        for field in search_params.extra_fields():
+            if level_info['general_fields_only'] and field not in settings.GENERAL_FIELDS:
+                raise InvalidFieldError(field, self.site)
+            if level_info['hide_admin_fields'] and field in settings.ADMIN_ONLY_FIELDS:
+                raise InvalidFieldError(field, self.site)
 
     def add_date_query(self, param, date):
         # strip the _year/_after/_before
@@ -420,6 +418,9 @@ class SearchParams(object):
     PARAMS_DONE = (
         'start_offset',
         'num_results',
+        'sort_asc',
+        'sort_desc',
+        'extra_fields',
     )
 
     def __init__(self, get_params):
@@ -529,7 +530,8 @@ class SearchParams(object):
         return sort_field, ascending
 
     def extra_fields(self):
-        return self.params.get('extra_fields', '').lower().split(' ')
+        # filter(None, XXX) - removes the empty strings left by split
+        return filter(None, self.params.get('extra_fields', '').lower().split(' '))
 
 
 class SolrUnavailableError(defines.IdsApiError):
