@@ -4,6 +4,7 @@ import copy
 from django.test.testcases import TestCase
 from django.test.utils import override_settings
 
+from ..search_builder import SearchParams
 from ..data import DataMunger, SourceLangParser
 
 PREFER_TEST_DICT = {
@@ -87,7 +88,7 @@ class DataMungerTests(TestCase):
 class SourceLangParserTests(TestCase):
 
     def setUp(self):
-        self.slp = SourceLangParser({})
+        self.slp = SourceLangParser(SearchParams({}))
 
     def test_create_source_lang_dict_works(self):
         result = {
@@ -183,35 +184,35 @@ class SourceLangParserTests(TestCase):
         self.assertFalse(self.slp.exclude_field('object_id_eldis_zz'))
 
     def test_exclude_lang_includes_lang_if_lang_only_not_set(self):
-        self.slp.search_params = {}
+        self.slp.search_params = SearchParams({})
         self.assertFalse(self.slp.exclude_lang('en'))
 
     def test_exclude_lang_includes_lang_if_lang_only_is_same(self):
-        self.slp.search_params = {'lang_only': 'en'}
+        self.slp.search_params = SearchParams({'lang_only': 'en'})
         self.assertFalse(self.slp.exclude_lang('en'))
 
     def test_exclude_lang_excludes_lang_if_lang_only_is_different(self):
-        self.slp.search_params = {'lang_only': 'es'}
+        self.slp.search_params = SearchParams({'lang_only': 'es'})
         self.assertTrue(self.slp.exclude_lang('en'))
 
     def test_exclude_lang_excludes_lang_if_lang_is_zx(self):
-        self.slp.search_params = {}
+        self.slp.search_params = SearchParams({})
         self.assertTrue(self.slp.exclude_lang('zx'))
 
     def test_exclude_lang_includes_lang_if_lang_is_zz(self):
-        self.slp.search_params = {}
+        self.slp.search_params = SearchParams({})
         self.assertFalse(self.slp.exclude_lang('zz'))
 
     def test_prefer_lang_does_not_modify_out_dict_if_lang_pref_not_set(self):
         self.slp.lang_fields = set(PREFER_TEST_DICT.keys())
-        self.slp.search_params = {}
+        self.slp.search_params = SearchParams({})
         self.slp.out_dict = copy.deepcopy(PREFER_TEST_DICT)
         self.slp.prefer_lang()
         self.assertDictEqual(self.slp.out_dict, PREFER_TEST_DICT)
 
     def test_prefer_lang_does_modify_out_dict_if_lang_pref_set(self):
         self.slp.lang_fields = set(PREFER_TEST_DICT.keys())
-        self.slp.search_params = {'lang_pref': 'en'}
+        self.slp.search_params = SearchParams({'lang_pref': 'en'})
         self.slp.out_dict = copy.deepcopy(PREFER_TEST_DICT)
         self.slp.prefer_lang()
         expected_dict = {
@@ -228,14 +229,14 @@ class SourceLangParserTests(TestCase):
 
     def test_prefer_source_does_not_modify_out_dict_if_source_pref_not_set(self):
         self.slp.source_fields = set(PREFER_TEST_DICT.keys())
-        self.slp.search_params = {}
+        self.slp.search_params = SearchParams({})
         self.slp.out_dict = copy.deepcopy(PREFER_TEST_DICT)
         self.slp.prefer_source()
         self.assertDictEqual(self.slp.out_dict, PREFER_TEST_DICT)
 
     def test_prefer_source_does_modify_out_dict_if_source_pref_set(self):
         self.slp.source_fields = set(PREFER_TEST_DICT.keys())
-        self.slp.search_params = {'source_pref': 'bridge'}
+        self.slp.search_params = SearchParams({'source_pref': 'bridge'})
         self.slp.out_dict = copy.deepcopy(PREFER_TEST_DICT)
         self.slp.prefer_source()
         expected_dict = {
@@ -249,13 +250,13 @@ class SourceLangParserTests(TestCase):
         self.assertDictEqual(self.slp.out_dict, expected_dict)
 
     def test_exclude_source_includes_source_if_source_only_not_set(self):
-        self.slp.search_params = {}
+        self.slp.search_params = SearchParams({})
         self.assertFalse(self.slp.exclude_source('eldis'))
 
     def test_exclude_source_includes_source_if_source_only_is_same(self):
-        self.slp.search_params = {'source_only': 'eldis'}
+        self.slp.search_params = SearchParams({'source_only': 'eldis'})
         self.assertFalse(self.slp.exclude_source('eldis'))
 
     def test_exclude_source_excludes_source_if_source_only_is_different(self):
-        self.slp.search_params = {'source_only': 'ella'}
+        self.slp.search_params = SearchParams({'source_only': 'ella'})
         self.assertTrue(self.slp.exclude_source('eldis'))

@@ -62,7 +62,7 @@ class SearchBuilder():
                     (param, query_mapping[param]['object_type'], object_type))
 
     def _is_date_query(self, param):
-        for date_prefix in settings.DATE_PREFIX_MAPPING.keys():
+        for date_prefix in settings.DATE_PREFIX_MAPPING:
             if param.startswith(date_prefix):
                 return True
         return False
@@ -182,8 +182,9 @@ class SearchWrapper:
         num_results = search_params.num_results()
         max_results = settings.USER_LEVEL_INFO[self.user_level]['max_items_per_call']
         if max_results != 0 and num_results > max_results:
-            raise InvalidQueryError("'num_results' cannot be more than %d - you gave %d"
-                    % (max_results, num_results))
+            raise InvalidQueryError(
+                "'num_results' cannot be more than %d - you gave %d"
+                % (max_results, num_results))
         self.si_query = self.si_query.paginate(start=start_offset, rows=num_results)
 
     def _get_default_sort_order(self, object_type):
@@ -374,7 +375,7 @@ class FacetArgs(object):
     }
 
     def __init__(self, search_params, facet_type, facet_mapping, exclude_zero_count):
-        if facet_type not in facet_mapping.keys():
+        if facet_type not in facet_mapping:
             raise InvalidQueryError("Unknown count type: '%s_count'" % facet_type)
         self.mapped_facet = facet_mapping[facet_type]
         self.exclude_zero_count = exclude_zero_count
@@ -538,6 +539,22 @@ class SearchParams(object):
     def extra_fields(self):
         # filter(None, XXX) - removes the empty strings left by split
         return filter(None, self.params.get('extra_fields', '').lower().split(' '))
+
+    def exclude_source(self, source):
+        """ check for source_only or source_exclude """
+        return (
+            source != self.params.get('source_only', source)
+            or
+            source == self.params.get('source_exclude', 'NO_SOURCE')
+        )
+
+    def exclude_lang(self, lang):
+        """ check for lang_only or lang_exclude """
+        return (
+            lang != self.params.get('lang_only', lang)
+            or
+            lang == self.params.get('lang_exclude', 'NO_LANG')
+        )
 
 
 class SolrUnavailableError(defines.IdsApiError):

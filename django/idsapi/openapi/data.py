@@ -33,9 +33,6 @@ class DataMunger():
     def _keep_not_matching_fields(self, in_dict, field_list):
         return dict((k, v) for k, v in in_dict.items() if k not in field_list)
 
-    def _extra_fields(self):
-        return self.search_params.get('extra_fields', '').lower().split(' ')
-
     def _filter_id_fields(self, result):
         return {'object_id': result.get('object_id', result['item_id'])}
 
@@ -47,7 +44,7 @@ class DataMunger():
             'item_type': result['item_type'],
             'title': result.get('title', result.get('name')),
         }
-        for field in self._extra_fields():
+        for field in self.search_params.extra_fields():
             if field in result:
                 object_data[field] = result[field]
         return object_data
@@ -148,7 +145,7 @@ class DataMunger():
                 xml_field.encode('utf-8'), single_item_list, set_encoding="UTF-8")
         except ParseError as e:
             # send to logs
-            logger.error(
+            logger.warning(
                 "COULD NOT PARSE XML. object_id: %s, field: %s Error: %s" %
                 (self.object_id, xml_field, str(e)),
                 exc_info=e
@@ -322,37 +319,14 @@ class SourceLangParser(object):
         )
 
     def exclude_source(self, source):
-        """ check for source_only or source_exclude """
-        return (
-            (
-                'source_only' in self.search_params and
-                source != self.search_params['source_only']
-            )
-            or
-            (
-                'source_exclude' in self.search_params and
-                source == self.search_params['source_exclude']
-            )
-        )
+        return self.search_params.exclude_source(source)
 
     def exclude_lang(self, lang):
-        """ check for lang_only or lang_exclude """
         if lang == 'zz':
             return False
-        # TODO: what about 'un' ??
-        return (
-            lang == 'zx'
-            or
-            (
-                'lang_only' in self.search_params and
-                lang != self.search_params['lang_only']
-            )
-            or
-            (
-                'lang_exclude' in self.search_params and
-                lang == self.search_params['lang_exclude']
-            )
-        )
+        if lang == 'zx':
+            return True
+        return self.search_params.exclude_lang(lang)
 
     def prefer_source(self):
         source_pref = self.search_params.get('source_pref', None)
