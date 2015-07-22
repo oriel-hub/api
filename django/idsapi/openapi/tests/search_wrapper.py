@@ -11,7 +11,7 @@ from openapi.search_builder import (
     FacetArgs,
     InvalidFieldError,
     InvalidQueryError,
-    # UnknownQueryParamError
+    UnknownQueryParamError
 )
 
 DEFAULT_SEARCH_TERM = 'water'
@@ -323,15 +323,13 @@ class SearchWrapperAddFieldQueryTests(unittest.TestCase):
             self.sw.split_string_around_quotes_and_delimiters('"complex|split&ting"| another & bit&!"or two"'))
 
 
+class MockQueryDict(dict):
+
+    def getlist(self, key):
+        return self[key]
+
+
 class SearchParamsTests(unittest.TestCase):
-
-    def test_has_query_true_if_any_search_params_present(self):
-        sp = SearchParams({'q': DEFAULT_SEARCH_TERM})
-        self.assertTrue(sp.has_query())
-
-    def test_has_query_false_if_no_search_params_present(self):
-        sp = SearchParams({})
-        self.assertFalse(sp.has_query())
 
     def test_invalid_param_returns_false_if_param_starts_with_underscore(self):
         sp = SearchParams({})
@@ -364,6 +362,74 @@ class SearchParamsTests(unittest.TestCase):
     def test_invalid_param_returns_true_if_bad_param_present(self):
         sp = SearchParams({'q': DEFAULT_SEARCH_TERM, 'bad_param': 'value'})
         self.assertTrue(sp._invalid_param('bad_param', []))
+
+    def test_assert_all_params_valid_doesnt_raise_for_valid_params(self):
+        sp = SearchParams({
+            '_underscore_param': 'value',
+            'allowed1': 'value',
+            BaseRenderer._FORMAT_QUERY_PARAM: 'value',
+        })
+        try:
+            sp.assert_all_params_valid(['allowed1'])
+        except UnknownQueryParamError as e:
+            self.fail("Unexpected error from assert_all_params_valid: %s" % e)
+
+    def test_assert_all_params_valid_does_raise_for_invalid_params(self):
+        sp = SearchParams({
+            '_underscore_param': 'value',
+            'allowed1': 'value',
+            BaseRenderer._FORMAT_QUERY_PARAM: 'value',
+            'bad_param': 'value',
+        })
+        self.assertRaises(
+            UnknownQueryParamError,
+            sp.assert_all_params_valid, ['allowed'])
+
+    def test_assert_all_params_valid_error_names_all_bad_params(self):
+        sp = SearchParams({
+            '_underscore_param': 'value',
+            'allowed1': 'value',
+            BaseRenderer._FORMAT_QUERY_PARAM: 'value',
+            'bad_param1': 'value',
+            'bad_param2': 'value',
+        })
+        try:
+            sp.assert_all_params_valid(['allowed1'])
+        except UnknownQueryParamError as e:
+            error_msg = unicode(e)
+            self.assertIn('bad_param1', error_msg)
+            self.assertIn('bad_param2', error_msg)
+        else:
+            self.fail("assert_all_params_valid didn't raise exception")
+
+    def test_get_query_for_param_returns_item_from_list(self):
+        sp = SearchParams(MockQueryDict(q=['value']))
+        self.assertSequenceEqual(sp.get_query_for_param('q'), ('q', 'value'))
+
+    def test_get_query_for_param_raises_error_if_multiple_values(self):
+        sp = SearchParams(MockQueryDict(q=['value', 'value2']))
+        self.assertRaises(
+            InvalidQueryError,
+            sp.get_query_for_param, 'q')
+
+    def test_get_query_for_param_raises_error_if_empty_value(self):
+        sp = SearchParams(MockQueryDict(q=['']))
+        self.assertRaises(
+            InvalidQueryError,
+            sp.get_query_for_param, 'q')
+
+    def test_query_items_returns_items_from_each_list(self):
+        sp = SearchParams(MockQueryDict(q=['value'], q2=['value2']))
+        items = sorted(list(sp.query_items()), key=lambda x: x[0])
+        self.assertSequenceEqual(items, (('q', 'value'), ('q2', 'value2')))
+
+    def test_has_query_true_if_any_search_params_present(self):
+        sp = SearchParams({'q': DEFAULT_SEARCH_TERM})
+        self.assertTrue(sp.has_query())
+
+    def test_has_query_false_if_no_search_params_present(self):
+        sp = SearchParams({})
+        self.assertFalse(sp.has_query())
 
 
 class FacetArgsTests(unittest.TestCase):
