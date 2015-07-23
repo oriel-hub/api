@@ -431,6 +431,63 @@ class SearchParamsTests(unittest.TestCase):
         sp = SearchParams({})
         self.assertFalse(sp.has_query())
 
+    def test_start_offset_returns_zero_if_not_set(self):
+        sp = SearchParams({})
+        self.assertEqual(sp.start_offset(), 0)
+
+    def test_start_offset_returns_number_version_of_string(self):
+        sp = SearchParams({'start_offset': '15'})
+        self.assertEqual(sp.start_offset(), 15)
+
+    def test_start_offset_raises_exception_for_negative_value(self):
+        sp = SearchParams({'start_offset': '-15'})
+        self.assertRaises(
+            InvalidQueryError,
+            sp.start_offset
+        )
+
+    def test_start_offset_raises_exception_for_non_numeric_value(self):
+        sp = SearchParams({'start_offset': 'the'})
+        self.assertRaises(
+            InvalidQueryError,
+            sp.start_offset
+        )
+
+    def test_num_results_returns_10_by_default(self):
+        sp = SearchParams({})
+        self.assertEqual(sp.num_results(), 10)
+
+    def test_num_results_returns_integer_value(self):
+        sp = SearchParams({'num_results': '20'})
+        self.assertEqual(sp.num_results(), 20)
+
+    def test_num_results_returns_0_when_num_results_only_in_search_params(self):
+        sp = SearchParams({'num_results_only': 'x', 'num_results': '10'})
+        self.assertEqual(sp.num_results(), 0)
+
+    def test_num_results_raises_exception_for_negative_value(self):
+        sp = SearchParams({'num_results': '-1'})
+        self.assertRaises(
+            InvalidQueryError,
+            sp.num_results
+        )
+
+    def test_num_results_does_not_raise_exception_for_negative_value_for_facet(self):
+        sp = SearchParams({'num_results': '-1'})
+        self.assertEqual(sp.num_results(for_facet=True), -1)
+
+    def test_num_results_raises_exception_for_non_numeric_value(self):
+        sp = SearchParams({'num_results': 'the'})
+        self.assertRaises(
+            InvalidQueryError,
+            sp.num_results
+        )
+
+    # TODO: sort_field_ascending
+    # TODO: extra_fields
+    # TODO: exclude_lang
+    # TODO: exclude_source
+
 
 class FacetArgsTests(unittest.TestCase):
     FACET_MAPPING = {
