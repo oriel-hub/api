@@ -38,7 +38,8 @@ def _install_django_jenkins():
     cmds = [
         # django-jenkins after 0.14 require django>=1.4, so pin to 0.14
         [pip_bin, 'install', 'django-jenkins==0.14'],
-        [pip_bin, 'install', 'pylint==1.3.1'],
+        [pip_bin, 'install', 'pylint==1.3'],
+        [pip_bin, 'install', 'astroid==1.2.1'],
         [pip_bin, 'install', 'coverage']]
 
     for cmd in cmds:
