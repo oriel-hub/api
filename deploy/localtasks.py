@@ -1,6 +1,6 @@
 import os
 import tasklib
-from .project_settings import django_apps
+from project_settings import django_apps
 
 
 def deploy(environment=None):
