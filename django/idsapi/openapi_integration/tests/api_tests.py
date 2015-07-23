@@ -213,7 +213,7 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         self.assertStatusCode(response)
 
     def test_query_by_country_with_and(self):
-        response = self.object_search(query={'country': 'angola&namibia'})
+        response = self.object_search(query={'country': 'kenya&uganda'})
         self.assert_results_list_if_present(
             response,
             'country_focus',
