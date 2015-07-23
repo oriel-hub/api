@@ -21,9 +21,6 @@ INSTALLED_APPS = (
     'django_jenkins',
 ) + INSTALLED_APPS
 
-SOLR_SERVER_URLS = {
-    'eldis': 'http://localhost:8983/solr/eldis-test/',
-    'bridge': 'http://localhost:8983/solr/bridge-test/',
-}
+SERVER_ENV = "localdev"
 
 # vi: ft=python
