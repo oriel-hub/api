@@ -199,8 +199,6 @@ class SearchWrapperAddFieldQueryTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        # TODO: there doesn't seem to be a easy way to just test the query
-        # building behaviour with out building a real connection.
         # we can build this class without network access by:
         schema_path = path.join(
             path.dirname(__file__), '..', '..', '..', '..',
