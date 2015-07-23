@@ -58,7 +58,7 @@ def _manage_py_jenkins(apps_to_test):
     tasklib._manage_py(args, cwd=tasklib.env['project_dir'])
 
 
-def run_jenkins(apps_to_test=None):
+def run_jenkins(apps_to_test=None, local_settings='jenkins'):
     """ make sure the local settings is correct and the database exists """
     if apps_to_test is None:
         apps_to_test = django_apps
@@ -66,15 +66,16 @@ def run_jenkins(apps_to_test=None):
     tasklib.update_ve()
     _install_django_jenkins()
     tasklib.create_private_settings()
-    tasklib.link_local_settings('jenkins')
+    tasklib.link_local_settings(local_settings)
     tasklib.clean_db()
     tasklib.update_db()
     _manage_py_jenkins(apps_to_test)
 
 
 def run_jenkins_fast():
-    run_jenkins(['openapi', 'userprofile'])
+    fast_django_apps = [a for a in django_apps if 'integration' not in a]
+    run_jenkins(fast_django_apps, 'jenkins_fast')
 
 
 def run_jenkins_full():
-    run_jenkins(['openapi', 'userprofile', 'openapi_integration'])
+    run_jenkins()
