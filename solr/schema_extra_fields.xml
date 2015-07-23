@@ -1,0 +1,123 @@
+<fields>
+<!-- 
+  *** The following fields are generated as single-valued in idskshub.solrfields.inc using the following rules: ***
+    [...]
+    'sort' => array(
+        'title' => array('title_sort_hub_en' => array('copy' => 'title_hub_en')),
+        'date_created' => array('date_created_sort_hub_zz' => array('copy' => 'date_created_hub_zz')),
+        'date_updated' => array('date_updated_sort_hub_zz' => array('copy' => 'date_updated_hub_zz')),
+        'category_path' => array('category_path_sort_hub_zz' => array('construction' => 'single')), 
+        'name' => array('name_sort_hub_en' => array('construction' => 'single')), 
+        'object_id' => array('object_id_sort_hub_zz' => array('construction' => 'single')), 
+        'acronym' => array('acronym_sort_hub_en' => array('construction' => 'single')), 
+        'category_id' => array('category_id_sort_hub_zz' => array('construction' => 'single')), 
+        'asset_id' => array('asset_id_sort_hub_zz' => array('construction' => 'single')), 
+        'publication_date' => array('publication_date_sort_hub_zz' => array('construction' => 'single')), 
+      ),
+    [...]
+    'single' => array(
+        'title_hub_en' => array('source' => 'eldis'),
+        'description_hub_en' => array('source' => 'eldis'),
+        'date_created_hub_zz' => array('select' => 'lowest'),
+        'date_updated_hub_zz' => array('select' => 'highest'),
+        'category_path_sort_hub_zz' => array('source' => 'eldis'),
+        'name_sort_hub_en' => array('source' => 'eldis'),
+        'object_id_sort_hub_zz' => array('source' => 'eldis'),
+        'acronym_sort_hub_en' => array('source' => 'eldis'),
+        'category_id_sort_hub_zz' => array('source' => 'eldis'),
+        'asset_id_sort_hub_zz' => array('source' => 'eldis'),
+        'publication_date_sort_hub_zz' => array('source' => 'eldis'),
+      ),
+    [...]
+  *** In general, the rest of the fields can be multivalued, as even IDS-specific fields can be
+      imported from Eldis/BRIDGE into a partner's site and then re-imported into the hub from a new source. ***
+
+  *** The fields that are not defined here explicitely are indexed as multi-valued with type 'string' (see schema.xml). ***
+-->
+
+  <!-- Fields for hub data -->
+  <field name="hub_timestamp" type="date" indexed="true" stored="true"/>
+  <field name="item_type" type="string" indexed="true" stored="true"/>
+
+  <!-- Generic single-valued fields (to display, case-insensitive searches, etc). -->
+  <field name="title_hub_zx" type="text" indexed="true" stored="true"/>
+  <field name="description_hub_zx" type="text" indexed="true" stored="true"/>
+  <field name="date_created_hub_zz" type="date" indexed="true" stored="true"/>
+  <field name="date_updated_hub_zz" type="date" indexed="true" stored="true"/>
+
+  <!-- Single-valued fields used for sorting -->
+  <field name="title_sort_hub_zx" type="sortString" indexed="true" stored="true"/>
+  <field name="category_path_sort_hub_zz" type="sortString" indexed="true" stored="true"/>
+  <field name="name_sort_hub_zx" type="sortString" indexed="true" stored="true"/>
+  <field name="object_id_sort_hub_zz" type="sortString" indexed="true" stored="true"/>
+  <field name="acronym_sort_hub_zx" type="sortString" indexed="true" stored="true"/>
+  <field name="category_id_sort_hub_zz" type="sint" indexed="true" stored="true"/>
+  <field name="asset_id_sort_hub_zz" type="sint" indexed="true" stored="true"/>
+  <field name="publication_date_sort_hub_zz" type="tdate" indexed="true" stored="true"/>
+  <field name="date_created_sort_hub_zz" type="tdate" indexed="true" stored="true"/>
+  <field name="date_updated_sort_hub_zz" type="tdate" indexed="true" stored="true"/>
+
+  <!-- Integer type -->
+  <dynamicField name="asset_id_*" type="integer" indexed="true" stored="true"/> <!-- single-valued? -->
+  <dynamicField name="category_id_*" type="integer" indexed="true" stored="true"/> <!-- single-valued? -->
+  <dynamicField name="publication_year_*" type="integer" indexed="true" stored="true" multiValued="true"/>
+
+  <!-- Date type -->
+  <dynamicField name="date_created_*" type="date" indexed="true" stored="true" multiValued="true"/>
+  <dynamicField name="date_updated_*" type="date" indexed="true" stored="true" multiValued="true"/>
+  <dynamicField name="publication_date_*" type="date" indexed="true" stored="true" multiValued="true"/>
+
+  <!-- String -->
+  <dynamicField name="object_id_*" type="string" indexed="true" stored="true"/>
+  <dynamicField name="object_type_*" type="string" indexed="true" stored="true"/>
+  <dynamicField name="site_*" type="string" indexed="true" stored="true"/>
+
+  <!--dynamicField name="acronym_*" type="string" indexed="true" stored="true"/-->
+  <!--dynamicField name="language_name_*" type="string" indexed="true" stored="true"/-->
+  <!--dynamicField name="metadata_url_*" type="string" indexed="true" stored="true"/-->
+  <!--dynamicField name="website_url_*" type="string" indexed="true" stored="true"/-->
+  <!--dynamicField name="site_*" type="string" indexed="true" stored="true"/-->
+
+  <!-- IDS-specific fields (that are not imported/re-exported by partner sites). 
+       NOTE: There might be more than one value for items with content from BRIDGE and Eldis!!!
+       Do they have to be single-valued for some reason? Otherwise - these rules can be removed to index as multi-valued strings -->
+  <dynamicField name="category_path_*" type="string" indexed="true" stored="true"/>
+  <dynamicField name="category_region_array_*" type="string" indexed="true" stored="true"/>
+  <dynamicField name="category_subject_array_*" type="string" indexed="true" stored="true"/>
+  <dynamicField name="category_theme_array_*" type="string" indexed="true" stored="true"/>
+  <dynamicField name="country_focus_array_*" type="string" indexed="true" stored="true"/>
+  <dynamicField name="publisher_array_*" type="string" indexed="true" stored="true"/>
+  <dynamicField name="language_array_*" type="string" indexed="true" stored="true"/>
+
+  <!-- Text fields 
+       - commented as they are covered by the rules for translatable fields at the bottom.
+  <dynamicField name="title_*" type="text" indexed="true" stored="true" termVectors="true" multiValued="true"/>
+  <dynamicField name="name_*" type="text" indexed="true" stored="true" multiValued="true"/>
+  <dynamicField name="description_*" type="text" indexed="true" stored="true" multiValued="true"/ -->
+
+  <!-- *** Other versions of the fields that have types different to those defined above or in schema.xml are included below. *** -->
+
+  <!-- Combined fields for searching, 'generated' in the hub by rules in idskshub.solrfields.inc -->
+  <!--dynamicField name="title_search*" type="string" indexed="true" stored="true" multiValued="true"/ 
+    - commented: multi-valued string is assumed -->
+
+  <dynamicField name="title_autocomplete*" type="edgytext" indexed="true" stored="false" multiValued="true"/>   
+
+  <!-- Fields to be faceted for counting -->
+  <dynamicField name="*_facet_hub_zx" type="string_keyword_facet" indexed="true" stored="true" multiValued="true"/>
+  <dynamicField name="*_facet_hub_zz" type="string_keyword_facet" indexed="true" stored="true" multiValued="true"/>
+
+  <!-- Fields to be searched - which need top match on lowercase -->
+  <!-- dynamicField name="*_search_hub_*" type="string" indexed="true" stored="true" multiValued="true"/
+     - commented: mult-valued string is assumed. -->
+
+   <!-- Translatable fields are identified by the language code in the suffix. zx means language unknown or multiple languages -->
+   <!-- Being of type 'text' they support case-insensitive searches -->
+   <dynamicField name="*_en" type="text" indexed="true" stored="true" termVectors="true" multiValued="true"/>
+   <dynamicField name="*_zx" type="text" indexed="true" stored="true" termVectors="true" multiValued="true"/>
+   <dynamicField name="*_es" type="text_es" indexed="true" stored="true" termVectors="true" multiValued="true"/>
+   <dynamicField name="*_fr" type="text_fr" indexed="true" stored="true" termVectors="true" multiValued="true"/>
+z
+   <dynamicField name="*_zz" type="text" indexed="true" stored="true" termVectors="true" multiValued="true"/>
+
+</fields>

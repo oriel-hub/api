@@ -1,3 +1,4 @@
+from os import path
 from django.test import SimpleTestCase
 from django.utils import unittest
 from django.conf import settings
@@ -200,7 +201,13 @@ class SearchWrapperAddFieldQueryTests(unittest.TestCase):
     def setUpClass(cls):
         # TODO: there doesn't seem to be a easy way to just test the query
         # building behaviour with out building a real connection.
-        cls.si = sunburnt.SolrInterface(settings.BASE_URL)
+        # we can build this class without network access by:
+        schema_path = path.join(
+            path.dirname(__file__), '..', '..', '..', '..',
+            'solr', 'schema.xml')
+        schemadoc = open(schema_path)
+        cls.si = sunburnt.SolrInterface(
+            settings.BASE_URL, schemadoc=schemadoc, http_connection="fake_conn")
 
     def setUp(self):
         self.sw = SearchWrapper('General User', 'hub', SearchWrapperAddFieldQueryTests.si)
