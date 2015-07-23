@@ -1,7 +1,8 @@
 from openapi.tests.test_base import BaseTestCase
-from openapi.tests.api_tests import ApiTestsBase
+from openapi_integration.tests.api_tests import ApiTestsBase
 
 SEARCH_URL_BASE = '/v1/hub/search/documents/'
+
 
 class ApiAuthTests(BaseTestCase):
     def do_search(self):
@@ -55,6 +56,7 @@ class ApiAuthTests(BaseTestCase):
         self.login()
         response = self.client.get(SEARCH_URL_BASE, {'q': 'undp'})
         self.assertEqual(403, response.status_code)
+
 
 class UserLimitTests(ApiTestsBase):
     def test_200_returned_for_2000_results_requested_general_user(self):
