@@ -1,9 +1,10 @@
-from settings import INSTALLED_APPS
 import private_settings
-
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 DATABASES = {
     'default': {
@@ -17,9 +18,7 @@ DATABASES = {
 }
 
 # add the jenkins app here
-INSTALLED_APPS = (
-    'django_jenkins',
-) + INSTALLED_APPS
+EXTRA_INSTALLED_APPS = ('django_jenkins',)
 
 SERVER_ENV = "localdev"
 
