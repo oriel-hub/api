@@ -1,0 +1,7 @@
+The django apps are:
+
+* openapi - the bulk of the code, and fast local tests
+* userprofile - user specific stuff
+* openapi_integration - only contains tests - the ones that need to connect to the IDS Solr server
+
+At time of writing, some functionality is only tested in openapi_integration - we need to increase the test coverage in openapi.
