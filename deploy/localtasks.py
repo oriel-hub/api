@@ -30,6 +30,21 @@ def update_docs():
     tasklib._call_wrapper(['make', 'html'], cwd=docs_dir, env=docs_env)
 
 
+def _install_django_jenkins():
+    """ ensure that pip has installed the django-jenkins thing """
+    if not tasklib.env['quiet']:
+        print "### Installing Jenkins packages"
+    pip_bin = os.path.join(tasklib.env['ve_dir'], 'bin', 'pip')
+    cmds = [
+        # django-jenkins after 0.14 require django>=1.4, so pin to 0.14
+        [pip_bin, 'install', 'django-jenkins==0.14'],
+        [pip_bin, 'install', 'pylint==1.3.1'],
+        [pip_bin, 'install', 'coverage']]
+
+    for cmd in cmds:
+        tasklib._call_wrapper(cmd)
+
+
 def _manage_py_jenkins(apps_to_test):
     """ run the jenkins command """
     args = ['jenkins', ]
@@ -49,7 +64,7 @@ def run_jenkins(apps_to_test=None):
         apps_to_test = django_apps
     tasklib.env['verbose'] = True
     tasklib.update_ve()
-    tasklib._install_django_jenkins()
+    _install_django_jenkins()
     tasklib.create_private_settings()
     tasklib.link_local_settings('jenkins')
     tasklib.clean_db()
