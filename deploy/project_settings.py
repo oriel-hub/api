@@ -8,6 +8,8 @@ project_name = "idsapi"
 # put "plain" here for a basic apache app
 project_type = "django"
 
-django_dir   = "django/" + project_name
+django_dir = "django/" + project_name
 
-django_apps  = ['openapi', 'userprofile']
+# openapi_integration holds all the tests that require a connection to the
+# server
+django_apps = ['openapi', 'userprofile', 'openapi_integration']

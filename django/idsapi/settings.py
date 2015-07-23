@@ -142,6 +142,7 @@ INSTALLED_APPS = (
 
     # our code
     'openapi',
+    'openapi_integration',
     'userprofile',
 )
 

@@ -569,7 +569,7 @@ class GetSolrInterfaceTests(TestCase):
 
     def test_get_solr_interface_returns_different_object_if_global_is_blanked(self):
         si1 = get_solr_interface('hub')
-        from .. import search_builder
+        from openapi import search_builder
         del search_builder.saved_solr_interface['hub']
         si2 = get_solr_interface('hub')
         self.assertIsNot(si1, si2)
@@ -578,7 +578,7 @@ class GetSolrInterfaceTests(TestCase):
 
     def test_get_solr_interface_returns_different_object_if_time_reset(self):
         si1 = get_solr_interface('hub')
-        from .. import search_builder
+        from openapi import search_builder
         search_builder.solr_interface_created['hub'] = datetime.datetime(2000, 1, 1)
         si2 = get_solr_interface('hub')
         self.assertIsNot(si1, si2)
