@@ -118,7 +118,7 @@ SORT_FIELDS = [
 ]
 
 # a sub set of fields from the hub
-HUB_FIELDS = [
+CORE_FIELDS = [
     'title',
     'name',
     'item_id',

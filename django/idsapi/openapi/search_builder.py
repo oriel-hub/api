@@ -242,7 +242,7 @@ class SearchWrapper:
         self.si_query = self.si_query.facet_by(*fa.args(), **fa.kwargs())
 
     def restrict_fields_returned(self, output_format, search_params):
-        if output_format not in [None, '', 'id', 'short', 'hub', 'full']:
+        if output_format not in [None, '', 'id', 'short', 'core', 'full']:
             raise InvalidOutputFormat(output_format)
 
         level_info = settings.USER_LEVEL_INFO[self.user_level]
@@ -577,7 +577,7 @@ class InvalidOutputFormat(BadRequestError):
     def __init__(self, output_format):
         BadRequestError.__init__(self)
         self.error_text = "The output_format of data returned can be 'id', " \
-            "'short', 'hub' or 'full' - you gave '%s'" % output_format
+            "'short', 'core' or 'full' - you gave '%s'" % output_format
 
 
 class InvalidFieldError(BadRequestError):

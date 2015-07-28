@@ -49,8 +49,8 @@ class DataMunger():
                 object_data[field] = result[field]
         return object_data
 
-    def _filter_hub_fields(self, result):
-        object_data = self._keep_matching_fields(result, settings.HUB_FIELDS)
+    def _filter_core_fields(self, result):
+        object_data = self._keep_matching_fields(result, settings.CORE_FIELDS)
         return object_data
 
     def _filter_full_fields(self, result):
@@ -63,7 +63,7 @@ class DataMunger():
                 'short': self._filter_short_fields,
                 '': self._filter_short_fields,
                 None: self._filter_short_fields,
-                'hub': self._filter_hub_fields,
+                'core': self._filter_core_fields,
                 'full': self._filter_full_fields,
             }[output_format]
         except KeyError:
