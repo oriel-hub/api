@@ -777,13 +777,6 @@ class ApiCategoryChildrenIntegrationTests(ApiTestsBase):
         response = self.children_search(object_type='regions', object_id='1346')
         self.assertStatusCode(response, 400)
 
-    def test_all_have_children_link(self):
-        for object_type in settings.OBJECT_TYPES_WITH_HIERARCHY:
-            response = self.get_all(object_type=object_type, output_format='full')
-            search_results = json.loads(response.content)
-            for result in search_results['results']:
-                self.assertTrue('children' in result['children_url'])
-
     def test_metadata_solr_query_depends_on_hide_admin_field_value(self):
         returns_response = lambda x: x.children_search(object_type='themes', object_id='34')
         self.assert_metadata_solr_query_included_when_admin_fields_is_false(returns_response)

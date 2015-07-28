@@ -107,10 +107,6 @@ class DataMunger():
         # convert date fields to expected output format
         # self._convert_date_fields(object_data)
 
-        # add the parent category, if relevant
-        if self.object_type in settings.OBJECT_TYPES_WITH_HIERARCHY:
-            self._add_child_parent_links(object_data, result)
-
         if 'description' in object_data:
             self._convert_descriptions(
                 object_data['description'], user_level_info, beacon_guid)
@@ -193,23 +189,6 @@ class DataMunger():
             title = re.sub('\W+', '-', object_name).lower().strip('-')
             metadata_url += title + '/'
         return metadata_url
-
-    def _add_child_parent_links(self, object_data, result):
-        """Add links to child and parent categories"""
-        object_data['children_url'] = self._create_metadata_url(url_name='category_children')
-
-        # TODO: write test for condition when parent links not set
-        if not all(field in result for field in ['cat_parent', 'cat_superparent']):
-            return
-
-        if result['cat_parent'] != result['cat_superparent']:
-            object_data['parent_url'] = self._create_metadata_url(
-                object_id=result['cat_parent'].values()[0][0])
-
-        if result['cat_first_parent'] != result['cat_parent'] and \
-                result['cat_first_parent'] != result[settings.SOLR_OBJECT_ID]:
-            object_data['toplevel_parent_url'] = self._create_metadata_url(
-                object_id=result['cat_first_parent'].values()[0][0])
 
     def convert_facet_string(self, facet_string):
         result = {
