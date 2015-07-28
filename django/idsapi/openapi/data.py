@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from openapi import defines
-from openapi.search_builder import InvalidOutputFormat
+from openapi.search_builder import InvalidOutputFormat, InvalidSolrOutputError
 from openapi.xmldict import XmlDictConfig
 
 try:
@@ -135,18 +135,30 @@ class DataMunger():
         return newfield
 
     def _convert_single_xml_field(self, xml_field, single_item_list):
-        xml_field = xml_field.replace(' & ', '&amp;')
+        if not isinstance(xml_field, basestring):
+            msg = "COULD NOT PARSE XML - NOT A STRING. object_id: %s, field: %s" % \
+                (self.object_id, xml_field)
+            if settings.ERROR_ON_XML_FIELD_PARSE_FAIL:
+                raise InvalidSolrOutputError(msg)
+            else:
+                logger.error(msg)
+                return "Could not parse XML, issue reported in logs"
+
         try:
+            if not settings.ERROR_ON_XML_FIELD_PARSE_FAIL:
+                xml_field = xml_field.replace(' & ', '&amp;')
             field_dict = XmlDictConfig.xml_string_to_dict(
                 xml_field.encode('utf-8'), single_item_list, set_encoding="UTF-8")
         except ParseError as e:
-            # send to logs
-            logger.warning(
-                "COULD NOT PARSE XML. object_id: %s, field: %s Error: %s" %
-                (self.object_id, xml_field, str(e)),
-                exc_info=e
-            )
-            return "Could not parse XML, issue reported in logs"
+            if settings.ERROR_ON_XML_FIELD_PARSE_FAIL:
+                raise e
+            else:
+                logger.warning(
+                    "COULD NOT PARSE XML. object_id: %s, field: %s Error: %s" %
+                    (self.object_id, xml_field, str(e)),
+                    exc_info=e
+                )
+                return "Could not parse XML, issue reported in logs"
         self._add_metadata_url_to_xml_fields(field_dict)
         return field_dict
 

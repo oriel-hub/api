@@ -35,6 +35,9 @@ SOLR_SCHEMA = BASE_URL + SOLR_SCHEMA_SUFFIX
 # SOLR_INDEX_ID = '(ids_ks_item_sources_index OR ok_hub_meta_solr_index_live)'
 SOLR_INDEX_ID = 'ids_ks_item_sources_index'
 
+# edit this to True to make bad structured XML fields blow up
+ERROR_ON_XML_FIELD_PARSE_FAIL = False
+
 # whether to send solr search parameters to logs/console
 # default to False - best to override in local_settings
 # don't forget to turn it off again!

@@ -586,6 +586,11 @@ class InvalidFieldError(BadRequestError):
         self.error_text = 'Unknown field requested: %s ' % invalid_field
 
 
+class InvalidSolrOutputError(BadRequestError):
+    def __init__(self, msg):
+        BadRequestError.__init__(self, msg)
+
+
 class UnknownQueryParamError(BadRequestError):
     def __init__(self, error_text=''):
         BadRequestError.__init__(self)
