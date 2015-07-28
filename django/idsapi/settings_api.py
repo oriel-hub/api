@@ -597,6 +597,9 @@ IGNORE_FIELDS = [
     'id',
     'index_id',
     'spell',
+    'site',
+    'site_eldis_zz',
+    'site_bridge_zz',
     # 'item_id',
     # 'item_type',
 ]
