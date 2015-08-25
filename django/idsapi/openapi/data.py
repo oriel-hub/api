@@ -5,6 +5,8 @@ import re
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
+from lib.helper import keep_matching_fields, keep_not_matching_fields
+
 from openapi import defines
 from openapi.search_builder import InvalidOutputFormat, InvalidSolrOutputError
 from openapi.xmldict import XmlDictConfig
@@ -20,6 +22,7 @@ logger.setLevel(getattr(settings, 'LOG_LEVEL', logging.DEBUG))
 
 
 class DataMunger():
+    short_field_list = ['object_id', 'item_id', 'object_type', 'item_type', 'title']
 
     def __init__(self, site, search_params):
         self.site = site
@@ -27,31 +30,28 @@ class DataMunger():
         self.object_id = None
         self.object_type = None
 
-    def _keep_matching_fields(self, in_dict, field_list):
-        return dict((k, v) for k, v in in_dict.items() if k in field_list)
-
-    def _keep_not_matching_fields(self, in_dict, field_list):
-        return dict((k, v) for k, v in in_dict.items() if k not in field_list)
+    def _keep_matching_fields_with_defaults(self, in_dict, field_list):
+        data = keep_matching_fields(in_dict, field_list)
+        for key, backup_key in (
+            ('object_id', 'item_id'),
+            ('object_type', 'item_type'),
+            ('title', 'name')
+        ):
+            if key in field_list:
+                if key not in data:
+                    data[key] = in_dict[backup_key]
+        return data
 
     def _filter_id_fields(self, result):
-        return {'object_id': result.get('object_id', result['item_id'])}
+        return self._keep_matching_fields_with_defaults(result, ['object_id'])
 
     def _filter_short_fields(self, result):
-        object_data = {
-            'object_id': result.get('object_id', result['item_id']),
-            'item_id': result['item_id'],
-            'object_type': result.get('object_type', result['item_type']),
-            'item_type': result['item_type'],
-            'title': result.get('title', result.get('name')),
-        }
-        for field in self.search_params.extra_fields():
-            if field in result:
-                object_data[field] = result[field]
-        return object_data
+        field_list = self.short_field_list + self.search_params.extra_fields()
+        return self._keep_matching_fields_with_defaults(result, field_list)
 
     def _filter_core_fields(self, result):
-        object_data = self._keep_matching_fields(result, settings.CORE_FIELDS)
-        return object_data
+        field_list = settings.CORE_FIELDS + self.search_params.extra_fields()
+        return self._keep_matching_fields_with_defaults(result, field_list)
 
     def _filter_full_fields(self, result):
         return result
@@ -72,9 +72,9 @@ class DataMunger():
 
     def _filter_fields_for_user(self, object_data, user_level_info):
         if user_level_info['general_fields_only']:
-            object_data = self._keep_matching_fields(object_data, settings.GENERAL_FIELDS)
+            object_data = keep_matching_fields(object_data, settings.GENERAL_FIELDS)
         elif user_level_info['hide_admin_fields']:
-            object_data = self._keep_not_matching_fields(object_data, settings.ADMIN_ONLY_FIELDS)
+            object_data = keep_not_matching_fields(object_data, settings.ADMIN_ONLY_FIELDS)
         return object_data
 
     def _convert_date_fields(self, object_data):

@@ -141,6 +141,7 @@ INSTALLED_APPS = (
     'djangorestframework',
 
     # our code
+    'lib',
     'openapi',
     'openapi_integration',
     'userprofile',
