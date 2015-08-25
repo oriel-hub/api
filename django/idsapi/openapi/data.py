@@ -297,7 +297,7 @@ class SourceLangParser(object):
 class ObjectDataFilter(object):
     """ This class filters the field according to the output format and user type
     """
-    short_field_list = ['object_id', 'item_id', 'object_type', 'item_type', 'title']
+    short_field_list = ('object_id', 'item_id', 'object_type', 'item_type', 'title')
 
     def __init__(self, search_params):
         self.search_params = search_params
@@ -317,7 +317,7 @@ class ObjectDataFilter(object):
         return self._keep_matching_fields_with_defaults(result, ['object_id'])
 
     def _filter_short_fields(self, result):
-        field_list = self.short_field_list + self.search_params.extra_fields()
+        field_list = list(self.short_field_list) + self.search_params.extra_fields()
         return self._keep_matching_fields_with_defaults(result, field_list)
 
     def _filter_core_fields(self, result):

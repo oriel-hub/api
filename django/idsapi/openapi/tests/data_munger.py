@@ -4,8 +4,8 @@ import copy
 from django.test.testcases import TestCase
 from django.test.utils import override_settings
 
-from ..search_builder import SearchParams
-from ..data import DataMunger, SourceLangParser
+from ..search_builder import SearchParams, InvalidOutputFormat
+from ..data import DataMunger, SourceLangParser, ObjectDataFilter
 
 PREFER_TEST_DICT = {
     "title": {
@@ -260,3 +260,89 @@ class SourceLangParserTests(TestCase):
     def test_exclude_source_excludes_source_if_source_only_is_different(self):
         self.slp.search_params = SearchParams({'source_only': 'ella'})
         self.assertTrue(self.slp.exclude_source('eldis'))
+
+
+TEST_SHORT_FIELDS = list(ObjectDataFilter.short_field_list)
+TEST_CORE_FIELDS = ['hub_this', 'hub_that', 'hub_other']
+TEST_GENERAL_FIELDS = TEST_CORE_FIELDS + ['author', 'publisher', 'site']
+TEST_ADMIN_ONLY_FIELDS = ['deleted', 'legacy_id']
+
+BIG_RESULTS = {
+    'object_id': 44,
+    'item_id': 44,
+    'object_type': 'documents',
+    'item_type': 'documents',
+    'title': 'some big long thing',
+    'hub_this': 'hub44',
+    'author': 'Einstein',
+    'not_general': 'details',
+    'publisher': 'John Pub',
+    'deleted': 'false'
+}
+
+
+@override_settings(
+    CORE_FIELDS=TEST_CORE_FIELDS + TEST_SHORT_FIELDS,
+    GENERAL_FIELDS=TEST_GENERAL_FIELDS + TEST_SHORT_FIELDS,
+    ADMIN_ONLY_FIELDS=TEST_ADMIN_ONLY_FIELDS,
+)
+class ObjectDataFilterTests(TestCase):
+
+    def setUp(self):
+        self.odf = ObjectDataFilter(SearchParams({}))
+        self.user_level_info = {
+            'general_fields_only': False,
+            'hide_admin_fields': False,
+        }
+
+    def test_filter_results_raises_when_invalid_output_format(self):
+        self.assertRaises(
+            InvalidOutputFormat,
+            self.odf.filter_results, {}, 'invalid', self.user_level_info)
+
+    def test_filter_results_for_output_format_id_only_returns_object_id(self):
+        result = {
+            'a': 1,
+            'b': 2,
+            'object_id': 3,
+            'item_id': 4
+        }
+        actual = self.odf.filter_results(result, 'id', self.user_level_info)
+        expected = {'object_id': 3}
+        self.assertDictEqual(actual, expected)
+
+    def test_filter_results_for_output_format_id_uses_item_id_if_object_id_not_available(self):
+        result = {
+            'a': 1,
+            'b': 2,
+            'item_id': 4
+        }
+        actual = self.odf.filter_results(result, 'id', self.user_level_info)
+        expected = {'object_id': 4}
+        self.assertDictEqual(actual, expected)
+
+    def test_filter_results_for_output_format_id_ignores_extra_fields(self):
+        result = {
+            'a': 1,
+            'object_id': 3,
+        }
+        self.odf = ObjectDataFilter(SearchParams({'extra_fields': 'a'}))
+        actual = self.odf.filter_results(result, 'id', self.user_level_info)
+        expected = {'object_id': 3}
+        self.assertDictEqual(actual, expected)
+
+    def test_filter_results_returns_all_short_fields_for_all_short_specifiers(self):
+        for output_format in ('short', '', None):
+            actual = self.odf.filter_results(BIG_RESULTS, 'short', self.user_level_info)
+            self.assertSetEqual(set(actual.keys()), set(ObjectDataFilter.short_field_list))
+
+    def test_filter_results_for_output_format_short_includes_extra_fields(self):
+        result = {
+            'a': 1,
+            'object_id': 3,
+            'object_type': 'document',
+            'title': 'awesome doc',
+        }
+        self.odf = ObjectDataFilter(SearchParams({'extra_fields': 'a'}))
+        actual = self.odf.filter_results(result, 'short', self.user_level_info)
+        self.assertDictEqual(actual, result)
