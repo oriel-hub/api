@@ -22,60 +22,11 @@ logger.setLevel(getattr(settings, 'LOG_LEVEL', logging.DEBUG))
 
 
 class DataMunger():
-    short_field_list = ['object_id', 'item_id', 'object_type', 'item_type', 'title']
-
     def __init__(self, site, search_params):
         self.site = site
         self.search_params = search_params
         self.object_id = None
         self.object_type = None
-
-    def _keep_matching_fields_with_defaults(self, in_dict, field_list):
-        data = keep_matching_fields(in_dict, field_list)
-        for key, backup_key in (
-            ('object_id', 'item_id'),
-            ('object_type', 'item_type'),
-            ('title', 'name')
-        ):
-            if key in field_list:
-                if key not in data:
-                    data[key] = in_dict[backup_key]
-        return data
-
-    def _filter_id_fields(self, result):
-        return self._keep_matching_fields_with_defaults(result, ['object_id'])
-
-    def _filter_short_fields(self, result):
-        field_list = self.short_field_list + self.search_params.extra_fields()
-        return self._keep_matching_fields_with_defaults(result, field_list)
-
-    def _filter_core_fields(self, result):
-        field_list = settings.CORE_FIELDS + self.search_params.extra_fields()
-        return self._keep_matching_fields_with_defaults(result, field_list)
-
-    def _filter_full_fields(self, result):
-        return result
-
-    def _get_object_data_from_result(self, output_format, result):
-        try:
-            filter_fn = {
-                'id': self._filter_id_fields,
-                'short': self._filter_short_fields,
-                '': self._filter_short_fields,
-                None: self._filter_short_fields,
-                'core': self._filter_core_fields,
-                'full': self._filter_full_fields,
-            }[output_format]
-        except KeyError:
-            raise InvalidOutputFormat(output_format)
-        return filter_fn(result)
-
-    def _filter_fields_for_user(self, object_data, user_level_info):
-        if user_level_info['general_fields_only']:
-            object_data = keep_matching_fields(object_data, settings.GENERAL_FIELDS)
-        elif user_level_info['hide_admin_fields']:
-            object_data = keep_not_matching_fields(object_data, settings.ADMIN_ONLY_FIELDS)
-        return object_data
 
     def _convert_date_fields(self, object_data):
         # convert date fields to expected output format
@@ -99,8 +50,8 @@ class DataMunger():
         self.object_id = result[settings.SOLR_OBJECT_ID]
         self.object_type = defines.object_name_to_object_type(result[settings.SOLR_OBJECT_TYPE])
         result = SourceLangParser(self.search_params).create_source_lang_dict(result)
-        object_data = self._get_object_data_from_result(output_format, result)
-        object_data = self._filter_fields_for_user(object_data, user_level_info)
+        object_data = ObjectDataFilter(self.search_params).filter_results(
+            result, output_format, user_level_info)
 
         self._convert_xml_field_list(object_data)
 
@@ -341,3 +292,62 @@ class SourceLangParser(object):
                     self.out_dict[field][source] = {
                         lang_pref: self.out_dict[field][source][lang_pref]
                     }
+
+
+class ObjectDataFilter(object):
+    """ This class filters the field according to the output format and user type
+    """
+    short_field_list = ['object_id', 'item_id', 'object_type', 'item_type', 'title']
+
+    def __init__(self, search_params):
+        self.search_params = search_params
+
+    def _keep_matching_fields_with_defaults(self, in_dict, field_list):
+        data = keep_matching_fields(in_dict, field_list)
+        for key, backup_key in (
+            ('object_id', 'item_id'),
+            ('object_type', 'item_type'),
+            ('title', 'name')
+        ):
+            if key in field_list and key not in data:
+                data[key] = in_dict[backup_key]
+        return data
+
+    def _filter_id_fields(self, result):
+        return self._keep_matching_fields_with_defaults(result, ['object_id'])
+
+    def _filter_short_fields(self, result):
+        field_list = self.short_field_list + self.search_params.extra_fields()
+        return self._keep_matching_fields_with_defaults(result, field_list)
+
+    def _filter_core_fields(self, result):
+        field_list = settings.CORE_FIELDS + self.search_params.extra_fields()
+        return self._keep_matching_fields_with_defaults(result, field_list)
+
+    def _filter_full_fields(self, result):
+        return result
+
+    def _get_object_data_from_result(self, result, output_format):
+        try:
+            filter_fn = {
+                'id': self._filter_id_fields,
+                'short': self._filter_short_fields,
+                '': self._filter_short_fields,
+                None: self._filter_short_fields,
+                'core': self._filter_core_fields,
+                'full': self._filter_full_fields,
+            }[output_format]
+        except KeyError:
+            raise InvalidOutputFormat(output_format)
+        return filter_fn(result)
+
+    def _filter_fields_for_user(self, object_data, user_level_info):
+        if user_level_info['general_fields_only']:
+            object_data = keep_matching_fields(object_data, settings.GENERAL_FIELDS)
+        elif user_level_info['hide_admin_fields']:
+            object_data = keep_not_matching_fields(object_data, settings.ADMIN_ONLY_FIELDS)
+        return object_data
+
+    def filter_results(self, result, output_format, user_level_info):
+        object_data = self._get_object_data_from_result(result, output_format)
+        return self._filter_fields_for_user(object_data, user_level_info)
