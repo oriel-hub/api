@@ -281,11 +281,6 @@ BIG_RESULTS = {
 }
 
 
-@override_settings(
-    CORE_FIELDS=TEST_CORE_FIELDS + TEST_SHORT_FIELDS,
-    GENERAL_FIELDS=TEST_GENERAL_FIELDS + TEST_SHORT_FIELDS,
-    ADMIN_ONLY_FIELDS=TEST_ADMIN_ONLY_FIELDS,
-)
 class ObjectDataFilterTests(TestCase):
 
     def setUp(self):
@@ -333,7 +328,7 @@ class ObjectDataFilterTests(TestCase):
 
     def test_filter_results_returns_all_short_fields_for_all_short_specifiers(self):
         for output_format in ('short', '', None):
-            actual = self.odf.filter_results(BIG_RESULTS, 'short', self.user_level_info)
+            actual = self.odf.filter_results(BIG_RESULTS, output_format, self.user_level_info)
             self.assertSetEqual(set(actual.keys()), set(ObjectDataFilter.short_field_list))
 
     def test_filter_results_for_output_format_short_includes_extra_fields(self):
@@ -346,3 +341,55 @@ class ObjectDataFilterTests(TestCase):
         self.odf = ObjectDataFilter(SearchParams({'extra_fields': 'a'}))
         actual = self.odf.filter_results(result, 'short', self.user_level_info)
         self.assertDictEqual(actual, result)
+
+    def test_filter_results_for_output_format_short_uses_backup_values(self):
+        result = {
+            'item_id': 3,
+            'item_type': 'document',
+            'name': 'awesome doc',
+        }
+        actual = self.odf.filter_results(result, 'short', self.user_level_info)
+        expected = {
+            'item_id': 3,
+            'item_type': 'document',
+            'object_id': 3,
+            'object_type': 'document',
+            'title': 'awesome doc',
+        }
+        self.assertDictEqual(actual, expected)
+
+    @override_settings(CORE_FIELDS=TEST_CORE_FIELDS + TEST_SHORT_FIELDS)
+    def test_filter_results_for_output_format_core_returns_all_core_fields(self):
+        actual = self.odf.filter_results(BIG_RESULTS, 'core', self.user_level_info)
+        self.assertSetEqual(
+            set(actual.keys()),
+            set(BIG_RESULTS.keys()) & set(TEST_CORE_FIELDS + TEST_SHORT_FIELDS)
+        )
+
+    def test_filter_results_for_output_format_full_returns_all_fields(self):
+        actual = self.odf.filter_results(BIG_RESULTS, 'full', self.user_level_info)
+        self.assertDictEqual(actual, BIG_RESULTS)
+
+    @override_settings(GENERAL_FIELDS=TEST_GENERAL_FIELDS + TEST_SHORT_FIELDS)
+    def test_filter_resulst_for_output_format_full_for_general_user(self):
+        user_level_info = {
+            'general_fields_only': True,
+            'hide_admin_fields': True,
+        }
+        actual = self.odf.filter_results(BIG_RESULTS, 'full', user_level_info)
+        self.assertSetEqual(
+            set(actual.keys()),
+            set(BIG_RESULTS.keys()) & set(TEST_GENERAL_FIELDS + TEST_SHORT_FIELDS)
+        )
+
+    @override_settings(ADMIN_ONLY_FIELDS=TEST_ADMIN_ONLY_FIELDS)
+    def test_filter_resulst_for_output_format_full_for_non_admin_user(self):
+        user_level_info = {
+            'general_fields_only': False,
+            'hide_admin_fields': True,
+        }
+        actual = self.odf.filter_results(BIG_RESULTS, 'full', user_level_info)
+        self.assertSetEqual(
+            set(actual.keys()),
+            set(BIG_RESULTS.keys()) - set(TEST_ADMIN_ONLY_FIELDS)
+        )
