@@ -49,6 +49,7 @@ class DataMunger():
     def get_required_data(self, result, output_format, user_level_info, beacon_guid):
         self.object_id = result[settings.SOLR_OBJECT_ID]
         self.object_type = defines.object_name_to_object_type(result[settings.SOLR_OBJECT_TYPE])
+        self.metadata = MetaDataURLCreator(self.object_type, self.object_id, self.site)
         result = SourceLangParser(self.search_params).create_source_lang_dict(result)
         object_data = ObjectDataFilter(self.search_params).filter_results(
             result, output_format, user_level_info)
@@ -62,7 +63,7 @@ class DataMunger():
             self._convert_descriptions(
                 object_data['description'], user_level_info, beacon_guid)
 
-        object_data['metadata_url'] = self._create_metadata_url()
+        object_data['metadata_url'] = self.metadata.create_url()
         return object_data
 
     def _convert_xml_field_list(self, object_data):
@@ -119,10 +120,11 @@ class DataMunger():
                 if 'object_id' in item and \
                         'object_name' in item and \
                         'object_type' in item:
-                    item['metadata_url'] = self._create_metadata_url(
+                    item['metadata_url'] = self.metadata.create_url(
                         defines.object_name_to_object_type(item['object_type']),
                         item['object_id'],
-                        item['object_name'])
+                        item['object_name']
+                    )
 
     def _process_description(self, description, user_level_info, beacon_guid):
         """truncate the description for general level users and
@@ -134,24 +136,6 @@ class DataMunger():
             description += " <img src='" + settings.IMAGE_BEACON_STUB_URL + \
                 '?beacon_guid=' + beacon_guid + "' width='1' height='1'>"
         return description
-
-    def _create_metadata_url(self, object_type=None, object_id=None, object_name=None,
-                             url_name='object'):
-        """create a URL that will give information about the object"""
-        if object_type is None:
-            object_type = self.object_type
-        if object_id is None:
-            object_id = self.object_id
-        metadata_url = reverse(url_name, kwargs={
-            'object_type': object_type,
-            'object_id': object_id,
-            'output_format': 'full',
-            'site': self.site,
-        }) + '/'
-        if object_name:
-            title = re.sub('\W+', '-', object_name).lower().strip('-')
-            metadata_url += title + '/'
-        return metadata_url
 
     def convert_facet_string(self, facet_string):
         result = {
@@ -176,10 +160,11 @@ class DataMunger():
 
             # create metadata url, but only if data exists
             if result['object_id'] and result['object_type'] and result['object_name']:
-                result['metadata_url'] = self._create_metadata_url(
+                result['metadata_url'] = self.metadata.create_url(
                     defines.object_name_to_object_type(result['object_type']),
                     result['object_id'],
-                    result['object_name'])
+                    result['object_name']
+                )
 
         return result
 
@@ -351,3 +336,39 @@ class ObjectDataFilter(object):
     def filter_results(self, result, output_format, user_level_info):
         object_data = self._get_object_data_from_result(result, output_format)
         return self._filter_fields_for_user(object_data, user_level_info)
+
+
+class MetaDataURLCreator(object):
+
+    def __init__(self, object_type, object_id, site):
+        self.default_object_type = object_type
+        self.default_object_id = object_id
+        self.site = site
+
+    def _base_url(self, url_name, object_id, object_type):
+        return reverse(
+            url_name,
+            kwargs={
+                'object_type': object_type,
+                'object_id': object_id,
+                'output_format': 'full',
+                'site': self.site,
+            }
+        ) + '/'
+
+    def _object_name_suffix(self, object_name):
+        if object_name:
+            return re.sub('\W+', '-', object_name).lower().strip('-') + '/'
+        else:
+            return ''
+
+    def create_url(
+        self, object_type=None, object_id=None, object_name=None, url_name='object'
+    ):
+        """create a URL that will give information about the object"""
+        if object_type is None:
+            object_type = self.default_object_type
+        if object_id is None:
+            object_id = self.default_object_id
+        return self._base_url(url_name, object_id, object_type) + \
+            self._object_name_suffix(object_name)

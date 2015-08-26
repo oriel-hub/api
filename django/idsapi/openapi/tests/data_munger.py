@@ -1,11 +1,14 @@
 # tests for the data munger
 import copy
 
+from django.core.urlresolvers import reverse
 from django.test.testcases import TestCase
 from django.test.utils import override_settings
 
 from ..search_builder import SearchParams, InvalidOutputFormat
-from ..data import DataMunger, SourceLangParser, ObjectDataFilter
+from ..data import (
+    DataMunger, SourceLangParser, ObjectDataFilter, MetaDataURLCreator
+)
 
 PREFER_TEST_DICT = {
     "title": {
@@ -24,6 +27,7 @@ class DataMungerTests(TestCase):
 
     def setUp(self):
         self.data = DataMunger('hub', {})
+        self.data.metadata = MetaDataURLCreator('Document', '789', 'hub')
 
     def assert_endswith(self, full_string, expected_end):
         self.assertTrue(full_string.endswith(expected_end),
@@ -335,7 +339,7 @@ class ObjectDataFilterTests(TestCase):
         result = {
             'a': 1,
             'object_id': 3,
-            'object_type': 'document',
+            'object_type': 'Document',
             'title': 'awesome doc',
         }
         self.odf = ObjectDataFilter(SearchParams({'extra_fields': 'a'}))
@@ -345,15 +349,15 @@ class ObjectDataFilterTests(TestCase):
     def test_filter_results_for_output_format_short_uses_backup_values(self):
         result = {
             'item_id': 3,
-            'item_type': 'document',
+            'item_type': 'Document',
             'name': 'awesome doc',
         }
         actual = self.odf.filter_results(result, 'short', self.user_level_info)
         expected = {
             'item_id': 3,
-            'item_type': 'document',
+            'item_type': 'Document',
             'object_id': 3,
-            'object_type': 'document',
+            'object_type': 'Document',
             'title': 'awesome doc',
         }
         self.assertDictEqual(actual, expected)
@@ -393,3 +397,40 @@ class ObjectDataFilterTests(TestCase):
             set(actual.keys()),
             set(BIG_RESULTS.keys()) - set(TEST_ADMIN_ONLY_FIELDS)
         )
+
+
+class MetaDataURLCreatorTests(TestCase):
+
+    def setUp(self):
+        self.metadata = MetaDataURLCreator('Document', 789, 'hub')
+
+    def get_base_url(self, url_name='object', object_type='Document', object_id=789):
+        return reverse(
+            url_name,
+            kwargs={
+                'object_type': object_type,
+                'object_id': object_id,
+                'output_format': 'full',
+                'site': 'hub'
+            }
+        )
+
+    def test_create_url_with_no_arguments(self):
+        expected = self.get_base_url() + '/'
+        actual = self.metadata.create_url()
+        self.assertEqual(actual, expected)
+
+    def test_create_url_appends_name_in_url_friendly_format(self):
+        expected = self.get_base_url() + '/expecting-childbirth-in-africa/'
+        actual = self.metadata.create_url(object_name='Expecting - childbirth in Africa. ')
+        self.assertEqual(actual, expected)
+
+    def test_create_url_with_object_id_and_type(self):
+        expected = self.get_base_url(object_type='Country', object_id=1234) + '/'
+        actual = self.metadata.create_url(object_type='Country', object_id=1234)
+        self.assertEqual(actual, expected)
+
+    def test_create_url_with_url_name_specified(self):
+        expected = self.get_base_url(url_name='category_children') + '/'
+        actual = self.metadata.create_url(url_name='category_children')
+        self.assertEqual(actual, expected)
