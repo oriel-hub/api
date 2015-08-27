@@ -438,7 +438,8 @@ class MetaDataURLCreatorTests(TestCase):
     def test_add_url_to_item_if_keys_available_does_nothing_when_item_is_string(self):
         item = 'a string'
         self.metadata.add_url_to_item_if_keys_available(item)
-        self.assertNotIn('metadata_url', item)
+        # the test is really that it doesn't cause an exception
+        # but don't catch the exception so we will see the full stack trace
 
     def test_add_url_to_item_if_keys_available_does_nothing_when_all_keys_not_available(self):
         for item in [
