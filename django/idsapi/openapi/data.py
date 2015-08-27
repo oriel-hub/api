@@ -115,16 +115,12 @@ class DataMunger():
         return field_dict
 
     def _add_metadata_url_to_xml_fields(self, field_dict):
-        for list_value in field_dict.values():
-            for item in list_value:
-                if 'object_id' in item and \
-                        'object_name' in item and \
-                        'object_type' in item:
-                    item['metadata_url'] = self.metadata.create_url(
-                        defines.object_name_to_object_type(item['object_type']),
-                        item['object_id'],
-                        item['object_name']
-                    )
+        for value in field_dict.values():
+            if isinstance(value, list):
+                for item in value:
+                    self.metadata.add_url_to_item_if_keys_available(item)
+            else:
+                self.metadata.add_url_to_item_if_keys_available(value)
 
     def _process_description(self, description, user_level_info, beacon_guid):
         """truncate the description for general level users and
@@ -159,6 +155,8 @@ class DataMunger():
                 result['object_name'] = facet_string
 
             # create metadata url, but only if data exists
+            self.metadata = MetaDataURLCreator(self.object_type, self.object_id, self.site)
+            self.metadata.add_url_to_item_if_keys_available(result)
             if result['object_id'] and result['object_type'] and result['object_name']:
                 result['metadata_url'] = self.metadata.create_url(
                     defines.object_name_to_object_type(result['object_type']),
@@ -372,3 +370,16 @@ class MetaDataURLCreator(object):
             object_id = self.default_object_id
         return self._base_url(url_name, object_id, object_type) + \
             self._object_name_suffix(object_name)
+
+    def add_url_to_item_if_keys_available(self, item):
+        if (
+            isinstance(item, dict) and
+            item.get('object_id') and
+            item.get('object_name') and
+            item.get('object_type')
+        ):
+            item['metadata_url'] = self.create_url(
+                defines.object_name_to_object_type(item['object_type']),
+                item['object_id'],
+                item['object_name']
+            )

@@ -26,7 +26,7 @@ PREFER_TEST_DICT = {
 class DataMungerTests(TestCase):
 
     def setUp(self):
-        self.data = DataMunger('hub', {})
+        self.data = DataMunger('hub', SearchParams({}))
         self.data.metadata = MetaDataURLCreator('Document', '789', 'hub')
 
     def assert_endswith(self, full_string, expected_end):
@@ -402,9 +402,9 @@ class ObjectDataFilterTests(TestCase):
 class MetaDataURLCreatorTests(TestCase):
 
     def setUp(self):
-        self.metadata = MetaDataURLCreator('Document', 789, 'hub')
+        self.metadata = MetaDataURLCreator('documents', 789, 'hub')
 
-    def get_base_url(self, url_name='object', object_type='Document', object_id=789):
+    def get_base_url(self, url_name='object', object_type='documents', object_id=789):
         return reverse(
             url_name,
             kwargs={
@@ -434,3 +434,23 @@ class MetaDataURLCreatorTests(TestCase):
         expected = self.get_base_url(url_name='category_children') + '/'
         actual = self.metadata.create_url(url_name='category_children')
         self.assertEqual(actual, expected)
+
+    def test_add_url_to_item_if_keys_available_does_nothing_when_item_is_string(self):
+        item = 'a string'
+        self.metadata.add_url_to_item_if_keys_available(item)
+        self.assertNotIn('metadata_url', item)
+
+    def test_add_url_to_item_if_keys_available_does_nothing_when_all_keys_not_available(self):
+        for item in [
+            {},
+            {'object_type': 'Document', 'object_name': 'Expecting'},
+            {'object_id': 789, 'object_name': 'Expecting'},
+            {'object_id': 789, 'object_type': 'Document'},
+        ]:
+            self.metadata.add_url_to_item_if_keys_available(item)
+            self.assertNotIn('metadata_url', item)
+
+    def test_add_url_to_item_if_keys_available_adds_url_when_all_keys_not_available(self):
+        item = {'object_id': 789, 'object_type': 'Document', 'object_name': 'Expecting'}
+        self.metadata.add_url_to_item_if_keys_available(item)
+        self.assertEqual(item['metadata_url'], self.get_base_url() + '/expecting/')
