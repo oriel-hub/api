@@ -1,18 +1,21 @@
+-e git+git://github.com/aptivate/dye.git@a8597a41c94caa7680ecf35bb35123e5f6b92994#egg=dye
+
 # core django
-Django==1.4.15
-mysql-python==1.2.3
-pytz
+Django>=1.8,<1.9
+MySQL-python==1.2.5
+pytz==2015.4
 
 # solr
 -e git+https://github.com/aptivate/sunburnt.git@30cbee7eb4d4e4c5c7a33c2c080871dc6ee632b7#egg=sunburnt
 
 # user stuff
-django-countries==1.0.5
+django-countries==3.4.1
 django-profiles==0.2
-django-registration==1.0
+django-registration==2.0.3
 
 # general libraries
-djangorestframework==0.2.4
+#dddjangorestframework==0.2.4
+djangorestframework==3.3.2
 httplib2==0.7.4
 lxml==2.3
 git+https://github.com/jdunck/python-unicodecsv.git
@@ -20,3 +23,17 @@ git+https://github.com/jdunck/python-unicodecsv.git
 # document generation
 sphinx==1.0.7
 sphinxcontrib-httpdomain==1.1.4
+
+# testing
+pytest-django==2.9.1
+pytest-cov==2.2.0
+django-jenkins==0.17.0
+# django-debug-toolbar==1.3.2
+#mock==1.3.0
+#funcsigs==0.4   # mock dependency
+#lxml==3.4.4
+#beautifulsoup4==4.3.2
+
+
+# development
+django-pdb

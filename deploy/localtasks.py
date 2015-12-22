@@ -1,21 +1,12 @@
+from __future__ import unicode_literals, absolute_import
+
 import os
 import tasklib
 from project_settings import django_apps
 
 
-def deploy(environment=None):
-    """Do all the required steps in order"""
-    if environment is None:
-        environment = tasklib._infer_environment()
-        if tasklib.env['verbose']:
-            print "Inferred environment as %s" % environment
-
-    tasklib.create_private_settings()
-    tasklib.link_local_settings(environment)
-    tasklib.create_ve()
-    tasklib.update_db()
+def post_deploy(environment):
     update_docs()
-
 
 def update_docs():
     """Generate the documentation using sphinx"""
