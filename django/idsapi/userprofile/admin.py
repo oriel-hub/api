@@ -1,5 +1,5 @@
-from django.conf.urls.defaults import patterns, url
-from django.contrib import admin 
+from django.conf.urls  import patterns, url
+from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist

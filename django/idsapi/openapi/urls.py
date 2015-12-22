@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls import patterns, url
 
 from openapi.views import (AllObjectView, ObjectSearchView, ObjectView,
     RootView, FacetCountView, CategoryChildrenView, The404View)

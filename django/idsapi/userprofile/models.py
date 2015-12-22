@@ -32,7 +32,7 @@ class UserProfile(models.Model):
 
     # things the user will edit in their profile
     organisation = models.CharField(max_length=100, blank=True)
-    organisation_url = models.URLField("Organisation Website", blank=True, verify_exists=False)
+    organisation_url = models.URLField("Organisation Website", blank=True)
     organisation_address1 = models.CharField("Organisation address (line 1)", max_length=100, blank=True)
     organisation_address2 = models.CharField("Organisation address (line 2)", max_length=100, blank=True)
     organisation_address3 = models.CharField("Organisation address (line 3)", max_length=100, blank=True)
@@ -51,7 +51,7 @@ class UserProfile(models.Model):
     api_usage_type = models.CharField("API usage type", max_length=50, blank=True)
     cms_technology_platform = models.CharField("CMS/Technology platform", max_length=50, blank=True)
     heard_about = models.CharField("How did you hear about us?", max_length=250, blank=True)
-    website_using_api = models.URLField("Website that will use the API", verify_exists=False)
+    website_using_api = models.URLField("Website that will use the API")
     COMMERCIAL_CHOICES = (
         (u'Commercial', u'Commercial'),
         (u'Non-Commercial', u'Non-Commercial'),
