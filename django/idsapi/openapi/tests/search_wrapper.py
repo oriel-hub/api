@@ -2,7 +2,7 @@ from os import path
 from django.test import SimpleTestCase
 from django.utils import unittest
 from django.conf import settings
-from djangorestframework.renderers import BaseRenderer
+from rest_framework.renderers import BaseRenderer
 import sunburnt
 
 from openapi.search_builder import (

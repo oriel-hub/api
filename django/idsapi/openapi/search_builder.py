@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 import sunburnt
 
 from django.conf import settings
-from djangorestframework.renderers import BaseRenderer
+from rest_framework.renderers import BaseRenderer
 
 from openapi import defines
 

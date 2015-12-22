@@ -1,6 +1,6 @@
-from djangorestframework.permissions import PerUserThrottling
-from djangorestframework.response import ErrorResponse
-from djangorestframework import status
+from rest_framework.permissions import PerUserThrottling
+from rest_framework.response import ErrorResponse
+from rest_framework import status
 
 from django.conf import settings
 from django.contrib.sites.models import Site
