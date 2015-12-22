@@ -3,18 +3,20 @@
 import httplib2
 from xml.dom import minidom
 
-from djangorestframework import status
-from djangorestframework.authentication import UserLoggedInAuthentication
-from djangorestframework.permissions import IsAuthenticated
-from djangorestframework.response import Response
-from djangorestframework.views import View
+from rest_framework import status
+from rest_framework.authentication import UserLoggedInAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import View
 
 from django.conf import settings
 
 from sunburnt import SolrError
 
 from openapi.data import DataMunger
-from openapi.search_builder import SearchBuilder, BadRequestError, SolrUnavailableError
+from openapi.search_builder import (
+    SearchBuilder, SearchParams, BadRequestError, SolrUnavailableError
+)
 from openapi.defines import URL_ROOT, IdsApiError
 from openapi.guid_authentication import GuidAuthentication
 from openapi.permissions import PerUserThrottlingRatePerGroup

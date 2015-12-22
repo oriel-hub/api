@@ -1,7 +1,7 @@
 # a class to build searches
 #
 # TODO: create a mock version of this class for tests
-import sys
+import logging
 import urllib
 import urllib2
 import re
@@ -9,8 +9,7 @@ from datetime import datetime, timedelta
 import sunburnt
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
-from djangorestframework.renderers import BaseRenderer
+from rest_framework.renderers import BaseRenderer
 
 from openapi import defines
 
@@ -19,6 +18,9 @@ saved_solr_interface = {}
 solr_interface_created = {}
 
 query_mapping = settings.QUERY_MAPPING
+
+logger = logging.getLogger(__name__)
+logger.setLevel(getattr(settings, 'LOG_LEVEL', logging.DEBUG))
 
 
 def get_solr_interface(site):
@@ -162,8 +164,8 @@ class SearchWrapper:
         solr_query = settings.SOLR_SERVER_URLS[self.site] + 'select/?' + urllib.urlencode(self.si_query.params())
         if settings.LOG_SEARCH_PARAMS:
             # this will print to console or error log as appropriate
-            print >> sys.stderr, self.si_query.params()
-            print >> sys.stderr, solr_query
+            logger.info("search params: " + self.si_query.params())
+            logger.info("solr query: " + solr_query)
         return self.si_query.execute(), solr_query
 
     def restrict_search_by_object(self, object_type, allow_objects=False):

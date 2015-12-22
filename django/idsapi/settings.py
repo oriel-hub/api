@@ -126,7 +126,7 @@ INSTALLED_APPS = (
     'registration',
 
     # Tom Christie REST framework
-    'djangorestframework',
+    'rest_framework',
 
     # our code
     'openapi',

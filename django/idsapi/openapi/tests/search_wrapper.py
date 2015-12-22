@@ -1,8 +1,20 @@
+from os import path
+from django.test import SimpleTestCase
 from django.utils import unittest
 from django.conf import settings
+from rest_framework.renderers import BaseRenderer
 import sunburnt
 
-from openapi.search_builder import SearchWrapper, InvalidFieldError, InvalidQueryError
+from openapi.search_builder import (
+    SearchBuilder,
+    SearchWrapper,
+    SearchParams,
+    FacetArgs,
+    InvalidFieldError,
+    InvalidQueryError,
+    UnknownQueryParamError
+)
+
 
 
 class MockSolrInterface:

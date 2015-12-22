@@ -1,4 +1,4 @@
-from djangorestframework.authentication import BaseAuthentication
+from rest_framework.authentication import BaseAuthentication
 
 from userprofile.models import UserProfile
 
