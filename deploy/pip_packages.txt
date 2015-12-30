@@ -10,7 +10,8 @@ pytz==2015.4
 
 # user stuff
 django-countries==3.4.1
-django-profiles==0.2
+# Replaced by local copy of app modified to support Django 1.8
+# django-profiles==0.2
 django-registration==2.0.3
 
 # general libraries
