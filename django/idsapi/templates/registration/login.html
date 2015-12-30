@@ -11,7 +11,7 @@
 		<form method="post" class="clear" action=".">{% csrf_token %}
 		  {{ form.as_p }}
 
-		  <p><a id="resetpassword" class="sub-link" href="{% url auth_password_reset %}">{% trans "Forgotten your password" %}</a></p>
+		  <p><a id="resetpassword" class="sub-link" href="{% url 'auth_password_reset'  %}">{% trans "Forgotten your password" %}</a></p>
 		  
 		  <button class="submitBtn"  type="submit" value="{% trans 'Log in' %}" /><span>Log in</span></button>
 		  <input type="hidden" name="next" value="{{ next }}" />
@@ -36,7 +36,7 @@
 
 					</ul>
 
-				<p class="register-btn"><a class="link" href="{% url registration_register %}">{% trans "Register for an API key" %}</a></p>
+				<p class="register-btn"><a class="link" href="{% url 'registration_register'  %}">{% trans "Register for an API key" %}</a></p>
 	</div><!--ends register -->
 
 </div><!--ends main -->
