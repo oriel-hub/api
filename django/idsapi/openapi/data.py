@@ -8,7 +8,7 @@ from django.core.urlresolvers import reverse
 from lib.helper import keep_matching_fields, keep_not_matching_fields
 
 from openapi import defines
-from openapi.search_builder import InvalidOutputFormat, InvalidSolrOutputError
+from .search_builder import InvalidOutputFormat, InvalidSolrOutputError
 from openapi.xmldict import XmlDictConfig
 
 try:

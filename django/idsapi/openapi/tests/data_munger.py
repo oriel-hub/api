@@ -295,9 +295,9 @@ class ObjectDataFilterTests(TestCase):
         }
 
     def test_filter_results_raises_when_invalid_output_format(self):
-        self.assertRaises(
-            InvalidOutputFormat,
-            self.odf.filter_results, {}, 'invalid', self.user_level_info)
+        with self.assertRaises(InvalidOutputFormat) as context:
+            self.odf.filter_results({}, 'invalid', self.user_level_info)
+        self.assertTrue("you gave 'invalid'" in str(context.exception))
 
     def test_filter_results_for_output_format_id_only_returns_object_id(self):
         result = {
