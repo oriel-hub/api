@@ -9,7 +9,8 @@ from datetime import datetime, timedelta
 import sunburnt
 
 from django.conf import settings
-from rest_framework.renderers import BaseRenderer
+
+from rest_framework.settings import api_settings
 
 from openapi import defines
 
@@ -452,7 +453,7 @@ class SearchParams(object):
         return (
             param[0] != '_' and
             param not in allowed_param_list and
-            param != BaseRenderer._FORMAT_QUERY_PARAM
+            param != api_settings.URL_FORMAT_OVERRIDE
         )
 
     def assert_valid_query_param(self, param, allowed_param_list):

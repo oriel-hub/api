@@ -1,8 +1,11 @@
 from os import path
+
 from django.test import SimpleTestCase
 from django.utils import unittest
 from django.conf import settings
-from rest_framework.renderers import BaseRenderer
+
+from rest_framework.settings import api_settings
+
 import sunburnt
 
 from openapi.search_builder import (
@@ -16,7 +19,7 @@ from openapi.search_builder import (
 )
 
 DEFAULT_SEARCH_TERM = 'water'
-
+FORMAT_QUERY_PARAM = api_settings.URL_FORMAT_OVERRIDE
 
 class MockSolrInterface:
     def __init__(self, site_url=None):
@@ -342,7 +345,7 @@ class SearchParamsTests(unittest.TestCase):
 
     def test_invalid_param_returns_false_if_param_is_format_query_param(self):
         sp = SearchParams({})
-        self.assertFalse(sp._invalid_param(BaseRenderer._FORMAT_QUERY_PARAM, []))
+        self.assertFalse(sp._invalid_param(FORMAT_QUERY_PARAM, []))
 
     def test_invalid_param_returns_false_if_param_is_in_allowed_param_list(self):
         sp = SearchParams({})
@@ -372,7 +375,7 @@ class SearchParamsTests(unittest.TestCase):
         sp = SearchParams({
             '_underscore_param': 'value',
             'allowed1': 'value',
-            BaseRenderer._FORMAT_QUERY_PARAM: 'value',
+            FORMAT_QUERY_PARAM: 'value',
         })
         try:
             sp.assert_all_params_valid(['allowed1'])
@@ -383,7 +386,7 @@ class SearchParamsTests(unittest.TestCase):
         sp = SearchParams({
             '_underscore_param': 'value',
             'allowed1': 'value',
-            BaseRenderer._FORMAT_QUERY_PARAM: 'value',
+            FORMAT_QUERY_PARAM: 'value',
             'bad_param': 'value',
         })
         self.assertRaises(
@@ -394,7 +397,7 @@ class SearchParamsTests(unittest.TestCase):
         sp = SearchParams({
             '_underscore_param': 'value',
             'allowed1': 'value',
-            BaseRenderer._FORMAT_QUERY_PARAM: 'value',
+            FORMAT_QUERY_PARAM: 'value',
             'bad_param1': 'value',
             'bad_param2': 'value',
         })
