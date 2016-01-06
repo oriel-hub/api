@@ -38,13 +38,13 @@ CSV_COL_NAMES = [
             'Access GUID',
             'Beacon GUID',
         ]
- 
+
 @staff_member_required
 def download_view(request):
     "A view to download all instances of this model as a CSV file."
-    response = HttpResponse(mimetype='text/csv')
+    response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename=users.csv'
-    
+
     writer = unicodecsv.writer(response)
     writer.writerow(CSV_COL_NAMES)
     for user in User.objects.all():
