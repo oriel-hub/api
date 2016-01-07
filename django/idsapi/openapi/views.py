@@ -68,9 +68,10 @@ class RootView(View):
         }
 
 
-class BaseAuthView(View):
-    permissions = (IsAuthenticated, PerUserThrottlingRatePerGroup)
-    authentication = (GuidAuthentication, SessionAuthentication)
+class BaseAuthView(APIView):
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (GuidAuthentication, SessionAuthentication)
+    throttle_classes = (PerUserThrottlingRatePerGroup,)
 
     def __init__(self):
         View.__init__(self)
