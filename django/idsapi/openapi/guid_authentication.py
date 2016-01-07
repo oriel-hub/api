@@ -9,8 +9,8 @@ class GuidAuthentication(BaseAuthentication):
 
     def authenticate(self, request):
         """
-        Returns a :obj:`User` if a valid GUID was supplied.
-        Otherwise returns :const:`None`.  
+        Returns a tuple ( :obj:`User` , token ) if a valid GUID was supplied.
+        Otherwise returns :const:`None`.
         """
         auth_token = None
         if 'HTTP_TOKEN_GUID' in request.META:
@@ -22,10 +22,7 @@ class GuidAuthentication(BaseAuthentication):
                 profile = UserProfile.objects.get(access_guid=auth_token)
                 user = profile.user
                 if user is not None and user.is_active:
-                    return user
+                    return (user, None)
             except UserProfile.DoesNotExist:
                 return None
         return None
-
-
-
