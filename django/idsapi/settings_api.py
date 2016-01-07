@@ -72,7 +72,7 @@ USER_LEVEL_INFO = {
         'level':              3,
     },
     'Unlimited': {
-        'max_call_rate':      '0/sec',
+        'max_call_rate':      None, # unlimited
         'max_items_per_call': 0,
         'image_beacon':       False,
         'hide_admin_fields':  False,
