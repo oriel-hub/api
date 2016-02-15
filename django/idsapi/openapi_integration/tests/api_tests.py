@@ -118,7 +118,10 @@ class ApiSearchResponseTests(ApiTestsBase):
 
     def test_json_full_search_does_not_contain_facet_fields(self):
         response = self.object_search(output_format='full')
-        self.assert_results_list(response, lambda x: all(not key.endswith('_facet') for key in x.keys()), msg="Full search should not show facet fields")
+        self.assert_results_list(
+            response,
+            lambda x: all(not key.endswith('_facet') for key in x.keys()),
+            msg="Full search should not show facet fields")
 
     def test_json_full_search_does_not_contain_hidden_fields(self):
         response = self.object_search(output_format='full')
