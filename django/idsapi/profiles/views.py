@@ -177,7 +177,7 @@ def edit_profile(request, form_class=None, success_url=None,
 
     """
     try:
-        profile_obj = request.user.get_profile()
+        profile_obj = request.user.userprofile
     except ObjectDoesNotExist:
         return HttpResponseRedirect(reverse('profiles_create_profile'))
 
@@ -268,7 +268,7 @@ def profile_detail(request, username, public_profile_field=None,
     """
     user = get_object_or_404(User, username=username)
     try:
-        profile_obj = user.get_profile()
+        profile_obj = user.userprofile()
     except ObjectDoesNotExist:
         raise Http404
     if public_profile_field is not None and \

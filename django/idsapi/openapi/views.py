@@ -78,7 +78,7 @@ class BaseAuthView(APIView):
         self.site = None
 
     def get_user_level_info(self):
-        profile = self.user.get_profile()
+        profile = self.user.userprofile
         return settings.USER_LEVEL_INFO[profile.user_level]
 
     def hide_admin_fields(self):
@@ -88,7 +88,7 @@ class BaseAuthView(APIView):
         return self.get_user_level_info()['general_fields_only']
 
     def get_beacon_guid(self):
-        profile = self.user.get_profile()
+        profile = self.user.userprofile
         return profile.beacon_guid
 
 
@@ -171,7 +171,7 @@ class ObjectView(BaseSearchView):
         self.site = site
         self.data_munger = DataMunger(site)
         search_params = request.GET
-        user_level = self.user.get_profile().user_level
+        user_level = self.user.userprofile.user_level
 
         try:
             self.query = SearchBuilder.create_objectid_query(user_level, site,
@@ -194,7 +194,7 @@ class ObjectSearchView(BaseSearchView):
         self.output_format = output_format
         self.site = site
         self.data_munger = DataMunger(site)
-        user_level = self.user.get_profile().user_level
+        user_level = self.user.userprofile.user_level
 
         search_params = request.GET
         if len(search_params.keys()) == 0:
@@ -217,7 +217,7 @@ class AllObjectView(BaseSearchView):
         self.output_format = output_format
         self.site = site
         self.data_munger = DataMunger(site)
-        user_level = self.user.get_profile().user_level
+        user_level = self.user.userprofile.user_level
 
         search_params = request.GET
         try:
@@ -236,7 +236,7 @@ class FacetCountView(BaseAuthView):
     def get(self, request, site, object_type, facet_type):
         self.site = site
         search_params = request.GET
-        user_level = self.user.get_profile().user_level
+        user_level = self.user.userprofile.user_level
         try:
             query = SearchBuilder.create_search(user_level, site,
                     search_params, object_type, 'id', facet_type)
@@ -291,7 +291,7 @@ class CategoryChildrenView(BaseSearchView):
         self.output_format = output_format
         self.site = site
         self.data_munger = DataMunger(site)
-        user_level = self.user.get_profile().user_level
+        user_level = self.user.userprofile.user_level
 
         try:
             self.query = SearchBuilder.create_category_children_search(user_level,

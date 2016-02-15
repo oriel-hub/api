@@ -24,13 +24,13 @@ class ApiAuthTests(BaseTestCase):
         self.assertEqual(200, response.status_code)
 
     def test_search_works_with_token_in_header(self):
-        profile = self.user.get_profile()
+        profile = self.user.userprofile
         response = self.client.get(SEARCH_URL_BASE, {'q': 'undp'},
                 HTTP_TOKEN_GUID=profile.access_guid)
         self.assertEqual(200, response.status_code)
 
     def test_search_works_with_token_in_url(self):
-        profile = self.user.get_profile()
+        profile = self.user.userprofile
         response = self.client.get(SEARCH_URL_BASE,
                 {'q': 'undp', '_token_guid': profile.access_guid})
         self.assertEqual(200, response.status_code)
@@ -43,13 +43,13 @@ class ApiAuthTests(BaseTestCase):
     def test_403_returned_if_user_not_active_guid(self):
         self.user.is_active = False
         self.user.save()
-        profile = self.user.get_profile()
+        profile = self.user.userprofile
         response = self.client.get(SEARCH_URL_BASE, {'q': 'undp'},
                 HTTP_TOKEN_GUID=profile.access_guid)
         self.assertEqual(403, response.status_code)
 
     def test_403_returned_if_user_profile_incomplete(self):
-        profile = self.user.get_profile()
+        profile = self.user.userprofile
         profile.user_level = -1
         profile.save()
         self.login()
