@@ -59,6 +59,7 @@ class UserProfile(models.Model):
     commercial = models.CharField("Usage", max_length=50, choices=COMMERCIAL_CHOICES)
     agree_to_licensing = models.BooleanField(
             u'I have read and agree to the Terms and Conditions',
+            default=False,
             validators=[validate_agreed_to_license_terms])
 
     def __unicode__(self):
