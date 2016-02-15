@@ -7,7 +7,8 @@ from rest_framework import status
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import View
+from rest_framework.views import APIView
+from rest_framework.exceptions import ValidationError
 
 from django.conf import settings
 
@@ -22,11 +23,11 @@ from openapi.guid_authentication import GuidAuthentication
 from openapi.permissions import PerUserThrottlingRatePerGroup
 
 
-class RootView(View):
+class RootView(APIView):
     def get(self, request):
         hostname = request.get_host()
         url_root = 'http://' + hostname + URL_ROOT
-        return {
+        return Response(data={
             'help': 'http://' + hostname + '/docs/',
             'some_api_calls': {
                 'all': {
@@ -74,7 +75,7 @@ class BaseAuthView(APIView):
     throttle_classes = (PerUserThrottlingRatePerGroup,)
 
     def __init__(self):
-        View.__init__(self)
+        super(APIView, self).__init__()
         self.site = None
 
     def get_user_level_info(self):
@@ -177,16 +178,16 @@ class ObjectView(BaseSearchView):
             self.query = SearchBuilder.create_objectid_query(user_level, site,
                     object_id, object_type, search_params, output_format)
         except BadRequestError as e:
-            return Response(status.HTTP_400_BAD_REQUEST, content=e)
+            raise ValidationError(e)
         except SolrUnavailableError as e:
-            return Response(status.HTTP_500_INTERNAL_SERVER_ERROR, content=e)
+            return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # return the metadata with the output_format specified
         try:
-            return {'results': self.build_response()[0]}
+            return Response(data={'results': self.build_response()[0]})
         except NoObjectFoundError:
-            return Response(status.HTTP_404_NOT_FOUND,
-                    content='No %s found with object_id %s' % (object_type, object_id))
+            return Response(status=status.HTTP_404_NOT_FOUND,
+                    data='No %s found with item_id %s' % (object_type, object_id))
 
 
 class ObjectSearchView(BaseSearchView):
@@ -201,15 +202,20 @@ class ObjectSearchView(BaseSearchView):
             return Response(status.HTTP_400_BAD_REQUEST,
                     content='object search must have some query string, eg /objects/search/short?q=undp')
         try:
-            self.query = SearchBuilder.create_search(user_level, site,
-                    search_params, object_type, output_format)
+            self.setup_vars(request, site, output_format)
+            if not self.search_params.has_query():
+                return Response(
+                    status.HTTP_400_BAD_REQUEST,
+                    content='object search must have some query string, eg /objects/search/short?q=undp')
+            self.query = self.builder.create_search(
+                self.search_params, object_type, output_format)
         except BadRequestError as e:
-            return Response(status.HTTP_400_BAD_REQUEST, content=e)
+            return Response(data=str(e), status=status.HTTP_400_BAD_REQUEST)
         except SolrUnavailableError as e:
-            return Response(status.HTTP_500_INTERNAL_SERVER_ERROR, content=e)
+            return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # return the metadata with the output_format specified
-        return self.format_result_list(request)
+        return Response(self.format_result_list(request))
 
 
 class AllObjectView(BaseSearchView):
@@ -224,12 +230,12 @@ class AllObjectView(BaseSearchView):
             self.query = SearchBuilder.create_all_search(user_level, site,
                     search_params, object_type, output_format)
         except BadRequestError as e:
-            return Response(status.HTTP_400_BAD_REQUEST, content=e)
+            raise ValidationError(e)
         except SolrUnavailableError as e:
-            return Response(status.HTTP_500_INTERNAL_SERVER_ERROR, content=e)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=str(e))
 
         # return the metadata with the output_format specified
-        return self.format_result_list(request)
+        return Response(self.format_result_list(request))
 
 
 class FacetCountView(BaseAuthView):
@@ -241,9 +247,9 @@ class FacetCountView(BaseAuthView):
             query = SearchBuilder.create_search(user_level, site,
                     search_params, object_type, 'id', facet_type)
         except BadRequestError as e:
-            return Response(status.HTTP_400_BAD_REQUEST, content=e)
+            raise ValidationError(e)
         except SolrUnavailableError as e:
-            return Response(status.HTTP_500_INTERNAL_SERVER_ERROR, content=e)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=str(e))
         search_response, solr_query = query.execute()
         facet_counts = search_response.facet_counts.facet_fields[settings.FACET_MAPPING[facet_type]]
         data = DataMunger(site)
@@ -257,9 +263,8 @@ class FacetCountView(BaseAuthView):
         if not self.hide_admin_fields():
             metadata['solr_query'] = solr_query
 
-        return {'metadata': metadata,
-                facet_type + '_count': facet_dict_list}
-
+        return Response({'metadata': metadata,
+                facet_type + '_count': facet_dict_list})
 
 class FieldListView(BaseAuthView):
     def get(self, request, site):
@@ -297,20 +302,20 @@ class CategoryChildrenView(BaseSearchView):
             self.query = SearchBuilder.create_category_children_search(user_level,
                     site, request.GET, object_type, object_id)
         except BadRequestError as e:
-            return Response(status.HTTP_400_BAD_REQUEST, content=e)
+            raise ValidationError(e)
         except SolrUnavailableError as e:
-            return Response(status.HTTP_500_INTERNAL_SERVER_ERROR, content=e)
+            return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # return the metadata with the output_format specified
-        return self.format_result_list(request)
+        return Response(self.format_result_list(request))
 
 
-class The404View(View):
+class The404View(APIView):
 
     name = '404'
 
     def get(self, request, path):
-        return Response(status.HTTP_404_NOT_FOUND, content="Path '%s' not known." % path)
+        return Response(status=status.HTTP_404_NOT_FOUND, data="Path '%s' not known." % path)
 
 
 class NoObjectFoundError(IdsApiError):
