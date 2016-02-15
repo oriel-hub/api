@@ -9,13 +9,13 @@ class BaseTestCase(TestCase):
         self.user.set_password('password')
         self.user.save()
         self.user = User.objects.get(username='user1')
-        profile = self.user.get_profile()
+        profile = self.user.userprofile
         profile.ensure_hidden_fields_set()
         profile.user_level = 'Partner'
         profile.save()
 
     def setUserLevel(self, level):
-        profile = self.user.get_profile()
+        profile = self.user.userprofile
         profile.user_level = level
         profile.save()
 

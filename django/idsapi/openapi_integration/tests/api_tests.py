@@ -62,7 +62,7 @@ class ApiTestsBase(BaseTestCase):
     def assert_metadata_solr_query_included_when_admin_fields_is_false(self, returns_response):
         self.setUserLevel('Unlimited')
         self.login()
-        test_user_level = self.user.get_profile().user_level
+        test_user_level = self.user.userprofile.user_level
         self.assertFalse(settings.USER_LEVEL_INFO[test_user_level]['hide_admin_fields'],
             "We expect hide_admin_fields to be False.")
 
@@ -73,7 +73,7 @@ class ApiTestsBase(BaseTestCase):
     def assert_metadata_solr_query_not_included_when_admin_fields_is_true(self, returns_response):
         self.setUserLevel('General User')
         self.login()
-        test_user_level = self.user.get_profile().user_level
+        test_user_level = self.user.userprofile.user_level
         self.assertTrue(settings.USER_LEVEL_INFO[test_user_level]['hide_admin_fields'],
             "We expect hide_admin_fields to be False.")
 
@@ -141,7 +141,7 @@ class ApiSearchResponseTests(ApiTestsBase):
 
     def test_description_contains_image_beacon(self):
         response = self.object_search(object_type='documents', output_format='full')
-        profile = self.user.get_profile()
+        profile = self.user.userprofile
 
         def check_image_beacon_exists_and_has_correct_id(description):
             text = self.extract_text_from_description(description)

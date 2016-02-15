@@ -177,7 +177,7 @@ def edit_profile(request, form_class=None, success_url=None,
 
     """
     try:
-        profile_obj = request.user.get_profile()
+        profile_obj = request.user.userprofile
     except ObjectDoesNotExist:
         return HttpResponseRedirect(reverse('profiles_create_profile'))
 

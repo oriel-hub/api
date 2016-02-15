@@ -70,7 +70,7 @@ class BaseAuthView(APIView):
         self.site = None
 
     def get_user_level_info(self):
-        profile = self.user.get_profile()
+        profile = self.user.userprofile
         return settings.USER_LEVEL_INFO[profile.user_level]
 
     def hide_admin_fields(self):
@@ -80,15 +80,16 @@ class BaseAuthView(APIView):
         return self.get_user_level_info()['general_fields_only']
 
     def get_beacon_guid(self):
-        profile = self.user.get_profile()
+        profile = self.user.userprofile
         return profile.beacon_guid
 
     def setup_vars(self, request, site, output_format):
+        self.user = request.user
         self.output_format = output_format
         self.site = site
         self.search_params = SearchParams(request.GET)
         self.data_munger = DataMunger(site, self.search_params)
-        self.user_level = self.user.get_profile().user_level
+        self.user_level = self.user.userprofile.user_level
         # note this can throw an exception, so need to catch it
         self.builder = SearchBuilder(self.user_level, site)
 

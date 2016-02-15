@@ -7,7 +7,7 @@ from django.template import RequestContext
 @login_required
 def profile_detail(request):
     """ Detail view of a user's profile."""
-    profile_obj = request.user.get_profile()
+    profile_obj = request.user.userprofile
     if profile_obj.agree_to_licensing == False:
         return HttpResponseRedirect(reverse('edit_profile'))
     context = RequestContext(request)

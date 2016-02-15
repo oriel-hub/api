@@ -48,7 +48,7 @@ def download_view(request):
     writer = unicodecsv.writer(response)
     writer.writerow(CSV_COL_NAMES)
     for user in User.objects.all():
-        profile = user.get_profile()
+        profile = user.userprofile
         writer.writerow([
             user.username,
             user.first_name,
