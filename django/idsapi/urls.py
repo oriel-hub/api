@@ -23,7 +23,7 @@ urlpatterns += patterns('',
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
 
-    url(r'^accounts/', include('registration.backends.default.urls')),
+    url(r'^accounts/', include('registration.backends.model_activation.urls')),
 
     url(r'^profiles/edit/', 'profiles.views.edit_profile',
         {'form_class': ProfileForm, 'success_url': '/profiles/view/'},
