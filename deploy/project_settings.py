@@ -14,7 +14,7 @@ from os import path
 project_name = "idsapi"
 
 repo_type = "git"
-repository = 'git@github.com:oreal-hub/oriel-hub/api.git'
+repository = 'git@github.com:oriel-hub/api.git'
 
 # put "django" here if you want django specific stuff to run
 # put "plain" here for a basic apache app
@@ -75,7 +75,7 @@ host_list = {
     'production':   ['lin-' + project_name + '.aptivate.org:48001'],
     'staging':      ['fen-vz-' + project_name + '-stage.fen.aptivate.org'],
     'staging_test': ['fen-vz-' + project_name + '.fen.aptivate.org'],
-    'dev_server':   ['fen-vz-' + project_name + '-dev.fen.aptivate.org'],
+    'drooga':       ['drooga.ids.ac.uk'],
 }
 
 # this is the default git branch to use on each server
@@ -84,6 +84,7 @@ default_branch = {
     'staging':      'master',
     'staging_test': 'master',
     'dev_server':   'develop',
+    'drooga':       'django_18_upgrade',
 }
 
 # where on the server the django apps are deployed
