@@ -17,6 +17,8 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 ALLOWED_HOSTS = [
     '.api.ids.ac.uk',
+    '.api.okhub.org',
+    'drooga.ids.ac.uk',
 ]
 
 # Local time zone for this installation. Choices can be found here:
@@ -94,6 +96,13 @@ TEMPLATE_LOADERS = (
     # 'django.template.loaders.eggs.Loader',
 )
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.request',
+    'django.core.context_processors.media',
+    'django.core.context_processors.static',
+)
+
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -110,6 +119,9 @@ TEMPLATE_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
     os.path.join(PROJECT_HOME, 'templates'),
 )
+
+# required for the ssi tag, used to include a standard menu
+ALLOWED_INCLUDE_ROOTS = ('/var/www/includes/',)
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -130,7 +142,9 @@ INSTALLED_APPS = (
     'rest_framework',
 
     # our code
+    'lib',
     'openapi',
+    'openapi_integration',
     'userprofile',
 )
 
@@ -171,8 +185,34 @@ LOGGING = {
     }
 }
 
+try:
+    import local_settings
+except ImportError:
+    print """
+    -------------------------------------------------------------------------
+    You need to create a local_settings.py file. Run ../../deploy/tasks.py
+    deploy:<whatever> to use one of the local_settings.py.* files as your
+    local_settings.py, and create the database and tables mentioned in it.
+    -------------------------------------------------------------------------
+    """
+    import sys
+    sys.exit(1)
+else:
+    # Import any symbols that begin with A-Z. Append to lists any symbols that
+    # begin with "EXTRA_".
+    import re
+    for attr in dir(local_settings):
+        match = re.search('^EXTRA_(\w+)', attr)
+        if match:
+            name = match.group(1)
+            value = getattr(local_settings, attr)
+            try:
+                globals()[name] += value
+            except KeyError:
+                globals()[name] = value
+        elif re.search('^[A-Z]', attr):
+            globals()[attr] = getattr(local_settings, attr)
+
 # import this after local_settings, so the SERVER_ENV setting will
 # be available
 from settings_api import *
-
-from local_settings import *
