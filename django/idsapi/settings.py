@@ -18,6 +18,7 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 ALLOWED_HOSTS = [
     '.api.ids.ac.uk',
     '.api.okhub.org',
+    'drooga.ids.ac.uk',
 ]
 
 # Local time zone for this installation. Choices can be found here:
