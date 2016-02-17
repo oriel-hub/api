@@ -1,0 +1,17 @@
+.okhub_api .wrapper {
+    padding-top: 0;
+    margin-top: 20px;
+}
+.okhub_api fieldset {
+    padding: 0;
+}
+.okhub_api .breadcrumb {
+    margin-top: 0;
+}
+.okhub_api .btn-primary {
+    color: #fff;
+}
+
+.okhub_api #footer {
+    width: 100%;
+}

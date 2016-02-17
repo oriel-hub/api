@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Login" %}{% endblock %}
+
+{% block content %}
+<div id="sidebar">
+
+	<div id="signin" class="boxed">
+		<h3>Sign In</h3>
+
+		<form method="post" class="clear" action=".">{% csrf_token %}
+		  {{ form.as_p }}
+
+		  <p><a id="resetpassword" class="sub-link" href="{% url 'auth_password_reset'  %}">{% trans "Forgotten your password" %}</a></p>
+		  
+		  <button class="submitBtn"  type="submit" value="{% trans 'Log in' %}" /><span>Log in</span></button>
+		  <input type="hidden" name="next" value="{{ next }}" />
+		</form>
+
+		</div><!--ends boxed -->
+	
+</div><!--ends sidebar -->
+
+		
+<div id="main">
+
+	<div id="register" class="boxed">
+
+			<h3>Register for an API key</h3>
+				<p class="clear">The OKHub <strong>API</strong> provides easy <strong>programmatic access</strong> to <strong>tens of thousands</strong> of thematically organised <strong>research documents</strong> that are freely available online.</p>
+					<ul class="bullets">
+
+						<li>Access hand picked, summarised, categorised research documents</li>
+
+						<li>Free easy access via our API?</li>
+
+					</ul>
+
+				<p class="register-btn"><a class="link" href="{% url 'registration_register'  %}">{% trans "Register for an API key" %}</a></p>
+	</div><!--ends register -->
+
+</div><!--ends main -->
+
+
+{% endblock %}

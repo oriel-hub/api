@@ -1,0 +1,26 @@
+@import url('http://fonts.googleapis.com/css?family=Bitter:400,700');
+
+html {
+	font-size: 101%;
+}
+
+body
+{
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background: #fff;
+        font-family: Arial, Veranda, 'sans serif';
+}
+
+h1, h2, h3, h4 {
+	font-family: bitter;
+	margin: 5px 0 8px 0;
+	color:#000;
+}
+h1 { font-size: 2em; }
+h2 { font-size: 1.6em; }
+h3 { font-size: 1.4em; }
+h4 { font-size: 1.1em; }
+
+
