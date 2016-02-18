@@ -1,3 +1,14 @@
+.okhub_api .container {
+    position: relative;
+}
+.okhub_api #user-tools {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 1.2em 10px;
+    font-size: 11px;
+    text-align: right;
+}
 .okhub_api .wrapper {
     padding-top: 0;
     margin: 20px 0;
