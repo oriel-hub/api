@@ -23,7 +23,7 @@
 {% block body %}
     {# {% ssi '/var/www/includes/nav.shtml' %} #}
     {% include 'includes/nav.shtml' %}
-
+    <div class="container">
 	<div id="header">
 		<div id="branding">
 		  <h1 id="site-name"><a href="/">API Endpoint</a></h1>
@@ -40,6 +40,7 @@
         {% endif %}
         </div>
 	</div>
+    </div><!-- id="container" -->
     {{ block.super }}
     <div class="container">
         {% include 'snippets/footer.html' %}
