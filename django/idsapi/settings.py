@@ -108,6 +108,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'google_analytics.middleware.GoogleAnalyticsMiddleware',
 )
 
 ROOT_URLCONF = 'urls'
@@ -134,11 +135,14 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'django_countries',
-    'profiles',
+    # 'profiles',
     'registration',
 
     # Tom Christie REST framework
     'rest_framework',
+
+    # Analytics
+    'google_analytics',
 
     # our code
     'lib',
@@ -146,6 +150,22 @@ INSTALLED_APPS = (
     'openapi_integration',
     'userprofile',
 )
+
+# google_analytics app configuration
+GOOGLE_ANALYTICS = {
+    'google_analytics_id': 'UA-55483566-2',
+}
+GOOGLE_ANALYTICS_IGNORE_PATH = ['/health/', ]
+
+# CELERY SETTINGS
+BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}  # 1 hour.
+
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_IMPORTS = ('google_analytics.tasks',)
 
 # settings required for extra fields for users
 AUTH_PROFILE_MODULE = "userprofile.UserProfile"
