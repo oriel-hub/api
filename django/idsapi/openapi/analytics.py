@@ -27,7 +27,7 @@ class PageViewMixin(object):
             if not any(path.startswith(exclude) for exclude in SST_SETTINGS['pageview_exclude']):
                 misc_parameters = []
 
-                # Track authenticated users via beacon_guid
+                # Track authenticated users
                 if hasattr(request, 'user'):
                     try:
                         guid = request.user.userprofile.access_guid
