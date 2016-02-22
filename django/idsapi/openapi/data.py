@@ -293,7 +293,7 @@ class ObjectDataFilter(object):
             ('title', 'name')
         ):
             if key in field_list and key not in data:
-                data[key] = in_dict[backup_key]
+                data[key] = in_dict.get(backup_key)
         return data
 
     def _filter_id_fields(self, result):
