@@ -138,6 +138,7 @@ INSTALLED_APPS = (
     'django_countries',
     'profiles',
     'registration',
+    'djcelery',
 
     # Tom Christie REST framework
     'rest_framework',
