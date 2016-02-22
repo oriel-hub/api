@@ -111,7 +111,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'google_analytics.middleware.GoogleAnalyticsMiddleware',
+    'server_tracking.django.middleware.PageViewMiddleware',
 )
 
 ROOT_URLCONF = 'urls'
@@ -124,7 +124,10 @@ TEMPLATE_DIRS = (
 )
 
 # required for the ssi tag, used to include a standard menu
-ALLOWED_INCLUDE_ROOTS = ('/var/www/includes/',)
+ALLOWED_INCLUDE_ROOTS = (
+        '/var/www/includes/',
+        path.join(BASE_DIR, 'okhub_base/templates/includes'),
+)
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -150,7 +153,7 @@ INSTALLED_APPS = (
     'rest_framework',
 
     # Analytics
-    'google_analytics',
+    'server_tracking',
 
     # our code
     'lib',
@@ -159,11 +162,13 @@ INSTALLED_APPS = (
     'userprofile',
 )
 
-# google_analytics app configuration
-GOOGLE_ANALYTICS = {
-    'google_analytics_id': 'UA-55483566-2',
+# server_tracking app configuration
+SERVER_SIDE_TRACKING = {
+    'defer': 'celery',
 }
-GOOGLE_ANALYTICS_IGNORE_PATH = ['/health/', ]
+SERVER_SIDE_TRACKING_GA = {
+    'property': private_settings.GA_PROPERTY
+}
 
 # CELERY SETTINGS
 BROKER_URL = 'redis://localhost:6379/0'
@@ -173,7 +178,7 @@ BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}  # 1 hour.
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-CELERY_IMPORTS = ('google_analytics.tasks',)
+CELERY_IMPORTS = ('server_tracking.google.tasks',)
 
 # settings required for extra fields for users
 AUTH_PROFILE_MODULE = "userprofile.UserProfile"

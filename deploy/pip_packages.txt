@@ -39,7 +39,7 @@ django-jenkins==0.17.0
 # Tracking
 celery==3.1.20
 redis==2.10.5
-django-google-analytics-app==2.0.3
+-e git+https://github.com/merll/server-tracking.git@e80aae7941cc91707bc4033ba91ec7e503c8bd41#egg=server-tracking
 
 # development
 django-pdb
