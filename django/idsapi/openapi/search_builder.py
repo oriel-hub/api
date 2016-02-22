@@ -7,6 +7,7 @@ import urllib2
 import re
 from datetime import datetime, timedelta
 import sunburnt
+import requests
 
 from django.conf import settings
 
@@ -24,6 +25,30 @@ logger = logging.getLogger(__name__)
 logger.setLevel(getattr(settings, 'LOG_LEVEL', logging.DEBUG))
 
 
+class Response(object):
+    def __init__(self, response):
+        self.response = response
+
+    @property
+    def status(self):
+        return self.response.status_code
+
+
+class Connection(object):
+    def __init__(self):
+        self.connection = requests
+
+    def request(self, uri, method='GET'):
+        """ Compatability with httplib2
+
+            httplib2.Http().request(
+                    self, uri, method='GET', body=None,
+                    headers=None, redirections=5, connection_type=None)
+        """
+        resp = self.connection.request(method, uri)
+        return (Response(resp), resp.content)
+
+
 def get_solr_interface(site):
     """cache the solr interface for an hour at a time so we don't need
     to fetch the schema on every single query."""
@@ -39,7 +64,9 @@ def get_solr_interface(site):
     if too_old:
         try:
             saved_solr_interface[site] = sunburnt.SolrInterface(
-                settings.BASE_URL, format='json')
+                settings.BASE_URL,
+                http_connection=Connection(),
+                format='json')
             solr_interface_created[site] = datetime.now()
         except Exception as e:
             msg = 'Solr is not responding (using %s )' % settings.BASE_URL
