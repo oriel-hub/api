@@ -84,7 +84,7 @@ default_branch = {
     'staging':      'master',
     'staging_test': 'master',
     'dev_server':   'develop',
-    'drooga':       'django_18_upgrade',
+    'drooga':       'okhub_v2',
 }
 
 # where on the server the django apps are deployed
