@@ -143,6 +143,7 @@ INSTALLED_APPS = (
     'django_countries',
     # 'profiles',
     'registration',
+    'djcelery',
 
 
     # Overriding templates/styles app
