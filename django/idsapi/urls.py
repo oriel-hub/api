@@ -34,5 +34,4 @@ urlpatterns += patterns('',
     # the API stuff
     url(r'^v1/', include(openapi.urls)),
     url(r'^$', RedirectView.as_view(url='/about/', permanent=False)),
-    url(r'^djga/', include('google_analytics.urls')),
 )
