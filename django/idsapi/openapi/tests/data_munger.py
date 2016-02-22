@@ -398,6 +398,17 @@ class ObjectDataFilterTests(TestCase):
             set(BIG_RESULTS.keys()) - set(TEST_ADMIN_ONLY_FIELDS)
         )
 
+    @override_settings(ADMIN_ONLY_FIELDS=TEST_ADMIN_ONLY_FIELDS)
+    def test_short_fields_missing_default_field_returns_null_value(self):
+        user_level_info = {
+            'general_fields_only': True,
+            'hide_admin_fields': True,
+        }
+
+        # We're really testing that no key error is rasied here (to keep
+        # existing behaviour of not failing if a value is missing).
+        actual = self.odf.filter_results({}, 'short', user_level_info)
+        self.assertDictEqual(actual, {'object_type': None, 'object_id': None, 'title': None})
 
 class MetaDataURLCreatorTests(TestCase):
 

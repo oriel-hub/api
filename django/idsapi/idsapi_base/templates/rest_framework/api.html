@@ -1,0 +1,48 @@
+{% extends "rest_framework/base.html" %}
+
+{% load staticfiles %}
+
+{% block title %}IDS Web API - {{ name }}{% endblock %}
+
+{% block style %}
+    {{ block.super }}
+    <link rel="icon" type="image/vnd.microsoft.icon" href="{% static "static/favicon.ico" %}" />
+    {% comment %}
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/base.css" %}" />
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}" />
+    {% endcomment %}
+    <link href="http://www.okhub.org/static/globalnav.css" rel="stylesheet" type="text/css" media="screen" />
+    <link href="{% static "/static/styles2.css" %}" rel="stylesheet" type="text/css" media="screen" />
+    <link href="{% static "/static/custom_api.css" %}" rel="stylesheet" type="text/css" media="screen" />
+{% endblock %}
+
+{% block navbar %}
+{% endblock %}
+
+{% block bodyclass %}okhub_api{% endblock %}
+{% block body %}
+    {# {% ssi '/var/www/includes/nav.shtml' %} #}
+    {# {% include 'includes/nav.shtml' %} #}
+    <div class="container">
+    <div id="header">
+        <div id="branding">
+            <h1 id="site-name"><a href="/">IDS Web API</a></h1>
+        </div>
+        <div id="user-tools">
+        {% if user.is_active %}
+          Welcome, <a href="/profiles/view/">{{ user.first_name }} {{ user.last_name }}</a> | 
+          <a href="/docs/">API Documentation</a> |
+          <a href='{{ logout_url }}'>Log out</a>
+        {% else %}
+          Anonymous | 
+          <a href="/docs/">API Documentation</a> |
+          <a href='{{ login_url }}'>Log in</a>
+        {% endif %}
+        </div>
+    </div>
+    </div><!-- id="container" -->
+    {{ block.super }}
+    <div class="container">
+        {% include 'snippets/footer.html' %}
+    </div>
+{% endblock body %}

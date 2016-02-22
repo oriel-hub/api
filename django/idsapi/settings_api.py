@@ -124,7 +124,19 @@ SORT_FIELDS = [
 CORE_FIELDS = [
     'title',
     'name',
-    'item_id',
+    'description',
+    'item_id', 'hub_item_id',
+    'hub_item_type', 'item_type',
+    'hub_document_type',
+    'metadata_languages',
+    'metadata_url',
+    'hub_organisation',
+    'hub_theme',
+    'hub_region',
+    'hub_subject',
+    'hub_country',
+    'country_code',
+    'hub_timestamp',
     'category_id',
     'category_path',
     'category_path_sort',
@@ -136,7 +148,33 @@ CORE_FIELDS = [
     'acronym',
     'timestamp',
     'score',
+    'sources',
+    'website_url',
+    'website',
+    'urls',
+'author',
+'publisher',
+'alternative_name',
+'iso_number',
+'iso_three_letter_code',
+'iso_two_letter_code',
+'keywords',
+'licence_type',
+'acronym',
+'organisation_type',
+'organisation_url'
+'theme_array',
+'subject_array',
+'country_array',
+'region_array',
+'theme_context',
+'top_level',
+'logo',
+    'theme_broader_array',
+    'theme_narrower_array',
+    'theme_sameas_array',
 ]
+
 
 # these fields will be hidden from those with #'hide_admin_fields' set to True
 ADMIN_ONLY_FIELDS = [
@@ -183,11 +221,13 @@ GENERAL_FIELDS = [
     'country_focus_array',
     'country_focus_ids',
     'country_name',
+    'country_code',
     'date_created',
     'date_updated',
     'document_medium',
-    'document_type',
+    'document_type', 'hub_document_type',
     'description',
+    'default_language',
     'corporate_author',
     'et_al',
     'headline',
@@ -207,6 +247,9 @@ GENERAL_FIELDS = [
     'language_name',
     'level',
     'licence_type',
+    'licence_description',
+    'licence_url',
+    'logo',
     'address1',
     'address2',
     'address3',
@@ -229,12 +272,24 @@ GENERAL_FIELDS = [
     'publisher_country',
     'publisher_id',
     'site',
+    'sources',
     'superparent_object_id',
     'timestamp',
     'title',
     'toplevel_object_id',
     'urls',
+    'website',
     'website_url',
+'theme_array',
+'subject_array',
+'country_array',
+'region_array',
+'theme_context',
+'top_level',
+'logo',
+    'theme_broader_array',
+    'theme_narrower_array',
+    'theme_sameas_array',
 ]
 
 # these are fields that contain XML data
@@ -252,7 +307,21 @@ STRUCTURED_XML_FIELDS = [
     'parent_object_array',
     'country_focus_array_hub_zx',
     'language_array',
-    # 'hub_metadata_languages',
+#    'hub_metadata_languages',
+    'theme_array',
+    'country_array',
+    'region_array',
+    'subject_array',
+    'theme_broader_array',
+    'theme_narrower_array',
+    'theme_sameas_array',
+    'subject_broader_array',
+    'subject_narrower_array',
+    'subject_sameas_array',
+    'contributor_array', 
+    'default_language',
+    'publisher_country_array',
+    'document_type_array',
 ]
 
 # these are the entries in the dropdown box for user registration
@@ -325,12 +394,20 @@ QUERY_MAPPING = {
         'solr_field': 'hub_country_search_hub_zx',
         'object_type': 'all'
     },
+    'country_id': {
+        'solr_field': 'hub_country_item_id_facet_hub_zz',
+        'object_type': 'all'
+    },
     'country_code': {
         'solr_field': 'country_code_search_hub_zz',
         'object_type': 'all'
     },
     'region':  {
         'solr_field': 'hub_region_search_hub_zx',
+        'object_type': 'all'
+    },
+    'region_id':  {
+        'solr_field': 'hub_region_item_id_facet_hub_zz',
         'object_type': 'all'
     },
     'sector':  {
@@ -341,13 +418,13 @@ QUERY_MAPPING = {
         'solr_field': 'hub_subject_search_hub_zx',
         'object_type': 'all'
     },
+    'subject_id': {
+        'solr_field': 'hub_subject_item_id_facet_hub_zz',
+        'object_type': 'all'
+    },
     'subject_name': {
         'solr_field': 'category_subject_objects',
         'object_type': 'all'
-    },
-    'subject_id': {
-        'solr_field': 'category_subject_ids',
-        'object_type': 'documents'
     },
     'keyword': {
         'solr_field': 'keyword_search_hub_zx',
@@ -381,12 +458,16 @@ QUERY_MAPPING = {
         'solr_field': 'author_search_hub_zz',
         'object_type': 'documents'
     },
-    'publisher_name': {
-        'solr_field': 'publisher',
+    'publisher': {
+        'solr_field': 'hub_organisation_search_hub_zx',
         'object_type': 'documents'
     },
-    'publisher': {
-        'solr_field': 'publisher_id',
+    'publisher_id': {
+        'solr_field': 'hub_organisation_item_id_facet_hub_zz',
+        'object_type': 'documents'
+    },
+    'publisher_name': {
+        'solr_field': 'publisher',
         'object_type': 'documents'
     },
     'copyright_clearance': {
@@ -414,7 +495,11 @@ QUERY_MAPPING = {
         'object_type': 'documents',
     },
     'publisher_country': {
-        'solr_field': 'publisher_country',
+        'solr_field': ['publisher_country_search_hub_zx', 'hub_publisher_country_search_hub_zx'],
+        'object_type': 'documents',
+    },
+    'publisher_country_id': {
+        'solr_field': 'hub_publisher_country_item_id_facet_hub_zz',
         'object_type': 'documents',
     },
     'organisation_name': {
@@ -457,8 +542,12 @@ QUERY_MAPPING = {
         'solr_field': 'parent_object_id',
         'object_type': 'all'
     },
-    'toplevel_object_id':  {
+    'top_level_object_id':  {
         'solr_field': 'toplevel_object_id',
+        'object_type': 'all'
+    },
+    'top_level':  {
+        'solr_field': 'top_level_hub_zz',
         'object_type': 'all'
     },
     'url':  {
@@ -489,13 +578,19 @@ QUERY_MAPPING = {
         'solr_field': 'metadata_languages_hub_zz',
         'object_type': 'all',
     },
-    'document_type':  {
+    'document_type': {
         'solr_field': 'hub_document_type_search_hub_zx',
         'object_type': 'documents'
-    }
+    },
+    'document_type_id': {
+        'solr_field': 'hub_document_type_item_id_facet_hub_zz',
+        'object_type': 'documents'
+    },
 }
 
 # fields to use fq queries for
+# works on single value fields, but not on multi-value
+
 FQ_FIELDS = [
     'author',
     'country',
@@ -505,6 +600,8 @@ FQ_FIELDS = [
     'source_only',
     'keyword_search',
     'licence_type',
+    	'source',
+    'top_level',
     # 'theme',
 ]
 
@@ -533,11 +630,11 @@ FACET_MAPPING = {
     'document_type':     'hub_document_type_facet_hub_zx',
     'language':          'metadata_languages_hub_zz',
 
-    'publisher':         'publisher_facet_hub_zx',
-    'publisher_country': 'publisher_country_facet_hub_zx',
+    'publisher':         'hub_organisation_facet_hub_zx',
+    'publisher_country': 'hub_publisher_country_facet_hub_zx',
     'publication_year':  'publication_year_facet_hub_zx',
 
-    'author':            'author_facet_hub_zx',
+    'author':            'author_facet_hub_zz',
     'keyword':           'keyword_facet_hub_zx',
     'country_code':      'country_code_facet_hub_zz',
 
@@ -577,7 +674,7 @@ OBJECT_TYPES_TO_OBJECT_NAME = {
     'countries':     'Country',
     'regions':       'Region',
     'itemtypes':     'Itemtype',
-    'documenttypes': 'Documenttype',
+    'documenttypes': 'DocumentType',
     'languages': 'Language',
 }
 

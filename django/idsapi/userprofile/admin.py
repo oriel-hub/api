@@ -81,19 +81,19 @@ def download_view(request):
     return response
 
 # class UserProfileAdmin(admin.ModelAdmin):
-    # list_display = ('user_level', 'access_guid', 'beacon_guid') 
-    
-# admin.site.register(UserProfile, UserProfileAdmin) 
+    # list_display = ('user_level', 'access_guid', 'beacon_guid')
+
+# admin.site.register(UserProfile, UserProfileAdmin)
 
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
-    
+
 class MyUserAdmin(UserAdmin):
     list_display = UserAdmin.list_display + ('user_level',)
 
     def user_level(self, obj):
         try:
-            return obj.get_profile().user_level
+            return obj.userprofile.user_level
         except (obj.DoesNotExist, ObjectDoesNotExist):
             return "not set yet"
 
@@ -107,8 +107,8 @@ class MyUserAdmin(UserAdmin):
         urls = patterns('',
             url(r'^download/$', download_view, name='user_list_download'),
         ) + urls
-        
+
         return urls
-        
-admin.site.unregister(User) 
-admin.site.register(User, MyUserAdmin) 
+
+admin.site.unregister(User)
+admin.site.register(User, MyUserAdmin)

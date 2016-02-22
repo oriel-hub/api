@@ -155,7 +155,7 @@ class SearchWrapper:
             'select/?' + urllib.urlencode(self.si_query.params())
         if settings.LOG_SEARCH_PARAMS:
             # this will print to console or error log as appropriate
-            logger.info("search params: " + self.si_query.params())
+            logger.info("search params: " + unicode(self.si_query.params()))
             logger.info("solr query: " + solr_query)
         return self.si_query.execute(), solr_query
 

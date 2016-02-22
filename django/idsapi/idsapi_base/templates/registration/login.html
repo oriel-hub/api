@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Login" %}{% endblock %}
+
+{% block content %}
+<div id="sidebar">
+
+	<div id="signin" class="boxed">
+		<h3>Sign In</h3>
+
+		<form method="post" class="clear" action=".">{% csrf_token %}
+		  {{ form.as_p }}
+
+		  <p><a id="resetpassword" class="sub-link" href="{% url 'auth_password_reset'  %}">{% trans "Forgotten your password" %}</a></p>
+		  
+		  <button class="submitBtn"  type="submit" value="{% trans 'Log in' %}" /><span>Log in</span></button>
+		  <input type="hidden" name="next" value="{{ next }}" />
+		</form>
+
+		</div><!--ends boxed -->
+	
+</div><!--ends sidebar -->
+
+		
+<div id="main">
+
+	<div id="register" class="boxed">
+
+			<h3>Not registered for an API key?</h3>
+				<p class="clear">The Knowledge Services <strong>Open API</strong> provides easy <strong>programmatic access</strong> to <strong>tens of thousands</strong> of thematically organised <strong>research documents</strong> that are freely available online.</p>
+					<ul class="bullets">
+
+						<li>want to access over 33,000 hand picked, summarised, categorised research documents?</li>
+
+						<li>want free easy access via our API?</li>
+
+					</ul>
+
+				<p><a class="link" href="{% url 'registration_register'  %}">{% trans "Register for your API key" %}</a></p>
+	</div><!--ends register -->
+
+</div><!--ends main -->
+
+
+{% endblock %}

@@ -1,0 +1,129 @@
+#okhubnav { background-color: #222; color: #fff; height: 40px; margin: 0; padding: 0;}
+#okhubnavcontent
+{
+	margin: 0 auto;
+	max-width: 1070px;
+	min-width: 800px;
+}
+
+#okhubnav ul
+{
+	list-style-type: none;
+	margin: 0;
+}
+#okhubnav ul li { float: left; }
+#okhubnav ul li a
+{
+	display: block;
+	font-weight: bold;
+	font-size: 0.9em; 
+	padding: 12px 12px 12px 42px;
+	border-right: 1px solid #999;
+	color: #fff; 
+	text-decoration: none;
+	text-transform: uppercase;
+	//height: 40px;
+}
+#okhubnav ul li a:hover { color: #fff; }
+
+#okhubnav ul li a.okhubnavhome { }
+
+.okhubnavexplorer a
+{
+	background: url("http://www.okhub.org/static/images/explorer-banner.png") no-repeat 8px 7px #000;
+	border-bottom: 3px solid #B5CA1C;
+}
+
+.okhubnavdeveloper 
+{
+	background: url("http://www.okhub.org/static/images/developer-banner.png") no-repeat 8px 7px #000;
+	border-bottom: 3px solid #FF8000;
+}
+
+.okhubnavdata
+{
+	background: url("http://www.okhub.org/static/images/hub-banner.png") no-repeat 8px 7px #000;
+	border-bottom: 3px solid #487FC1;
+}
+
+.okhubnavapi
+{
+	background: url("http://www.okhub.org/static/images/api-banner.png") no-repeat 8px 7px #000;
+	border-bottom: 3px solid #E0007D;
+}
+
+#gnavlogo
+{
+	float: left;
+	padding: 6px 5px 0 5px;
+}
+#gnavmenu
+{
+	float: right;
+}
+
+#footer-container
+{
+	clear: left;
+	background: #fff;
+	border-top: 4px solid #487fc1;
+}
+
+#footer
+{
+	margin: 0 auto;
+	width: 950px;
+	padding: 20px;
+	height: 50px;
+	font-size: 0.9em;
+}
+
+#footer-left
+{
+	float: left;
+}
+
+#footer-left img
+{
+	padding-right: 35px;
+}
+
+#footer-right
+{
+	float: right;
+	text-align: right;
+}
+
+#footer-right img
+{
+	padding-top: 10px;
+}
+
+#footer-right ul
+{
+	margin: 0;
+	padding: 0;
+	list-style-type: disc;
+	color: red;
+}
+
+#footer-right ul li
+{
+	display: inline;
+	padding-left: 7px;
+	margin-bottom: 10px;
+}
+
+#footer-right ul li a
+{
+	text-decoration: none;
+	color: #555;
+	border-bottom: #ddd 3px solid;
+}
+
+#footer-right ul li a:hover
+{
+	text-decoration: none;
+	color: #000;
+	border-bottom: #aaa 3px solid;
+}

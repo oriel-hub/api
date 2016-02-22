@@ -6,6 +6,7 @@
 ####################################################################
 
 import os
+from os import path
 import sys
 
 # override in local_settings if you want to
@@ -13,10 +14,12 @@ DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 PROJECT_HOME = os.path.dirname(os.path.realpath(__file__))
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 ALLOWED_HOSTS = [
     '.api.ids.ac.uk',
     '.api.okhub.org',
+    'drooga.ids.ac.uk',
 ]
 
 # Local time zone for this installation. Choices can be found here:
@@ -57,7 +60,7 @@ MEDIA_URL = '/media/'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = ''
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -89,8 +92,8 @@ SECRET_KEY = private_settings.SECRET_KEY
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
+    'django.template.loaders.filesystem.Loader',
     # 'django.template.loaders.eggs.Loader',
 )
 
@@ -137,6 +140,11 @@ INSTALLED_APPS = (
     'django_countries',
     # 'profiles',
     'registration',
+
+
+    # Overriding templates/styles app
+    # 'idsapi_base',
+    'okhub_base',
 
     # Tom Christie REST framework
     'rest_framework',
@@ -190,7 +198,7 @@ LOGGING = {
             'class': 'django.utils.log.AdminEmailHandler'
         },
         'console': {
-            'level': 'ERROR',
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
             'class': 'logging.StreamHandler',
             'stream': sys.stdout
         },
@@ -201,6 +209,10 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
+        'openapi.search_builder': {
+            'handlers': ['console',],
+            'level': 'INFO',
+        }
     }
 }
 
