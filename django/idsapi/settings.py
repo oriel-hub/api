@@ -178,7 +178,7 @@ LOGGING = {
             'class': 'django.utils.log.AdminEmailHandler'
         },
         'console': {
-            'level': 'ERROR',
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
             'class': 'logging.StreamHandler',
             'stream': sys.stdout
         },
@@ -189,6 +189,10 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
+        'openapi.search_builder': {
+            'handlers': ['console',],
+            'level': 'INFO',
+        }
     }
 }
 
