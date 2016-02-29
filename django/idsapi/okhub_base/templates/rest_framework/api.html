@@ -32,11 +32,11 @@
         {% if user.is_active %}
           Welcome, <a href="/profiles/view/">{{ user.first_name }} {{ user.last_name }}</a> |
           <a href="http://developer.okhub.org">API Documentation</a> |
-          <a href='{{ logout_url }}'>Log out</a>
+          <a href='{% url 'auth_logout' %}'>Log out</a>
         {% else %}
           Anonymous |
           <a href="http://developer.okhub.org">API Documentation</a> |
-          <a href='{{ login_url }}'>Log in</a>
+          <a href="{% url 'auth_login' %}">Log in</a>
         {% endif %}
         </div>
 	</div>
