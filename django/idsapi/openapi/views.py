@@ -17,8 +17,14 @@ from openapi.defines import URL_ROOT, IdsApiError
 from openapi.guid_authentication import GuidAuthentication
 from openapi.permissions import PerUserThrottlingRatePerGroup
 
+from .analytics import PageViewMixin
 
-class RootView(APIView):
+
+class OpenAPIView(PageViewMixin, APIView):
+    pass
+
+
+class RootView(OpenAPIView):
     def get(self, request):
         hostname = request.get_host()
         url_root = 'http://' + hostname + URL_ROOT
@@ -61,13 +67,13 @@ class RootView(APIView):
         })
 
 
-class BaseAuthView(APIView):
+class BaseAuthView(OpenAPIView):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (GuidAuthentication, SessionAuthentication)
     throttle_classes = (PerUserThrottlingRatePerGroup,)
 
     def __init__(self):
-        super(APIView, self).__init__()
+        super(OpenAPIView, self).__init__()
         self.site = None
 
     def get_user_level_info(self):
@@ -262,7 +268,7 @@ class CategoryChildrenView(BaseSearchView):
         return Response(self.format_result_list(request))
 
 
-class The404View(APIView):
+class The404View(OpenAPIView):
 
     name = '404'
 
