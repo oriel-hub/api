@@ -78,6 +78,10 @@ class BaseAuthView(APIView):
         super(APIView, self).__init__()
         self.site = None
 
+    def dispatch(self, request, *args, **kwargs):
+        self.user = request.user
+        return super(BaseAuthView, self).dispatch(request, *args, **kwargs)
+
     def get_user_level_info(self):
         profile = self.user.userprofile
         return settings.USER_LEVEL_INFO[profile.user_level]
