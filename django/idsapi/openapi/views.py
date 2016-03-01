@@ -203,16 +203,11 @@ class ObjectSearchView(BaseSearchView):
 
         search_params = request.GET
         if len(search_params.keys()) == 0:
-            return Response(status.HTTP_400_BAD_REQUEST,
-                    content='object search must have some query string, eg /objects/search/short?q=undp')
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                data='object search must have some query string, eg /objects/search/short?q=undp')
         try:
-            self.setup_vars(request, site, output_format)
-            if not self.search_params.has_query():
-                return Response(
-                    status.HTTP_400_BAD_REQUEST,
-                    content='object search must have some query string, eg /objects/search/short?q=undp')
-            self.query = self.builder.create_search(
-                self.search_params, object_type, output_format)
+            self.query = SearchBuilder.create_search(user_level, site,
+                    search_params, object_type, output_format)
         except BadRequestError as e:
             return Response(data=str(e), status=status.HTTP_400_BAD_REQUEST)
         except SolrUnavailableError as e:
@@ -292,7 +287,7 @@ class FieldListView(BaseAuthView):
             field_list = [elem for elem in field_list if not elem in ['text', 'word']]
             if self.hide_admin_fields():
                 field_list = [elem for elem in field_list if not elem in settings.ADMIN_ONLY_FIELDS]
-        return field_list
+        return Response(field_list)
 
 
 class CategoryChildrenView(BaseSearchView):
