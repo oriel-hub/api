@@ -8,8 +8,6 @@ import sunburnt
 from openapi.search_builder import (
     SearchBuilder,
     SearchWrapper,
-    SearchParams,
-    FacetArgs,
     InvalidFieldError,
     InvalidQueryError,
     UnknownQueryParamError

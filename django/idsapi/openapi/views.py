@@ -16,7 +16,7 @@ from sunburnt import SolrError
 
 from openapi.data import DataMunger
 from openapi.search_builder import (
-    SearchBuilder, SearchParams, BadRequestError, SolrUnavailableError
+    SearchBuilder, BadRequestError, SolrUnavailableError
 )
 from openapi.defines import URL_ROOT, IdsApiError
 from openapi.guid_authentication import GuidAuthentication
