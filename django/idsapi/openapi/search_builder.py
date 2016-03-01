@@ -9,7 +9,8 @@ from datetime import datetime, timedelta
 import sunburnt
 
 from django.conf import settings
-from rest_framework.renderers import BaseRenderer
+
+from rest_framework.settings import api_settings
 
 from openapi import defines
 
@@ -52,9 +53,11 @@ class SearchBuilder():
     def create_objectid_query(cls, user_level, site, object_id, object_type,
                               search_params, output_format):
         for param in search_params:
-            if (param[0] != '_' and param != BaseRenderer._FORMAT_QUERY_PARAM and
-                    param not in ['extra_fields']):
-                raise InvalidQueryError("Unknown query parameter '%s'" % key)
+            if (param[0] != '_' and
+                param != api_settings.URL_FORMAT_OVERRIDE and
+                param not in ['extra_fields']
+            ):
+                raise InvalidQueryError("Unknown query parameter '%s'" % param)
         sw = SearchWrapper(user_level, site)
         sw.si_query = sw.solr.query(object_id=object_id)
         sw.restrict_search_by_object(object_type, allow_objects=True)
@@ -105,7 +108,7 @@ class SearchBuilder():
                 # django rest framework parameters. Would it be better to
                 # delete them from the request before they are passed to our
                 # API code?
-                if (param[0] != '_' and param != BaseRenderer._FORMAT_QUERY_PARAM):
+                if (param[0] != '_' and param != api_settings.URL_FORMAT_OVERRIDE):
                     raise UnknownQueryParamError(param)
 
         sw.restrict_search_by_object(object_type)
