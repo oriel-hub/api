@@ -66,7 +66,7 @@ class RootView(APIView):
                     ]
                 },
             },
-        }
+        })
 
 
 class BaseAuthView(APIView):
