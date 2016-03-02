@@ -7,9 +7,9 @@ from django.conf import settings
 from django.test.testcases import TestCase
 from sunburnt import SolrInterface
 
-from openapi import defines
-from openapi.search_builder import get_solr_interface
-from openapi.tests.test_base import BaseTestCase
+from .. import defines
+from ..search_builder import get_solr_interface
+from .test_base import BaseTestCase
 
 
 class ApiTestsBase(BaseTestCase):
