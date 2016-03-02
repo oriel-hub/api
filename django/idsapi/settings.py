@@ -142,17 +142,20 @@ INSTALLED_APPS = (
     'rest_framework',
 
     # our code
-    'lib',
     'openapi',
-    'openapi_integration',
     'userprofile',
 )
 
 REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
         'rest_framework_xml.parsers.XMLParser',
     ),
     'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
         'rest_framework_xml.renderers.XMLRenderer',
     ),
 }
