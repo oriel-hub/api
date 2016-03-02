@@ -148,6 +148,15 @@ INSTALLED_APPS = (
     'userprofile',
 )
 
+REST_FRAMEWORK = {
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework_xml.parsers.XMLParser',
+    ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework_xml.renderers.XMLRenderer',
+    ),
+}
+
 # settings required for extra fields for users
 AUTH_PROFILE_MODULE = "userprofile.UserProfile"
 
