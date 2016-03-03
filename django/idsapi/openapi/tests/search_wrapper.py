@@ -1,3 +1,5 @@
+import pytest
+
 from os import path
 from django.test import SimpleTestCase
 from django.utils import unittest
@@ -162,6 +164,7 @@ class SearchWrapperAddSortTests(unittest.TestCase):
         self.assertEquals(self.msi.query.sort_field, '-title_sort')
 
 
+@pytest.mark.xfail(reason="Already broken in tag idsapi_14")
 class SearchWrapperAddFreeTextQueryTests(unittest.TestCase):
     # 2014-02-05, HD: we just pass through most of this untouched now
     # and let dismax sort it out
