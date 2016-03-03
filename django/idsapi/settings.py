@@ -154,6 +154,8 @@ INSTALLED_APPS = (
 )
 
 # server_tracking app configuration
+ANALYTICS_IGNORE_GUIDS = private_settings.ANALYTICS_IGNORE_GUIDS
+
 SERVER_SIDE_TRACKING = {
     'defer': 'celery',
 }

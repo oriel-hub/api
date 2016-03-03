@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import logging
 
 from django.http import HttpResponse
+from django.conf import settings
 
 from server_tracking.google.parameters import CustomDimensionUrlGenerator
 from server_tracking.parameters import VP
@@ -26,16 +27,14 @@ class PageViewMixin(object):
             path = request.path_info.lstrip('/')
             if not any(path.startswith(exclude) for exclude in SST_SETTINGS['pageview_exclude']):
                 misc_parameters = []
-
                 # Track authenticated users
-                if hasattr(request, 'user'):
-                    try:
-                        guid = request.user.userprofile.access_guid
-                        misc_parameters.append(CustomDimensionParams(guid=guid))
-                    except Exception as e:
-                        log.exception(e)
-
                 try:
+                    if hasattr(request, 'user') and hasattr(request.user, 'userprofile'):
+                        guid = request.user.userprofile.access_guid
+                        if guid in settings.ANALYTICS_IGNORE_GUIDS:
+                            return response
+                        misc_parameters.append(CustomDimensionParams(guid=guid))
+                    
                     pageview_params, session_params = get_default_parameters(request, param_response)
                     default_client.pageview(
                         params=pageview_params,
