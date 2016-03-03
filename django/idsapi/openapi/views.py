@@ -76,6 +76,10 @@ class BaseAuthView(OpenAPIView):
         super(OpenAPIView, self).__init__()
         self.site = None
 
+    def initial(self, request, *args, **kwargs):
+        self.user = request.user
+        return super(BaseAuthView, self).initial(request, *args, **kwargs)
+
     def get_user_level_info(self):
         profile = self.user.userprofile
         return settings.USER_LEVEL_INFO[profile.user_level]

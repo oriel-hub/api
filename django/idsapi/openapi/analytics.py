@@ -28,9 +28,10 @@ class PageViewMixin(object):
                 misc_parameters = []
 
                 # Track authenticated users via beacon_guid
-                if hasattr(self, 'get_beacon_guid'):
+                if hasattr(request, 'user') and hasattr(self, 'get_beacon_guid'):
                     guid = self.get_beacon_guid()
                     misc_parameters.append(CustomDimensionParams(guid=guid))
+
                 try:
                     pageview_params, session_params = get_default_parameters(request, param_response)
                     default_client.pageview(
