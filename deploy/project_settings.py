@@ -20,7 +20,7 @@ repository = 'git@github.com:oriel-hub/api.git'
 # put "plain" here for a basic apache app
 project_type = "django"
 
-django_dir = "django/" + project_name
+# django_dir = "django/" + project_name
 
 # openapi_integration holds all the tests that require a connection to the
 # server
