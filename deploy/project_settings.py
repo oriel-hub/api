@@ -84,7 +84,7 @@ default_branch = {
     'staging':      'master',
     'staging_test': 'master',
     'dev_server':   'develop',
-    'drooga':       'django_18_upgrade',
+    'drooga':       'idsapi_14_upgrade_18',
 }
 
 # where on the server the django apps are deployed

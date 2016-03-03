@@ -21,7 +21,7 @@ EMAIL_HOST = 'mailrelay.ids.ac.uk'
 # files and are here for reference
 DEFAULT_SITE = 'eldis'
 
-if True: #  SERVER_ENV == "production":
+if SERVER_ENV == "production":
     SOLR_SERVER_URLS = {
         'eldis': 'http://localhost:8984/solr/eldis-live/',
         'bridge': 'http://localhost:8984/solr/bridge-live/',
