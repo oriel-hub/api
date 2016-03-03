@@ -11,7 +11,7 @@ from os import path
 
 # This is the directory inside the project dev dir that contains the django
 # application
-project_name = "idsapi"
+project_name = "okhub"
 
 repo_type = "git"
 repository = 'git@github.com:oriel-hub/api.git'
