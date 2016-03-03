@@ -182,7 +182,7 @@ class ObjectView(BaseSearchView):
             self.query = SearchBuilder.create_objectid_query(user_level, site,
                     object_id, object_type, search_params, output_format)
         except BadRequestError as e:
-            raise ValidationError(e)
+            raise ValidationError(str(e))
         except SolrUnavailableError as e:
             return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
