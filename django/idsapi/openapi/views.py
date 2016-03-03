@@ -272,7 +272,7 @@ class FieldListView(BaseAuthView):
         # TODO: Is this caching useful?
         http = httplib2.Http("/tmp/.cache")
         if site not in settings.SOLR_SERVER_URLS:
-            return Response(status.HTTP_400_BAD_REQUEST, content="Unknown site: %s" % site)
+            return Response(status=status.HTTP_400_BAD_REQUEST, data="Unknown site: %s" % site)
         schema_url = settings.SOLR_SERVER_URLS[site] + settings.SOLR_SCHEMA_SUFFIX
         # TODO: Check the response code here, so that SOLR errors are gracefully handled.
         _, content = http.request(schema_url, "GET")  # @UnusedVariable
