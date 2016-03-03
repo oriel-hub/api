@@ -142,7 +142,9 @@ INSTALLED_APPS = (
     'rest_framework',
 
     # our code
+    # 'lib',
     'openapi',
+    # 'openapi_integration',
     'userprofile',
 )
 
