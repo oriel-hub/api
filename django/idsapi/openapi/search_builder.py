@@ -64,7 +64,7 @@ def get_solr_interface(site):
     if too_old:
         try:
             saved_solr_interface[site] = sunburnt.SolrInterface(
-                settings.BASE_URL,
+                settings.SOLR_SERVER_URLS[site],
                 http_connection=Connection(),
                 format='json')
             solr_interface_created[site] = datetime.now()
