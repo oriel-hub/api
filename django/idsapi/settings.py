@@ -110,7 +110,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'server_tracking.django.middleware.PageViewMiddleware',
 )
 
 ROOT_URLCONF = 'urls'
@@ -221,6 +220,10 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
+        'openapi.analytics': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        }
     }
 }
 
