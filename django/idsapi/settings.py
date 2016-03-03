@@ -110,6 +110,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'server_tracking.django.middleware.PageViewMiddleware',
 )
 
 ROOT_URLCONF = 'urls'
@@ -143,12 +144,23 @@ INSTALLED_APPS = (
     # Tom Christie REST framework
     'rest_framework',
 
+    # Analytics
+    'server_tracking',
+
     # our code
     # 'lib',
     'openapi',
     # 'openapi_integration',
     'userprofile',
 )
+
+# server_tracking app configuration
+SERVER_SIDE_TRACKING = {
+    'defer': 'celery',
+}
+SERVER_SIDE_TRACKING_GA = {
+    'property': private_settings.GA_PROPERTY
+}
 
 REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': (
