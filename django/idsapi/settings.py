@@ -165,11 +165,28 @@ INSTALLED_APPS = (
 )
 
 # server_tracking app configuration
+ANALYTICS_IGNORE_GUIDS = private_settings.ANALYTICS_IGNORE_GUIDS
+
 SERVER_SIDE_TRACKING = {
     'defer': 'celery',
 }
 SERVER_SIDE_TRACKING_GA = {
     'property': private_settings.GA_PROPERTY
+}
+
+REST_FRAMEWORK = {
+    'UNICODE_JSON': False,
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+        'rest_framework_xml.parsers.XMLParser',
+    ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+        'rest_framework_xml.renderers.XMLRenderer',
+    ),
 }
 
 # CELERY SETTINGS
@@ -181,6 +198,7 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_IMPORTS = ('server_tracking.google.tasks',)
+
 
 # settings required for extra fields for users
 AUTH_PROFILE_MODULE = "userprofile.UserProfile"
