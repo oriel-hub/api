@@ -164,6 +164,7 @@ SERVER_SIDE_TRACKING_GA = {
 }
 
 REST_FRAMEWORK = {
+    'UNICODE_JSON': False,
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework.parsers.JSONParser',
         'rest_framework.parsers.FormParser',
