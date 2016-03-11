@@ -16,6 +16,7 @@ django-registration==2.0.3
 
 # general libraries
 #dddjangorestframework==0.2.4
+djangorestframework-xml==1.3.0
 djangorestframework==3.3.2
 httplib2==0.7.4
 lxml==2.3
