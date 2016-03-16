@@ -190,8 +190,8 @@ REST_FRAMEWORK = {
 }
 
 # CELERY SETTINGS
-BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+BROKER_URL = 'redis://localhost:6379/1'  # redid DB /0 used for IDSAPI
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
 BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}  # 1 hour.
 
 CELERY_ACCEPT_CONTENT = ['json']
