@@ -23,8 +23,9 @@ DEFAULT_SITE = 'eldis'
 
 if SERVER_ENV == "production":
     SOLR_SERVER_URLS = {
-        'eldis': 'http://jabba.ids.ac.uk:8983/solr/eldis-live/',
-        'bridge': 'http://jabba.ids.ac.uk:8983/solr/bridge-live/',
+        'eldis': 'http://solr.ids.ac.uk:8983/solr/eldis-live/',
+        'bridge': 'http://solr.ids.ac.uk:8983/solr/bridge-live/',
+        'bridge_plus': 'http://solr.ids.ac.uk:8983/solr/bridge-live-plus/',
     }
 elif SERVER_ENV in ["staging", "localdev"]:
     SOLR_SERVER_URLS = {
