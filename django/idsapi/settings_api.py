@@ -121,6 +121,7 @@ SORT_FIELDS = [
 # these fields will be hidden from those with #'hide_admin_fields' set to True
 ADMIN_ONLY_FIELDS = [
 'asset_id',
+'author_array',
 'copyright_clearance',
 'deleted',
 'end_date',
@@ -133,7 +134,8 @@ ADMIN_ONLY_FIELDS = [
 'send_email_alerts',
 'start_date',
 'title_sort',
-'category_path_sort'
+'category_path_sort',
+'publication_country_id'        
 ]
 
 # these are the fields that will be given to a 'General User'
@@ -144,6 +146,7 @@ GENERAL_FIELDS = [
 'alternative_name',
 'archived',
 'author',
+'author_array',
 'cat_level',
 'category_id',
 'category_path',
@@ -202,13 +205,14 @@ GENERAL_FIELDS = [
 'publisher_array',
 'publisher_country',
 'publisher_id',
+'publication_country_id',
 'site',
 'superparent_object_id',
 'timestamp',
 'title',
 'toplevel_object_id',
 'urls',
-'website_url'
+'website_url',
 ]
 
 # these are fields that contain XML data
@@ -220,7 +224,8 @@ STRUCTURED_XML_FIELDS = [
 'category_region_array',
 'children_object_array',
 'parent_object_array',
-'language_array'
+'language_array',
+'author_array',
 ]
 
 # these are the entries in the dropdown box for user registration
@@ -395,6 +400,10 @@ QUERY_MAPPING = {
     },
     'parent_object_id':  {
         'solr_field': 'parent_object_id',
+        'object_type': 'all'
+    },
+    'first_parent_object_id':  {
+        'solr_field': 'cat_first_parent',
         'object_type': 'all'
     },
     'toplevel_object_id':  {
