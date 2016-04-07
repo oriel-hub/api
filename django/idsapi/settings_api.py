@@ -227,7 +227,6 @@ GENERAL_FIELDS = [
     'document_medium',
     'document_type', 'hub_document_type',
     'description',
-    'default_language',
     'corporate_author',
     'et_al',
     'headline',
@@ -319,7 +318,6 @@ STRUCTURED_XML_FIELDS = [
     'subject_narrower_array',
     'subject_sameas_array',
     'contributor_array', 
-    'default_language',
     'publisher_country_array',
     'document_type_array',
 ]
