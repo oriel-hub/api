@@ -317,7 +317,7 @@ STRUCTURED_XML_FIELDS = [
     'subject_broader_array',
     'subject_narrower_array',
     'subject_sameas_array',
-    'contributor_array', 
+    'contributor_array',
     'publisher_country_array',
     'document_type_array',
 ]
