@@ -99,7 +99,7 @@ class BaseAuthView(OpenAPIView):
         self.output_format = output_format
         self.site = site
         self.search_params = SearchParams(request.GET)
-        self.data_munger = DataMunger(site, self.search_params)
+        self.data_munger = DataMunger(site, self.search_params, request)
         self.user_level = self.user.userprofile.user_level
         # note this can throw an exception, so need to catch it
         self.builder = SearchBuilder(self.user_level, site)

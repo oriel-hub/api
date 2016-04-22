@@ -24,11 +24,12 @@ logger.setLevel(getattr(settings, 'LOG_LEVEL', logging.DEBUG))
 
 
 class DataMunger():
-    def __init__(self, site, search_params):
+    def __init__(self, site, search_params, request=None):
         self.site = site
         self.search_params = search_params
         self.object_id = None
         self.object_type = None
+        self.request = request
 
     def _convert_date_fields(self, object_data):
         # convert date fields to expected output format
@@ -51,7 +52,7 @@ class DataMunger():
     def get_required_data(self, result, output_format, user_level_info, beacon_guid):
         self.object_id = result[settings.SOLR_OBJECT_ID]
         self.object_type = defines.object_name_to_object_type(result[settings.SOLR_OBJECT_TYPE])
-        self.metadata = MetaDataURLCreator(self.object_type, self.object_id, self.site)
+        self.metadata = MetaDataURLCreator(self.object_type, self.object_id, self.site, self.request)
         result = SourceLangParser(self.search_params).create_source_lang_dict(result)
         object_data = ObjectDataFilter(self.search_params).filter_results(
             result, output_format, user_level_info)
@@ -174,7 +175,7 @@ class DataMunger():
                 result['object_name'] = facet_string
 
             # create metadata url, but only if data exists
-            self.metadata = MetaDataURLCreator(self.object_type, self.object_id, self.site)
+            self.metadata = MetaDataURLCreator(self.object_type, self.object_id, self.site, self.request)
             self.metadata.add_url_to_item_if_keys_available(result)
             if result['object_id'] and result['object_type'] and result['object_name']:
                 result['metadata_url'] = self.metadata.create_url(
@@ -357,10 +358,11 @@ class ObjectDataFilter(object):
 
 class MetaDataURLCreator(object):
 
-    def __init__(self, object_type, object_id, site):
+    def __init__(self, object_type, object_id, site, request=None):
         self.default_object_type = object_type
         self.default_object_id = object_id
         self.site = site
+        self.request = request
 
     def _base_url(self, url_name, object_id, object_type):
         return reverse(
@@ -387,8 +389,13 @@ class MetaDataURLCreator(object):
             object_type = self.default_object_type
         if object_id is None:
             object_id = self.default_object_id
-        return self._base_url(url_name, object_id, object_type) + \
+
+        path = self._base_url(url_name, object_id, object_type) + \
             self._object_name_suffix(object_name)
+
+        if self.request:
+            return self.request.build_absolute_uri(path)
+        return path
 
     def add_url_to_item_if_keys_available(self, item):
         if (
