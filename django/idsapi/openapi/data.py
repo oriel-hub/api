@@ -16,10 +16,11 @@ except ImportError:
 
 
 class DataMunger():
-    def __init__(self, site):
+    def __init__(self, site, request=None):
         self.site = site
         self.object_id = None
         self.object_type = None
+        self.request = request
 
     def get_required_data(self, result, output_format, user_level_info, beacon_guid):
         self.object_id = result['object_id']
@@ -122,6 +123,10 @@ class DataMunger():
         if object_name is not None:
             title = re.sub('\W+', '-', object_name).lower().strip('-')
             metadata_url += title + '/'
+
+        if self.request:
+           return self.request.build_absolute_uri(metadata_url)
+
         return metadata_url
 
     def _add_child_parent_links(self, object_data, result):

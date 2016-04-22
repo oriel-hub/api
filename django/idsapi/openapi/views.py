@@ -180,7 +180,7 @@ class ObjectView(BaseSearchView):
     def get(self, request, site, object_id, output_format, object_type=None):
         self.output_format = output_format
         self.site = site
-        self.data_munger = DataMunger(site)
+        self.data_munger = DataMunger(site, request)
         search_params = request.GET
         user_level = self.user.userprofile.user_level
 
@@ -204,7 +204,7 @@ class ObjectSearchView(BaseSearchView):
     def get(self, request, site, output_format, object_type=None):
         self.output_format = output_format
         self.site = site
-        self.data_munger = DataMunger(site)
+        self.data_munger = DataMunger(site, request)
         user_level = self.user.userprofile.user_level
 
         search_params = request.GET
@@ -227,7 +227,7 @@ class AllObjectView(BaseSearchView):
     def get(self, request, site, output_format, object_type=None):
         self.output_format = output_format
         self.site = site
-        self.data_munger = DataMunger(site)
+        self.data_munger = DataMunger(site, request)
         user_level = self.user.userprofile.user_level
 
         search_params = request.GET
@@ -257,7 +257,7 @@ class FacetCountView(BaseAuthView):
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=str(e))
         search_response, solr_query = query.execute()
         facet_counts = search_response.facet_counts.facet_fields[settings.FACET_MAPPING[facet_type]]
-        data = DataMunger(site)
+        data = DataMunger(site, request)
         facet_dict_list = []
         for category, count in facet_counts:
             facet_dict = data.convert_facet_string(category, facet_type)
@@ -300,7 +300,7 @@ class CategoryChildrenView(BaseSearchView):
     def get(self, request, site, object_type, object_id, output_format):
         self.output_format = output_format
         self.site = site
-        self.data_munger = DataMunger(site)
+        self.data_munger = DataMunger(site, request)
         user_level = self.user.userprofile.user_level
 
         try:
