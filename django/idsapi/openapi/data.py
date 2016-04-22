@@ -1,6 +1,7 @@
 # class to assemble the data to be returned
 import sys
 import re
+import collections
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -60,7 +61,24 @@ class DataMunger():
                     object_data['description'], user_level_info, beacon_guid)
 
         object_data['metadata_url'] = self._create_metadata_url(object_name=result['title'])
-        return object_data
+        return self.fields_sorted(object_data)
+
+    def fields_sorted(self, object_data):
+        """Order dicts by keys, returning OrderedDicts"""
+        if not isinstance(object_data, dict):
+            return object_data
+
+        ordered = collections.OrderedDict()
+        for k, v in sorted(object_data.items(), key=lambda (k, v): k):
+            # Reorder nested dicts
+            if isinstance(v, dict):
+                ordered[k] = self.fields_sorted(v)
+            # Reorder lists of dicts
+            elif isinstance(v, list) or isinstance(v, tuple):
+                ordered[k] = [self.fields_sorted(o) for o in v]
+            else:
+                ordered[k] = v
+        return ordered
 
     def _convert_xml_field(self, xml_field):
         """convert an XML string into a list of dictionaries and add
