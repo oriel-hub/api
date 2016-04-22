@@ -20,7 +20,7 @@ EMAIL_HOST = 'mailrelay.ids.ac.uk'
 # Where to find SOLR - note that these are over-written in the local settings
 # files and are here for reference
 if SERVER_ENV in ["production_okhub"]:
-    BASE_URL = 'http://localhost:8983/solr/okhub-live/'
+    BASE_URL = 'http://solr.ids.ac.uk:8983/solr/okhub-live/'
 elif SERVER_ENV in ["staging_okhub", "localdev"]:
     # Index for current version of test hub
     # BASE_URL = 'http://localhost:8983/solr/oriel-searchapi-test/'
@@ -227,7 +227,6 @@ GENERAL_FIELDS = [
     'document_medium',
     'document_type', 'hub_document_type',
     'description',
-    'default_language',
     'corporate_author',
     'et_al',
     'headline',
@@ -319,7 +318,6 @@ STRUCTURED_XML_FIELDS = [
     'subject_narrower_array',
     'subject_sameas_array',
     'contributor_array', 
-    'default_language',
     'publisher_country_array',
     'document_type_array',
 ]
