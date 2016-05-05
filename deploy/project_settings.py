@@ -75,6 +75,7 @@ host_list = {
     'production':   ['lin-' + project_name + '.aptivate.org:48001'],
     'staging':      ['fen-vz-' + project_name + '-stage.fen.aptivate.org'],
     'staging_test': ['fen-vz-' + project_name + '.fen.aptivate.org'],
+    'boorka':       ['boorka.ids.ac.uk'],
     'drooga':       ['drooga.ids.ac.uk'],
 }
 
@@ -84,6 +85,7 @@ default_branch = {
     'staging':      'master',
     'staging_test': 'master',
     'dev_server':   'develop',
+    'boorka':       'idsapi_v2',
     'drooga':       'idsapi_v2',
 }
 
