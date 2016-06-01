@@ -14,6 +14,6 @@ DATABASES = {
     }
 }
 
-SERVER_ENV = "production_okhub"
+SERVER_ENV = "staging_okhub"
 
 # vi: ft=python
