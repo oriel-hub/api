@@ -27,7 +27,13 @@ if SERVER_ENV == "production":
         'bridge': 'http://solr.ids.ac.uk:8983/solr/bridge-live/',
         'bridge_plus': 'http://solr.ids.ac.uk:8983/solr/bridge-live-plus/',
     }
-elif SERVER_ENV in ["staging", "localdev"]:
+elif SERVER_ENV in ["staging"]:
+    SOLR_SERVER_URLS = {
+        'eldis': 'http://test.api.ids.ac.uk:8983/solr/eldis-dev/',
+        'bridge': 'http://test.api.ids.ac.uk:8983/solr/bridge-dev/',
+        'bridge_plus': 'http://test.api.ids.ac.uk:8983/solr/bridge-dev-plus/',
+    }
+elif SERVER_ENV in ["localdev"]:
     SOLR_SERVER_URLS = {
         'eldis': 'http://localhost:8983/solr/eldis-test/',
         'bridge': 'http://localhost:8983/solr/bridge-test/',
