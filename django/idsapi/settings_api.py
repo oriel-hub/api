@@ -141,7 +141,11 @@ ADMIN_ONLY_FIELDS = [
 'start_date',
 'title_sort',
 'category_path_sort',
-'publication_country_id'        
+'publication_country_id',
+'funder',
+'funder_array',
+'service_array',
+'content_partner_array'
 ]
 
 # these are the fields that will be given to a 'General User'
@@ -177,6 +181,7 @@ GENERAL_FIELDS = [
 'description',
 'document_type',
 'corporate_author',
+'corporate_author_name',
 'et_al',
 'headline',
 'iso_number',
@@ -232,6 +237,9 @@ STRUCTURED_XML_FIELDS = [
 'parent_object_array',
 'language_array',
 'author_array',
+'funder_array',
+'service_array',
+'content_partner_array'
 ]
 
 # these are the entries in the dropdown box for user registration
