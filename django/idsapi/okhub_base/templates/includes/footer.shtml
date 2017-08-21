@@ -1,11 +1,11 @@
-<div id="footer-container">
-    <div id="footer">
-        <div id="footer-left">
-            <a href="http://www.dfid.gov.uk/"><img src="http://developer.okhub.org/wp-content/themes/dev-okh/images/logoUKAID.png" alt="DFID - UK Aid"></a>
-            <a href="http://www.ids.ac.uk/"><img src="http://developer.okhub.org/wp-content/themes/dev-okh/images/logoIDS.gif" alt="IDS"></a>
-        </div>
-        <div id="footer-right">
-                &nbsp;
-        </div>
-    </div>
-</div>
+	<div id="footer-container">
+		<div id="footer">
+			<div id="footer-left">
+				<a href="http://www.dfid.gov.uk/"><img src="//developer.okhub.org/wp-content/themes/dev-okh/images/logoUKAID.png" alt="DFID - UK Aid"></a>
+				<a href="http://www.ids.ac.uk/"><img src="//developer.okhub.org/wp-content/themes/dev-okh/images/logoIDS.gif" alt="IDS"></a>
+			</div>
+			<div id="footer-right">
+				&nbsp;
+			</div>
+		</div>
+	</div>

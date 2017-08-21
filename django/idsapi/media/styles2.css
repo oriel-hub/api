@@ -9,7 +9,7 @@ figure, figcaption, footer, header, hgroup,  menu, nav, output, ruby, section, s
 }
 
 h1, h2, h3, h4 { color: #444; font-weight: normal; }
-#logo h1, #branding h1 { text-decoration: none; padding: 10px 10px 10px 60px; background: url('http://www.okhub.org/static/images/api.png') 0 0 no-repeat transparent; }
+#logo h1, #branding h1 { text-decoration: none; padding: 10px 10px 10px 60px; background: url('//www.okhub.org/static/images/api.png') 0 0 no-repeat transparent; }
 #logo h1 a, #branding h1 a, #logo h1 a:link, #branding h1 a:link, #logo h1 a:visited, #branding h1 a:visited, h2 { color: #E0007D !important; text-decoration: none; }
 /* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
