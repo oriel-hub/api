@@ -21,7 +21,9 @@ EMAIL_HOST = 'mailrelay.ids.ac.uk'
 # files and are here for reference
 if SERVER_ENV in ["production_okhub"]:
     BASE_URL = 'http://solr.ids.ac.uk:8983/solr/okhub-live/'
-elif SERVER_ENV in ["staging_okhub", "localdev"]:
+elif SERVER_ENV in ["staging_okhub"]:
+    BASE_URL = 'http://solr.test.ids.ac.uk:8983/solr/oriel-dev/'
+elif SERVER_ENV in ["localdev"]:
     # Index for current version of test hub
     # BASE_URL = 'http://localhost:8983/solr/oriel-searchapi-test/'
     # Index for older version of test hub for testing

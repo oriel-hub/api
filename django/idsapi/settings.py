@@ -19,6 +19,7 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 ALLOWED_HOSTS = [
     '.api.ids.ac.uk',
     '.api.okhub.org',
+    'api.test.okhub.org',
     'drooga.ids.ac.uk',
     'okhub.testdns.aptivate.org',
 ]
