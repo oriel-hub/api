@@ -1,4 +1,6 @@
-{% load ssi from future %}{% load urlize_quoted_links %}{% load add_query_param %}<?xml version="1.0" encoding="UTF-8"?>
+{% load urlize_quoted_links %}
+{% load add_query_param %}
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -22,7 +24,7 @@
   </head>
   <body>
 <!-- nav shared across sites -->
-{% ssi '/var/www/includes/nav.shtml' %}
+{% include 'includes/nav.shtml' %}
   <div id="container">
 
 	<div id="header">
