@@ -438,6 +438,10 @@ QUERY_MAPPING = {
         'solr_field': 'document_type',
         'object_type': 'documents'
     },
+    'service':  {
+        'solr_field': 'service_id',
+        'object_type': 'all'
+    },
 }
 
 # this maps from the date-based query parameter to the SOLR field used
