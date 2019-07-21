@@ -30,7 +30,8 @@ if SERVER_ENV == "production":
     }
 elif SERVER_ENV in ["staging"]:
     SOLR_SERVER_URLS = {
-        'eldis': 'http://solr.ids.ac.uk:8983/solr/eldis-ims-live/',
+        'eldis': 'http://test.api.ids.ac.uk:8983/solr/eldis-dev/',
+        'eldis_plus': 'http://test.ids.ac.uk:8983/solr/eldis-ims-live/',
         'bridge': 'http://test.api.ids.ac.uk:8983/solr/bridge-dev/',
         'bridge_plus': 'http://test.api.ids.ac.uk:8983/solr/bridge-dev-plus/',
     }
@@ -147,7 +148,7 @@ ADMIN_ONLY_FIELDS = [
 'funder',
 'funder_array',
 'service_array',
-'content_partner_array'     
+'content_partner_array'
 ]
 
 # these are the fields that will be given to a 'General User'
@@ -437,6 +438,10 @@ QUERY_MAPPING = {
     'document_type':  {
         'solr_field': 'document_type',
         'object_type': 'documents'
+    },
+    'service':  {
+        'solr_field': 'service_id',
+        'object_type': 'all'
     },
 }
 
