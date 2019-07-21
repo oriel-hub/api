@@ -1,8 +1,8 @@
 import pytest
+import unittest
 
 from os import path
 from django.test import SimpleTestCase
-from django.utils import unittest
 from django.conf import settings
 from rest_framework.renderers import BaseRenderer
 import sunburnt
