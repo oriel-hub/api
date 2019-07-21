@@ -20,6 +20,7 @@ ALLOWED_HOSTS = [
     '.api.okhub.org',
     'drooga.ids.ac.uk',
     'idsapi.testdns.aptivate.org',
+    'boorka.ids.ac.uk',
 ]
 
 # Local time zone for this installation. Choices can be found here:
