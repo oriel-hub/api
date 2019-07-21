@@ -1,2 +1,1 @@
-# import signals so they get registered
-from . import signals
+default_app_config = 'userprofile.apps.UserProfileConfig'
