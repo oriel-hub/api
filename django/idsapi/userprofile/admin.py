@@ -104,9 +104,9 @@ class MyUserAdmin(UserAdmin):
     def get_urls(self):
         urls = super(MyUserAdmin, self).get_urls()
 
-        urls = ('',
+        urls = ['',
             url(r'^download/$', download_view, name='user_list_download'),
-        ) + urls
+        ] + urls
 
         return urls
 
