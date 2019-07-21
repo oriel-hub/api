@@ -24,12 +24,14 @@ DEFAULT_SITE = 'eldis'
 if SERVER_ENV == "production":
     SOLR_SERVER_URLS = {
         'eldis': 'http://solr.ids.ac.uk:8983/solr/eldis-live/',
+        'eldis_plus': 'http://solr.ids.ac.uk:8983/solr/eldis-ims-live/',
         'bridge': 'http://solr.ids.ac.uk:8983/solr/bridge-live/',
         'bridge_plus': 'http://solr.ids.ac.uk:8983/solr/bridge-live-plus/',
     }
 elif SERVER_ENV in ["staging"]:
     SOLR_SERVER_URLS = {
         'eldis': 'http://test.api.ids.ac.uk:8983/solr/eldis-dev/',
+        'eldis_plus': 'http://test.ids.ac.uk:8983/solr/eldis-ims-live/',
         'bridge': 'http://test.api.ids.ac.uk:8983/solr/bridge-dev/',
         'bridge_plus': 'http://test.api.ids.ac.uk:8983/solr/bridge-dev-plus/',
     }
@@ -435,6 +437,10 @@ QUERY_MAPPING = {
     'document_type':  {
         'solr_field': 'document_type',
         'object_type': 'documents'
+    },
+    'service':  {
+        'solr_field': 'service_id',
+        'object_type': 'all'
     },
 }
 
