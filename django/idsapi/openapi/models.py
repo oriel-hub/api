@@ -8,4 +8,4 @@
 
 from sunburnt.strings import SolrString
 
-SolrString.lucene_special_chars = '+-&|!(){}[]^"~*?:\t\v\\/'
+SolrString.lucene_special_chars = '&|!(){}[]^~*?:\t\v\\/'
