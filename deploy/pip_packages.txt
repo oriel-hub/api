@@ -26,6 +26,7 @@ lxml==4.3.4
 git+https://github.com/jdunck/python-unicodecsv.git
 
 # document generation
+docutils==0.14  # >0.15 Python 3 only
 sphinx==1.0.7
 sphinxcontrib-httpdomain==1.1.4
 
