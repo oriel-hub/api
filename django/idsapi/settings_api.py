@@ -118,6 +118,7 @@ SORT_FIELDS = [
 'category_path',
 'category_path_sort',
 'publication_date',
+'date_updated',
 'date_created',
 'start_date',
 'end_date',
