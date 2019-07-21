@@ -3,8 +3,7 @@ from django.conf.urls import url
 from openapi.views import AllObjectView, ObjectSearchView, ObjectView, FieldListView, \
     RootView, FacetCountView, CategoryChildrenView, The404View
 
-urlpatterns = ('idsapi.openapi.views',
-
+urlpatterns = [
     url(r'^$', RootView.as_view(), name='root'),
 
     url(r'^(?P<site>\w+)/fieldlist/?$', FieldListView.as_view(), name='field_list'),
@@ -40,4 +39,4 @@ urlpatterns = ('idsapi.openapi.views',
 
     # finally do a catch all to give a nicer 404
     url(r'^(?P<path>.+)$', The404View.as_view(), name='404'),
-)
+]
