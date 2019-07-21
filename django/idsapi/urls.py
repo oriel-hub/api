@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from django.views.generic.base import RedirectView
 
 import userprofile.urls
@@ -14,7 +14,7 @@ import openapi.urls
 
 from userprofile.forms import ProfileForm
 
-urlpatterns += patterns('',
+urlpatterns += ('',
     (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
 
     # Uncomment the admin/doc line below to enable admin documentation:

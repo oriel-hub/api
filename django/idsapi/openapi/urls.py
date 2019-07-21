@@ -1,9 +1,9 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from openapi.views import AllObjectView, ObjectSearchView, ObjectView, FieldListView, \
     RootView, FacetCountView, CategoryChildrenView, The404View
 
-urlpatterns = patterns('idsapi.openapi.views',
+urlpatterns = ('idsapi.openapi.views',
 
     url(r'^$', RootView.as_view(), name='root'),
 

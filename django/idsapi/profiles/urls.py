@@ -22,12 +22,12 @@ redirect. If you don't use that name, remember to explicitly pass
 
 """
 
-from django.conf.urls.defaults import *
+from django.conf.urls.defaults import url
 
 from profiles import views
 
 
-urlpatterns = patterns('',
+urlpatterns = ('',
                        url(r'^create/$',
                            views.create_profile,
                            name='profiles_create_profile'),
