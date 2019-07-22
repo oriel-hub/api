@@ -24,6 +24,7 @@ urlpatterns += [
     url(r'^admin/', include(admin.site.urls)),
 
     url(r'^accounts/', include('django_registration.backends.activation.urls')),
+    url(r'^accounts/', include('django.contrib.auth.urls')),
 
     url(r'^profiles/edit/', edit_profile,
         {'form_class': ProfileForm, 'success_url': '/profiles/view/'},
