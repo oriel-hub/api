@@ -4,9 +4,7 @@ from local_settings import SERVER_ENV
 
 # This is used to send email alerts to the admins of the system
 ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
-    ('Peter Mason', 'p.mason@ids.ac.uk'),
-    # ('Duncan Edwards', 'd.edwards@ids.ac.uk'),
+    ('Aptivate Carers', 'carers-idsapi@aptivate.org'),
 )
 MANAGERS = ADMINS
 
