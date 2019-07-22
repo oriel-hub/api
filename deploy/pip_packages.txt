@@ -12,10 +12,9 @@ django-htmlmin==0.11.0
 # solr
 -e git+https://github.com/aptivate/sunburnt.git@3ed5dc420a2ebf8380ffc26c603bcdf9e8b0d65e#egg=sunburnt
 
-# user stuff
+# User profiles and registration
 django-countries==5.3.3
-# Replaced by local copy of app modified to support Django 1.8
-# django-profiles==0.2
+# django-profiles==0.2  # Replaced by local copy of app modified to support Django 1.8
 django-registration==3.0.1
 
 # general libraries
