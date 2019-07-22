@@ -85,7 +85,7 @@ default_branch = {
     'staging':      'master',
     'staging_test': 'master',
     'dev_server':   'develop',
-    'boorka':       'idsapi_v2',
+    'boorka':       'idsapi_v2_django_1_11',
     'drooga':       'idsapi_v2',
 }
 
