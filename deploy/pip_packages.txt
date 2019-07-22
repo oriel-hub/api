@@ -26,7 +26,7 @@ lxml==4.3.4
 unicodecsv==0.14.1
 
 # document generation
-docutils==0.14  # >0.15 Python 3 only
+docutils==0.14  # docutils>=0.15 supports Python 3 only
 sphinx==1.0.7
 sphinxcontrib-httpdomain==1.1.4
 
