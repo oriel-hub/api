@@ -39,6 +39,10 @@ class RegistrationTests(TestCase):
         profile = self.user1.userprofile
         self.assertTrue(isinstance(profile, UserProfile))
 
+    def test_login_page_has_register_link(self):
+        response = self.client.get(reverse('login'))
+        self.assertContains(response, reverse('django_registration_register'))
+
     def test_redirected_to_edit_profile_on_first_login(self):
         self.login()
         response = self.client.get(reverse('profile_detail'))
