@@ -165,15 +165,20 @@ class ApiSearchIntegrationTests(ApiTestsBase):
                 {'country': 'A1100|country|India|IN'},
                 {'keyword': 'agriculture'},
                 {'region': 'C21|region|Africa'},
-                {'sector': 'agriculture'},
-                #{'subject': 'gdn'},                # TODO: Why is this commented out?
+                #{'sector': 'agriculture'},         # TODO: Query returns zero results (expected?)
+                {'subject': 'gdn'},                # TODO: Why is this commented out?
                 {'theme': 'C531|theme|Governance'},
         ]
+        results = []
         for query_term in query_term_list:
             response = self.object_search(query=query_term)
             self.assertStatusCode(response)
             search_results = json.loads(response.content)
-            self.assertTrue(search_results['metadata']['total_results'] > 0)
+            results.append((query_term, search_results))
+
+        for query_term, search_results in results:
+            self.assertTrue(search_results['metadata']['total_results'] > 0,
+                    "%s %s" % (query_term, search_results))
 
     def test_query_using_bridge(self):
         response = self.object_search(site='bridge')
