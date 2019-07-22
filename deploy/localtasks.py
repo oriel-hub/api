@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, absolute_import
 
 import os
-import tasklib
 from dye.tasklib.environment import env
 from dye.tasklib import tasklib
 from project_settings import django_apps
