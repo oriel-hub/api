@@ -104,7 +104,10 @@ class RegistrationTests(TestCase):
 
     def test_profile_csv_download_requires_staff(self):
         self.login()
-        response = self.client.get(reverse(userprofile.admin.download_view))
+        response = self.client.get(
+            reverse(userprofile.admin.download_view),
+            follow=True
+        )
         self.assertContains(response, 'Log in')
 
     def test_profile_csv_download_output(self):
@@ -148,7 +151,7 @@ class RegistrationTests(TestCase):
                 profile.access_guid,
                 profile.beacon_guid,
                 ])
-        
+
         self.assertEqual(expected.getvalue(), response.content)
         self.assertEqual('text/csv', response['Content-Type'])
         self.assertEqual('attachment; filename=users.csv',
