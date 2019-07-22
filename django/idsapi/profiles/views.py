@@ -7,9 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404
-from django.shortcuts import render_to_response
-from django.template import RequestContext
+from django.shortcuts import get_object_or_404, render
 from django.views.generic.list import ListView
 
 from django.contrib.auth.decorators import login_required
@@ -111,13 +109,15 @@ def create_profile(request, form_class=None, success_url=None,
 
     if extra_context is None:
         extra_context = {}
-    context = RequestContext(request)
+
+    context = {
+        'form': form,
+    }
     for key, value in extra_context.items():
         context[key] = callable(value) and value() or value
 
-    return render_to_response(template_name,
-                              { 'form': form },
-                              context_instance=context)
+    return render(reqest, template_name, context)
+
 create_profile = login_required(create_profile)
 
 def edit_profile(request, form_class=None, success_url=None,
@@ -202,14 +202,16 @@ def edit_profile(request, form_class=None, success_url=None,
 
     if extra_context is None:
         extra_context = {}
-    context = RequestContext(request)
+
+    context = {
+        'form': form,
+        'profile': profile_obj,
+    }
     for key, value in extra_context.items():
         context[key] = callable(value) and value() or value
 
-    return render_to_response(template_name,
-                              { 'form': form,
-                                'profile': profile_obj, },
-                              context_instance=context)
+    return render(request, template_name, context)
+
 edit_profile = login_required(edit_profile)
 
 def profile_detail(request, username, public_profile_field=None,
@@ -277,13 +279,14 @@ def profile_detail(request, username, public_profile_field=None,
 
     if extra_context is None:
         extra_context = {}
-    context = RequestContext(request)
+
+    context = {
+        'profile': profile_obj,
+    }
     for key, value in extra_context.items():
         context[key] = callable(value) and value() or value
 
-    return render_to_response(template_name,
-                              { 'profile': profile_obj },
-                              context_instance=context)
+    return render(request, template_name, context)
 
 def profile_list(request, public_profile_field=None,
                  template_name='profiles/profile_list.html', **kwargs):
