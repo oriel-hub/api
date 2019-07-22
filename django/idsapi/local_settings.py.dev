@@ -1,7 +1,6 @@
 import private_settings
 
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
 
 # whether to send solr search parameters to logs/console
 # default to False - best to override in local_settings
