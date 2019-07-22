@@ -4,23 +4,24 @@ Fabric==1.14.0
 -e git+git://github.com/aptivate/dye.git@bcaff392f4f216b880fa91a61d96b9cc476eec49#egg=dye
 
 # core django
-Django>=1.8,<1.9
+Django>=1.11,<2.0
 mysqlclient==1.4.2.post1
 pytz==2015.4
+django-htmlmin==0.11.0
 
 # solr
 -e git+https://github.com/aptivate/sunburnt.git@3ed5dc420a2ebf8380ffc26c603bcdf9e8b0d65e#egg=sunburnt
 
 # user stuff
-django-countries==3.4.1
+django-countries==5.3.3
 # Replaced by local copy of app modified to support Django 1.8
 # django-profiles==0.2
-django-registration==2.0.3
+django-registration==3.0.1
 
 # general libraries
 requests==2.22.0
-djangorestframework-xml==1.3.0
-djangorestframework==3.3.2
+djangorestframework-xml==1.4.0
+djangorestframework==3.9.4
 httplib2==0.13.0
 lxml==4.3.4
 git+https://github.com/jdunck/python-unicodecsv.git
