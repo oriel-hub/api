@@ -306,6 +306,7 @@ from settings_api import *
 # Hosts/domain names that are valid for this site
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = [
+    '127.0.0.1',
     '.api.ids.ac.uk',
     '.api.okhub.org',
     'drooga.ids.ac.uk',
