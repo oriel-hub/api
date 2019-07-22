@@ -23,7 +23,7 @@ djangorestframework-xml==1.4.0
 djangorestframework==3.9.4
 httplib2==0.13.0
 lxml==4.3.4
-git+https://github.com/jdunck/python-unicodecsv.git
+unicodecsv==0.14.1
 
 # document generation
 docutils==0.14  # >0.15 Python 3 only
