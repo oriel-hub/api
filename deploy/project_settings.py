@@ -79,7 +79,7 @@ host_list = {
 # this is the default git branch to use on each server
 default_branch = {
     'boorka':       'idsapi_v2_django_1_11',
-    'drooga':       'idsapi_v2',
+    'drooga':       'idsapi_v2_django_1_11'
 }
 
 # where on the server the django apps are deployed
