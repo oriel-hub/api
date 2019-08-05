@@ -4,7 +4,7 @@ Fabric==1.14.0
 -e git+git://github.com/aptivate/dye.git@bcaff392f4f216b880fa91a61d96b9cc476eec49#egg=dye
 
 # core django
-Django>=1.11,<2.0
+Django==1.11.23
 mysqlclient==1.4.2.post1
 pytz==2015.4
 django-htmlmin==0.11.0
