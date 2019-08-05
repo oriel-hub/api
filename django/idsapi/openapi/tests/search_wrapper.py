@@ -34,14 +34,16 @@ class MockSolrQuery:
         self.sort_field = None
         self.has_free_text_query = False
         self.extra = {}
+        self.score = False
 
     def query(self, *args, **kwargs):
         self.query_call_count += 1
         self.query_args.append([args, kwargs])
         return self
 
-    def field_limit(self, field_list):
-        self.field_list = field_list
+    def field_limit(self, fields=None, score=False):
+        self.field_list = fields
+        self.score = score
         return self
 
     def sort_by(self, sort_field):
@@ -92,6 +94,12 @@ class SearchWrapperTests(unittest.TestCase):
 
         sw.restrict_fields_returned('short', {'extra_fields': extra_field})
         self.assertTrue(extra_field in self.msi.query.field_list)
+
+
+    def test_request_score_pseudo_field(self):
+        sw = SearchWrapper('Unlimited', 'eldis', self.msi)
+        sw.restrict_fields_returned('short', {'extra_fields': 'score'})
+        self.assertTrue(self.msi.query.score)
 
 
 class SearchWrapperAddSortTests(unittest.TestCase):
