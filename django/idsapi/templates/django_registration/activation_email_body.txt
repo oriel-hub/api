@@ -3,7 +3,7 @@ Thank you for registering for a key for the Knowledge Services API.
 To activate your account, please click on this link or copy and paste it into your browser within {{expiration_days}} days.
 After {{expiration_days}} days this link will not work and you will have to register again.
 
-{{ protocol }}://{{ domain }}/accounts/activate/{{activation_key}}/
+{{ scheme }}://{{ site.domain }}{% url 'django_registration_activate' activation_key %}
 
 If you have received this mail in error, you do not need to take any action.
 
