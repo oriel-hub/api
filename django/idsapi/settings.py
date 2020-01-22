@@ -1,5 +1,5 @@
 # Build paths inside the project like this: path.join(BASE_DIR, ...)
-from __future__ import unicode_literals, absolute_import
+
 
 from os import path
 BASE_DIR = path.abspath(path.dirname(__file__))
@@ -9,7 +9,7 @@ try:
     import djcelery
     djcelery.setup_loader()
 except:
-    print 'ERROR: django-celery is missing.'
+    print('ERROR: django-celery is missing.')
 
 ########## DEFAULT DEBUG SETTINGS - OVERRIDE IN local_settings
 DEBUG = False
@@ -263,13 +263,13 @@ LOGGING = {
 try:
     import local_settings
 except ImportError:
-    print """
+    print("""
     -------------------------------------------------------------------------
     You need to create a local_settings.py file. Run ../../deploy/tasks.py
     deploy:<whatever> to use one of the local_settings.py.* files as your
     local_settings.py, and create the database and tables mentioned in it.
     -------------------------------------------------------------------------
-    """
+    """)
     import sys
     sys.exit(1)
 else:
@@ -307,6 +307,7 @@ from settings_api import *
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = [
     '127.0.0.1',
+    'localhost',
     '.api.ids.ac.uk',
     '.api.okhub.org',
     'drooga.ids.ac.uk',
