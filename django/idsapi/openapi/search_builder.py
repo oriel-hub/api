@@ -2,8 +2,7 @@
 #
 # TODO: create a mock version of this class for tests
 import logging
-import urllib
-import urllib2
+import urllib.parse
 import re
 from datetime import datetime, timedelta
 import sunburnt
@@ -105,7 +104,7 @@ class SearchBuilder():
             if len(query) < 1:
                 raise InvalidQueryError("All query parameters must have a value, but '%s' does not" % param)
             if param == 'q':
-                sw.add_free_text_query(urllib.unquote_plus(query))
+                sw.add_free_text_query(urllib.parse.unquote_plus(query))
             elif param in query_mapping.keys():
                 if query_mapping[param]['object_type'] != 'all':
                     if query_mapping[param]['object_type'] != object_type:
@@ -184,7 +183,7 @@ class SearchWrapper:
         self.has_free_text_query = False
 
     def execute(self):
-        solr_query = settings.SOLR_SERVER_URLS[self.site] + 'select/?' + urllib.urlencode(self.si_query.params())
+        solr_query = settings.SOLR_SERVER_URLS[self.site] + 'select/?' + urllib.parse.urlencode(self.si_query.params())
         if settings.LOG_SEARCH_PARAMS:
             # this will print to console or error log as appropriate
             logger.info("search params: " + self.si_query.params())
@@ -367,7 +366,7 @@ class SearchWrapper:
 
     def add_field_query(self, field_name, param_value):
         # decode spaces and '|' before using
-        decoded_param_value = urllib2.unquote(param_value)
+        decoded_param_value = urllib.parse.unquote(param_value)
         if not (decoded_param_value[0].isalnum() or decoded_param_value[0] == '"'):
             raise InvalidQueryError("Cannot start query value with '%s'"
                     % decoded_param_value[0])
