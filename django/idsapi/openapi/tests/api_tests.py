@@ -207,9 +207,9 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         response_no_slash = self.object_search(output_format='no_slash')
         # the metadata is different due to next/prev link containing "short",
         # or not, so just compare up to the metadata.
-        response_short = response_short.content.split('"metadata":')[0]
-        response_blank = response_blank.content.split('"metadata":')[0]
-        response_no_slash = response_no_slash.content.split('"metadata":')[0]
+        response_short = response_short.content.split(b'"metadata":')[0]
+        response_blank = response_blank.content.split(b'"metadata":')[0]
+        response_no_slash = response_no_slash.content.split(b'"metadata":')[0]
         self.assertEqual(response_short, response_blank)
         self.assertEqual(response_short, response_no_slash)
 
