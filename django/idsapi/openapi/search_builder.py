@@ -38,15 +38,8 @@ class Connection(object):
     def __init__(self):
         self.connection = requests
 
-    def request(self, uri, method='GET'):
-        """ Compatability with httplib2
-
-            httplib2.Http().request(
-                    self, uri, method='GET', body=None,
-                    headers=None, redirections=5, connection_type=None)
-        """
-        resp = self.connection.request(method, uri)
-        return (Response(resp), resp.content)
+    def request(self, method, uri):
+        return self.connection.request(method, uri)
 
 
 def get_solr_interface(site):
