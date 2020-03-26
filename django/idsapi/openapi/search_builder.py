@@ -85,7 +85,7 @@ class SearchBuilder():
 
     @classmethod
     def _is_date_query(cls, param):
-        for date_prefix in settings.DATE_PREFIX_MAPPING.keys():
+        for date_prefix in list(settings.DATE_PREFIX_MAPPING.keys()):
             if param.startswith(date_prefix):
                 return True
         return False
@@ -105,7 +105,7 @@ class SearchBuilder():
                 raise InvalidQueryError("All query parameters must have a value, but '%s' does not" % param)
             if param == 'q':
                 sw.add_free_text_query(urllib.parse.unquote_plus(query))
-            elif param in query_mapping.keys():
+            elif param in list(query_mapping.keys()):
                 if query_mapping[param]['object_type'] != 'all':
                     if query_mapping[param]['object_type'] != object_type:
                         raise InvalidQueryError(
@@ -287,7 +287,7 @@ class SearchWrapper:
         self.si_query = self.si_query.query(search_text.lower())
 
     def add_facet(self, facet_type, search_params):
-        if not facet_type in settings.FACET_MAPPING.keys():
+        if not facet_type in list(settings.FACET_MAPPING.keys()):
             raise InvalidQueryError("Unknown count type: '%s_count'" % facet_type)
         facet_kwargs = {}
         if settings.EXCLUDE_ZERO_COUNT_FACETS:
@@ -397,7 +397,7 @@ class SearchWrapper:
         """split string into quoted sections and on & or | outside quotes"""
         quoted_divided_string = self.quoted_re.split(string)
         # remove empty/whitespace strings
-        quoted_divided_string = filter(None, [s.strip() for s in quoted_divided_string])
+        quoted_divided_string = [_f for _f in [s.strip() for s in quoted_divided_string] if _f]
         # now we have quoted strings and other strings
         divided_string = []
         for str_fragment in quoted_divided_string:
@@ -406,7 +406,7 @@ class SearchWrapper:
             else:
                 words = [w.strip() for w in self.amp_pipe_re.split(str_fragment)]
                 # the filter(None, array) discards empty strings
-                divided_string.extend(filter(None, words))
+                divided_string.extend([_f for _f in words if _f])
         return divided_string
 
     def is_quoted(self, string):
