@@ -108,7 +108,7 @@ class XmlDictConfig(dict):
         try:
             if set_encoding:
                 xml_header = '<?xml version="1.1" encoding="%s" ?>\n' % set_encoding
-                xml_string = xml_header + xml_string
+                xml_string = xml_header.encode(set_encoding) + xml_string
                 root = ElementTree.fromstring(xml_string)
             else:
                 #TODO: Is this a useful feature?
