@@ -115,12 +115,12 @@ class SearchWrapperAddSortTests(unittest.TestCase):
     def test_add_descending_sort_inverts_field(self):
         sw = SearchWrapper('General User', 'eldis', self.msi)
         sw.add_sort({'sort_desc': 'title'}, 'assets')
-        self.assertEquals(self.msi.query.sort_field, '-title')
+        self.assertEqual(self.msi.query.sort_field, '-title')
 
     def test_add_sort_with_no_mapping(self):
         sw = SearchWrapper('General User', 'eldis', self.msi)
         sw.add_sort({'sort_asc': 'title'}, 'assets')
-        self.assertEquals(self.msi.query.sort_field, 'title')
+        self.assertEqual(self.msi.query.sort_field, 'title')
 
     def test_add_sort_with_mapping(self):
         """
@@ -129,7 +129,7 @@ class SearchWrapperAddSortTests(unittest.TestCase):
         settings.SORT_MAPPING = {'title': 'title_sort'}
         sw = SearchWrapper('General User', 'eldis', self.msi)
         sw.add_sort({'sort_asc': 'title'}, 'assets')
-        self.assertEquals(self.msi.query.sort_field, 'title_sort')
+        self.assertEqual(self.msi.query.sort_field, 'title_sort')
 
     def test_add_sort_default_ordering_when_no_sort_params(self):
         """
@@ -145,7 +145,7 @@ class SearchWrapperAddSortTests(unittest.TestCase):
         settings.SORT_MAPPING = {'title': 'title_sort'}
         sw = SearchWrapper('General User', 'eldis', self.msi)
         sw.add_sort(dict(), 'countries')
-        self.assertEquals(self.msi.query.sort_field, 'title_sort')
+        self.assertEqual(self.msi.query.sort_field, 'title_sort')
 
     def test_add_sort_no_default_ordering_when_free_text_query(self):
         """
@@ -169,7 +169,7 @@ class SearchWrapperAddSortTests(unittest.TestCase):
         sw = SearchWrapper('General User', 'eldis', self.msi)
         sw.has_free_text_query = True
         sw.add_sort({'sort_desc': 'title'}, 'assets')
-        self.assertEquals(self.msi.query.sort_field, '-title_sort')
+        self.assertEqual(self.msi.query.sort_field, '-title_sort')
 
 
 @pytest.mark.xfail(reason="Already broken in tag idsapi_14")
@@ -192,55 +192,55 @@ class SearchWrapperAddFreeTextQueryTests(unittest.TestCase):
 
     def test_free_text_query_has_implicit_or(self):
         self.sw.add_free_text_query('brazil health ozone')
-        self.assertEquals(self.solr_q(), 'brazil\\ health\\ ozone')
+        self.assertEqual(self.solr_q(), 'brazil\\ health\\ ozone')
 
     def test_free_text_query_supports_single_and_operator(self):
         self.sw.add_free_text_query('brazil and health')
-        self.assertEquals(self.solr_q(), 'brazil\\ and\\ health')
+        self.assertEqual(self.solr_q(), 'brazil\\ and\\ health')
 
     def test_free_text_query_supports_single_and_operator_with_implicit_or(self):
         self.sw.add_free_text_query('brazil and health ozone')
-        self.assertEquals(self.solr_q(), 'brazil\\ and\\ health\\ ozone')
+        self.assertEqual(self.solr_q(), 'brazil\\ and\\ health\\ ozone')
 
     def test_free_text_query_supports_single_and_operator_alternative(self):
         self.sw.add_free_text_query('brazil & health ozone')
-        self.assertEquals(self.solr_q(), 'brazil\\ \\&\\ health\\ ozone')
+        self.assertEqual(self.solr_q(), 'brazil\\ \\&\\ health\\ ozone')
 
     def test_free_text_query_supports_single_and_operator_alternative_with_no_spaces(self):
         self.sw.add_free_text_query('brazil&health ozone')
-        self.assertEquals(self.solr_q(), 'brazil\\&health\\ ozone')
+        self.assertEqual(self.solr_q(), 'brazil\\&health\\ ozone')
 
     def test_free_text_query_supports_multiple_and_operator(self):
         self.sw.add_free_text_query('brazil and health and ozone')
-        self.assertEquals(self.solr_q(), 'brazil\\ and\\ health\\ and\\ ozone')
+        self.assertEqual(self.solr_q(), 'brazil\\ and\\ health\\ and\\ ozone')
 
     def test_free_text_query_ignores_disconnected_and(self):
         self.sw.add_free_text_query('brazil and health ozone and')
-        self.assertEquals(self.solr_q(), 'brazil\\ and\\ health\\ ozone\\ and')
+        self.assertEqual(self.solr_q(), 'brazil\\ and\\ health\\ ozone\\ and')
 
     def test_free_text_query_ignores_and_at_start_of_string(self):
         self.sw.add_free_text_query('and brazil and health ozone')
-        self.assertEquals(self.solr_q(), 'and\\ brazil\\ and\\ health\\ ozone')
+        self.assertEqual(self.solr_q(), 'and\\ brazil\\ and\\ health\\ ozone')
 
     def test_free_text_query_ignores_multiple_ands(self):
         self.sw.add_free_text_query('brazil and and health ozone')
-        self.assertEquals(self.solr_q(), 'brazil\\ and\\ and\\ health\\ ozone')
+        self.assertEqual(self.solr_q(), 'brazil\\ and\\ and\\ health\\ ozone')
 
     def test_free_text_query_supports_or_operator(self):
         self.sw.add_free_text_query('brazil or health ozone')
-        self.assertEquals(self.solr_q(), 'brazil\\ or\\ health\\ ozone')
+        self.assertEqual(self.solr_q(), 'brazil\\ or\\ health\\ ozone')
 
     def test_free_text_query_gracefully_handles_meaningless_operators(self):
         self.sw.add_free_text_query('|')
-        self.assertEquals(self.solr_q(), '\\|')
+        self.assertEqual(self.solr_q(), '\\|')
 
     def test_free_text_query_supports_or_operators_alternative(self):
         self.sw.add_free_text_query('brazil | health | ozone')
-        self.assertEquals(self.solr_q(), 'brazil\\ \\|\\ health\\ \\|\\ ozone')
+        self.assertEqual(self.solr_q(), 'brazil\\ \\|\\ health\\ \\|\\ ozone')
 
     def test_and_has_higher_operator_precedence_than_or(self):
         self.sw.add_free_text_query('brazil and health ozone and environment')
-        self.assertEquals(self.solr_q(), 'brazil\\ and\\ health\\ ozone\\ and\\ environment')
+        self.assertEqual(self.solr_q(), 'brazil\\ and\\ health\\ ozone\\ and\\ environment')
 
 
 class SearchWrapperAddFieldQueryTests(unittest.TestCase):
@@ -257,31 +257,31 @@ class SearchWrapperAddFieldQueryTests(unittest.TestCase):
 
     def test_field_query_supports_quoted_text(self):
         q = self.sw.add_field_query('title', '"beyond their age"')
-        self.assertEquals(u'title:\\"beyond their age\\"', q.options()[None])
+        self.assertEqual(u'title:\\"beyond their age\\"', q.options()[None])
 
     def test_field_query_supports_quoted_text_with_or(self):
         q = self.sw.add_field_query('title', '"beyond their age"|climate')
-        self.assertEquals(u'title:\\"beyond their age\\" OR title:climate', q.options()[None])
+        self.assertEqual(u'title:\\"beyond their age\\" OR title:climate', q.options()[None])
 
     def test_field_query_supports_quoted_text_with_and(self):
         q = self.sw.add_field_query('title', '"beyond their age"&"climate change"')
-        self.assertEquals(u'title:\\"beyond their age\\" AND title:\\"climate change\\"', q.options()[None])
+        self.assertEqual(u'title:\\"beyond their age\\" AND title:\\"climate change\\"', q.options()[None])
 
     def test_field_query_supports_pipe_in_quoted_text(self):
         q = self.sw.add_field_query('title', '"beyond|their age"')
-        self.assertEquals(u'title:\\"beyond\\|their age\\"', q.options()[None])
+        self.assertEqual(u'title:\\"beyond\\|their age\\"', q.options()[None])
 
     def test_field_query_supports_ampersand_in_quoted_text(self):
         q = self.sw.add_field_query('title', '"beyond&their age"')
-        self.assertEquals(u'title:\\"beyond\\&their age\\"', q.options()[None])
+        self.assertEqual(u'title:\\"beyond\\&their age\\"', q.options()[None])
 
     def test_field_query_supports_quoted_text_with_and_aswell_as_pipe_in_quotes(self):
         q = self.sw.add_field_query('title', '"beyond their age"&"climate|change"')
-        self.assertEquals(u'title:\\"beyond their age\\" AND title:\\"climate\\|change\\"', q.options()[None])
+        self.assertEqual(u'title:\\"beyond their age\\" AND title:\\"climate\\|change\\"', q.options()[None])
 
     def test_field_query_supports_quoted_text_with_or_aswell_as_ampersand_in_quotes(self):
         q = self.sw.add_field_query('title', '"beyond their age"|"climate&change"')
-        self.assertEquals(u'title:\\"beyond their age\\" OR title:\\"climate\\&change\\"', q.options()[None])
+        self.assertEqual(u'title:\\"beyond their age\\" OR title:\\"climate\\&change\\"', q.options()[None])
 
     def test_field_query_checks_quoted_text_is_closed(self):
         self.assertRaises(InvalidQueryError, self.sw.add_field_query, 'title', '"beyond their age')

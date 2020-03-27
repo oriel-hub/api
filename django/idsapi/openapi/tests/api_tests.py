@@ -688,7 +688,7 @@ class ApiGetObjectIntegrationTests(ApiTestsBase):
                 query={'extra_fields': 'not_a_valid_field'})
         self.assertStatusCode(response, 400)
         expected_message = b'["Invalid query: Can\'t limit Fields - Fields not defined in schema: [\'not_a_valid_field\']"]'
-        self.assertEquals(response.content, expected_message)
+        self.assertEqual(response.content, expected_message)
 
 
 class ApiRootIntegrationTests(ApiTestsBase):

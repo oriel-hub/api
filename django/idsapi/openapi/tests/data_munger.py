@@ -16,9 +16,9 @@ class DataMungerTests(TestCase):
         data = DataMunger("eldis")
         facet_dict = data.convert_facet_string(test_string, "country")
 
-        self.assertEquals(facet_dict['object_id'], 'A1200')
-        self.assertEquals(facet_dict['object_type'], 'Country')
-        self.assertEquals(facet_dict['object_name'], 'South Africa')
+        self.assertEqual(facet_dict['object_id'], 'A1200')
+        self.assertEqual(facet_dict['object_type'], 'Country')
+        self.assertEqual(facet_dict['object_name'], 'South Africa')
         self.assertTrue(facet_dict['metadata_url'].endswith('/openapi/eldis/get/countries/A1200/full/south-africa/'),
             "Got %s" % facet_dict['metadata_url'])
 
@@ -27,10 +27,10 @@ class DataMungerTests(TestCase):
         data = DataMunger("eldis")
         facet_dict = data.convert_facet_string(test_string, "theme")
 
-        self.assertEquals(facet_dict['object_id'], 'C563')
-        self.assertEquals(facet_dict['object_type'], 'theme')
-        self.assertEquals(facet_dict['object_name'], 'Health Challenges')
-        self.assertEquals(facet_dict['level'], '1')
+        self.assertEqual(facet_dict['object_id'], 'C563')
+        self.assertEqual(facet_dict['object_type'], 'theme')
+        self.assertEqual(facet_dict['object_name'], 'Health Challenges')
+        self.assertEqual(facet_dict['level'], '1')
         self.assertTrue(facet_dict['metadata_url'].endswith('/openapi/eldis/get/themes/C563/full/health-challenges/'),
             "Got %s" % facet_dict['metadata_url'])
 
@@ -39,17 +39,17 @@ class DataMungerTests(TestCase):
         data = DataMunger("eldis")
         facet_dict = data.convert_facet_string(test_string, "keyword")
 
-        self.assertEquals(facet_dict['object_id'], '')
-        self.assertEquals(facet_dict['object_type'], '')
-        self.assertEquals(facet_dict['object_name'], '')
-        self.assertEquals(facet_dict['metadata_url'], '')
+        self.assertEqual(facet_dict['object_id'], '')
+        self.assertEqual(facet_dict['object_type'], '')
+        self.assertEqual(facet_dict['object_name'], '')
+        self.assertEqual(facet_dict['metadata_url'], '')
 
     def test_convert_old_style_facet_string_returns_dict_with_just_object_name(self):
         test_string = "environmental statistics"
         data = DataMunger("eldis")
         facet_dict = data.convert_facet_string(test_string, "keyword")
 
-        self.assertEquals(facet_dict['object_id'], '')
-        self.assertEquals(facet_dict['object_type'], '')
-        self.assertEquals(facet_dict['object_name'], 'environmental statistics')
-        self.assertEquals(facet_dict['metadata_url'], '')
+        self.assertEqual(facet_dict['object_id'], '')
+        self.assertEqual(facet_dict['object_type'], '')
+        self.assertEqual(facet_dict['object_name'], 'environmental statistics')
+        self.assertEqual(facet_dict['metadata_url'], '')
