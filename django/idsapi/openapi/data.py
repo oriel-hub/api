@@ -120,7 +120,7 @@ class DataMunger():
             'site': self.site,
         }) + '/'
         if object_name is not None:
-            title = re.sub('\W+', '-', object_name).lower().strip('-')
+            title = re.sub(r'\W+', '-', object_name).lower().strip('-')
             metadata_url += title + '/'
 
         if self.request:
