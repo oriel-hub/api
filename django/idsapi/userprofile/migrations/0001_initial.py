@@ -37,7 +37,7 @@ class Migration(migrations.Migration):
                 ('website_using_api', models.URLField(verbose_name=b'Website that will use the API')),
                 ('commercial', models.CharField(max_length=50, verbose_name=b'Usage', choices=[('Commercial', 'Commercial'), ('Non-Commercial', 'Non-Commercial')])),
                 ('agree_to_licensing', models.BooleanField(default=False, verbose_name='I have read and agree to the Terms and Conditions', validators=[userprofile.models.validate_agreed_to_license_terms])),
-                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
+                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
     ]
