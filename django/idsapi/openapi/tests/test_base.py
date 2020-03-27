@@ -1,8 +1,9 @@
 # functions to help the tests
 from django.contrib.auth.models import User
-from django.test.testcases import TestCase
+from django.test.testcases import TransactionTestCase
 
-class BaseTestCase(TestCase):
+class BaseTestCase(TransactionTestCase):
+
     def setUp(self):
         self.user = User.objects.create(username='user1', email='user1@example.org')
         self.user.set_password('password')
