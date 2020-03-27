@@ -5,11 +5,6 @@ from os import path
 BASE_DIR = path.abspath(path.dirname(__file__))
 
 import sys
-try:
-    import djcelery
-    djcelery.setup_loader()
-except:
-    print('ERROR: django-celery is missing.')
 
 ########## DEFAULT DEBUG SETTINGS - OVERRIDE IN local_settings
 DEBUG = False
@@ -144,9 +139,7 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     'django_countries',
     'django_registration',
-    'djcelery',
     'rest_framework',
-    'server_tracking',
 ]
 
 # Apps specific for this project go here.
@@ -373,16 +366,6 @@ CACHES = {
 
 ########## Your stuff: Below this line define 3rd party libary settings
 
-# server_tracking app configuration
-ANALYTICS_IGNORE_GUIDS = private_settings.ANALYTICS_IGNORE_GUIDS
-
-SERVER_SIDE_TRACKING = {
-    'defer': 'celery',
-}
-SERVER_SIDE_TRACKING_GA = {
-    'property': private_settings.GA_PROPERTY
-}
-
 REST_FRAMEWORK = {
     'UNICODE_JSON': False,
     'DEFAULT_PARSER_CLASSES': (
@@ -397,17 +380,6 @@ REST_FRAMEWORK = {
         'rest_framework_xml.renderers.XMLRenderer',
     ),
 }
-
-# CELERY SETTINGS
-BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}  # 1 hour.
-
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_IMPORTS = ('server_tracking.google.tasks',)
-
 
 # settings required for extra fields for users
 AUTH_PROFILE_MODULE = "userprofile.UserProfile"

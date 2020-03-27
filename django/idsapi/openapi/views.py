@@ -22,10 +22,7 @@ from openapi.defines import URL_ROOT, IdsApiError
 from openapi.guid_authentication import GuidAuthentication
 from openapi.permissions import PerUserThrottlingRatePerGroup
 
-from .analytics import PageViewMixin
-
-
-class OpenAPIView(PageViewMixin, APIView):
+class OpenAPIView(APIView):
     pass
 
 
