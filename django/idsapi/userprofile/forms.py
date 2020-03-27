@@ -11,7 +11,7 @@ class ProfileForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(ProfileForm, self).__init__(*args, **kwargs)
         # Insert User model fields first (for expected order)
-        field_sequence = self.fields.items()
+        field_sequence = list(self.fields.items())
         field_sequence.insert(0, ('first_name', forms.CharField(label="First name", help_text='')))
         field_sequence.insert(1, ('last_name', forms.CharField(label="Last name", help_text='')))
         field_sequence.insert(2, ('email', forms.EmailField(label="Primary email", help_text='')))

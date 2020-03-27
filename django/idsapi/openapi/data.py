@@ -29,11 +29,11 @@ class DataMunger():
             object_data = {'object_id': self.object_id}
         elif output_format == 'full':
             # filter out fields we don't want
-            object_data = dict((k, v) for k, v in result.items() if not k.endswith('_facet'))
+            object_data = dict((k, v) for k, v in list(result.items()) if not k.endswith('_facet'))
             if user_level_info['general_fields_only']:
-                object_data = dict((k, v) for k, v in object_data.items() if k in settings.GENERAL_FIELDS)
+                object_data = dict((k, v) for k, v in list(object_data.items()) if k in settings.GENERAL_FIELDS)
             elif user_level_info['hide_admin_fields']:
-                object_data = dict((k, v) for k, v in object_data.items() if k not in settings.ADMIN_ONLY_FIELDS)
+                object_data = dict((k, v) for k, v in list(object_data.items()) if k not in settings.ADMIN_ONLY_FIELDS)
         else:
             object_data = result
 
@@ -44,9 +44,8 @@ class DataMunger():
                 except ParseError as e:
                     object_data[xml_field] = "Could not parse XML, issue reported in logs"
                     # and send to logs
-                    print >> sys.stderr, \
-                        "COULD NOT PARSE XML. object_id: %s, field: %s Error: %s" % \
-                        (self.object_id, xml_field, str(e))
+                    print("COULD NOT PARSE XML. object_id: %s, field: %s Error: %s" % \
+                        (self.object_id, xml_field, str(e)), file=sys.stderr)
 
         # convert date fields to expected output format
         for date_field in settings.DATE_FIELDS:
@@ -70,7 +69,7 @@ class DataMunger():
             return object_data
 
         ordered = collections.OrderedDict()
-        for k, v in sorted(object_data.items(), key=lambda (k, v): k):
+        for k, v in sorted(list(object_data.items()), key=lambda k_v: k_v[0]):
             # Reorder nested dicts
             if isinstance(v, dict):
                 ordered[k] = self.fields_sorted(v)
@@ -85,7 +84,7 @@ class DataMunger():
         """convert an XML string into a list of dictionaries and add
         metadata URLs"""
         field_dict = XmlDictConfig.xml_string_to_dict(xml_field.encode('utf-8'), True, set_encoding="UTF-8")
-        for _, list_value in field_dict.items():
+        for _, list_value in list(field_dict.items()):
             for item in list_value:
                 if 'object_id' in item and \
                         'object_name' in item and \

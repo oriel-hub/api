@@ -8,7 +8,7 @@ from userprofile.models import UserProfile
 import userprofile.admin
 
 import unicodecsv
-import StringIO
+import io
 
 class RegistrationTests(TestCase):
     def setUp(self):
@@ -25,12 +25,12 @@ class RegistrationTests(TestCase):
     def create_profile(self):
         self.login()
         profile_data = {
-                'first_name': u'User',
-                'last_name': u'1',
-                'email': u'user1@example.org',
-                'country': u'GB',
-                'website_using_api': u'http://www.example.org/',
-                'commercial': u'Commercial',
+                'first_name': 'User',
+                'last_name': '1',
+                'email': 'user1@example.org',
+                'country': 'GB',
+                'website_using_api': 'http://www.example.org/',
+                'commercial': 'Commercial',
                 'agree_to_licensing': True,
                 }
         return self.client.post(reverse('edit_profile'), profile_data, follow=True)
@@ -62,12 +62,12 @@ class RegistrationTests(TestCase):
     def test_cannot_create_profile_without_agree_to_licensing(self):
         self.login()
         profile_data = {
-                'first_name': u'User',
-                'last_name': u'1',
-                'email': u'user1@example.org',
-                'country': u'GB',
-                'website_using_api': u'http://www.example.org/',
-                'commercial': u'Commercial',
+                'first_name': 'User',
+                'last_name': '1',
+                'email': 'user1@example.org',
+                'country': 'GB',
+                'website_using_api': 'http://www.example.org/',
+                'commercial': 'Commercial',
                 'agree_to_licensing': False,
                 }
         response = self.client.post(reverse('edit_profile'), profile_data)
@@ -93,13 +93,13 @@ class RegistrationTests(TestCase):
         profile = self.user1.userprofile
         orig_guid = profile.access_guid = str(uuid.uuid4())
         profile.beacon_guid = str(uuid.uuid4())
-        profile.user_level = u'Partner'
+        profile.user_level = 'Partner'
         profile.save()
         self.create_profile()
         user = User.objects.get(username='user1')
         profile = user.userprofile
         self.assertEqual(orig_guid, profile.access_guid)
-        self.assertEqual(u'Partner', profile.user_level)
+        self.assertEqual('Partner', profile.user_level)
 
     def test_profile_details_include_email(self):
         self.test_minimum_info_to_create_profile()
@@ -121,7 +121,7 @@ class RegistrationTests(TestCase):
 
         response = self.client.get(reverse(userprofile.admin.download_view))
 
-        expected = StringIO.StringIO()
+        expected = io.BytesIO()
         writer = unicodecsv.writer(expected)
         writer.writerow(userprofile.admin.CSV_COL_NAMES)
         for user in User.objects.all():
