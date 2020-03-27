@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 # integration tests at the API level
 import json
 import re
@@ -15,7 +17,7 @@ from .test_base import BaseTestCase
 
 class ApiTestsBase(BaseTestCase):
     def setUp(self):
-        BaseTestCase.setUp(self)
+        super(ApiTestsBase, self).setUp()
         self.login()
 
     def object_search(self, site='eldis', object_type='documents', output_format='full', query=None,
@@ -59,6 +61,7 @@ class ApiTestsBase(BaseTestCase):
         self.assertEqual(status_code, response.status_code, response.content)
 
     def assert_metadata_solr_query_included_when_admin_fields_is_false(self, returns_response):
+        self.client.logout()
         self.setUserLevel('Unlimited')
         self.login()
         test_user_level = self.user.userprofile.user_level
@@ -70,6 +73,7 @@ class ApiTestsBase(BaseTestCase):
         self.assertTrue('solr_query' in response_list['metadata'])
 
     def assert_metadata_solr_query_not_included_when_admin_fields_is_true(self, returns_response):
+        self.client.logout()
         self.setUserLevel('General User')
         self.login()
         test_user_level = self.user.userprofile.user_level
@@ -683,7 +687,7 @@ class ApiGetObjectIntegrationTests(ApiTestsBase):
         response = self.get_object(object_type='documents', output_format='short',
                 query={'extra_fields': 'not_a_valid_field'})
         self.assertStatusCode(response, 400)
-        expected_message = '["Invalid query: Can\'t limit Fields - Fields not defined in schema: [u\'not_a_valid_field\']"]'
+        expected_message = b'["Invalid query: Can\'t limit Fields - Fields not defined in schema: [\'not_a_valid_field\']"]'
         self.assertEquals(response.content, expected_message)
 
 
