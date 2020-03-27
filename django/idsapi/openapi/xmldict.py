@@ -38,7 +38,7 @@ class XmlDictConfig(dict):
     '''
     def __init__(self, parent_element, single_item_list=False):
         dict.__init__(self)
-        children_names = [child.tag for child in parent_element.getchildren()]
+        children_names = [child.tag for child in list(parent_element)]
         if parent_element.items():
             self.update(dict(parent_element.items()))
         for element in parent_element:
