@@ -9,7 +9,7 @@ import sunburnt
 import requests
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from rest_framework.settings import api_settings
 
 from openapi import defines

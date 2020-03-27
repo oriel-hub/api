@@ -4,7 +4,7 @@ Views for creating, editing and viewing site-specific user profiles.
 """
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import Http404
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render

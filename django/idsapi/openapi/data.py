@@ -4,7 +4,7 @@ import re
 import collections
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from openapi import defines
 from openapi.xmldict import XmlDictConfig

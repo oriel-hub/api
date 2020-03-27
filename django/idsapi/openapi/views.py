@@ -1,5 +1,3 @@
-#from django.core.urlresolvers import reverse
-#from django.http import HttpResponse, HttpResponseBadRequest
 import httplib2
 from xml.dom import minidom
 
