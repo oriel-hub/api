@@ -154,7 +154,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 ########## END APP CONFIGURATION
 
 ########## MIDDLEWARE CONFIGURATION
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django.middleware.cache.UpdateCacheMiddleware',
     'htmlmin.middleware.HtmlMinifyMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
