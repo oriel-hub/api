@@ -15,7 +15,7 @@ def validate_agreed_to_license_terms(value):
 
 class UserProfile(models.Model):
     # so we can get it with user.get_profile()
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     # the access guid is to authenticate against the API
     access_guid = models.CharField(max_length=36)
