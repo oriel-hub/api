@@ -60,7 +60,8 @@ def get_solr_interface(site):
                 http_connection=Connection(),
                 format='json')
             solr_interface_created[site] = datetime.now()
-        except:
+        except Exception as e:
+            logger.error("get_solr_interface: %s" % e, exc_info=True)
             raise SolrUnavailableError('Solr is not responding (using %s )' %
                                        settings.SOLR_SERVER_URLS[site])
     return saved_solr_interface[site]
