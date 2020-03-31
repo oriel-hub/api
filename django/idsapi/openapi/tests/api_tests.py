@@ -289,7 +289,7 @@ class ApiSearchIntegrationTests(ApiTestsBase):
             self.assertEqual('Jobs', result['item_type'])
 
     def test_num_results_only_returns_only_total_results(self):
-        response = self.object_search(query={'q': 'un', 'num_results_only': None})
+        response = self.object_search(query={'q': 'un', 'num_results_only': 'true'})
         self.assertStatusCode(response)
         response_dict = json.loads(response.content)
         self.assertIn('metadata', response_dict)
