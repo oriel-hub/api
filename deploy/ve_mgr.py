@@ -1,4 +1,4 @@
-from __future__ import unicode_literals, absolute_import
+
 import os
 import sys
 import shutil
@@ -58,18 +58,16 @@ def check_python_version(min_python_major_version, min_python_minor_version, py_
                         env=new_env)
                 sys.exit(retcode)
             except OSError:
-                print >> sys.stderr, \
-                    "You must use python %d.%d or later, you are using %d.%d" % (
+                print("You must use python %d.%d or later, you are using %d.%d" % (
                         min_python_major_version, min_python_minor_version,
-                        sys.version_info[0], sys.version_info[1])
-                print >> sys.stderr, "Could not find %s in path" % python_exe
+                        sys.version_info[0], sys.version_info[1]), file=sys.stderr)
+                print("Could not find %s in path" % python_exe, file=sys.stderr)
                 sys.exit(1)
         else:
-            print >> sys.stderr, \
-                "You must use python %d.%d or later, you are using %d.%d" % (
+            print("You must use python %d.%d or later, you are using %d.%d" % (
                     min_python_major_version, min_python_minor_version,
-                    sys.version_info[0], sys.version_info[1])
-            print >> sys.stderr, "Try doing '%s %s'" % (python_exe, sys.argv[0])
+                    sys.version_info[0], sys.version_info[1]), file=sys.stderr)
+            print("Try doing '%s %s'" % (python_exe, sys.argv[0]), file=sys.stderr)
             sys.exit(1)
 
 
@@ -88,7 +86,7 @@ class UpdateVE(object):
             try:
                 from project_settings import local_requirements_file
             except ImportError:
-                print >> sys.stderr, "could not find local_requirements_file in project_settings.py"
+                print("could not find local_requirements_file in project_settings.py", file=sys.stderr)
                 raise
             self.requirements = local_requirements_file
 
@@ -99,7 +97,7 @@ class UpdateVE(object):
                 from project_settings import local_vcs_root, relative_ve_dir
                 ve_dir = path.join(local_vcs_root, relative_ve_dir)
             except ImportError:
-                print >> sys.stderr, "could not find local_vcs_root/relative_ve_dir in project_settings.py"
+                print("could not find local_vcs_root/relative_ve_dir in project_settings.py", file=sys.stderr)
                 raise
             self.ve_dir = ve_dir
 
@@ -108,11 +106,11 @@ class UpdateVE(object):
         import project_settings
         self.pypi_cache_url = getattr(project_settings, 'pypi_cache_url', None)
         # the major version must be exact, the minor version is a minimum
-        self.python_version = getattr(project_settings, 'python_version', (2, 6))
+        self.python_version = getattr(project_settings, 'python_version', (3, 6))
 
     def update_ve_timestamp(self):
         os.utime(self.ve_dir, None)
-        file(self.ve_timestamp, 'w').close()
+        open(self.ve_timestamp, 'w').close()
 
     def check_virtualenv_python_version(self):
         """ returns True if the virtualenv python exists and is new enough """
@@ -120,11 +118,11 @@ class UpdateVE(object):
         if not path.exists(ve_python):
             return False
         major_version = capture_command(
-            [ve_python, '-c', 'import sys; print sys.version_info[0]'])
+            [ve_python, '-c', 'import sys; print(sys.version_info[0])'])
         if int(major_version) != self.python_version[0]:
             return False
         minor_version = capture_command(
-            [ve_python, '-c', 'import sys; print sys.version_info[1]'])
+            [ve_python, '-c', 'import sys; print(sys.version_info[1])'])
         if int(minor_version) < self.python_version[1]:
             return False
         return True
@@ -163,7 +161,7 @@ class UpdateVE(object):
         try:
             from project_settings import local_vcs_root, repo_type
         except ImportError:
-            print >> sys.stderr, "could not find ve_dir in project_settings.py"
+            print("could not find ve_dir in project_settings.py", file=sys.stderr)
             raise
         if repo_type != 'git':
             return
@@ -190,11 +188,11 @@ class UpdateVE(object):
             shutil.rmtree(self.ve_dir)
         if not path.exists(self.ve_dir):
             if not self.check_current_python_version():
-                print "Running wrong version of python for virtualenv creation"
+                print("Running wrong version of python for virtualenv creation")
                 return 1
-            import virtualenv
-            virtualenv.logger = virtualenv.Logger(consumers=[])
-            virtualenv.create_environment(self.ve_dir, site_packages=False)
+            from venv import EnvBuilder
+            env_builder = EnvBuilder(system_site_packages=False, with_pip=True)
+            env_builder.create(self.ve_dir)
         return 0
 
     def run_pip_command(self, pip_args, **call_kwargs):
@@ -202,25 +200,25 @@ class UpdateVE(object):
         command = [pip_path] + pip_args + self.get_pypi_cache_args()
         try:
             pip_retcode = subprocess.call(command, **call_kwargs)
-        except OSError, e:
-            print "command failed: %s: %s" % (" ".join(command), e)
+        except OSError as e:
+            print("command failed: %s: %s" % (" ".join(command), e))
             return 1
 
         if pip_retcode != 0:
-            print "command failed: %s" % " ".join(command)
+            print("command failed: %s" % " ".join(command))
 
         return pip_retcode
 
     def update_ve(self, full_rebuild, force_update):
         if not path.exists(self.requirements):
-            print >> sys.stderr, "Could not find requirements: file %s" % self.requirements
+            print("Could not find requirements: file %s" % self.requirements, file=sys.stderr)
             return 1
 
         update_required = self.virtualenv_needs_update()
         if not update_required and not force_update:
             # Nothing to be done
-            print "VirtualEnv does not need to be updated"
-            print "use --force to force an update"
+            print("VirtualEnv does not need to be updated")
+            print("use --force to force an update")
             return 0
 
         # if we need to create the virtualenv, then we must do that from

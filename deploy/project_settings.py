@@ -31,7 +31,7 @@ django_apps = ['openapi', 'userprofile', 'openapi_integration']
 use_virtualenv = True
 
 # python version - major version must be exact, minor version is the minimum
-python_version = (2, 7)
+python_version = (3, 6)
 
 ################################
 # PATHS TO IMPORTANT DIRECTORIES
@@ -74,16 +74,18 @@ test_cmd = ' manage.py test -v0 ' + ' '.join(django_apps)
 host_list = {
     'boorka':       ['boorka.ids.ac.uk'],
     'drooga':       ['drooga.ids.ac.uk'],
+    'api':          ['api@c59725.sgvps.net:18765'],
 }
 
 # this is the default git branch to use on each server
 default_branch = {
     'boorka':       'idsapi_v2_django_1_11',
-    'drooga':       'idsapi_v2_django_1_11'
+    'drooga':       'idsapi_v2_django_1_11',
+    'api':          'python3_upgrade',
 }
 
 # where on the server the django apps are deployed
-server_home = '/var/django'
+server_home = '~/django'
 
 # the top level directory on the server
 # underneath it there will be dev/ containing the live instance
@@ -101,6 +103,9 @@ if socket.getfqdn().endswith('.fen.aptivate.org'):
 ###################################################
 # OPTIONAL SETTINGS FOR FABRIC - will be put in env
 ###################################################
+
+use_sudo = False
+python_bin = '/usr/bin/python3.6'
 
 # if you have an ssh key and particular user you need to use
 # then uncomment the next 2 lines

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from __future__ import unicode_literals, absolute_import
 # a script to set up the virtualenv so we can use fabric and tasks
 
 import os
@@ -18,22 +17,22 @@ else:
     ve_dir = path.join(local_vcs_root, relative_ve_dir)
 
 if not os.path.exists(ve_dir):
-    print "Expected virtualenv does not exist"
-    print "(required for correct version of fabric and dye)"
-    print "Please run './bootstrap.py' to create virtualenv"
+    print("Expected virtualenv does not exist")
+    print("(required for correct version of fabric and dye)")
+    print("Please run './bootstrap.py' to create virtualenv")
     sys.exit(1)
 
 updater = UpdateVE(ve_dir=ve_dir)
 if updater.virtualenv_needs_update():
-    print "VirtualEnv needs to be updated"
-    print 'Run deploy/bootstrap.py'
+    print("VirtualEnv needs to be updated")
+    print('Run deploy/bootstrap.py')
     sys.exit(1)
 
 # if the virtualenv python version is not correct then the virtualenv
 # needs updating
 if not updater.check_virtualenv_python_version():
-    print "VirtualEnv has wrong python version"
-    print 'Run deploy/bootstrap.py'
+    print("VirtualEnv has wrong python version")
+    print('Run deploy/bootstrap.py')
     sys.exit(1)
 
 # depending on how you've installed dye, you may need to edit this line
@@ -51,7 +50,7 @@ tasks_call += ['--deploydir=' + current_dir]
 tasks_call += sys.argv[1:]
 
 if '-v' in sys.argv or '--verbose' in sys.argv:
-    print "Running tasks.py in ve: %s" % ' '.join(tasks_call)
+    print("Running tasks.py in ve: %s" % ' '.join(tasks_call))
 
 # exit with the tasks.py exit code
 sys.exit(subprocess.call(tasks_call))

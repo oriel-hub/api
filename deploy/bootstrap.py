@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from __future__ import unicode_literals, absolute_import
+
 """
 bootstrap.py will set up a virtualenv for you and update it as required.
 
@@ -21,11 +21,11 @@ import ve_mgr
 
 
 def print_help_text():
-    print __doc__
+    print(__doc__)
 
 
 def print_error_msg(error_msg):
-    print error_msg
+    print(error_msg)
     print_help_text()
     return 2
 
@@ -43,7 +43,7 @@ def main(argv):
         try:
             opts, args = getopt.getopt(argv[1:], 'hfqr',
                 ['help', 'force', 'quiet', 'full-rebuild'])
-        except getopt.error, msg:
+        except getopt.error as msg:
             return print_error_msg('Bad options: %s' % msg)
         # process options
         for o, a in opts:
