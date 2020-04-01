@@ -191,7 +191,13 @@ class UpdateVE(object):
                 print("Running wrong version of python for virtualenv creation")
                 return 1
             from venv import EnvBuilder
-            env_builder = EnvBuilder(system_site_packages=False, with_pip=True)
+            env_builder = EnvBuilder(
+                    system_site_packages=False,
+                    clear=True,
+                    symlinks=True,
+                    upgrade=False,
+                    with_pip=True
+                )
             env_builder.create(self.ve_dir)
         return 0
 
