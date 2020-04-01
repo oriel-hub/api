@@ -57,6 +57,7 @@ relative_ve_dir = path.join(relative_django_dir, '.ve')
 # the requirements file
 requirements_per_env = False
 local_requirements_file = path.join(local_deploy_dir, 'pip_packages.txt')
+use_site_packages = True
 
 # the requirements directory
 #requirements_per_env = True

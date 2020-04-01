@@ -107,6 +107,7 @@ class UpdateVE(object):
         self.pypi_cache_url = getattr(project_settings, 'pypi_cache_url', None)
         # the major version must be exact, the minor version is a minimum
         self.python_version = getattr(project_settings, 'python_version', (3, 6))
+        self.use_site_packages = getattr(project_settings, 'use_site_packages', False)
 
     def update_ve_timestamp(self):
         os.utime(self.ve_dir, None)
@@ -192,7 +193,7 @@ class UpdateVE(object):
                 return 1
             from venv import EnvBuilder
             env_builder = EnvBuilder(
-                    system_site_packages=False,
+                    system_site_packages=self.use_site_packages,
                     clear=True,
                     symlinks=True,
                     upgrade=False,
