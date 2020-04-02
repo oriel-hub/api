@@ -42,7 +42,7 @@ class XmlDictConfig(dict):
         if parent_element.items():
             self.update(dict(parent_element.items()))
         for element in parent_element:
-            if element:
+            if list(element):
                 # treat like dict - we assume that if the first two tags
                 # in a series are different, then they are all different.
                 if len(element) == 1 or element[0].tag != element[1].tag:
