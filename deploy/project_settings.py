@@ -56,7 +56,7 @@ relative_ve_dir = path.join(relative_django_dir, '.ve')
 # requirements can be in a single file, or in a directory
 # the requirements file
 requirements_per_env = False
-local_requirements_file = path.join(local_deploy_dir, 'pip_packages.txt')
+local_requirements_file = path.join(local_deploy_dir, 'pip_packages_devel.txt')
 use_site_packages = True
 
 # the requirements directory
@@ -75,18 +75,18 @@ test_cmd = ' manage.py test -v0 ' + ' '.join(django_apps)
 host_list = {
     'boorka':       ['boorka.ids.ac.uk'],
     'drooga':       ['drooga.ids.ac.uk'],
-    'api':          ['api@c59725.sgvps.net:18765'],
+    'tacuma':       ['31.221.49.74'],
 }
 
 # this is the default git branch to use on each server
 default_branch = {
     'boorka':       'idsapi_v2_django_1_11',
     'drooga':       'idsapi_v2_django_1_11',
-    'api':          'python3_upgrade',
+    'tacuma':       'python3_upgrade',
 }
 
 # where on the server the django apps are deployed
-server_home = '~/django'
+server_home = '/var/django'
 
 # the top level directory on the server
 # underneath it there will be dev/ containing the live instance
