@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # a script to set up the virtualenv so we can use fabric and tasks
 
 import os
