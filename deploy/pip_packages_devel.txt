@@ -1,3 +1,5 @@
+-r pip_packages.txt
+
 # testing
 # markupsafe==0.23
 pytest==5.4.1

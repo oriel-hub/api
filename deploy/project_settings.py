@@ -56,7 +56,8 @@ relative_ve_dir = path.join(relative_django_dir, '.ve')
 # requirements can be in a single file, or in a directory
 # the requirements file
 requirements_per_env = False
-local_requirements_file = path.join(local_deploy_dir, 'pip_packages_devel.txt')
+local_requirements_file = path.join(local_deploy_dir, 'pip_packages.txt')
+# local_requirements_file = path.join(local_deploy_dir, 'pip_packages_devel.txt')
 use_site_packages = True
 
 # the requirements directory
@@ -95,6 +96,7 @@ server_project_home = path.join(server_home, project_name)
 
 # which web server to use (or None)
 webserver = 'apache'
+webserver_cmd = 'systemctl %s httpd'
 
 import socket
 
