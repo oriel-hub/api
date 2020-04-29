@@ -13,7 +13,7 @@ def post_deploy(environment):
 def update_docs():
     """Generate the documentation using sphinx"""
     if not env['quiet']:
-        print "### Regenerating the documentation"
+        print("### Regenerating the documentation")
     docs_dir = os.path.join(env['vcs_root_dir'], 'docs')
     docs_env = os.environ
     docs_env['PATH'] = os.path.join(env['ve_dir'], 'bin') + ':' + os.environ['PATH']
@@ -26,7 +26,7 @@ def update_docs():
 def _install_django_jenkins():
     """ ensure that pip has installed the django-jenkins thing """
     if not env['quiet']:
-        print "### Installing Jenkins packages"
+        print("### Installing Jenkins packages")
     pip_bin = os.path.join(env['ve_dir'], 'bin', 'pip')
     cmds = [
         # django-jenkins after 0.14 require django>=1.4, so pin to 0.14
@@ -48,7 +48,7 @@ def _manage_py_jenkins(apps_to_test):
         args += ['--coverage-rcfile', coveragerc_filepath]
     args += apps_to_test
     if not env['quiet']:
-        print "### Running django-jenkins, with args; %s" % args
+        print("### Running django-jenkins, with args; %s" % args)
     tasklib._manage_py(args, cwd=env['vcs_root_dir'])
 
 
