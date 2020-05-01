@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 bootstrap.py will set up a virtualenv for you and update it as required.
