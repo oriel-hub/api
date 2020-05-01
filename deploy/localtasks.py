@@ -6,7 +6,7 @@ from dye.tasklib import tasklib
 from project_settings import django_apps
 
 
-def post_deploy(environment):
+def _post_deploy(environment):
     update_docs()
 
 
