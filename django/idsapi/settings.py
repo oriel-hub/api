@@ -306,6 +306,7 @@ ALLOWED_HOSTS = [
     'drooga.ids.ac.uk',
     'idsapi.testdns.aptivate.org',
     'boorka.ids.ac.uk',
+    'tacuma.ids.ac.uk'
 ]
 ########## END SITE CONFIGURATION
 
