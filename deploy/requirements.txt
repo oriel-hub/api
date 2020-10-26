@@ -2,7 +2,7 @@ Fabric3==1.14.post1 # Python3 Fabric 1 (pre 2) fork
 -e git+https://git.coop/aptivate/dye.git@master#egg=dye
 
 # core django
-Django==2.2.11
+Django==2.2.16
 
 # MySQL connector
 # we need to be quite specific about the version, as it's not possible to build
@@ -23,7 +23,7 @@ django-registration==3.1
 requests==2.23.0
 djangorestframework-xml==1.4.0
 djangorestframework==3.10.3
-httplib2==0.17.0
+httplib2==0.18.1
 lxml==4.5.0
 unicodecsv==0.14.1
 
