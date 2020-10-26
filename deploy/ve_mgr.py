@@ -243,6 +243,7 @@ class UpdateVE(object):
         command_list = [
             ['install', '-U', 'pip'],
             ['install', '-U', 'setuptools'],
+            ['install', '-U', 'wheel'],
         ]
 
         for command in command_list:
