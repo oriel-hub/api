@@ -53,17 +53,10 @@ relative_django_settings_dir = relative_django_dir
 # the path from the VCS root to the virtualenv dir
 relative_ve_dir = path.join(relative_django_dir, '.ve')
 
-# requirements can be in a single file, or in a directory
-# the requirements file
-requirements_per_env = False
-local_requirements_file = path.join(local_deploy_dir, 'pip_packages.txt')
-# local_requirements_file = path.join(local_deploy_dir, 'pip_packages_devel.txt')
-use_site_packages = True
+local_requirements_file = path.join(local_deploy_dir, 'requirements.txt')
+local_requirements_file_dev = path.join(local_deploy_dir, 'requirements_devel.txt')
 
-# the requirements directory
-#requirements_per_env = True
-#local_requirements_dir = path.join(local_deploy_dir, 'requirements')
-# and the files should be path.join(requirements_dir, '%s.txt' % environment)
+use_site_packages = True
 
 test_cmd = ' manage.py test -v0 ' + ' '.join(django_apps)
 

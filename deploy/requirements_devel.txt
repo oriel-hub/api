@@ -1,4 +1,4 @@
--r pip_packages.txt
+-r requirements.txt
 
 # testing
 # markupsafe==0.23

@@ -1,4 +1,3 @@
-
 import os
 import sys
 import shutil
@@ -78,17 +77,23 @@ def in_virtualenv():
 
 class UpdateVE(object):
 
-    def __init__(self, ve_dir=None, requirements=None):
+    def __init__(self, ve_dir=None, requirements=None, environment=None):
 
         if requirements:
             self.requirements = requirements
         else:
             try:
-                from project_settings import local_requirements_file
+                setting = 'local_requirements_file'
+                if environment is not None:
+                    setting += '_dev'
+                import importlib
+                requirements_file = importlib.import_module('project_settings')
             except ImportError:
                 print("could not find local_requirements_file in project_settings.py", file=sys.stderr)
                 raise
-            self.requirements = local_requirements_file
+
+            if setting in dir(requirements_file):
+                self.requirements = getattr(requirements_file, setting)
 
         if ve_dir:
             self.ve_dir = ve_dir

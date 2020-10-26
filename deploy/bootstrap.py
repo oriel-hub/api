@@ -38,11 +38,12 @@ def main(argv):
     full_rebuild = False
     fake_update = False
     clean_ve = False
+    devel = False
 
     if argv:
         try:
             opts, args = getopt.getopt(argv[1:], 'hfqr',
-                ['help', 'force', 'quiet', 'full-rebuild'])
+                ['help', 'force', 'quiet', 'full-rebuild', 'dev'])
         except getopt.error as msg:
             return print_error_msg('Bad options: %s' % msg)
         # process options
@@ -54,6 +55,8 @@ def main(argv):
                 force_update = True
             if o in ("-r", "--full-rebuild"):
                 full_rebuild = True
+            if o in ("-d", "--dev"):
+                devel = True
         if len(args) > 1:
             return print_error_msg(
                     "Can only have one argument - you had %s" % (' '.join(args)))
@@ -71,7 +74,9 @@ def main(argv):
         if full_rebuild and clean_ve:
             return print_error_msg("Cannot use --full-rebuild with clean")
 
-    updater = ve_mgr.UpdateVE()
+    environment = 'dev' if devel is True else None
+    updater = ve_mgr.UpdateVE(environment=environment)
+
     if fake_update:
         return updater.update_ve_timestamp()
     elif clean_ve:
