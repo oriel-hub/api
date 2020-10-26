@@ -218,10 +218,14 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         self.assertEqual(response_short, response_no_slash)
 
     def test_urls_include_friendly_ids(self):
+        import urllib.parse
         response = self.object_search()
         search_results = json.loads(response.content)['results']
         for result in search_results:
-            url_bits = result['metadata_url'].split(defines.URL_ROOT)[-1].strip('/').split('/')
+            url_bits = urllib.parse.unquote(
+                result['metadata_url']
+            ).split(defines.URL_ROOT)[-1].strip('/').split('/')
+
             # should now have something like ['eldis', 'get', 'documents', '1234', 'full', 'asdf']
             self.assertEqual(len(url_bits), 6)
             self.assertEqual(url_bits[0], 'eldis')
