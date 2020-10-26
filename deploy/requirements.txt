@@ -1,4 +1,5 @@
 Fabric3==1.14.post1 # Python3 Fabric 1 (pre 2) fork
+packaging=20.4
 -e git+https://git.coop/aptivate/dye.git@master#egg=dye
 
 # core django
