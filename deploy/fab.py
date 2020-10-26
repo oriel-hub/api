@@ -17,24 +17,24 @@ else:
     from project_settings import local_vcs_root, relative_ve_dir
     ve_dir = path.join(local_vcs_root, relative_ve_dir)
 
-if not path.exists(ve_dir):
-    print("Expected virtualenv does not exist")
-    print("(required for correct version of fabric and dye)")
-    print("Please run './bootstrap.py' to create virtualenv")
-    sys.exit(1)
+    if not path.exists(ve_dir):
+        print("Expected virtualenv does not exist")
+        print("(required for correct version of fabric and dye)")
+        print("Please run './bootstrap.py' to create virtualenv")
+        sys.exit(1)
 
-updater = UpdateVE(ve_dir=ve_dir)
-if updater.virtualenv_needs_update():
-    print("VirtualEnv needs to be updated")
-    print('Run deploy/bootstrap.py')
-    sys.exit(1)
+    updater = UpdateVE(ve_dir=ve_dir)
+    if updater.virtualenv_needs_update():
+        print("VirtualEnv needs to be updated")
+        print('Run deploy/bootstrap.py')
+        sys.exit(1)
 
-# if the virtualenv python version is not correct then the virtualenv
-# needs updating
-if not updater.check_virtualenv_python_version():
-    print("VirtualEnv has wrong python version")
-    print('Run deploy/bootstrap.py')
-    sys.exit(1)
+    # if the virtualenv python version is not correct then the virtualenv
+    # needs updating
+    if not updater.check_virtualenv_python_version():
+        print("VirtualEnv has wrong python version")
+        print('Run deploy/bootstrap.py')
+        sys.exit(1)
 
 fab_bin = path.join(ve_dir, 'bin', 'fab')
 
