@@ -1,0 +1,20 @@
+import private_settings
+
+DEBUG = False
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'mysql.connector.django',
+        'USER': 'mysql_user',
+        'NAME': 'api_idsapi',                      # Or path to database file if using sqlite3.
+        'USER': 'api_idsapi',                      # Not used with sqlite3.
+        'PASSWORD': private_settings.DB_PASSWORD,                  # Not used with sqlite3.
+        'OPTIONS': {
+          'autocommit': True,
+        },
+    }
+}
+
+SERVER_ENV = "production"
+
+# vi: ft=python

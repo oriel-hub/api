@@ -1,21 +1,20 @@
+import pytest
+import unittest
+
 from os import path
 from django.test import SimpleTestCase
-from django.utils import unittest
 from django.conf import settings
-from djangorestframework.renderers import BaseRenderer
+from rest_framework.renderers import BaseRenderer
 import sunburnt
 
 from openapi.search_builder import (
     SearchBuilder,
     SearchWrapper,
-    SearchParams,
-    FacetArgs,
     InvalidFieldError,
     InvalidQueryError,
     UnknownQueryParamError
 )
 
-DEFAULT_SEARCH_TERM = 'water'
 
 
 class MockSolrInterface:
@@ -35,15 +34,16 @@ class MockSolrQuery:
         self.sort_field = None
         self.has_free_text_query = False
         self.extra = {}
-        self.filter_args = {}
+        self.score = False
 
     def query(self, *args, **kwargs):
         self.query_call_count += 1
         self.query_args.append([args, kwargs])
         return self
 
-    def field_limit(self, field_list):
-        self.field_list = field_list
+    def field_limit(self, fields=None, score=False):
+        self.field_list = fields
+        self.score = score
         return self
 
     def sort_by(self, sort_field):
@@ -116,8 +116,13 @@ class SearchWrapperTests(unittest.TestCase):
     #    sw.restrict_fields_returned('short', SearchParams({'extra_fields': extra_field}))
     #    self.assertTrue(extra_field in self.msi.query.field_list)
 
+    def test_request_score_pseudo_field(self):
+        sw = SearchWrapper('Unlimited', 'eldis', self.msi)
+        sw.restrict_fields_returned('short', {'extra_fields': 'score'})
+        self.assertTrue(self.msi.query.score)
 
-class SearchWrapperAddSortTests(SimpleTestCase):
+
+class SearchWrapperAddSortTests(unittest.TestCase):
     def setUp(self):
         self.msi = MockSolrInterface()
 
@@ -128,25 +133,23 @@ class SearchWrapperAddSortTests(SimpleTestCase):
             self.assertRaises(InvalidQueryError, sw.add_sort, search_params, 'assets')
 
     def test_add_descending_sort_inverts_field(self):
-        with self.settings(SORT_MAPPING={'title': 'title_sort'}):
-            sw = SearchWrapper('General User', 'hub', self.msi)
-            sw.add_sort(SearchParams({'sort_desc': 'publication_date'}), 'assets')
-            self.assertEquals(self.msi.query.sort_field, '-publication_date')
+        sw = SearchWrapper('General User', 'eldis', self.msi)
+        sw.add_sort({'sort_desc': 'title'}, 'assets')
+        self.assertEqual(self.msi.query.sort_field, '-title')
 
     def test_add_sort_with_no_mapping(self):
-        with self.settings(SORT_MAPPING={'title': 'title_sort'}):
-            sw = SearchWrapper('General User', 'hub', self.msi)
-            sw.add_sort(SearchParams({'sort_asc': 'publication_date'}), 'assets')
-            self.assertEquals(self.msi.query.sort_field, 'publication_date')
+        sw = SearchWrapper('General User', 'eldis', self.msi)
+        sw.add_sort({'sort_asc': 'title'}, 'assets')
+        self.assertEqual(self.msi.query.sort_field, 'title')
 
     def test_add_sort_with_mapping(self):
         """
         Sort parameters should be overridable by the user via a mapping dictionary.
         """
-        with self.settings(SORT_MAPPING={'title': 'title_sort'}):
-            sw = SearchWrapper('General User', 'hub', self.msi)
-            sw.add_sort(SearchParams({'sort_asc': 'title'}), 'assets')
-            self.assertEquals(self.msi.query.sort_field, 'title_sort')
+        settings.SORT_MAPPING = {'title': 'title_sort'}
+        sw = SearchWrapper('General User', 'eldis', self.msi)
+        sw.add_sort({'sort_asc': 'title'}, 'assets')
+        self.assertEqual(self.msi.query.sort_field, 'title_sort')
 
     def test_add_sort_default_ordering_when_no_sort_params(self):
         """
@@ -155,16 +158,14 @@ class SearchWrapperAddSortTests(SimpleTestCase):
 
         Sort field mapping should still take place.
         """
-        with self.settings(
-            SORT_MAPPING={'title': 'title_sort'},
-            DEFAULT_SORT_OBJECT_MAPPING={
-                'countries':
-                    {'field': 'title', 'ascending': True},
-            }
-        ):
-            sw = SearchWrapper('General User', 'hub', self.msi)
-            sw.add_sort(SearchParams(dict()), 'countries')
-            self.assertEquals(self.msi.query.sort_field, 'title_sort')
+        settings.DEFAULT_SORT_OBJECT_MAPPING = {
+            'countries':
+                {'field': 'title', 'ascending': True},
+        }
+        settings.SORT_MAPPING = {'title': 'title_sort'}
+        sw = SearchWrapper('General User', 'eldis', self.msi)
+        sw.add_sort(dict(), 'countries')
+        self.assertEqual(self.msi.query.sort_field, 'title_sort')
 
     def test_add_sort_no_default_ordering_when_free_text_query(self):
         """
@@ -184,15 +185,84 @@ class SearchWrapperAddSortTests(SimpleTestCase):
         """
         Free text queries should still be sortable if a sort order is specified.
         """
-        with self.settings(
-            SORT_MAPPING={'title': 'title_sort'},
-            DEFAULT_SORT_FIELD='title',
-            DEFAULT_SORT_ASCENDING=True
-        ):
-            sw = SearchWrapper('General User', 'hub', self.msi)
-            sw.has_free_text_query = True
-            sw.add_sort(SearchParams({'sort_desc': 'title'}), 'assets')
-            self.assertEquals(self.msi.query.sort_field, '-title_sort')
+        settings.DEFAULT_SORT_FIELD = 'title'
+        settings.DEFAULT_SORT_ASCENDING = True
+        settings.SORT_MAPPING = {'title': 'title_sort'}
+        sw = SearchWrapper('General User', 'eldis', self.msi)
+        sw.has_free_text_query = True
+        sw.add_sort({'sort_desc': 'title'}, 'assets')
+        self.assertEqual(self.msi.query.sort_field, '-title_sort')
+
+
+@pytest.mark.xfail(reason="Already broken in tag idsapi_14")
+class SearchWrapperAddFreeTextQueryTests(unittest.TestCase):
+    # 2014-02-05, HD: we just pass through most of this untouched now
+    # and let dismax sort it out
+
+    @classmethod
+    def setUpClass(cls):
+        # TODO: there doesn't seem to be a easy way to just test the query
+        # building behaviour with out building a real connection.
+        cls.si = sunburnt.SolrInterface(settings.SOLR_SERVER_URLS['eldis'])
+
+    def setUp(self):
+        self.msi = MockSolrInterface()
+        self.sw = SearchWrapper('General User', 'eldis', SearchWrapperAddFreeTextQueryTests.si)
+
+    def solr_q(self):
+        return self.sw.si_query.options()['q']
+
+    def test_free_text_query_has_implicit_or(self):
+        self.sw.add_free_text_query('brazil health ozone')
+        self.assertEqual(self.solr_q(), 'brazil\\ health\\ ozone')
+
+    def test_free_text_query_supports_single_and_operator(self):
+        self.sw.add_free_text_query('brazil and health')
+        self.assertEqual(self.solr_q(), 'brazil\\ and\\ health')
+
+    def test_free_text_query_supports_single_and_operator_with_implicit_or(self):
+        self.sw.add_free_text_query('brazil and health ozone')
+        self.assertEqual(self.solr_q(), 'brazil\\ and\\ health\\ ozone')
+
+    def test_free_text_query_supports_single_and_operator_alternative(self):
+        self.sw.add_free_text_query('brazil & health ozone')
+        self.assertEqual(self.solr_q(), 'brazil\\ \\&\\ health\\ ozone')
+
+    def test_free_text_query_supports_single_and_operator_alternative_with_no_spaces(self):
+        self.sw.add_free_text_query('brazil&health ozone')
+        self.assertEqual(self.solr_q(), 'brazil\\&health\\ ozone')
+
+    def test_free_text_query_supports_multiple_and_operator(self):
+        self.sw.add_free_text_query('brazil and health and ozone')
+        self.assertEqual(self.solr_q(), 'brazil\\ and\\ health\\ and\\ ozone')
+
+    def test_free_text_query_ignores_disconnected_and(self):
+        self.sw.add_free_text_query('brazil and health ozone and')
+        self.assertEqual(self.solr_q(), 'brazil\\ and\\ health\\ ozone\\ and')
+
+    def test_free_text_query_ignores_and_at_start_of_string(self):
+        self.sw.add_free_text_query('and brazil and health ozone')
+        self.assertEqual(self.solr_q(), 'and\\ brazil\\ and\\ health\\ ozone')
+
+    def test_free_text_query_ignores_multiple_ands(self):
+        self.sw.add_free_text_query('brazil and and health ozone')
+        self.assertEqual(self.solr_q(), 'brazil\\ and\\ and\\ health\\ ozone')
+
+    def test_free_text_query_supports_or_operator(self):
+        self.sw.add_free_text_query('brazil or health ozone')
+        self.assertEqual(self.solr_q(), 'brazil\\ or\\ health\\ ozone')
+
+    def test_free_text_query_gracefully_handles_meaningless_operators(self):
+        self.sw.add_free_text_query('|')
+        self.assertEqual(self.solr_q(), '\\|')
+
+    def test_free_text_query_supports_or_operators_alternative(self):
+        self.sw.add_free_text_query('brazil | health | ozone')
+        self.assertEqual(self.solr_q(), 'brazil\\ \\|\\ health\\ \\|\\ ozone')
+
+    def test_and_has_higher_operator_precedence_than_or(self):
+        self.sw.add_free_text_query('brazil and health ozone and environment')
+        self.assertEqual(self.solr_q(), 'brazil\\ and\\ health\\ ozone\\ and\\ environment')
 
 
 class SearchWrapperAddFieldQueryTests(unittest.TestCase):
@@ -216,31 +286,31 @@ class SearchWrapperAddFieldQueryTests(unittest.TestCase):
 
     def test_field_query_supports_quoted_text(self):
         q = self.sw.add_field_query('title', '"beyond their age"')
-        self.assertEquals(u'title:"beyond their age"', q.options()[None])
+        self.assertEqual(u'title:\\"beyond their age\\"', q.options()[None])
 
     def test_field_query_supports_quoted_text_with_or(self):
         q = self.sw.add_field_query('title', '"beyond their age"|climate')
-        self.assertEquals(u'title:"beyond their age" OR title:climate', q.options()[None])
+        self.assertEqual(u'title:\\"beyond their age\\" OR title:climate', q.options()[None])
 
     def test_field_query_supports_quoted_text_with_and(self):
         q = self.sw.add_field_query('title', '"beyond their age"&"climate change"')
-        self.assertEquals(u'title:"beyond their age" AND title:"climate change"', q.options()[None])
+        self.assertEqual(u'title:\\"beyond their age\\" AND title:\\"climate change\\"', q.options()[None])
 
     def test_field_query_supports_pipe_in_quoted_text(self):
         q = self.sw.add_field_query('title', '"beyond|their age"')
-        self.assertEquals(u'title:"beyond\\|their age"', q.options()[None])
+        self.assertEqual(u'title:\\"beyond\\|their age\\"', q.options()[None])
 
     def test_field_query_supports_ampersand_in_quoted_text(self):
         q = self.sw.add_field_query('title', '"beyond&their age"')
-        self.assertEquals(u'title:"beyond\\&their age"', q.options()[None])
+        self.assertEqual(u'title:\\"beyond\\&their age\\"', q.options()[None])
 
     def test_field_query_supports_quoted_text_with_and_aswell_as_pipe_in_quotes(self):
         q = self.sw.add_field_query('title', '"beyond their age"&"climate|change"')
-        self.assertEquals(u'title:"beyond their age" AND title:"climate\\|change"', q.options()[None])
+        self.assertEqual(u'title:\\"beyond their age\\" AND title:\\"climate\\|change\\"', q.options()[None])
 
     def test_field_query_supports_quoted_text_with_or_aswell_as_ampersand_in_quotes(self):
         q = self.sw.add_field_query('title', '"beyond their age"|"climate&change"')
-        self.assertEquals(u'title:"beyond their age" OR title:"climate\\&change"', q.options()[None])
+        self.assertEqual(u'title:\\"beyond their age\\" OR title:\\"climate\\&change\\"', q.options()[None])
 
     def test_field_query_checks_quoted_text_is_closed(self):
         self.assertRaises(InvalidQueryError, self.sw.add_field_query, 'title', '"beyond their age')

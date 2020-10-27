@@ -1,8 +1,12 @@
-from djangorestframework import status
-from djangorestframework.authentication import UserLoggedInAuthentication
-from djangorestframework.permissions import IsAuthenticated
-from djangorestframework.response import Response
-from djangorestframework.views import View
+import httplib2
+from xml.dom import minidom
+
+from rest_framework import status
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.exceptions import ValidationError
 
 from django.conf import settings
 
@@ -10,18 +14,21 @@ from sunburnt import SolrError
 
 from openapi.data import DataMunger
 from openapi.search_builder import (
-    SearchBuilder, SearchParams, BadRequestError, SolrUnavailableError
+    SearchBuilder, BadRequestError, SolrUnavailableError
 )
 from openapi.defines import URL_ROOT, IdsApiError
 from openapi.guid_authentication import GuidAuthentication
 from openapi.permissions import PerUserThrottlingRatePerGroup
 
+class OpenAPIView(APIView):
+    pass
 
-class RootView(View):
+
+class RootView(OpenAPIView):
     def get(self, request):
         hostname = request.get_host()
         url_root = 'http://' + hostname + URL_ROOT
-        return {
+        return Response(data={
             'help': 'http://' + hostname + '/docs/',
             'some_api_calls': {
                 'all': {
@@ -57,19 +64,24 @@ class RootView(View):
                     ]
                 },
             },
-        }
+        })
 
 
-class BaseAuthView(View):
-    permissions = (IsAuthenticated, PerUserThrottlingRatePerGroup)
-    authentication = (GuidAuthentication, UserLoggedInAuthentication)
+class BaseAuthView(OpenAPIView):
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (GuidAuthentication, SessionAuthentication)
+    throttle_classes = (PerUserThrottlingRatePerGroup,)
 
     def __init__(self):
-        View.__init__(self)
+        super(OpenAPIView, self).__init__()
         self.site = None
 
+    def initial(self, request, *args, **kwargs):
+        self.user = request.user
+        return super(BaseAuthView, self).initial(request, *args, **kwargs)
+
     def get_user_level_info(self):
-        profile = self.user.get_profile()
+        profile = self.user.userprofile
         return settings.USER_LEVEL_INFO[profile.user_level]
 
     def hide_admin_fields(self):
@@ -79,7 +91,7 @@ class BaseAuthView(View):
         return self.get_user_level_info()['general_fields_only']
 
     def get_beacon_guid(self):
-        profile = self.user.get_profile()
+        profile = self.user.userprofile
         return profile.beacon_guid
 
     def setup_vars(self, request, site, output_format):
@@ -167,25 +179,40 @@ class ObjectView(BaseSearchView):
         BaseSearchView.__init__(self, True)
 
     def get(self, request, site, object_id, output_format, object_type=None):
+        self.output_format = output_format
+        self.site = site
+        self.data_munger = DataMunger(site, request)
+        search_params = request.GET
+        user_level = self.user.userprofile.user_level
+
         try:
             self.setup_vars(request, site, output_format)
             self.query = self.builder.create_itemid_query(
                 object_id, self.search_params, object_type, output_format)
         except BadRequestError as e:
-            return Response(status.HTTP_400_BAD_REQUEST, content=e)
+            raise ValidationError(str(e))
         except SolrUnavailableError as e:
-            return Response(status.HTTP_500_INTERNAL_SERVER_ERROR, content=e)
+            return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # return the metadata with the output_format specified
         try:
-            return {'results': self.build_response()[0]}
+            return Response(data={'results': self.build_response()[0]})
         except NoObjectFoundError:
-            return Response(status.HTTP_404_NOT_FOUND,
-                    content='No %s found with item_id %s' % (object_type, object_id))
+            return Response(status=status.HTTP_404_NOT_FOUND,
+                    data='No %s found with item_id %s' % (object_type, object_id))
 
 
 class ObjectSearchView(BaseSearchView):
     def get(self, request, site, output_format, object_type=None):
+        self.output_format = output_format
+        self.site = site
+        self.data_munger = DataMunger(site, request)
+        user_level = self.user.userprofile.user_level
+
+        search_params = request.GET
+        if len(search_params.keys()) == 0:
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                data='object search must have some query string, eg /objects/search/short?q=undp')
         try:
             self.setup_vars(request, site, output_format)
             if not self.search_params.has_query():
@@ -195,44 +222,54 @@ class ObjectSearchView(BaseSearchView):
             self.query = self.builder.create_search(
                 self.search_params, object_type, output_format)
         except BadRequestError as e:
-            return Response(status.HTTP_400_BAD_REQUEST, content=e)
+            return Response(data=str(e), status=status.HTTP_400_BAD_REQUEST)
         except SolrUnavailableError as e:
-            return Response(status.HTTP_500_INTERNAL_SERVER_ERROR, content=e)
+            return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # return the metadata with the output_format specified
-        return self.format_result_list(request)
+        return Response(self.format_result_list(request))
 
 
 class AllObjectView(BaseSearchView):
     def get(self, request, site, output_format, object_type=None):
+        self.output_format = output_format
+        self.site = site
+        self.data_munger = DataMunger(site, request)
+        user_level = self.user.userprofile.user_level
+
+        search_params = request.GET
         try:
             self.setup_vars(request, site, output_format)
             self.query = self.builder.create_all_search(
                 self.search_params, object_type, output_format)
         except BadRequestError as e:
-            return Response(status.HTTP_400_BAD_REQUEST, content=e)
+            raise ValidationError(e)
         except SolrUnavailableError as e:
-            return Response(status.HTTP_500_INTERNAL_SERVER_ERROR, content=e)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=str(e))
 
         # return the metadata with the output_format specified
-        return self.format_result_list(request)
+        return Response(self.format_result_list(request))
 
 
 class FacetCountView(BaseAuthView):
     def get(self, request, site, object_type, facet_type):
+        self.site = site
+        search_params = request.GET
+        user_level = self.user.userprofile.user_level
         try:
             self.setup_vars(request, site, 'id')
             query = self.builder.create_search(
                 self.search_params, object_type, 'id', facet_type)
         except BadRequestError as e:
-            return Response(status.HTTP_400_BAD_REQUEST, content=e)
+            raise ValidationError(e)
         except SolrUnavailableError as e:
-            return Response(status.HTTP_500_INTERNAL_SERVER_ERROR, content=e)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=str(e))
         search_response, solr_query = query.execute()
         facet_counts = search_response.facet_counts.facet_fields[settings.FACET_MAPPING[facet_type]]
+        data = DataMunger(site, request)
         facet_dict_list = []
         for category, count in facet_counts:
-            facet_dict = self.data_munger.convert_facet_string(category)
+            facet_dict = data.convert_facet_string(category, facet_type)
             facet_dict['count'] = count
             facet_dict_list.append(facet_dict)
 
@@ -240,31 +277,60 @@ class FacetCountView(BaseAuthView):
         if not self.hide_admin_fields():
             metadata['solr_query'] = solr_query
 
-        return {'metadata': metadata,
-                facet_type + '_count': facet_dict_list}
+        return Response({'metadata': metadata,
+                facet_type + '_count': facet_dict_list})
+
+class FieldListView(BaseAuthView):
+    def get(self, request, site):
+        self.site = site
+        # fetch file from SOLR_SCHEMA
+        # TODO: Is this caching useful?
+        http = httplib2.Http("/tmp/.cache")
+        if site not in settings.SOLR_SERVER_URLS:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data="Unknown site: %s" % site)
+        schema_url = settings.SOLR_SERVER_URLS[site] + settings.SOLR_SCHEMA_SUFFIX
+        # TODO: Check the response code here, so that SOLR errors are gracefully handled.
+        _, content = http.request(schema_url, "GET")  # @UnusedVariable
+        doc = minidom.parseString(content)
+        field_list = [field.getAttribute('name') for field in
+                doc.getElementsByTagName('fields')[0].getElementsByTagName('field')]
+        field_list.sort()
+        if self.general_fields_only():
+            field_list = [elem for elem in field_list if elem in settings.GENERAL_FIELDS]
+        else:
+            field_list = [elem for elem in field_list if not elem.endswith('_facet')]
+            field_list = [elem for elem in field_list if not elem in ['text', 'word']]
+            if self.hide_admin_fields():
+                field_list = [elem for elem in field_list if not elem in settings.ADMIN_ONLY_FIELDS]
+        return Response(field_list)
 
 
 class CategoryChildrenView(BaseSearchView):
     def get(self, request, site, object_type, object_id, output_format):
+        self.output_format = output_format
+        self.site = site
+        self.data_munger = DataMunger(site, request)
+        user_level = self.user.userprofile.user_level
+
         try:
             self.setup_vars(request, site, output_format)
             self.query = self.builder.create_category_children_search(
                 self.search_params, object_type, object_id)
         except BadRequestError as e:
-            return Response(status.HTTP_400_BAD_REQUEST, content=e)
+            raise ValidationError(e)
         except SolrUnavailableError as e:
-            return Response(status.HTTP_500_INTERNAL_SERVER_ERROR, content=e)
+            return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # return the metadata with the output_format specified
-        return self.format_result_list(request)
+        return Response(self.format_result_list(request))
 
 
-class The404View(View):
+class The404View(OpenAPIView):
 
     name = '404'
 
     def get(self, request, path):
-        return Response(status.HTTP_404_NOT_FOUND, content="Path '%s' not known." % path)
+        return Response(status=status.HTTP_404_NOT_FOUND, data="Path '%s' not known." % path)
 
 
 class NoObjectFoundError(IdsApiError):

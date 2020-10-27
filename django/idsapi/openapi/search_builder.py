@@ -2,14 +2,15 @@
 #
 # TODO: create a mock version of this class for tests
 import logging
-import urllib
-import urllib2
+import urllib.parse
 import re
 from datetime import datetime, timedelta
 import sunburnt
+import requests
 
 from django.conf import settings
-from djangorestframework.renderers import BaseRenderer
+from django.urls import reverse
+from rest_framework.settings import api_settings
 
 from openapi import defines
 
@@ -21,6 +22,23 @@ query_mapping = settings.QUERY_MAPPING
 
 logger = logging.getLogger(__name__)
 logger.setLevel(getattr(settings, 'LOG_LEVEL', logging.DEBUG))
+
+
+class Response(object):
+    def __init__(self, response):
+        self.response = response
+
+    @property
+    def status(self):
+        return self.response.status_code
+
+
+class Connection(object):
+    def __init__(self):
+        self.connection = requests
+
+    def request(self, method, uri):
+        return self.connection.request(method, uri)
 
 
 def get_solr_interface(site):
@@ -38,31 +56,37 @@ def get_solr_interface(site):
     if too_old:
         try:
             saved_solr_interface[site] = sunburnt.SolrInterface(
-                settings.BASE_URL, format='json')
+                settings.SOLR_SERVER_URLS[site],
+                http_connection=Connection(),
+                format='json')
             solr_interface_created[site] = datetime.now()
         except Exception as e:
-            msg = 'Solr is not responding (using %s )' % settings.BASE_URL
-            logger.error(msg + str(e), exc_info=e)
-            raise SolrUnavailableError(msg)
+            logger.error("get_solr_interface: %s" % e, exc_info=True)
+            raise SolrUnavailableError('Solr is not responding (using %s )' %
+                                       settings.SOLR_SERVER_URLS[site])
     return saved_solr_interface[site]
 
 
 class SearchBuilder():
 
-    def __init__(self, user_level, site, solr=None):
-        self.sw = SearchWrapper(user_level, site, solr)
+    @classmethod
+    def create_objectid_query(cls, user_level, site, object_id, object_type,
+                              search_params, output_format):
+        for param in search_params:
+            if (param[0] != '_' and
+                param != api_settings.URL_FORMAT_OVERRIDE and
+                param not in ['extra_fields']
+            ):
+                raise InvalidQueryError("Unknown query parameter '%s'" % param)
+        sw = SearchWrapper(user_level, site)
+        sw.si_query = sw.solr.query(object_id=object_id)
+        sw.restrict_search_by_object(object_type, allow_objects=True)
+        sw.restrict_fields_returned(output_format, search_params)
+        return sw
 
-    def _assert_query_param_can_be_user_with_object_type(self, param, object_type):
-        if query_mapping[param]['object_type'] != 'all':
-            if query_mapping[param]['object_type'] != object_type:
-                raise InvalidQueryError(
-                    "Can only use query parameter '%s' with item type '%s', "
-                    "your search had item type '%s'"
-                    %
-                    (param, query_mapping[param]['object_type'], object_type))
-
-    def _is_date_query(self, param):
-        for date_prefix in settings.DATE_PREFIX_MAPPING:
+    @classmethod
+    def _is_date_query(cls, param):
+        for date_prefix in list(settings.DATE_PREFIX_MAPPING.keys()):
             if param.startswith(date_prefix):
                 return True
         return False
@@ -100,9 +124,45 @@ class SearchBuilder():
             else:
                 search_params.assert_valid_query_param(query, allowed_param_list)
 
-        self.sw.restrict_search_by_object_type(object_type)
-        self.sw.restrict_fields_returned(output_format, search_params)
-        self.sw.add_sort(search_params, object_type)
+        for param in search_params:
+            query_list = search_params.getlist(param)
+            if len(query_list) > 1:
+                raise InvalidQueryError(
+                    "Cannot repeat query parameters - there is more than one '%s'"
+                    % param)
+            query = query_list[0]
+            if len(query) < 1:
+                raise InvalidQueryError("All query parameters must have a value, but '%s' does not" % param)
+            if param == 'q':
+                sw.add_free_text_query(urllib.parse.unquote_plus(query))
+            elif param in list(query_mapping.keys()):
+                if query_mapping[param]['object_type'] != 'all':
+                    if query_mapping[param]['object_type'] != object_type:
+                        raise InvalidQueryError(
+                            "Can only use query parameter '%s' with object type '%s', your search had object type '%s'"
+                            % (param, query_mapping[param]['object_type'], object_type))
+                # we might have to search across multiple fields
+                if isinstance(query_mapping[param]['solr_field'], list):
+                    sw.add_multifield_parameter_query(query_mapping[param]['solr_field'], query)
+                else:
+                    sw.add_parameter_query(query_mapping[param]['solr_field'], query)
+            elif SearchBuilder._is_date_query(param):
+                sw.add_date_query(param, query)
+            # if param not in our list of allowed params
+            elif not param in ['num_results', 'num_results_only', 'start_offset',
+                    'extra_fields', 'sort_asc', 'sort_desc']:
+                # params that start with _ are allowed, as well as the format
+                # parameter - the django rest framework deals with them
+                # TODO: This doesn't seem the most transparent way of handling
+                # django rest framework parameters. Would it be better to
+                # delete them from the request before they are passed to our
+                # API code?
+                if (param[0] != '_' and param != api_settings.URL_FORMAT_OVERRIDE):
+                    raise UnknownQueryParamError(param)
+
+        sw.restrict_search_by_object(object_type)
+        sw.restrict_fields_returned(output_format, search_params)
+        sw.add_sort(search_params, object_type)
         if facet_type is None:
             self.sw.add_paginate(search_params)
         else:
@@ -150,8 +210,7 @@ class SearchWrapper:
         self.has_free_text_query = False
 
     def execute(self):
-        solr_query = settings.BASE_URL + \
-            'select/?' + urllib.urlencode(self.si_query.params())
+        solr_query = settings.SOLR_SERVER_URLS[self.site] + 'select/?' + urllib.parse.urlencode(self.si_query.params())
         if settings.LOG_SEARCH_PARAMS:
             # this will print to console or error log as appropriate
             logger.info("search params: " + self.si_query.params())
@@ -233,24 +292,46 @@ class SearchWrapper:
         self.si_query = self.si_query.query(search_text.lower())
 
     def add_facet(self, facet_type, search_params):
-        fa = FacetArgs(
-            search_params,
-            facet_type,
-            settings.FACET_MAPPING,
-            settings.EXCLUDE_ZERO_COUNT_FACETS
-        )
-        self.si_query = self.si_query.facet_by(*fa.args(), **fa.kwargs())
+        if not facet_type in list(settings.FACET_MAPPING.keys()):
+            raise InvalidQueryError("Unknown count type: '%s_count'" % facet_type)
+        facet_kwargs = {}
+        if settings.EXCLUDE_ZERO_COUNT_FACETS:
+            facet_kwargs['mincount'] = 1
+        if 'num_results' in search_params:
+            facet_kwargs['limit'] = int(search_params['num_results'])
+
+        self.si_query = self.si_query.facet_by(settings.FACET_MAPPING[facet_type], **facet_kwargs)
 
     def restrict_fields_returned(self, output_format, search_params):
-        if output_format not in [None, '', 'id', 'short', 'core', 'full']:
-            raise InvalidOutputFormat(output_format)
+        if output_format == 'full':
+            return
+        # the id format needs object_type and title to construct the metadata_url
+        elif output_format in [None, '', 'short', 'id']:
+            field_list = ['object_id', 'object_type', 'title', 'level']
+        else:
+            raise InvalidQueryError(
+                    "the output_format of data returned can be 'id', 'short' or 'full' - you gave '%s'"
+                    % output_format)
+        score = False
+        if 'extra_fields' in search_params:
+            fields = search_params['extra_fields'].lower().split(' ')
+            level_info = settings.USER_LEVEL_INFO[self.user_level]
+            for field in fields:
+                if level_info['general_fields_only'] and field not in settings.GENERAL_FIELDS:
+                    raise InvalidFieldError(field, self.site)
+                if level_info['hide_admin_fields'] and field in settings.ADMIN_ONLY_FIELDS:
+                    raise InvalidFieldError(field, self.site)
 
-        level_info = settings.USER_LEVEL_INFO[self.user_level]
-        for field in search_params.extra_fields():
-            if level_info['general_fields_only'] and field not in settings.GENERAL_FIELDS:
-                raise InvalidFieldError(field, self.site)
-            if level_info['hide_admin_fields'] and field in settings.ADMIN_ONLY_FIELDS:
-                raise InvalidFieldError(field, self.site)
+                if field == 'score':
+                    score = True
+                    continue
+
+                field_list.append(field)
+
+        try:
+            self.si_query = self.si_query.field_limit(field_list, score=score)
+        except sunburnt.SolrError as e:
+            raise InvalidQueryError("Can't limit Fields - " + str(e))
 
     def add_date_query(self, param, date):
         # strip the _year/_after/_before
@@ -300,11 +381,8 @@ class SearchWrapper:
 
     def add_field_query(self, field_name, param_value):
         # decode spaces and '|' before using
-        decoded_param_value = urllib2.unquote(param_value)
-        if not (
-                decoded_param_value[0].isalnum() or
-                decoded_param_value[0] == '!' or
-                decoded_param_value[0] == '"'):
+        decoded_param_value = urllib.parse.unquote(param_value)
+        if not (decoded_param_value[0].isalnum() or decoded_param_value[0] == '"'):
             raise InvalidQueryError("Cannot start query value with '%s'"
                     % decoded_param_value[0])
         tokens = self.split_string_around_quotes_and_delimiters(decoded_param_value)
@@ -317,13 +395,16 @@ class SearchWrapper:
         if pipe_present:
             q_final = self.solr.Q()
             for term in [t for t in tokens if t != '|']:
-                q_final = q_final | self.get_Q(field_name, term)
+                kwargs = {field_name: term}
+                q_final = q_final | self.solr.Q(**kwargs)
         elif ampersand_present:
             q_final = self.solr.Q()
             for term in [t for t in tokens if t != '&']:
-                q_final = q_final & self.get_Q(field_name, term)
+                kwargs = {field_name: term}
+                q_final = q_final & self.solr.Q(**kwargs)
         else:
-            q_final = self.get_Q(field_name, param_value)
+            kwargs = {field_name: param_value}
+            q_final = self.solr.Q(**kwargs)
 
         return q_final
 
@@ -341,7 +422,7 @@ class SearchWrapper:
         """split string into quoted sections and on & or | outside quotes"""
         quoted_divided_string = self.quoted_re.split(string)
         # remove empty/whitespace strings
-        quoted_divided_string = filter(None, [s.strip() for s in quoted_divided_string])
+        quoted_divided_string = [_f for _f in [s.strip() for s in quoted_divided_string] if _f]
         # now we have quoted strings and other strings
         divided_string = []
         for str_fragment in quoted_divided_string:
@@ -350,7 +431,7 @@ class SearchWrapper:
             else:
                 words = [w.strip() for w in self.amp_pipe_re.split(str_fragment)]
                 # the filter(None, array) discards empty strings
-                divided_string.extend(filter(None, words))
+                divided_string.extend([_f for _f in words if _f])
         return divided_string
 
     def is_quoted(self, string):

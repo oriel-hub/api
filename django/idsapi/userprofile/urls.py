@@ -1,8 +1,8 @@
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls import url
 
 import userprofile.admin
 
-urlpatterns = patterns('',
-    url(r'^apiadmin/user/download/$', userprofile.admin.download_view,
+urlpatterns = [
+    url(r'^admin/user/download/$', userprofile.admin.download_view,
         name='user_list_download'),
-)
+]

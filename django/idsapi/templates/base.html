@@ -50,11 +50,12 @@
 
     <div id="nav">
 		<ul>
-			<li><a href="/profiles/view">Register/Login</a></li>
-			<li><a href="/about/terms.php">Terms and Conditions</a></li>
-			<li><a href="http://developer.okhub.org">Documentation and resources</a></li>
-			<li><a href="/v1/hub/get_all/assets/short">End point</a></li>
-	
+			<li><a href="//www.api.ids.ac.uk/about">About</a></li>
+			<li><a href="/profiles/view">Get API key</a></li>
+			<li><a href="//www.api.ids.ac.uk/about/terms.shtml">Terms and Conditions</a></li>
+			<li><a href="http://docs.api.ids.ac.uk/">Documentation</a></li>
+			<li><a href="//www.api.ids.ac.uk/about/resources.shtml">Useful resources</a></li>
+			<li><a href="/openapi/">API</a></li>
 		</ul>		
 	</div><!--ends nav-->
 
@@ -62,13 +63,14 @@
 				{% block header %}
 				{% if user.is_authenticated %}
 				<ul>
-					<li><a class="btn" href="{% url auth_logout %}">{% trans "Log out" %}</a></li>
-					<li><a class="btn" href="{% url auth_password_change %}">{% trans "Change password" %}</a></li>
-					<li><a class="btn" href="{% url edit_profile %}">{% trans "Edit profile" %}</a></li>
-				</ul>
+		  		  <li><a href="{% url 'logout' %}">{% trans "Log out" %}</a></li>
+				  <li><a href="{% url 'password_change' %}">{% trans "Change password" %}</a></li>
+				  <li><a href="{% url 'edit_profile' %}">{% trans "Edit profile" %}</a></li>
 				{% else %}
 				<ul>
-					<li><a class="btn" href="{% url auth_login %}">{% trans "Log in" %}</a></li>
+				  <li><a href="{% url 'login' %}">{% trans "Log in" %}</a></li>
+		{% endif %}
+	{% endblock %}
 				</ul>
 				{% endif %}
 				{% endblock %}
@@ -109,11 +111,11 @@
 			<li>E: <a href="mailto:api@ids.ac.uk">api@ids.ac.uk</a></li>
 			<li class="last">T: +44 (0)1273 606261</li>
 		</ul>
-
-		<a href="http://www.ids.ac.uk"><img src="http://api.ids.ac.uk/site_media/images/IDS_logo.png" alt="IDS logo" /></a>
-
-		<div>Site built by <a href="http://www.aptivate.org/">Aptivate</a></div>
-
+		 		
+		<a href="http://www.ids.ac.uk"><img src="//api.ids.ac.uk/site_media/images/IDS_logo.png" alt="IDS logo" /></a>
+	
+        <div>Site built by <a href="http://www.aptivate.org/">Aptivate</a></div>
+		
 	</div><!--ends footer-->
 </div><!--ends footer-wrapper-->
 

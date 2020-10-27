@@ -1,10 +1,9 @@
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls import url
 
 from openapi.views import (AllObjectView, ObjectSearchView, ObjectView,
     RootView, FacetCountView, CategoryChildrenView, The404View)
 
-urlpatterns = patterns('idsapi.openapi.views',
-
+urlpatterns = [
     url(r'^$', RootView.as_view(), name='root'),
 
     # eg:
@@ -18,10 +17,9 @@ urlpatterns = patterns('idsapi.openapi.views',
         CategoryChildrenView.as_view(), name='category_children'),
 
     # eg:
-    # /eldis/get/assets/1234/full
-    # /eldis/get/countries/1100/full
-    # A for Assets, C for Categories, S for Sources, L for languages (not done yet)
-    url(r'^(?P<site>\w+)/get/(?P<object_type>\w+)/(?P<object_id>[ACLS]?\d+)(?:/(?P<output_format>\w*)(/\S*)?)?$',
+    # /eldis/get/assets/C1234/full
+    # /eldis/get/countries/A1100/full
+    url(r'^(?P<site>\w+)/get/(?P<object_type>\w+)/(?P<object_id>[A-Z]\d+)(?:/(?P<output_format>\w*)(/\S*)?)?$',
         ObjectView.as_view(), name='object'),
 
     # eg:
@@ -39,4 +37,4 @@ urlpatterns = patterns('idsapi.openapi.views',
 
     # finally do a catch all to give a nicer 404
     url(r'^(?P<path>.+)$', The404View.as_view(), name='404'),
-)
+]

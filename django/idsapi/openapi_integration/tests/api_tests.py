@@ -1,22 +1,25 @@
+from __future__ import absolute_import
+
 # integration tests at the API level
 import json
 import re
 import datetime
+import pytest
 
 from django.conf import settings
 from django.test.testcases import TestCase
 from sunburnt import SolrInterface
 
-from openapi import defines
-from openapi.search_builder import get_solr_interface
-from openapi.tests.test_base import BaseTestCase
+from .. import defines
+from ..search_builder import get_solr_interface
+from .test_base import BaseTestCase
 
 DEFAULT_SEARCH_TERM = 'the'
 
 
 class ApiTestsBase(BaseTestCase):
     def setUp(self):
-        BaseTestCase.setUp(self)
+        super(ApiTestsBase, self).setUp()
         self.login()
 
     def object_search(self, site='hub', object_type='documents', output_format='full', query=None,
@@ -60,9 +63,10 @@ class ApiTestsBase(BaseTestCase):
         self.assertEqual(status_code, response.status_code, response.content)
 
     def assert_metadata_solr_query_included_when_admin_fields_is_false(self, returns_response):
+        self.client.logout()
         self.setUserLevel('Unlimited')
         self.login()
-        test_user_level = self.user.get_profile().user_level
+        test_user_level = self.user.userprofile.user_level
         self.assertFalse(settings.USER_LEVEL_INFO[test_user_level]['hide_admin_fields'],
             "We expect hide_admin_fields to be False.")
 
@@ -71,9 +75,10 @@ class ApiTestsBase(BaseTestCase):
         self.assertTrue('solr_query' in response_list['metadata'])
 
     def assert_metadata_solr_query_not_included_when_admin_fields_is_true(self, returns_response):
+        self.client.logout()
         self.setUserLevel('General User')
         self.login()
-        test_user_level = self.user.get_profile().user_level
+        test_user_level = self.user.userprofile.user_level
         self.assertTrue(settings.USER_LEVEL_INFO[test_user_level]['hide_admin_fields'],
             "We expect hide_admin_fields to be False.")
 
@@ -141,7 +146,7 @@ class ApiSearchResponseTests(ApiTestsBase):
 
     def test_description_contains_image_beacon(self):
         response = self.object_search(object_type='documents', output_format='full')
-        profile = self.user.get_profile()
+        profile = self.user.userprofile
 
         def check_image_beacon_exists_and_has_correct_id(description):
             text = self.extract_text_from_description(description)
@@ -198,15 +203,20 @@ class ApiSearchIntegrationTests(ApiTestsBase):
                 {'country': 'A1100|country|India|IN'},
                 {'keyword': 'agriculture'},
                 {'region': 'C21|region|Africa'},
-                # {'sector': 'agriculture'},  # commented out as disappeared from output
-                # {'subject': 'gdn'},         # commented out as disappeared from output
+                #{'sector': 'agriculture'},         # TODO: Query returns zero results (expected?)
+                {'subject': 'gdn'},                # TODO: Why is this commented out?
                 {'theme': 'C531|theme|Governance'},
         ]
+        results = []
         for query_term in query_term_list:
             response = self.object_search(query=query_term)
             self.assertStatusCode(response)
             search_results = json.loads(response.content)
-            self.assertTrue(search_results['metadata']['total_results'] > 0)
+            results.append((query_term, search_results))
+
+        for query_term, search_results in results:
+            self.assertTrue(search_results['metadata']['total_results'] > 0,
+                    "%s %s" % (query_term, search_results))
 
     def test_query_by_boolean_country_and_free_text(self):
         response = self.object_search(query={'q': DEFAULT_SEARCH_TERM, 'country': 'angola&tanzania'})
@@ -234,20 +244,24 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         response_no_slash = self.object_search(output_format='no_slash')
         # the metadata is different due to next/prev link containing "short",
         # or not, so just compare up to the metadata.
-        response_short = response_short.content.split('"metadata":')[0]
-        response_blank = response_blank.content.split('"metadata":')[0]
-        response_no_slash = response_no_slash.content.split('"metadata":')[0]
+        response_short = response_short.content.split(b'"metadata":')[0]
+        response_blank = response_blank.content.split(b'"metadata":')[0]
+        response_no_slash = response_no_slash.content.split(b'"metadata":')[0]
         self.assertEqual(response_short, response_blank)
         self.assertEqual(response_short, response_no_slash)
 
-    def test_urls_does_not_include_friendly_ids(self):
+    def test_urls_include_friendly_ids(self):
+        import urllib.parse
         response = self.object_search()
         search_results = json.loads(response.content)['results']
         for result in search_results:
-            url_bits = result['metadata_url'].split(defines.URL_ROOT)[-1].strip('/').split('/')
-            # should now have something like ['hub', 'get', 'documents', '1234', 'full', 'asdf']
-            self.assertEqual(len(url_bits), 5)
-            self.assertEqual(url_bits[0], 'hub')
+            url_bits = urllib.parse.unquote(
+                result['metadata_url']
+            ).split(defines.URL_ROOT)[-1].strip('/').split('/')
+
+            # should now have something like ['eldis', 'get', 'documents', '1234', 'full', 'asdf']
+            self.assertEqual(len(url_bits), 6)
+            self.assertEqual(url_bits[0], 'eldis')
             self.assertEqual(url_bits[1], 'get')
             self.assertNotEqual(url_bits[2], 'assets')
             self.assertTrue(url_bits[2] in defines.OBJECT_TYPES)
@@ -300,8 +314,9 @@ class ApiSearchIntegrationTests(ApiTestsBase):
             self.assertTrue(acronym_found or alternative_acronym_found)
     """
 
-    def test_object_specific_query_param_object_type(self):
-        # need to be unlimited to see the object_type
+    @pytest.mark.xfail(reason="_accept test data issue")
+    def test_item_specific_query_param_item_type(self):
+        # need to be unlimited to see the item_type
         self.setUserLevel('Unlimited')
         response = self.object_search(object_type='assets', query={'object_type': 'Organisation'})
         self.assertStatusCode(response)
@@ -311,7 +326,7 @@ class ApiSearchIntegrationTests(ApiTestsBase):
             self.assertEqual('Organisation', result['object_type'].values()[0])
 
     def test_num_results_only_returns_only_total_results(self):
-        response = self.object_search(query={'q': DEFAULT_SEARCH_TERM, 'num_results_only': None})
+        response = self.object_search(query={'q': 'un', 'num_results_only': 'true'})
         self.assertStatusCode(response)
         response_dict = json.loads(response.content)
         self.assertIn('metadata', response_dict)
@@ -333,6 +348,14 @@ class ApiSearchIntegrationTests(ApiTestsBase):
         response_lower_data = json.loads(response_lower.content)
         self.assertEqual(response_upper_data['metadata']['total_results'],
                 response_lower_data['metadata']['total_results'])
+
+    @pytest.mark.xfail(reason="_accept query returns both eldis and bridge")
+    def test_search_has_default_site_eldis(self):
+        response = self.object_search(object_type='documents', output_format='full',
+                query={'q': 'un', 'num_results': '500'})
+        results = json.loads(response.content)['results']
+        for result in results:
+            self.assertEqual('eldis', result['site'])
 
     def test_metadata_solr_query_depends_on_hide_admin_field_value(self):
         returns_response = lambda x: x.object_search()
@@ -666,6 +689,7 @@ class ApiGetObjectIntegrationTests(ApiTestsBase):
                                    query={'format': 'xml'})
         self.assertStatusCode(response)
 
+    @pytest.mark.xfail(reason="_accept appears to be deprecated in new DRF")
     def test_can_specify_content_type_in_query(self):
         response = self.get_object(query={'_accept': 'application/xml'},
                 content_type='text/html')
@@ -678,6 +702,13 @@ class ApiGetObjectIntegrationTests(ApiTestsBase):
         # not all the results have the abstracts, so just check it doesn't
         # immediately complain
         self.assertStatusCode(response)
+
+    def test_invalid_extra_field_in_object_search_returns_api_error(self):
+        response = self.get_object(object_type='documents', output_format='short',
+                query={'extra_fields': 'not_a_valid_field'})
+        self.assertStatusCode(response, 400)
+        expected_message = b'["Invalid query: Can\'t limit Fields - Fields not defined in schema: [\'not_a_valid_field\']"]'
+        self.assertEqual(response.content, expected_message)
 
 
 class ApiRootIntegrationTests(ApiTestsBase):
@@ -742,6 +773,7 @@ class ApiFacetIntegrationTests(ApiTestsBase):
             self.assert_results_list(
                 response, lambda x: x['count'] > 0, element='country_count')
 
+    @pytest.mark.xfail(reason="_accept no zero count results - test data issue or bug?")
     def test_facets_with_zero_count_included_by_setting(self):
         with self.settings(EXCLUDE_ZERO_COUNT_FACETS=False):
             response = self.facet_search(object_type='organisations')

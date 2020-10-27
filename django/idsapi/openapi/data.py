@@ -1,9 +1,10 @@
 # class to assemble the data to be returned
 import logging
 import re
+import collections
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from lib.helper import keep_matching_fields, keep_not_matching_fields
 
@@ -22,13 +23,38 @@ logger.setLevel(getattr(settings, 'LOG_LEVEL', logging.DEBUG))
 
 
 class DataMunger():
-    def __init__(self, site, search_params):
+    def __init__(self, site, request=None):
         self.site = site
         self.search_params = search_params
         self.object_id = None
         self.object_type = None
+        self.request = request
 
-    def _convert_date_fields(self, object_data):
+    def get_required_data(self, result, output_format, user_level_info, beacon_guid):
+        self.object_id = result['object_id']
+        self.object_type = defines.object_name_to_object_type(result['object_type'])
+        if output_format == 'id':
+            object_data = {'object_id': self.object_id}
+        elif output_format == 'full':
+            # filter out fields we don't want
+            object_data = dict((k, v) for k, v in list(result.items()) if not k.endswith('_facet'))
+            if user_level_info['general_fields_only']:
+                object_data = dict((k, v) for k, v in list(object_data.items()) if k in settings.GENERAL_FIELDS)
+            elif user_level_info['hide_admin_fields']:
+                object_data = dict((k, v) for k, v in list(object_data.items()) if k not in settings.ADMIN_ONLY_FIELDS)
+        else:
+            object_data = result
+
+        for xml_field in settings.STRUCTURED_XML_FIELDS:
+            if xml_field in object_data:
+                try:
+                    object_data[xml_field] = self._convert_xml_field(object_data[xml_field])
+                except ParseError as e:
+                    object_data[xml_field] = "Could not parse XML, issue reported in logs"
+                    # and send to logs
+                    print("COULD NOT PARSE XML. object_id: %s, field: %s Error: %s" % \
+                        (self.object_id, xml_field, str(e)), file=sys.stderr)
+
         # convert date fields to expected output format
         for date_field in settings.DATE_FIELDS:
             if date_field in object_data:
@@ -63,8 +89,25 @@ class DataMunger():
             self._convert_descriptions(
                 object_data['description'], user_level_info, beacon_guid)
 
-        object_data['metadata_url'] = self.metadata.create_url()
-        return object_data
+        object_data['metadata_url'] = self._create_metadata_url(object_name=result['title'])
+        return self.fields_sorted(object_data)
+
+    def fields_sorted(self, object_data):
+        """Order dicts by keys, returning OrderedDicts"""
+        if not isinstance(object_data, dict):
+            return object_data
+
+        ordered = collections.OrderedDict()
+        for k, v in sorted(list(object_data.items()), key=lambda k_v: k_v[0]):
+            # Reorder nested dicts
+            if isinstance(v, dict):
+                ordered[k] = self.fields_sorted(v)
+            # Reorder lists of dicts
+            elif isinstance(v, list) or isinstance(v, tuple):
+                ordered[k] = [self.fields_sorted(o) for o in v]
+            else:
+                ordered[k] = v
+        return ordered
 
     def _convert_xml_field_list(self, object_data):
         for xml_field in settings.STRUCTURED_XML_FIELDS:
@@ -78,40 +121,16 @@ class DataMunger():
     def _convert_xml_field(self, xml_field):
         """convert an XML string into a list of dictionaries and add
         metadata URLs"""
-        if isinstance(xml_field, list):
-            newfield = []
-            for field in xml_field:
-                newfield.append(self._convert_single_xml_field(field, False))
-        else:
-            newfield = self._convert_single_xml_field(xml_field, True)
-        return newfield
-
-    def _convert_single_xml_field(self, xml_field, single_item_list):
-        if not isinstance(xml_field, basestring):
-            msg = "COULD NOT PARSE XML - NOT A STRING. object_id: %s, field: %s" % \
-                (self.object_id, xml_field)
-            if settings.ERROR_ON_XML_FIELD_PARSE_FAIL:
-                raise InvalidSolrOutputError(msg)
-            else:
-                logger.error(msg)
-                return "Could not parse XML, issue reported in logs"
-
-        try:
-            if not settings.ERROR_ON_XML_FIELD_PARSE_FAIL:
-                xml_field = xml_field.replace(' & ', '&amp;')
-            field_dict = XmlDictConfig.xml_string_to_dict(
-                xml_field.encode('utf-8'), single_item_list, set_encoding="UTF-8")
-        except ParseError as e:
-            if settings.ERROR_ON_XML_FIELD_PARSE_FAIL:
-                raise e
-            else:
-                logger.warning(
-                    "COULD NOT PARSE XML. object_id: %s, field: %s Error: %s" %
-                    (self.object_id, xml_field, str(e)),
-                    exc_info=e
-                )
-                return "Could not parse XML, issue reported in logs"
-        self._add_metadata_url_to_xml_fields(field_dict)
+        field_dict = XmlDictConfig.xml_string_to_dict(xml_field.encode('utf-8'), True, set_encoding="UTF-8")
+        for _, list_value in list(field_dict.items()):
+            for item in list_value:
+                if 'object_id' in item and \
+                        'object_name' in item and \
+                        'object_type' in item:
+                    item['metadata_url'] = self._create_metadata_url(
+                            defines.object_name_to_object_type(item['object_type']),
+                            item['object_id'],
+                            item['object_name'])
         return field_dict
 
     def _add_metadata_url_to_xml_fields(self, field_dict):
@@ -133,7 +152,46 @@ class DataMunger():
                 '?beacon_guid=' + beacon_guid + "' width='1' height='1'>"
         return description
 
-    def convert_facet_string(self, facet_string):
+    def _create_metadata_url(self, object_type=None, object_id=None, object_name=None,
+            url_name='object'):
+        """create a URL that will give information about the object"""
+        if object_type is None:
+            object_type = self.object_type
+        if object_id is None:
+            object_id = self.object_id
+        metadata_url = reverse(url_name, kwargs={
+            'object_type': object_type,
+            'object_id': object_id,
+            'output_format': 'full',
+            'site': self.site,
+        }) + '/'
+        if object_name is not None:
+            title = re.sub(r'\W+', '-', object_name).lower().strip('-')
+            metadata_url += title + '/'
+
+        if self.request:
+           return self.request.build_absolute_uri(metadata_url)
+
+        return metadata_url
+
+    def _add_child_parent_links(self, object_data, result):
+        """Add links to child and parent categories"""
+        object_data['children_url'] = self._create_metadata_url(url_name='category_children')
+
+        # TODO: write test for condition when parent links not set
+        if not all(field in result for field in ['cat_parent', 'cat_superparent']):
+            return
+
+        if result['cat_parent'] != result['cat_superparent']:
+            object_data['parent_url'] = self._create_metadata_url(
+                    object_id='C' + result['cat_parent'])
+
+        if result['cat_first_parent'] != result['cat_parent'] and \
+                result['cat_first_parent'] != result['object_id']:
+            object_data['toplevel_parent_url'] = self._create_metadata_url(
+                object_id='C' + result['cat_first_parent'])
+
+    def convert_facet_string(self, facet_string, facet_type):
         result = {
             'object_id': '',
             'object_type': '',
@@ -142,11 +200,9 @@ class DataMunger():
         }
         if facet_string:
             # is it an XML facet_string
-            if facet_string[0] == '<' and facet_string[-1] == '>':
+            if settings.FACET_TYPES[facet_type] == "xml_string":
                 result = XmlDictConfig.xml_string_to_dict(facet_string.encode('utf-8'), set_encoding="UTF-8")
-            elif facet_string.find('|') > -1:
-                # TODO: is this an object_id (with prefix char) or actually
-                # object_id
+            elif settings.FACET_TYPES[facet_type] == "id_name_type":
                 object_id, object_type, object_name = facet_string.split('|', 2)
                 result['object_id'] = object_id
                 result['object_name'] = object_name

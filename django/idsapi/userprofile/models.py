@@ -3,7 +3,7 @@ import uuid
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
-from django_countries import CountryField
+from django_countries.fields import CountryField
 
 from django.conf import settings
 
@@ -15,7 +15,7 @@ def validate_agreed_to_license_terms(value):
 
 class UserProfile(models.Model):
     # so we can get it with user.get_profile()
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     # the access guid is to authenticate against the API
     access_guid = models.CharField(max_length=36)
@@ -32,7 +32,7 @@ class UserProfile(models.Model):
 
     # things the user will edit in their profile
     organisation = models.CharField(max_length=100, blank=True)
-    organisation_url = models.URLField("Organisation Website", blank=True, verify_exists=False)
+    organisation_url = models.URLField("Organisation Website", blank=True)
     organisation_address1 = models.CharField("Organisation address (line 1)", max_length=100, blank=True)
     organisation_address2 = models.CharField("Organisation address (line 2)", max_length=100, blank=True)
     organisation_address3 = models.CharField("Organisation address (line 3)", max_length=100, blank=True)
@@ -51,7 +51,7 @@ class UserProfile(models.Model):
     api_usage_type = models.CharField("API usage type", max_length=50, blank=True)
     cms_technology_platform = models.CharField("CMS/Technology platform", max_length=50, blank=True)
     heard_about = models.CharField("How did you hear about us?", max_length=250, blank=True)
-    website_using_api = models.URLField("Website that will use the API", verify_exists=False)
+    website_using_api = models.URLField("Website that will use the API")
     COMMERCIAL_CHOICES = (
         (u'Commercial', u'Commercial'),
         (u'Non-Commercial', u'Non-Commercial'),
@@ -59,6 +59,7 @@ class UserProfile(models.Model):
     commercial = models.CharField("Usage", max_length=50, choices=COMMERCIAL_CHOICES)
     agree_to_licensing = models.BooleanField(
             u'I have read and agree to the Terms and Conditions',
+            default=False,
             validators=[validate_agreed_to_license_terms])
 
     def __unicode__(self):

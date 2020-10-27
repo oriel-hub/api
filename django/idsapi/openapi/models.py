@@ -6,9 +6,6 @@
 # itself, so we remove whitespace from lucene_special_chars by
 # monkeypatching SolrString
 
-# we also remove the " character - we want to pass it through so that
-# we can group words together
-
 from sunburnt.strings import SolrString
 
-SolrString.lucene_special_chars = '+-&|!(){}[]^~*?:\t\v\\/'
+SolrString.lucene_special_chars = '+-&|!(){}[]^"~*?:\t\v\\/'

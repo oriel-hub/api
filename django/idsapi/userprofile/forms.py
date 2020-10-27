@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django import forms
 from django.contrib.auth.models import User
 from django.forms import ModelForm
@@ -8,10 +10,12 @@ from .models import UserProfile
 class ProfileForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(ProfileForm, self).__init__(*args, **kwargs)
-        # do it this way for ordering
-        self.fields.insert(0, 'first_name', forms.CharField(label="First name", help_text=''))
-        self.fields.insert(1, 'last_name', forms.CharField(label="Last name", help_text=''))
-        self.fields.insert(2, 'email', forms.EmailField(label="Primary email", help_text=''))
+        # Insert User model fields first (for expected order)
+        field_sequence = list(self.fields.items())
+        field_sequence.insert(0, ('first_name', forms.CharField(label="First name", help_text='')))
+        field_sequence.insert(1, ('last_name', forms.CharField(label="Last name", help_text='')))
+        field_sequence.insert(2, ('email', forms.EmailField(label="Primary email", help_text='')))
+        self.fields = OrderedDict(field_sequence)
         try:
             self.fields['email'].initial = self.instance.user.email
             self.fields['first_name'].initial = self.instance.user.first_name

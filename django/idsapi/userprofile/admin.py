@@ -1,5 +1,5 @@
-from django.conf.urls.defaults import patterns, url
-from django.contrib import admin 
+from django.conf.urls  import url
+from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
@@ -38,17 +38,17 @@ CSV_COL_NAMES = [
             'Access GUID',
             'Beacon GUID',
         ]
- 
+
 @staff_member_required
 def download_view(request):
     "A view to download all instances of this model as a CSV file."
-    response = HttpResponse(mimetype='text/csv')
+    response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename=users.csv'
-    
+
     writer = unicodecsv.writer(response)
     writer.writerow(CSV_COL_NAMES)
     for user in User.objects.all():
-        profile = user.get_profile()
+        profile = user.userprofile
         writer.writerow([
             user.username,
             user.first_name,
@@ -81,19 +81,19 @@ def download_view(request):
     return response
 
 # class UserProfileAdmin(admin.ModelAdmin):
-    # list_display = ('user_level', 'access_guid', 'beacon_guid') 
-    
-# admin.site.register(UserProfile, UserProfileAdmin) 
+    # list_display = ('user_level', 'access_guid', 'beacon_guid')
+
+# admin.site.register(UserProfile, UserProfileAdmin)
 
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
-    
+
 class MyUserAdmin(UserAdmin):
     list_display = UserAdmin.list_display + ('user_level',)
 
     def user_level(self, obj):
         try:
-            return obj.get_profile().user_level
+            return obj.userprofile.user_level
         except (obj.DoesNotExist, ObjectDoesNotExist):
             return "not set yet"
 
@@ -104,11 +104,11 @@ class MyUserAdmin(UserAdmin):
     def get_urls(self):
         urls = super(MyUserAdmin, self).get_urls()
 
-        urls = patterns('',
+        urls = [
             url(r'^download/$', download_view, name='user_list_download'),
-        ) + urls
-        
+        ] + urls
+
         return urls
-        
-admin.site.unregister(User) 
-admin.site.register(User, MyUserAdmin) 
+
+admin.site.unregister(User)
+admin.site.register(User, MyUserAdmin)

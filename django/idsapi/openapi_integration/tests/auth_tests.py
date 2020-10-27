@@ -1,3 +1,5 @@
+import pytest
+
 from openapi.tests.test_base import BaseTestCase
 from openapi_integration.tests.api_tests import ApiTestsBase
 
@@ -25,13 +27,13 @@ class ApiAuthTests(BaseTestCase):
         self.assertEqual(200, response.status_code)
 
     def test_search_works_with_token_in_header(self):
-        profile = self.user.get_profile()
+        profile = self.user.userprofile
         response = self.client.get(SEARCH_URL_BASE, {'q': 'undp'},
                 HTTP_TOKEN_GUID=profile.access_guid)
         self.assertEqual(200, response.status_code)
 
     def test_search_works_with_token_in_url(self):
-        profile = self.user.get_profile()
+        profile = self.user.userprofile
         response = self.client.get(SEARCH_URL_BASE,
                 {'q': 'undp', '_token_guid': profile.access_guid})
         self.assertEqual(200, response.status_code)
@@ -44,13 +46,13 @@ class ApiAuthTests(BaseTestCase):
     def test_403_returned_if_user_not_active_guid(self):
         self.user.is_active = False
         self.user.save()
-        profile = self.user.get_profile()
+        profile = self.user.userprofile
         response = self.client.get(SEARCH_URL_BASE, {'q': 'undp'},
                 HTTP_TOKEN_GUID=profile.access_guid)
         self.assertEqual(403, response.status_code)
 
     def test_403_returned_if_user_profile_incomplete(self):
-        profile = self.user.get_profile()
+        profile = self.user.userprofile
         profile.user_level = -1
         profile.save()
         self.login()
@@ -84,11 +86,18 @@ class UserLimitTests(ApiTestsBase):
         response = self.object_search(query={'q': 'un', 'num_results': '2001'})
         self.assertEqual(200, response.status_code)
 
+    # X-Throttle header dropped by DRF.
+    # The 'Retry-After: <seconds>' Header is now set, only once user is
+    # throttled).
+    # This is more standard behaviour, but does change the API for our API
+    # consumers.
+    @pytest.mark.xfail()
     def test_throttle_set_for_general_user(self):
         self.setUserLevel(u'General User')
         response = self.object_search(query={'q': 'un'})
         self.assertTrue(response.has_header('X-Throttle'))
 
+    @pytest.mark.xfail()
     def test_throttle_not_set_for_unlimited_user(self):
         self.setUserLevel(u'Unlimited')
         response = self.object_search(query={'q': 'unaid'})

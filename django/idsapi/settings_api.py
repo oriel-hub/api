@@ -4,28 +4,40 @@ from local_settings import SERVER_ENV
 
 # This is used to send email alerts to the admins of the system
 ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
-    ('Peter Mason', 'p.mason@ids.ac.uk'),
-    # ('Duncan Edwards', 'd.edwards@ids.ac.uk'),
+    ('Aptivate Carers', 'carers-idsapi@aptivate.org'),
 )
 MANAGERS = ADMINS
 
 # Default email address
-DEFAULT_FROM_EMAIL = 'api@okhub.org'
-SERVER_EMAIL = 'api@okhub.org'
+DEFAULT_FROM_EMAIL = 'api@ids.ac.uk'
+SERVER_EMAIL = 'api@ids.ac.uk'
 
 # the email server at IDS
 EMAIL_HOST = 'mailrelay.ids.ac.uk'
 
 # Where to find SOLR - note that these are over-written in the local settings
 # files and are here for reference
-if SERVER_ENV in ["production_okhub"]:
-    BASE_URL = 'http://localhost:8983/solr/okhub-live/'
-elif SERVER_ENV in ["staging_okhub", "localdev"]:
-    # Index for current version of test hub
-    # BASE_URL = 'http://localhost:8983/solr/oriel-searchapi-test/'
-    # Index for older version of test hub for testing
-    BASE_URL = 'http://localhost:8983/solr/oriel-dev/'
+DEFAULT_SITE = 'eldis'
+
+if SERVER_ENV == "production":
+    SOLR_SERVER_URLS = {
+        'eldis': 'http://solr.ids.ac.uk:8983/solr/eldis-live/',
+        'eldis_plus': 'http://solr.ids.ac.uk:8983/solr/eldis-ims-live/',
+        'bridge': 'http://solr.ids.ac.uk:8983/solr/bridge-live/',
+        'bridge_plus': 'http://solr.ids.ac.uk:8983/solr/bridge-live-plus/',
+    }
+elif SERVER_ENV in ["staging"]:
+    SOLR_SERVER_URLS = {
+        'eldis': 'http://test.api.ids.ac.uk:8983/solr/eldis-dev/',
+        'eldis_plus': 'http://test.ids.ac.uk:8983/solr/eldis-ims-live/',
+        'bridge': 'http://test.api.ids.ac.uk:8983/solr/bridge-dev/',
+        'bridge_plus': 'http://test.api.ids.ac.uk:8983/solr/bridge-dev-plus/',
+    }
+elif SERVER_ENV in ["localdev"]:
+    SOLR_SERVER_URLS = {
+        'eldis': 'http://localhost:8983/solr/eldis-test/',
+        'bridge': 'http://localhost:8983/solr/bridge-test/',
+    }
 
 SOLR_SCHEMA_SUFFIX = 'admin/file/?file=schema.xml'
 SOLR_SCHEMA = BASE_URL + SOLR_SCHEMA_SUFFIX
@@ -72,7 +84,7 @@ USER_LEVEL_INFO = {
         'level':              3,
     },
     'Unlimited': {
-        'max_call_rate':      '0/sec',
+        'max_call_rate':      None, # unlimited
         'max_items_per_call': 0,
         'image_beacon':       False,
         'hide_admin_fields':  False,
@@ -104,155 +116,140 @@ DEFAULT_SORT_OBJECT_MAPPING = {
 
 # these are the fields you can use for sorting
 SORT_FIELDS = [
-    'title',
-    'name',
-    'item_id',
-    'category_id',
-    'category_path',
-    'category_path_sort',
-    'publication_date',
-    'date_updated',
-    'date_created',
-    'start_date',
-    'end_date',
-    'acronym',
-    'timestamp',
-    'score',
-]
-
-# a sub set of fields from the hub
-CORE_FIELDS = [
-    'title',
-    'name',
-    'item_id',
-    'category_id',
-    'category_path',
-    'category_path_sort',
-    'publication_date',
-    'date_updated',
-    'date_created',
-    'start_date',
-    'end_date',
-    'acronym',
-    'timestamp',
-    'score',
+'title',
+'title_sort',
+'name',
+'asset_id',
+'object_id',
+'category_id',
+'category_path',
+'category_path_sort',
+'publication_date',
+'date_updated',
+'date_created',
+'start_date',
+'end_date',
+'acronym',
+'timestamp',
+'score',
 ]
 
 # these fields will be hidden from those with #'hide_admin_fields' set to True
 ADMIN_ONLY_FIELDS = [
-    'asset_id',
-    'copyright_clearance',
-    'deleted',
-    'end_date',
-    # 'item_id',
-    # 'item_type',
-    'legacy_id',
-    'notification_email',
-    'permission_to_host_info',
-    'redistribute_clearance',
-    'send_email_alerts',
-    'start_date',
-    'title_sort',
-    'category_path_sort',
+'asset_id',
+'author_array',
+'copyright_clearance',
+'deleted',
+'end_date',
+'item_type',
+'item_type_id',
+'legacy_id',
+'notification_email',
+'permission_to_host_info',
+'redistribute_clearance',
+'send_email_alerts',
+'start_date',
+'title_sort',
+'category_path_sort',
+'publication_country_id',
+'funder',
+'funder_array',
+'service_array',
+'content_partner_array'
 ]
 
 # these are the fields that will be given to a 'General User'
 GENERAL_FIELDS = [
-    'acronym',
-    'alternative_acronym',
-    'alternative_name',
-    'archived',
-    'author',
-    'cat_level',
-    'category_id',
-    'category_path',
-    'category_region_array',
-    'category_region_ids',
-    'category_region_path',
-    'category_theme',
-    'category_theme_array',
-    'category_theme_ids',
-    'category_theme_path',
-    'category_subject',
-    'category_subject_array',
-    'category_subject_ids',
-    'category_subject_path',
-    'children_object_array',
-    'code',
-    'country_focus',
-    'country_focus_array',
-    'country_focus_ids',
-    'country_name',
-    'date_created',
-    'date_updated',
-    'document_medium',
-    'document_type',
-    'description',
-    'corporate_author',
-    'et_al',
-    'headline',
-    'hub_theme',
-    'hub_country',
-    'hub_region',
-    'hub_subject',
-    'iso_number',
-    'iso_three_letter_code',
-    'iso_two_letter_code',
-    'item_id',
-    'item_type',
-    'object_id',
-    'object_type',
-    'keyword',
-    'language_id',
-    'language_name',
-    'level',
-    'licence_type',
-    'address1',
-    'address2',
-    'address3',
-    'address4',
-    'address5',
-    'town',
-    'postcode',
-    'location_country',
-    'metadata_url',
-    'metadata_languages',
-    'name',
-    'organisation_type',
-    'organisation_url',
-    'parent_object_array',
-    'parent_object_id',
-    'publication_date',
-    'publication_year',
-    'publisher',
-    'publisher_array',
-    'publisher_country',
-    'publisher_id',
-    'site',
-    'superparent_object_id',
-    'timestamp',
-    'title',
-    'toplevel_object_id',
-    'urls',
-    'website_url',
+'acronym',
+'asset_id',
+'alternative_acronym',
+'alternative_name',
+'archived',
+'author',
+'author_array',
+'cat_level',
+'category_id',
+'category_path',
+'category_region_array',
+'category_region_ids',
+'category_region_path',
+'category_theme',
+'category_theme_array',
+'category_theme_ids',
+'category_theme_path',
+'category_subject',
+'category_subject_array',
+'category_subject_ids',
+'category_subject_path',
+'children_object_array',
+'country_focus',
+'country_focus_array',
+'country_focus_ids',
+'country_name',
+'date_created',
+'date_updated',
+'description',
+'document_type',
+'corporate_author',
+'corporate_author_name',
+'et_al',
+'headline',
+'iso_number',
+'iso_three_letter_code',
+'iso_two_letter_code',
+'keyword',
+'language_id',
+'language_name',
+'language_array',
+'level',
+'licence_type',
+'address1',
+'address2',
+'address3',
+'address4',
+'address5',
+'town',
+'postcode',
+'location_country',
+'metadata_url',
+'metadata_languages',
+'name',
+'object_id',
+'object_type',
+'organisation_type',
+'organisation_url',
+'parent_object_array',
+'parent_object_id',
+'publication_date',
+'publication_year',
+'publisher',
+'publisher_array',
+'publisher_country',
+'publisher_id',
+'publication_country_id',
+'site',
+'superparent_object_id',
+'timestamp',
+'title',
+'toplevel_object_id',
+'urls',
+'website_url',
 ]
 
 # these are fields that contain XML data
 STRUCTURED_XML_FIELDS = [
-    'category_theme_array',
-    'category_theme_objects',
-    'category_subject_array',
-    'category_subject_objects',
-    'category_subject_objects_hub_zx',
-    'publisher_array',
-    'country_focus_array',
-    'country_focus_objects',
-    'category_region_array',
-    'children_object_array',
-    'parent_object_array',
-    'country_focus_array_hub_zx',
-    'language_array',
-    # 'hub_metadata_languages',
+'category_theme_array',
+'category_subject_array',
+'publisher_array',
+'country_focus_array',
+'category_region_array',
+'children_object_array',
+'parent_object_array',
+'language_array',
+'author_array',
+'funder_array',
+'service_array',
+'content_partner_array'
 ]
 
 # these are the entries in the dropdown box for user registration
@@ -457,6 +454,10 @@ QUERY_MAPPING = {
         'solr_field': 'parent_object_id',
         'object_type': 'all'
     },
+    'first_parent_object_id':  {
+        'solr_field': 'cat_first_parent',
+        'object_type': 'all'
+    },
     'toplevel_object_id':  {
         'solr_field': 'toplevel_object_id',
         'object_type': 'all'
@@ -492,7 +493,11 @@ QUERY_MAPPING = {
     'document_type':  {
         'solr_field': 'hub_document_type_search_hub_zx',
         'object_type': 'documents'
-    }
+    },
+    'service':  {
+        'solr_field': 'service_id',
+        'object_type': 'all'
+    },
 }
 
 # fields to use fq queries for
@@ -547,6 +552,21 @@ FACET_MAPPING = {
     # 'region':           'category_region_objects_facet',
     # 'subject':         'category_subject_objects_facet',
     # 'theme':           'category_theme_objects_facet',
+}
+
+# values are 'plain_string', 'id_name_type' or 'xml_string'
+FACET_TYPES = {
+    'country':   'xml_string',
+    'keyword':   'plain_string',
+    'region':    'id_name_type',
+    'sector':    'plain_string',
+    'subject':   'xml_string',
+    'theme':     'xml_string',
+    'publisher': 'plain_string',
+    'publisher_country': 'plain_string',
+    'publication_year': 'plain_string',
+    'language': 'plain_string',
+    'document_type': 'plain_string',
 }
 
 # this maps sort fields when generating SOLR queries, so that custom (eg non

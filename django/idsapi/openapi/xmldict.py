@@ -41,11 +41,11 @@ class XmlDictConfig(dict):
     '''
     def __init__(self, parent_element, single_item_list=False):
         dict.__init__(self)
-        children_names = [child.tag for child in parent_element.getchildren()]
+        children_names = [child.tag for child in list(parent_element)]
         if parent_element.items():
             self.update(dict(parent_element.items()))
         for element in parent_element:
-            if element:
+            if list(element):
                 # treat like dict - we assume that if the first two tags
                 # in a series are different, then they are all different.
                 if len(element) == 1 or element[0].tag != element[1].tag:
@@ -111,7 +111,7 @@ class XmlDictConfig(dict):
         try:
             if set_encoding:
                 xml_header = '<?xml version="1.1" encoding="%s" ?>\n' % set_encoding
-                xml_string = xml_header + xml_string
+                xml_string = xml_header.encode(set_encoding) + xml_string
                 root = ElementTree.fromstring(xml_string)
             else:
                 # TODO: Is this a useful feature?

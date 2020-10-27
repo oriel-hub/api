@@ -1,0 +1,20 @@
+import private_settings
+
+DEBUG = False
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'idsapi',
+        'USER': 'idsapi',
+        'HOST': '127.0.0.1',
+        'PASSWORD': private_settings.DB_PASSWORD,
+        'OPTIONS': {
+          'autocommit': True,
+        },
+    }
+}
+
+SERVER_ENV = "production"
+
+# vi: ft=python
