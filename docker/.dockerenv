@@ -1,0 +1,5 @@
+MYSQL_ROOT_PASSWORD=password
+MYSQL_DATABASE=idsapi
+MYSQL_USER=idsapi
+MYSQL_PASSWORD=idsapi
+DATABASE_URL=mysql://idsapi:idsapi@db:5432/idsapi
