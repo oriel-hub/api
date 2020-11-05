@@ -1,0 +1,72 @@
+# INSTALL
+
+# Development environment
+
+* Server is appears to have Python 3.6.1 so test/develop against that.
+
+$ eval "$(pyenv init -)"
+$ pyenv install 3.6.1
+$ pyenv local 3.6.1
+
+$ python --version
+Python 3.6.1
+
+
+# Bootstrap
+
+$ cd ./deploy
+$ ./bootstrap_dev.sh # (for development tools)
+$ ./bootstrap.sh # (for production)
+
+
+# Running tests
+
+* Tunnel SOLR connection for live tests:
+
+$ ../../scripts/solr_tunnel.sh
+
+* Run tests using pytest
+
+(.ve) $ python -m pytest -v -s # etc.. -x --pdb --ff
+
+# Server setup (tacuma)
+
+$ sudo yum install python36 python3-virtualenv
+$ sudo yum install mariadb-server mariadb-devel gcc
+$ sudo yum install httpd python3-mod_wsgi
+$ sudo yum install git
+
+
+$ systemctl enable --now mariadb httpd
+$ mysql_secure_installation 
+
+# Server notes
+
+* FW forbids SSH to github from {tacuma, *}.ids.ac.uk
+* Problem if want to deploy or push live changes back to GH.
+* To deploy, access github over SSH tunnel, ie:
+
+$ ssh-agent  # Add key for github access via agent forwarding
+
+$ ssh -A -R 3333:github.com:22 tomd@tacuma.ids.ac.uk
+
+# Git pushes @ tunnel
+$ sudo -E -s git push ssh://git@localhost:3333/oriel-hub/api.git
+
+# Upgrades
+
+* TODO
+* inplace? (ie. can we do pip upgrade?)
+
+# Deployment
+
+* Must configure agent forwarding for a key with access to the okhub github repo.
+$ ./deploy/fab.py -A tacuma deploy  # -A enables agent forwarding in Fabric.
+
+* test.api.ids.ac.uk not routeable via internet.
+
+* Forward locally:
+$ ssh -L 127.0.0.5:8080:127.0.0.1:80 tomd@boorka.ids.ac.uk
+# setup /etc/hosts to resolve test.api.ids.ac.uk to 127.0.0.5 (or set Host header some how).
+
+* Presume could foward db to local too
