@@ -48,6 +48,10 @@ fabfile = path.join(dye_pkg_dir, 'dye', 'fabfile.py')
 osenv = os.environ
 osenv['DEPLOYDIR'] = path.dirname(__file__)
 
+#from fabric.api import env
+#env.command_prefixes=["export LC_CTYPE=en_US.UTF-8",]
+osenv['LC_ALL'] = "en_GB.UTF-8"
+
 # call the fabric in the virtual env
 fab_call = [fab_bin]
 # tell it to use the fabfile from dye

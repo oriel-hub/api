@@ -1,0 +1,4 @@
+Fabric3==1.14.post1 # Python3 Fabric 1 (pre 2) fork
+-e git+https://git.coop/aptivate/dye.git@master#egg=dye
+# apt get install libmariadb-dev-compat
+mysqlclient==1.4.6

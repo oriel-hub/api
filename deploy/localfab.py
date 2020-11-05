@@ -14,7 +14,8 @@ from dye.fablib import (
      checkout_or_update,
      rm_pyc_files,
      create_deploy_virtualenv,
-     link_webserver_conf
+     link_webserver_conf,
+     webserver_cmd
 )
 
 from os import path
@@ -52,10 +53,6 @@ def _exists(path, use_sudo=False, verbose=False):
 # Monkey patch exists that doesn't use /usr/bin/stat (not available on
 # SiteGround)
 files.exists = _exists
-
-
-def webserver_cmd(cmd):
-    sudo("systemctl %s httpd" % cmd)
 
 # Work around firewall restrictions preventing direct connections to github:
 #
