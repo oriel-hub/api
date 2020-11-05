@@ -35,8 +35,10 @@ elif SERVER_ENV in ["staging"]:
     }
 elif SERVER_ENV in ["localdev"]:
     SOLR_SERVER_URLS = {
-        'eldis': 'http://localhost:8983/solr/eldis-test/',
-        'bridge': 'http://localhost:8983/solr/bridge-test/',
+        'eldis': 'http://solr-forwarding:8984/solr/eldis-live/',
+        'bridge': 'http://solr-forwarding:8984/solr/bridge-live/',
+        'eldis_plus': 'http://solr-forwarding:8984/solr/eldis-ims-live/',
+        'bridge_plus': 'http://solr-forwarding:8984/solr/bridge-live-plus/',
     }
 
 SOLR_SCHEMA_SUFFIX = 'admin/file/?file=schema.xml'
