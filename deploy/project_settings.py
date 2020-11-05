@@ -60,23 +60,16 @@ use_site_packages = True
 
 test_cmd = ' manage.py test -v0 ' + ' '.join(django_apps)
 
-# django jenkins version - latest might require a too new version of django
-#django_jenkins_version = '0.14.0'  # compatible with Django 1.5
-
 # servers, for use by fabric
 
 # production server - if commented out then the production task will abort
 host_list = {
-    'boorka':       ['boorka.ids.ac.uk'],
-    'drooga':       ['drooga.ids.ac.uk'],
     'tacuma':       ['31.221.49.74'],
 }
 
 # this is the default git branch to use on each server
 default_branch = {
-    'boorka':       'idsapi_v2_django_1_11',
-    'drooga':       'idsapi_v2_django_1_11',
-    'tacuma':       'python3_upgrade',
+    'tacuma':       'master',
 }
 
 # where on the server the django apps are deployed
