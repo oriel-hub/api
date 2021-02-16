@@ -22,7 +22,7 @@ requests==2.24.0
 djangorestframework-xml==2.0.0
 djangorestframework==3.12.1
 httplib2==0.19.0
-lxml==4.6.1
+lxml==4.6.2
 unicodecsv==0.14.1
 
 # document generation (not currently Python3 compat)
