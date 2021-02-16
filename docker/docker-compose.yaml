@@ -1,0 +1,62 @@
+# See Compose and Docker compatibility matrix:
+# - https://docs.docker.com/compose/compose-file/
+# - Docker version 17.05.0-ce, build 89658be
+version: '3.2'
+
+services:
+  db:
+    image: mariadb:10.3
+    restart: always
+    env_file:
+      - .dockerenv
+    expose:
+      - "3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - idsapi
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    entrypoint: ["sh", "-c", "sleep 2073600"]
+    depends_on:
+      - db
+      - solr-forwarding
+    env_file:
+      - .dockerenv
+    expose:
+      - "8000"
+    volumes:
+      - ../:/var/django/idsapi
+    networks:
+      - idsapi
+  solr-forwarding:
+    image: jnovack/autossh:latest
+    container_name: solr-forwarding
+    environment:
+      - SSH_MODE=-L
+      - SSH_HOSTUSER=aptivate
+      - SSH_HOSTNAME=tacuma.ids.ac.uk
+      - SSH_TUNNEL_REMOTE=0.0.0.0:8984
+      - SSH_TUNNEL_HOST=solr.ids.ac.uk
+      - SSH_TUNNEL_LOCAL=8983
+    restart: always
+    volumes:
+      - ~/.ssh/tacuma-id_rsa:/id_rsa
+    expose:
+      - "8983"
+    networks:
+      - idsapi
+
+networks:
+  idsapi:
+      external: true
+
+volumes:
+  static-files:
+    driver: local
+  mysql_data:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
