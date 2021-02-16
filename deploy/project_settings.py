@@ -64,7 +64,7 @@ test_cmd = ' manage.py test -v0 ' + ' '.join(django_apps)
 
 # production server - if commented out then the production task will abort
 host_list = {
-    'tacuma':       ['31.221.49.74'],
+    'tacuma':       ['tacuma.ids.ac.uk'],
 }
 
 # this is the default git branch to use on each server
