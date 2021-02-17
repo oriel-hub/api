@@ -65,7 +65,7 @@ files.exists = _exists
 #
 def deploy(revision=None, keep=None, full_rebuild=True):
 
-    if env.environment in ['drooga', 'boorka', 'tacuma']:
+    if env.environment in ['tacuma']:
         # Use adhoc tunneling to reach Git repo (bypass outbound firewall
         # rules).
         env.repository = 'ssh://git@127.0.0.1:48002/oriel-hub/api.git'
