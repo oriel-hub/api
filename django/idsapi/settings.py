@@ -140,6 +140,7 @@ THIRD_PARTY_APPS = [
     'django_countries',
     'django_registration',
     'rest_framework',
+    'corsheaders',
 ]
 
 # Apps specific for this project go here.
@@ -160,6 +161,7 @@ MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.admindocs.middleware.XViewMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -176,6 +178,11 @@ ROOT_URLCONF = 'urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 # WSGI_APPLICATION = 'wsgi.application'
 ########## END URL Configuration
+
+
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_URLS_REGEX = r'^/openapi/.*$'
+CORS_ALLOW_METHODS = ['GET']
 
 
 ########## django-secure - intended for sites that use SSL

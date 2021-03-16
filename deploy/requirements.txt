@@ -24,6 +24,7 @@ djangorestframework==3.12.2
 httplib2==0.19.0
 lxml==4.6.2
 unicodecsv==0.14.1
+django-cors-headers==3.7.0
 
 # document generation (not currently Python3 compat)
 # docutils==0.14  # docutils>=0.15 supports Python 3 only
