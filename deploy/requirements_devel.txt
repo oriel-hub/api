@@ -13,3 +13,11 @@ pytest-django==3.8.0
 
 # development
 django-pdb
+
+# document generation (not currently Python3 compat)
+docutils==0.16  # docutils>=0.15 supports Python 3 only
+sphinx==3.5.2
+sphinxcontrib-httpdomain==1.7.0
+
+# safety
+safety
