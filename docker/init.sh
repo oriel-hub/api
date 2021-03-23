@@ -3,6 +3,7 @@
 PYTHON_BIN="/usr/local/bin/python3"  # the real python path in our Docker image
 DEPLOY_DIR=$(realpath `dirname "$0"`/../deploy)
 DJANGO_DIR=$(realpath `dirname "$0"`/../django/idsapi)
+DOCKER_WEB="docker-compose exec web"
 
 CMD="all"
 if [ $# -gt 0 ] ; then
@@ -19,6 +20,10 @@ do_cmd () {
 		echo "Error: Command [ $@ ] returned $ret"
 		exit $ret
 	fi
+}
+
+web () {
+    $DOCKER_WEB "${@}"
 }
 
 py () {
