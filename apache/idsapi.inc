@@ -10,14 +10,6 @@
     Allow from all
     </Proxy>
 
-    ## Proxy non-API paths to current pages on ephant (was jabba)
-    # First exclude paths for WSGI from proxy:
-    # ProxyPassMatch ^(/(openapi|profiles|accounts|admin|site_media|static)) !
-    # Then match everything else and proxy to jabba:
-    # ProxyPassMatch ^/(.*)$ http://www.api.ids.ac.uk/$1
-    # Rewrite redirects for ephant headers
-    # ProxyPassReverse / http://www.api.ids.ac.uk/
-
     # Django settings
 
     WSGIScriptAlias / /var/django/idsapi/current/wsgi/wsgi_handler.py
