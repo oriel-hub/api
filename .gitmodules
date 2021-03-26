@@ -1,0 +1,4 @@
+[submodule "django/idsapi/frontend_widget/static/frontend_widget"]
+	path = django/idsapi/frontend_widget/static/frontend_widget
+	url = git@git.coop:aptivate/client-projects/ids-api-widget.git
+	branch = master

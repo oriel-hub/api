@@ -148,6 +148,7 @@ LOCAL_APPS = [
     'profiles',
     'openapi',
     'userprofile',
+    'frontend_widget',
 ]
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
