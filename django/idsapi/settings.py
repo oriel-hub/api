@@ -92,7 +92,7 @@ STATIC_ROOT = path.join(BASE_DIR, 'static')
 
 # URL prefix for static files.
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-url
-STATIC_URL = '/static/'
+STATIC_URL = '/site_media/'
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
 STATICFILES_DIRS = (
