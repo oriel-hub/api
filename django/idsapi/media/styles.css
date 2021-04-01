@@ -383,6 +383,7 @@ button.submitBtn:hover span, button.submitBtnHover span {
 #util {Width:100%; padding:10px 0; text-align:center;}
 #footer{ width:960px; margin:0 auto; padding:10px;font-size: 1.1em; }
 #footer img {padding:5px;}
+#footer img.footer-logo { height: 78px;}
 
 #footer ul li {display:inline;padding:4px 5px;}
 #footer ul li a {color:#094c6f;}

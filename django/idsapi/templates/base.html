@@ -73,25 +73,20 @@
 </div><!--ends action-nav -->	
 </div><!--ends nav-wrapper-->	
 </div><!--ends header-wrapper-->		
-	
 
-
-	<div id="content-wrapper">
-				<div id="content">
-					<div>
-						{% if user.is_authenticated %}		 
-					   <span class="loggedin"">{% trans "Logged in" %}: {{ user.first_name }} {{user.last_name }}</span>
-					 
-						{% else %}
-						<span>&nbsp;</span>
-						{% endif %}
-					</div>	    
-
-					{% block content %}{% endblock %}
-				</div>
-	</div>
-	
-		</div>
+    <div id="content-wrapper">
+        <div id="content">
+            <div>
+            {% if user.is_authenticated %}		 
+                <span class="loggedin">{% trans "Logged in" %}: {{ user.first_name }} {{user.last_name }}</span>
+            {% else %}
+                <span>&nbsp;</span>
+            {% endif %}
+            </div>	    
+            {% block content %}{% endblock %}
+        </div><!-- div content -->
+    </div><!-- div content-wrapper -->
+</div><!-- div main-wrapper -->
 		
 <div id="footer-wrapper" class="clear">
 	<div id="footer">
@@ -108,7 +103,7 @@
 			<li class="last">T: +44 (0)1273 606261</li>
 		</ul>
 		 		
-		<a href="http://www.ids.ac.uk"><img src="//api.ids.ac.uk/site_media/images/IDS_logo.png" alt="IDS logo" /></a>
+		<a href="http://www.ids.ac.uk"><img class="footer-logo" src="/site_media/images/IDS_logo.png" alt="IDS logo" /></a>
 	
         <div>Site built by <a href="http://www.aptivate.org/">Aptivate</a></div>
 		
