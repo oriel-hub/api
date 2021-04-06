@@ -15,7 +15,7 @@ django-htmlmin==0.11.0
 # User profiles and registration
 django-countries==7.0
 # django-profiles==0.2  # Replaced by local copy of app modified to support Django 1.8
-django-registration==3.1.1
+django-registration==3.1.2
 
 # general libraries
 requests==2.25.1
