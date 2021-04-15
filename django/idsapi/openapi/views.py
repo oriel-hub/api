@@ -1,3 +1,4 @@
+import logging
 import httplib2
 from xml.dom import minidom
 
@@ -19,6 +20,9 @@ from openapi.search_builder import (
 from openapi.defines import URL_ROOT, IdsApiError
 from openapi.guid_authentication import GuidAuthentication
 from openapi.permissions import PerUserThrottlingRatePerGroup
+
+
+logger = logging.getLogger(__name__)
 
 class OpenAPIView(APIView):
     pass
@@ -118,8 +122,17 @@ class BaseSearchView(BaseAuthView):
                 raise
         formatted_results = []
         for result in self.search_response:
-            formatted_results.append(self.data_munger.get_required_data(result,
-                self.output_format, self.get_user_level_info(), self.get_beacon_guid()))
+            try:
+                data = self.data_munger.get_required_data(
+                    result,
+                    self.output_format,
+                    self.get_user_level_info(),
+                    self.get_beacon_guid()
+                )
+                formatted_results.append(data)
+            except Exception as e:
+                logger.exception("Exception in get_required_data: %s" % e, result)
+
         if self.raise_if_no_results and len(formatted_results) == 0:
             raise NoObjectFoundError()
         return formatted_results
