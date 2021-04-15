@@ -3,7 +3,7 @@ packaging==20.4
 -e git+https://git.coop/aptivate/dye.git@master#egg=dye
 
 # core django
-Django==2.2.19
+Django==2.2.20
 
 mysqlclient==2.0.3
 pytz==2021.1
@@ -13,15 +13,15 @@ django-htmlmin==0.11.0
 -e git+https://git.coop/aptivate/sunburnt.git@95802c47688430bdddff20e92c27a7987ffaeb28#egg=sunburnt-python3
 
 # User profiles and registration
-django-countries==7.0
+django-countries==7.1
 # django-profiles==0.2  # Replaced by local copy of app modified to support Django 1.8
-django-registration==3.1.1
+django-registration==3.1.2
 
 # general libraries
 requests==2.25.1
 djangorestframework-xml==2.0.0
-djangorestframework==3.12.2
-httplib2==0.19.0
+djangorestframework==3.12.4
+httplib2==0.19.1
 lxml==4.6.3
 unicodecsv==0.14.1
 django-cors-headers==3.7.0
