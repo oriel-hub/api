@@ -16,14 +16,8 @@
     WSGIApplicationGroup %{GLOBAL}
     WSGIProcessGroup idsapi
 
-    Alias /site_media /var/django/idsapi/current/django/idsapi/media
+    Alias /site_media /var/django/idsapi/current/django/idsapi/static
     <Location "/site_media">
-    Require all granted
-    SetHandler None
-    </Location>
-
-    Alias /static /var/django/idsapi/current/django/idsapi/static
-    <Location "/static">
     Require all granted
     SetHandler None
     </Location>
