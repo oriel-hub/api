@@ -3,7 +3,7 @@ packaging==20.4
 -e git+https://git.coop/aptivate/dye.git@master#egg=dye
 
 # core django
-Django==2.2.20
+Django==2.2.21
 
 mysqlclient==2.0.3
 pytz==2021.1
