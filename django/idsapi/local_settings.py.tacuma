@@ -7,10 +7,10 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'idsapi',
         'USER': 'idsapi',
-        'HOST': '127.0.0.1',
         'PASSWORD': private_settings.DB_PASSWORD,
         'OPTIONS': {
           'autocommit': True,
+          'unix_socket': '/var/lib/mysql/mysql.sock'
         },
     }
 }
