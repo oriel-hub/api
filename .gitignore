@@ -10,3 +10,4 @@ django/idsapi/private_settings.py
 docs/_build
 
 *~
+.ignore
