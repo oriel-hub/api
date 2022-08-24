@@ -112,6 +112,12 @@ STATICFILES_FINDERS = (
 )
 ########## END STATIC FILE CONFIGURATION
 
+# When defining a model, if no field in a model is defined with
+# primary_key=True an implicit primary key is added. The type of this implicit
+# primary key can now be controlled via the DEFAULT_AUTO_FIELD
+# In a future Django release the default value of DEFAULT_AUTO_FIELD will be
+# changed to BigAutoField.
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 LOCALE_DIR = path.join(BASE_DIR, 'locale')
 if path.isdir(LOCALE_DIR):
