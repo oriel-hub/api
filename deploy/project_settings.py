@@ -31,7 +31,7 @@ django_apps = ['openapi', 'userprofile', 'openapi_integration']
 use_virtualenv = True
 
 # python version - major version must be exact, minor version is the minimum
-python_version = (3, 6)
+python_version = (3, 8)
 
 ################################
 # PATHS TO IMPORTANT DIRECTORIES
@@ -94,7 +94,7 @@ if socket.getfqdn().endswith('.fen.aptivate.org'):
 ###################################################
 
 use_sudo = False
-python_bin = '/usr/bin/python3.6'
+python_bin = '/usr/bin/python3.8'
 
 # if you have an ssh key and particular user you need to use
 # then uncomment the next 2 lines

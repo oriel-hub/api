@@ -1,4 +1,4 @@
-from django.conf.urls  import url
+from django.conf.urls  import re_path
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
@@ -85,8 +85,10 @@ def download_view(request):
 
 # admin.site.register(UserProfile, UserProfileAdmin)
 
+
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
+
 
 class MyUserAdmin(UserAdmin):
     list_display = UserAdmin.list_display + ('user_level',)
@@ -105,10 +107,11 @@ class MyUserAdmin(UserAdmin):
         urls = super(MyUserAdmin, self).get_urls()
 
         urls = [
-            url(r'^download/$', download_view, name='user_list_download'),
+            re_path(r'^download/$', download_view, name='user_list_download'),
         ] + urls
 
         return urls
+
 
 admin.site.unregister(User)
 admin.site.register(User, MyUserAdmin)

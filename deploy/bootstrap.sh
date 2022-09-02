@@ -1,8 +1,10 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-# Python3 replacement for legacy bootstrap.py 
+# Python3 replacement for legacy bootstrap.py
 
-PYTHON_3=`which python3.6`
+set -ex -o pipefail
+
+PYTHON_3=`which python3.8`
 
 # If set add WSGI baseline (production only)
 if [ -z "${WSGI_BASELINE}" ] ; then
@@ -25,8 +27,8 @@ VE_PIP="${VE_PYTHON} -m pip"
 ${BASELINE_VE_PYTHON} -m venv --clear ${VE_PATH}
 ${VE_PIP} install -U pip setuptools
 ${VE_PIP} install wheel
-${VE_PIP} install -r pip_packages.txt
+${VE_PIP} install -r requirements.txt
 
 if [[ `basename $0` == "bootstrap_dev.sh" ]]; then
-    ${VE_PIP} install -r pip_packages_devel.txt
+    ${VE_PIP} install -r requirements_devel.txt
 fi
