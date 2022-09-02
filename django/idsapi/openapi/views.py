@@ -185,7 +185,7 @@ class ObjectView(BaseSearchView):
     def __init__(self):
         BaseSearchView.__init__(self, True)
 
-    def get(self, request, site, object_id, output_format, object_type=None):
+    def get(self, request, site, object_id, output_format='', object_type=None):
         self.output_format = output_format
         self.site = site
         self.data_munger = DataMunger(site, request)
@@ -209,7 +209,7 @@ class ObjectView(BaseSearchView):
 
 
 class ObjectSearchView(BaseSearchView):
-    def get(self, request, site, output_format, object_type=None):
+    def get(self, request, site, output_format='', object_type=None):
         self.output_format = output_format
         self.site = site
         self.data_munger = DataMunger(site, request)
@@ -232,7 +232,7 @@ class ObjectSearchView(BaseSearchView):
 
 
 class AllObjectView(BaseSearchView):
-    def get(self, request, site, output_format, object_type=None):
+    def get(self, request, site, output_format='', object_type=None):
         self.output_format = output_format
         self.site = site
         self.data_munger = DataMunger(site, request)
