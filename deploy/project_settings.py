@@ -14,7 +14,7 @@ from os import path
 project_name = "idsapi"
 
 repo_type = "git"
-repository = 'git@github.com:martinburchell/api.git'
+repository = 'git@github.com:oriel-hub/api.git'
 
 # put "django" here if you want django specific stuff to run
 # put "plain" here for a basic apache app
@@ -69,7 +69,7 @@ host_list = {
 
 # this is the default git branch to use on each server
 default_branch = {
-    'tacuma':       'django3.2-upgrade',
+    'tacuma':       'master',
 }
 
 # where on the server the django apps are deployed
