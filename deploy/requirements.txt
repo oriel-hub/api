@@ -15,16 +15,16 @@ django-htmlmin==0.11.0
 # User profiles and registration
 django-countries==7.3.2
 # django-profiles==0.2  # Replaced by local copy of app modified to support Django 1.8
-django-registration==3.2
+django-registration==3.3
 
 # general libraries
-requests==2.27.1
+requests==2.28.1
 djangorestframework-xml==2.0.0
 djangorestframework==3.13.1
 httplib2==0.20.4
 lxml==4.9.1
 unicodecsv==0.14.1
-django-cors-headers==3.10.1
+django-cors-headers==3.13.0
 
 # document generation (not currently Python3 compat)
 # docutils==0.14  # docutils>=0.15 supports Python 3 only
